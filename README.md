@@ -1,5 +1,8 @@
 # Financial Tracker App
 
+![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)
+![FinTech](https://img.shields.io/badge/Domain-FinTech-blue)
+
 **Smart Expense Tracking from SMS, Emails & Receipts (All‑in‑One System)**
 
 ---
