@@ -192,4 +192,4 @@ MIT License. See the `LICENSE` file for more information.
 ## Contact
 
 For queries, suggestions, or collaboration:
-**[your-email@example.com](mailto:your-email@example.com)**
+**[shajithsivananthy@gmail.com](mailto:your-email@example.com)**
