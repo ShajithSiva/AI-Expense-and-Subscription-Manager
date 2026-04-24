@@ -1,4 +1,7 @@
 package com.example.aiexpensemanagementapplication.ui.dashboard;
 
-public class PersonalDashboardActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class PersonalDashboardActivity extends AppCompatActivity {
+
 }

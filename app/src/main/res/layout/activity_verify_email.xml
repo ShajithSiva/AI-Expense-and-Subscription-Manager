@@ -47,6 +47,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
+                android:id="@+id/tvUserEmail"
                 android:text="alex.rivera@example.com"
                 android:textStyle="bold"
                 android:textSize="14sp"
@@ -75,6 +76,7 @@
 
         <!-- Verify Button -->
         <Button
+            android:id="@+id/btnVerified"
             android:text="I've Verified"
             android:backgroundTint="#22C55E"
             android:textColor="@android:color/white"
