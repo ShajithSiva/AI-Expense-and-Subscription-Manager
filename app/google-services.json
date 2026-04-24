@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "151346084903",
+    "project_id": "aiexpenceandsubcribtionmanager",
+    "storage_bucket": "aiexpenceandsubcribtionmanager.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:151346084903:android:851b5608eb35ee3bbe6202",
+        "android_client_info": {
+          "package_name": "com.example.aiexpensemanagementapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWxE55gBmReoVCEIbfheji7vcSez9ZKus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

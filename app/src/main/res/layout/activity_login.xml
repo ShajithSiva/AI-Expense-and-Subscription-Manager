@@ -32,6 +32,7 @@
             android:layout_marginTop="32dp"
             android:gravity="center" />
 
+        <!-- Subtitle -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,29 +43,31 @@
             android:layout_marginBottom="24dp"
             android:gravity="center" />
 
-        <!-- Email Field -->
+        <!-- Email -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             app:boxBackgroundMode="filled"
             app:boxBackgroundColor="#E5E7EB"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:hintEnabled="false">
+            app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="name@example.com"
                 android:inputType="textEmailAddress"
-                android:padding="16dp"
-                android:textColor="#111827" />
+                android:padding="16dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Password Field -->
+        <!-- Password -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -74,47 +77,50 @@
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:hintEnabled="false">
+            app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="••••••••"
                 android:inputType="textPassword"
-                android:padding="16dp"
-                android:textColor="#111827" />
+                android:padding="16dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Forgot Password -->
         <TextView
+            android:id="@+id/tvForgotPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Forgot Password?"
             android:textColor="#22C55E"
             android:textSize="13sp"
             android:layout_gravity="end"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"/>
 
         <!-- Login Button -->
         <Button
+            android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:text="Login →"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:backgroundTint="#4CAF50"
-            android:layout_marginTop="24dp" />
+            android:layout_marginTop="24dp"/>
 
         <!-- Register -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvRegister"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Don't have an account? Register"
             android:textSize="14sp"
             android:textColor="#6B7280"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="24dp" />
+            android:gravity="center"
+            android:layout_marginTop="24dp"/>
 
     </LinearLayout>
+
 </ScrollView>
