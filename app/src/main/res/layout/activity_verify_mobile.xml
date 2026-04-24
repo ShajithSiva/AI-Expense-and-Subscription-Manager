@@ -1,6 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Logo -->
+        <ImageView
+            android:src="@drawable/logo"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="Logo"/>
+
+        <!-- Title -->
+        <TextView
+            android:text="Verify Mobile Number"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Subtitle -->
+        <TextView
+            android:text="Enter your mobile number to receive a one-time verification code to secure your vault."
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <!-- Label -->
+        <TextView
+            android:text="PHONE NUMBER"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#888888"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Phone Input Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:background="@drawable/mobilenumber_back">
+
+            <!-- Country -->
+            <TextView
+                android:text="🇮🇳  +91 ▼"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#DDDDDD"
+                android:layout_marginHorizontal="12dp"/>
+
+            <!-- Phone -->
+            <EditText
+                android:hint="98765 43210"
+                android:inputType="phone"
+                android:background="@android:color/transparent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- Button -->
+        <Button
+            android:text="Send OTP →"
+            android:textAllCaps="false"
+            android:backgroundTint="#22C55E"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"/>
+
+        <!-- Security text -->
+        <TextView
+            android:text="Secure 256-bit encrypted verification"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@android:drawable/ic_lock_lock"
+            android:drawablePadding="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+        <!-- Step pill -->
+        <TextView
+            android:text="Step 1 of 2"
+            android:textSize="12sp"
+            android:textColor="#22C55E"
+            android:background="@drawable/back1"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="85dp"
+            android:layout_height="25dp"/>
+
+        <!-- Login -->
+        <TextView
+            android:text="Already registered? Login"
+            android:textSize="13sp"
+            android:textColor="#666666"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Footer -->
+        <TextView
+            android:text="POWERED BY CENTRAL BANK COMPLIANCE"
+            android:textSize="10sp"
+            android:textColor="#BBBBBB"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</ScrollView>

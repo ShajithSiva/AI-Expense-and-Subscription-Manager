@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <style name="otpBox">
+        <item name="android:layout_width">44dp</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_margin">6dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@android:drawable/edit_text</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+</resources>

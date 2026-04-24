@@ -1,6 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
+
+        <!-- Logo -->
+        <ImageView
+            android:src="@drawable/logo"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="App Logo"/>
+
+        <!-- Message -->
+        <TextView
+            android:layout_marginHorizontal="40dp"
+            android:text="We've sent a verification link to your email address. Please check your inbox and confirm to continue."
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <!-- Email Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            android:padding="20dp"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:text="Sent to"
+                android:textSize="12sp"
+                android:textColor="#888888"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="alex.rivera@example.com"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- 2FA Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#EEEEEE"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:text="Secure your account with 2FA next."
+                android:textSize="13sp"
+                android:textColor="#555555"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/ic_lock_lock"/>
+        </LinearLayout>
+
+        <!-- Verify Button -->
+        <Button
+            android:text="I've Verified"
+            android:backgroundTint="#22C55E"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="28dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <!-- Resend -->
+        <TextView
+            android:text="Resend Email"
+            android:textColor="#22C55E"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Change Email -->
+        <TextView
+            android:text="Change Email Address"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Footer -->
+        <TextView
+            android:text="SECURED BY EXPENSEVAULT"
+            android:textSize="10sp"
+            android:textColor="#BBBBBB"
+            android:layout_marginTop="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</ScrollView>
