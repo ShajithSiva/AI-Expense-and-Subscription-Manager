@@ -1,6 +1,598 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:background="#FFFFFF">
+
+            <TextView
+                android:id="@+id/btnBack"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="‹"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="#111827" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Budget"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#111827"
+                android:paddingStart="10dp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D1D5DB" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="22dp">
+
+                <!-- MONTHLY BUDGET CARD -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:background="@drawable/bg_budget_card">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MONTHLY BUDGET"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08"
+                        android:textColor="#6B7280" />
+
+                    <TextView
+                        android:id="@+id/tvMonthlyBudget"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rs. 45,000"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:textColor="#111827"
+                        android:layout_marginTop="6dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="26dp">
+
+                        <TextView
+                            android:id="@+id/tvBudgetUsedPercent"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="68% Used"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#6B7280" />
+
+                        <TextView
+                            android:id="@+id/tvBudgetStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="On Track"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#111827" />
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/progressMonthlyBudget"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="14dp"
+                        android:max="100"
+                        android:progress="68"
+                        android:progressDrawable="@drawable/progress_dark" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="32dp"
+                        android:background="#E5E7EB" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="24dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="SPENT"
+                                android:textSize="13sp"
+                                android:textColor="#6B7280"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvSpentAmount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rs. 30,600"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#EF4444"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="56dp"
+                            android:background="#E5E7EB" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:paddingStart="22dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="REMAINING"
+                                android:textSize="13sp"
+                                android:textColor="#6B7280"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvRemainingAmount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rs. 14,400"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#111827"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- BUDGET INSIGHT -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/bg_insight">
+
+                    <TextView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:gravity="center"
+                        android:text="✦"
+                        android:textSize="24sp"
+                        android:textColor="#22C55E"
+                        android:background="@drawable/bg_icon_circle" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingStart="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Budget Insight"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#14532D" />
+
+                        <TextView
+                            android:id="@+id/tvBudgetInsight"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="You are likely to exceed your Food budget by Rs 1,200 this month. Consider reducing weekend dining."
+                            android:textSize="15sp"
+                            android:textColor="#166534"
+                            android:layout_marginTop="6dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- CATEGORY TITLE -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="26dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Category Budgets"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="#111827" />
+
+                    <TextView
+                        android:id="@+id/btnViewAllCategories"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View All"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#111827" />
+                </LinearLayout>
+
+                <!-- FOOD -->
+                <LinearLayout
+                    android:id="@+id/cardFoodBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="118dp"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_budget_card">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imgFoodIcon"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:padding="10dp"
+                            android:src="@drawable/dine"
+                            app:tint="#000000"
+                            android:background="@drawable/bg_icon_circle" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:paddingStart="14dp">
+
+                            <TextView
+                                android:id="@+id/tvFoodName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Food &amp; Dining"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="#111827" />
+
+                            <TextView
+                                android:id="@+id/tvFoodLimit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Limit: Rs. 8,000"
+                                android:textSize="13sp"
+                                android:textColor="#6B7280" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="82dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="end"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvFoodStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Safe"
+                                android:textStyle="bold"
+                                android:textColor="#111827" />
+
+                            <TextView
+                                android:id="@+id/btnEditFoodBudget"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="✎"
+                                android:textSize="20sp"
+                                android:textColor="#111827" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvFoodSpent"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="RS. 5,440 SPENT"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#374151" />
+
+                        <TextView
+                            android:id="@+id/tvFoodPercent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="68%"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#374151" />
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/progressFoodBudget"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="7dp"
+                        android:max="100"
+                        android:progress="68"
+                        android:layout_marginTop="7dp"
+                        android:progressDrawable="@drawable/progress_dark" />
+                </LinearLayout>
+
+                <!-- TRANSPORT -->
+                <LinearLayout
+                    android:id="@+id/cardTransportBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="118dp"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_budget_card">
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imgTransportIcon"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_transport"
+                            app:tint="#000000"
+                            android:background="@drawable/bg_icon_circle" />
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="14dp">
+                            <TextView android:id="@+id/tvTransportName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Transport" android:textSize="16sp" android:textStyle="bold" android:textColor="#111827" />
+                            <TextView android:id="@+id/tvTransportLimit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Limit: Rs. 3,500" android:textSize="13sp" android:textColor="#6B7280" />
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_width="82dp" android:layout_height="wrap_content" android:gravity="end" android:orientation="vertical">
+                            <TextView android:id="@+id/tvTransportStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Near Limit" android:textStyle="bold" android:textColor="#111827" />
+                            <TextView android:id="@+id/btnEditTransportBudget" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✎" android:textSize="20sp" android:textColor="#111827" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal">
+                        <TextView android:id="@+id/tvTransportSpent" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="RS. 3,100 SPENT" android:textSize="12sp" android:textStyle="bold" android:textColor="#374151" />
+                        <TextView android:id="@+id/tvTransportPercent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="89%" android:textSize="12sp" android:textStyle="bold" android:textColor="#374151" />
+                    </LinearLayout>
+
+                    <ProgressBar android:id="@+id/progressTransportBudget" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="7dp" android:max="100" android:progress="89" android:layout_marginTop="7dp" android:progressDrawable="@drawable/progress_dark" />
+                </LinearLayout>
+
+                <!-- UTILITIES -->
+                <LinearLayout
+                    android:id="@+id/cardUtilitiesBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="118dp"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_budget_card">
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imgUtilitiesIcon"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_utilities"
+                            app:tint="#000000"
+                            android:background="@drawable/bg_icon_circle" />
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="14dp">
+                            <TextView android:id="@+id/tvUtilitiesName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Utilities" android:textSize="16sp" android:textStyle="bold" android:textColor="#111827" />
+                            <TextView android:id="@+id/tvUtilitiesLimit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Limit: Rs. 5,000" android:textSize="13sp" android:textColor="#6B7280" />
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_width="82dp" android:layout_height="wrap_content" android:gravity="end" android:orientation="vertical">
+                            <TextView android:id="@+id/tvUtilitiesStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Safe" android:textStyle="bold" android:textColor="#111827" />
+                            <TextView android:id="@+id/btnEditUtilitiesBudget" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✎" android:textSize="20sp" android:textColor="#111827" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal">
+                        <TextView android:id="@+id/tvUtilitiesSpent" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="RS. 1,200 SPENT" android:textSize="12sp" android:textStyle="bold" android:textColor="#374151" />
+                        <TextView android:id="@+id/tvUtilitiesPercent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="24%" android:textSize="12sp" android:textStyle="bold" android:textColor="#374151" />
+                    </LinearLayout>
+
+                    <ProgressBar android:id="@+id/progressUtilitiesBudget" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="7dp" android:max="100" android:progress="24" android:layout_marginTop="7dp" android:progressDrawable="@drawable/progress_dark" />
+                </LinearLayout>
+
+                <!-- SHOPPING -->
+                <LinearLayout
+                    android:id="@+id/cardShoppingBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="118dp"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_budget_card">
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imgShoppingIcon"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_shopping"
+                            app:tint="#000000"
+                            android:background="@drawable/bg_icon_circle" />
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="14dp">
+                            <TextView android:id="@+id/tvShoppingName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Shopping" android:textSize="16sp" android:textStyle="bold" android:textColor="#111827" />
+                            <TextView android:id="@+id/tvShoppingLimit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Limit: Rs. 4,000" android:textSize="13sp" android:textColor="#6B7280" />
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_width="82dp" android:layout_height="wrap_content" android:gravity="end" android:orientation="vertical">
+                            <TextView android:id="@+id/tvShoppingStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Exceeded" android:textStyle="bold" android:textColor="#EF4444" />
+                            <TextView android:id="@+id/btnEditShoppingBudget" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✎" android:textSize="20sp" android:textColor="#111827" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal">
+                        <TextView android:id="@+id/tvShoppingSpent" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="RS. 4,500 SPENT" android:textSize="12sp" android:textStyle="bold" android:textColor="#374151" />
+                        <TextView android:id="@+id/tvShoppingPercent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="113%" android:textSize="12sp" android:textStyle="bold" android:textColor="#374151" />
+                    </LinearLayout>
+
+                    <ProgressBar android:id="@+id/progressShoppingBudget" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="7dp" android:max="100" android:progress="100" android:layout_marginTop="7dp" android:progressDrawable="@drawable/progress_red" />
+                </LinearLayout>
+
+                <!-- HOUSING -->
+                <LinearLayout
+                    android:id="@+id/cardHousingBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="118dp"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_budget_card">
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imgHousingIcon"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_home"
+                            app:tint="#000000"
+                            android:background="@drawable/bg_icon_circle" />
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="14dp">
+                            <TextView android:id="@+id/tvHousingName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Housing" android:textSize="16sp" android:textStyle="bold" android:textColor="#111827" />
+                            <TextView android:id="@+id/tvHousingLimit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Limit: Rs. 15,000" android:textSize="13sp" android:textColor="#6B7280" />
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_width="82dp" android:layout_height="wrap_content" android:gravity="end" android:orientation="vertical">
+                            <TextView android:id="@+id/tvHousingStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Safe" android:textStyle="bold" android:textColor="#111827" />
+                            <TextView android:id="@+id/btnEditHousingBudget" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✎" android:textSize="20sp" android:textColor="#111827" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal">
+                        <TextView android:id="@+id/tvHousingSpent" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="RS. 15,000 SPENT" android:textSize="12sp" android:textStyle="bold" android:textColor="#374151" />
+                        <TextView android:id="@+id/tvHousingPercent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="100%" android:textSize="12sp" android:textStyle="bold" android:textColor="#374151" />
+                    </LinearLayout>
+
+                    <ProgressBar android:id="@+id/progressHousingBudget" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="7dp" android:max="100" android:progress="100" android:layout_marginTop="7dp" android:progressDrawable="@drawable/progress_dark" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- BOTTOM NAV -->
+        <LinearLayout
+            android:id="@+id/bottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:background="#FFFFFF"
+            android:elevation="8dp"
+            android:padding="8dp"
+            android:weightSum="5">
+
+            <LinearLayout android:id="@+id/navDashboard" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/home" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dashboard" android:textSize="10sp" android:textColor="#111827" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/navExpenses" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/expense" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Expenses" android:textSize="10sp" android:textColor="#111827" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/navSubs" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/subs" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Subs" android:textSize="10sp" android:textColor="#111827" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/navFamily" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/family" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Family" android:textSize="10sp" android:textColor="#111827" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/navProfile" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/profile" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" android:textSize="10sp" android:textColor="#111827" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- FLOATING ADD BUTTON -->
+    <TextView
+        android:id="@+id/btnAddBudget"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="86dp"
+        android:gravity="center"
+        android:text="+"
+        android:textSize="36sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/bg_fab" />
+
+</FrameLayout>
