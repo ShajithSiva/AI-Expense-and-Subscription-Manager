@@ -1,4 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
 
-</selector>
+    <!-- Target circle outer -->
+    <path
+        android:fillColor="#111827"
+        android:pathData="M12,2a10,10 0 1,0 0,20a10,10 0 1,0 0,-20z"/>
+
+    <!-- Inner circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,6a6,6 0 1,0 0,12a6,6 0 1,0 0,-12z"/>
+
+    <!-- Center dot -->
+    <path
+        android:fillColor="#111827"
+        android:pathData="M12,10a2,2 0 1,0 0,4a2,2 0 1,0 0,-4z"/>
+</vector>

@@ -1,4 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
 
-</selector>
+    <!-- Receipt body -->
+    <path
+        android:fillColor="#111827"
+        android:pathData="M6,2l1.5,1.5L9,2l1.5,1.5L12,2l1.5,1.5L15,2l1.5,1.5L18,2v20l-1.5,-1.5L15,22l-1.5,-1.5L12,22l-1.5,-1.5L9,22l-1.5,-1.5L6,22V2z"/>
+
+    <!-- Lines -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,7h8v1H8zM8,10h8v1H8zM8,13h5v1H8z"/>
+
+    <!-- Plus icon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,13v2h2v2h-2v2h-2v-2h-2v-2h2v-2h2z"/>
+</vector>
