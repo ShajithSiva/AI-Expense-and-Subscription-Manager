@@ -1,6 +1,1695 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F6F8">
+
+    <!-- ════════════════════════════════════════
+         HEADER
+         ════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <!-- Matches "Good Morning," style from design -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Family Dashboard,"
+                android:textSize="12sp"
+                android:textColor="#6B7280"/>
+
+            <TextView
+                android:id="@+id/tvFamilyGroupName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sharma Family"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#111827"/>
+        </LinearLayout>
+
+        <!-- Notification bell icon — matches design -->
+        <ImageView
+            android:id="@+id/ivNotification"
+            android:layout_width="17dp"
+            android:layout_height="24dp"
+            android:src="@drawable/notification"
+            android:layout_marginEnd="12dp"/>
+
+        <!-- Profile avatar circle — matches design -->
+        <ImageView
+            android:id="@+id/ivProfileAvatar"
+            android:src="@drawable/profile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/round"
+            android:padding="8dp"/>
+    </LinearLayout>
+
+    <!-- ════════════════════════════════════════
+         SCROLLABLE CONTENT
+         ════════════════════════════════════════ -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- ════════════════════════════════
+                 1. TOTAL FAMILY SPENDING CARD
+                 ════════════════════════════════ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="#1F2937">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <!-- Label + Month -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="TOTAL FAMILY SPENDING"
+                            android:textColor="#9CA3AF"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.08"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="April 2026"
+                            android:textColor="#6B7280"
+                            android:textSize="11sp"/>
+                    </LinearLayout>
+
+                    <!-- Total Amount -->
+                    <TextView
+                        android:id="@+id/tvTotalFamilySpending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rs 42,850"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="4dp"/>
+
+                    <!-- Budget Progress -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Monthly Budget: Rs 55,000"
+                        android:textColor="#9CA3AF"
+                        android:textSize="11sp"
+                        android:layout_marginTop="8dp"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressFamilyBudget"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="6dp"
+                        android:progress="78"
+                        android:max="100"
+                        android:progressTint="#F59E0B"
+                        android:progressBackgroundTint="#374151"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="78% of budget used"
+                        android:textColor="#F59E0B"
+                        android:textSize="11sp"
+                        android:layout_marginTop="4dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#374151"
+                        android:layout_marginVertical="14dp"/>
+
+                    <!-- Stats Row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_subscriptions"
+                                android:tint="#9CA3AF"
+                                android:layout_marginBottom="4dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="SUBSCRIPTIONS"
+                                android:textColor="#9CA3AF"
+                                android:textSize="10sp"/>
+
+                            <TextView
+                                android:id="@+id/tvSharedSubscriptions"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="12 Shared"
+                                android:textColor="#FFFFFF"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_wallet"
+                                android:tint="#9CA3AF"
+                                android:layout_marginBottom="4dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="BUDGET LEFT"
+                                android:textColor="#9CA3AF"
+                                android:textSize="10sp"/>
+
+                            <TextView
+                                android:id="@+id/tvBudgetLeft"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rs 12,150"
+                                android:textColor="#34D399"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_group"
+                                android:tint="#9CA3AF"
+                                android:layout_marginBottom="4dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="MEMBERS"
+                                android:textColor="#9CA3AF"
+                                android:textSize="10sp"/>
+
+                            <TextView
+                                android:id="@+id/tvMemberCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2 Active"
+                                android:textColor="#FFFFFF"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ════════════════════════════════
+                 2. FAMILY MEMBERS SECTION
+                 ════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="20dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Family Members"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#111827"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Who's contributing this month"
+                        android:textColor="#6B7280"
+                        android:textSize="12sp"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvManageMembers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manage"
+                    android:textColor="#4B5563"
+                    android:textSize="12sp"
+                    android:background="@drawable/bg_outline_gray"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"/>
+            </LinearLayout>
+
+            <!-- Member Cards in horizontal scroll -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Arjun -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardMemberArjun"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:gravity="center">
+
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp">
+
+                                <TextView
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:text="A"
+                                    android:gravity="center"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#FFFFFF"
+                                    android:background="@drawable/circle_green"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="★"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:background="@drawable/badge_green"
+                                    android:paddingHorizontal="3dp"
+                                    android:paddingVertical="1dp"
+                                    android:layout_gravity="bottom|end"/>
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Arjun"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#111827"
+                                android:layout_marginTop="6dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Admin"
+                                android:textSize="10sp"
+                                android:textColor="#059669"
+                                android:background="@drawable/badge_light_green"
+                                android:paddingHorizontal="6dp"
+                                android:paddingVertical="2dp"
+                                android:layout_marginTop="2dp"/>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#F3F4F6"
+                                android:layout_marginVertical="8dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Contributed"
+                                android:textSize="10sp"
+                                android:textColor="#6B7280"/>
+
+                            <TextView
+                                android:id="@+id/tvArjunContribution"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rs 25,000"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#111827"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Priya -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardMemberPriya"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:gravity="center">
+
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp">
+
+                                <TextView
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:text="P"
+                                    android:gravity="center"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#FFFFFF"
+                                    android:background="@drawable/circle_teal"/>
+
+                                <View
+                                    android:layout_width="10dp"
+                                    android:layout_height="10dp"
+                                    android:background="@drawable/dot_orange"
+                                    android:layout_gravity="top|end"/>
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Priya"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#111827"
+                                android:layout_marginTop="6dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Member"
+                                android:textSize="10sp"
+                                android:textColor="#6B7280"
+                                android:background="@drawable/badge_light_gray"
+                                android:paddingHorizontal="6dp"
+                                android:paddingVertical="2dp"
+                                android:layout_marginTop="2dp"/>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#F3F4F6"
+                                android:layout_marginVertical="8dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Contributed"
+                                android:textSize="10sp"
+                                android:textColor="#6B7280"/>
+
+                            <TextView
+                                android:id="@+id/tvPriyaContribution"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rs 17,850"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#111827"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Add Member -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardAddMember"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#F9FAFB">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:gravity="center"
+                                android:text="+"
+                                android:textSize="26sp"
+                                android:textColor="#9CA3AF"
+                                android:background="@drawable/circle_dashed_gray"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Add"
+                                android:textSize="12sp"
+                                android:textColor="#6B7280"
+                                android:layout_marginTop="8dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Member"
+                                android:textSize="12sp"
+                                android:textColor="#6B7280"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- ════════════════════════════════
+                 3. CONTRIBUTION BREAKDOWN
+                 ════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contribution Breakdown"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#111827"
+                android:layout_marginTop="20dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <!-- Arjun bar -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:text="A"
+                            android:gravity="center"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:background="@drawable/circle_green"
+                            android:layout_marginEnd="10dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:text="Arjun — Rs 25,000"
+                                    android:textSize="13sp"
+                                    android:textColor="#111827"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="58%"
+                                    android:textSize="12sp"
+                                    android:textColor="#6B7280"/>
+                            </LinearLayout>
+
+                            <ProgressBar
+                                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="5dp"
+                                android:layout_marginTop="5dp"
+                                android:progress="58"
+                                android:max="100"
+                                android:progressTint="#059669"
+                                android:progressBackgroundTint="#E5E7EB"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Priya bar -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:text="P"
+                            android:gravity="center"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:background="@drawable/circle_teal"
+                            android:layout_marginEnd="10dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:text="Priya — Rs 17,850"
+                                    android:textSize="13sp"
+                                    android:textColor="#111827"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="42%"
+                                    android:textSize="12sp"
+                                    android:textColor="#6B7280"/>
+                            </LinearLayout>
+
+                            <ProgressBar
+                                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="5dp"
+                                android:layout_marginTop="5dp"
+                                android:progress="42"
+                                android:max="100"
+                                android:progressTint="#0EA5E9"
+                                android:progressBackgroundTint="#E5E7EB"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ════════════════════════════════
+                 4. SHARED SUBSCRIPTIONS
+                 ════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Shared Subscriptions"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111827"/>
+
+                <TextView
+                    android:id="@+id/tvViewAllSubs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="View All"
+                    android:textColor="#4B5563"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <!-- Netflix -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_netflix"
+                                android:layout_marginEnd="12dp"/>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Netflix Premium"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="#111827"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Renews in 3 days · Shared: 2 members"
+                                    android:textSize="11sp"
+                                    android:textColor="#6B7280"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:gravity="end"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Rs 649"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="#111827"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Renewal Soon"
+                                    android:textSize="9sp"
+                                    android:textColor="#FFFFFF"
+                                    android:background="@drawable/badge_red"
+                                    android:paddingHorizontal="6dp"
+                                    android:paddingVertical="2dp"
+                                    android:layout_marginTop="4dp"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Payer + Action Row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginStart="48dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:text="Payer: Family Pot"
+                                android:textSize="11sp"
+                                android:textColor="#9CA3AF"/>
+
+                            <TextView
+                                android:id="@+id/btnNetflixSplit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Split"
+                                android:textSize="11sp"
+                                android:textColor="#4B5563"
+                                android:background="@drawable/bg_outline_gray"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp"
+                                android:layout_marginEnd="6dp"/>
+
+                            <TextView
+                                android:id="@+id/btnNetflixCancel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Cancel"
+                                android:textSize="11sp"
+                                android:textColor="#EF4444"
+                                android:background="@drawable/bg_outline_red"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#F3F4F6"/>
+
+                    <!-- Spotify -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_spotify"
+                                android:layout_marginEnd="12dp"/>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Spotify Family"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="#111827"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Renews Oct 24 · Shared: 2 members"
+                                    android:textSize="11sp"
+                                    android:textColor="#6B7280"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:gravity="end"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Rs 199"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="#111827"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Active"
+                                    android:textSize="10sp"
+                                    android:textColor="#059669"
+                                    android:layout_marginTop="4dp"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginStart="48dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:text="Payer: Arjun"
+                                android:textSize="11sp"
+                                android:textColor="#9CA3AF"/>
+
+                            <TextView
+                                android:id="@+id/btnSpotifyAssign"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Assign Payer"
+                                android:textSize="11sp"
+                                android:textColor="#4B5563"
+                                android:background="@drawable/bg_outline_gray"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#F3F4F6"/>
+
+                    <!-- Amazon Prime -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_prime"
+                                android:layout_marginEnd="12dp"/>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Amazon Prime"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="#111827"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Renews Nov 12 · Shared: 2 members"
+                                    android:textSize="11sp"
+                                    android:textColor="#6B7280"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:gravity="end"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Rs 1,499"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="#111827"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Active"
+                                    android:textSize="10sp"
+                                    android:textColor="#059669"
+                                    android:layout_marginTop="4dp"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginStart="48dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:text="Payer: Priya"
+                                android:textSize="11sp"
+                                android:textColor="#9CA3AF"/>
+
+                            <TextView
+                                android:id="@+id/btnPrimeAssign"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Assign Payer"
+                                android:textSize="11sp"
+                                android:textColor="#4B5563"
+                                android:background="@drawable/bg_outline_gray"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#F3F4F6"/>
+
+                    <!-- Manage All -->
+                    <LinearLayout
+                        android:id="@+id/btnManageAllSubs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingTop="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Manage All Subscriptions"
+                            android:textColor="#374151"
+                            android:textSize="13sp"
+                            android:textStyle="bold"/>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_arrow_right"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ════════════════════════════════
+                 5. AI SAVINGS INSIGHTS
+                 ════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AI Savings Insights"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#111827"
+                android:layout_marginTop="20dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp"
+                android:backgroundTint="#EEF2FF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- AI Label -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✦ AI Assistant"
+                        android:textSize="11sp"
+                        android:textColor="#6366F1"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"/>
+
+                    <!-- Insight 1: Spending Prediction -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="top"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📈"
+                            android:textSize="15sp"
+                            android:layout_marginEnd="8dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Dining expenses up 24% this month. At current pace, food budget will be exhausted in 6 days."
+                            android:textSize="13sp"
+                            android:textColor="#374151"/>
+                    </LinearLayout>
+
+                    <!-- Insight 2: Unused Sub -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="top"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔁"
+                            android:textSize="15sp"
+                            android:layout_marginEnd="8dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Unused subscription detected. Cancel Spotify add-on to save Rs 499/month."
+                            android:textSize="13sp"
+                            android:textColor="#374151"/>
+                    </LinearLayout>
+
+                    <!-- Insight 3: Anomaly -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="top"
+                        android:layout_marginBottom="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⚠️"
+                            android:textSize="15sp"
+                            android:layout_marginEnd="8dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Entertainment spending is unusually high compared to last month."
+                            android:textSize="13sp"
+                            android:textColor="#374151"/>
+                    </LinearLayout>
+
+                    <!-- Buttons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnOptimizeNow"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="40dp"
+                            android:text="Optimize Now"
+                            android:backgroundTint="#111827"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="8dp"/>
+
+                        <Button
+                            android:id="@+id/btnViewFullReport"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="40dp"
+                            android:text="Full Report"
+                            android:backgroundTint="#FFFFFF"
+                            android:textColor="#111827"
+                            android:textSize="12sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ════════════════════════════════
+                 6. FAMILY ALERTS
+                 ════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Family Alerts"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111827"/>
+
+                <TextView
+                    android:id="@+id/tvAlertCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3 New"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/badge_red"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="3dp"/>
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <!-- Alert 1: Budget Warning -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="top"
+                        android:background="@drawable/bg_alert_warning"
+                        android:padding="10dp"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_alert"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginTop="1dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Budget Warning"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:textColor="#92400E"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Family food budget is 85% used (Rs 3,825/Rs 4,500). Consider capping dining out."
+                                android:textSize="12sp"
+                                android:textColor="#78350F"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Alert 2: Subscription Renewal -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="top"
+                        android:background="@drawable/bg_alert_info"
+                        android:padding="10dp"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_refresh"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginTop="1dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Subscription Renewal"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:textColor="#1E40AF"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Netflix renewal scheduled in 3 days. Charged to Family Pot."
+                                android:textSize="12sp"
+                                android:textColor="#1E3A8A"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Alert 3: Anomaly -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="top"
+                        android:background="@drawable/bg_alert_danger"
+                        android:padding="10dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_alert"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginTop="1dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Unusual Spending Detected"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:textColor="#991B1B"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Entertainment spending unusually high vs. previous months."
+                                android:textSize="12sp"
+                                android:textColor="#7F1D1D"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ════════════════════════════════
+                 7. QUICK ACTIONS
+                 ════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quick Actions"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#111827"
+                android:layout_marginTop="20dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:weightSum="4">
+
+                <LinearLayout
+                    android:id="@+id/actionAddExpense"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/card_action_bg"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_receipt_add"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add Expense"
+                        android:textSize="9sp"
+                        android:textColor="#374151"
+                        android:gravity="center"
+                        android:layout_marginTop="6dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/actionSetBudget"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/card_action_bg"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_budget_target"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Set Budget"
+                        android:textSize="9sp"
+                        android:textColor="#374151"
+                        android:gravity="center"
+                        android:layout_marginTop="6dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/actionSplitBill"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/card_action_bg"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_split_bill"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Split Bill"
+                        android:textSize="9sp"
+                        android:textColor="#374151"
+                        android:gravity="center"
+                        android:layout_marginTop="6dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/actionInvite"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/card_action_bg"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_person_add"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Invite"
+                        android:textSize="9sp"
+                        android:textColor="#374151"
+                        android:gravity="center"
+                        android:layout_marginTop="6dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Bottom padding for FAB -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="80dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ════════════════════════════════════════
+         FAB — Add Expense
+         ════════════════════════════════════════ -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddExpense"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="86dp"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="#111827"
+        app:tint="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Top hairline divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E5E7EB"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:orientation="horizontal"
+            android:weightSum="5"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:gravity="center_vertical">
+
+            <!-- ── Dashboard — inactive ── -->
+            <LinearLayout
+                android:id="@+id/navDashboard"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:src="@drawable/home"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:imageTintList="@color/nav_icon_gray"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dashboard"
+                    android:textSize="9sp"
+                    android:textColor="#9CA3AF"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- ── Expenses — inactive ── -->
+            <LinearLayout
+                android:id="@+id/navExpenses"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:src="@drawable/expense"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:imageTintList="@color/nav_icon_gray"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Expenses"
+                    android:textSize="9sp"
+                    android:textColor="#9CA3AF"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- ── Subs — inactive ── -->
+            <LinearLayout
+                android:id="@+id/navSubs"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:src="@drawable/subs"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:imageTintList="@color/nav_icon_gray"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Subs"
+                    android:textSize="9sp"
+                    android:textColor="#9CA3AF"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- ── Family — ACTIVE: dark filled pill ── -->
+            <LinearLayout
+                android:id="@+id/navFamily"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <!-- Pill container — dark rounded background -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/nav_active_pill"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp">
+
+                    <ImageView
+                        android:src="@drawable/family"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:imageTintList="@color/nav_icon_white"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Family"
+                        android:textSize="9sp"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="3dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── Profile — inactive ── -->
+            <LinearLayout
+                android:id="@+id/navProfile"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:src="@drawable/profile"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:imageTintList="@color/nav_icon_gray"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Profile"
+                    android:textSize="9sp"
+                    android:textColor="#9CA3AF"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
