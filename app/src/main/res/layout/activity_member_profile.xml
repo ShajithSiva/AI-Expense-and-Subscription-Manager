@@ -609,7 +609,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="30dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="60dp"
                 android:text="Remove from Family"
                 android:textAllCaps="false"
                 android:textStyle="bold"
