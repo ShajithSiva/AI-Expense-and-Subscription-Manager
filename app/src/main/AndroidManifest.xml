@@ -39,6 +39,9 @@
         <activity android:name=".ui.budget.SetBudgetActivity" />
         <activity android:name=".ui.budget.EditBudgetActivity" />
 
+        <!-- REPORT GENERATION SCREEN -->
+        <activity android:name=".ui.report.ReportActivity" />
+
     </application>
 
 </manifest>
