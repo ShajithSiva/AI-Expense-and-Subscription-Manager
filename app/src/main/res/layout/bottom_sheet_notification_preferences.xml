@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/notificationBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_notification_bottom_sheet"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp">
+
+
+        <!-- ===================================================== -->
+        <!-- DRAG HANDLE                                           -->
+        <!-- ===================================================== -->
+
+        <View
+            android:layout_width="48dp"
+            android:layout_height="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/bg_bottom_sheet_handle" />
+
+
+        <!-- ===================================================== -->
+        <!-- TITLE                                                 -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:id="@+id/tvNotificationTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="Notification Preferences"
+            android:textColor="#111827"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+
+        <!-- ===================================================== -->
+        <!-- DESCRIPTION                                           -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:id="@+id/tvNotificationDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:text="Choose which alerts you would like to receive."
+            android:textColor="#6B7280"
+            android:textSize="14sp" />
+
+
+        <!-- ===================================================== -->
+        <!-- NOTIFICATION OPTIONS                                  -->
+        <!-- ===================================================== -->
+
+        <LinearLayout
+            android:id="@+id/notificationOptionsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical">
+
+
+            <!-- ================================================= -->
+            <!-- EXPENSE ALERTS                                    -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutExpenseAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+
+                <!-- Icon Container -->
+
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_notification_icon">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Expense Alerts"
+                        android:src="@drawable/ic_notification"
+                        app:tint="#22C55E" />
+
+                </FrameLayout>
+
+
+                <!-- Text Container -->
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Expense Alerts"
+                        android:textColor="#111827"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Get notified for new expenses"
+                        android:textColor="#6B7280"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+
+                <!-- Switch -->
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchExpenseAlerts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    app:thumbTint="@color/notification_switch_thumb"
+                    app:trackTint="@color/notification_switch_track" />
+
+            </LinearLayout>
+
+
+            <!-- Divider -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E5E7EB" />
+
+
+            <!-- ================================================= -->
+            <!-- SUBSCRIPTION ALERTS                               -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutSubscriptionAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+
+                <!-- Icon Container -->
+
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_notification_icon">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Subscription Alerts"
+                        android:src="@drawable/ic_card"
+                        app:tint="#22C55E" />
+
+                </FrameLayout>
+
+
+                <!-- Text Container -->
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Subscription Alerts"
+                        android:textColor="#111827"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Renewals and payment reminders"
+                        android:textColor="#6B7280"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+
+                <!-- Switch -->
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchSubscriptionAlerts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    app:thumbTint="@color/notification_switch_thumb"
+                    app:trackTint="@color/notification_switch_track" />
+
+            </LinearLayout>
+
+
+            <!-- Divider -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E5E7EB" />
+
+
+            <!-- ================================================= -->
+            <!-- BUDGET ALERTS                                     -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutBudgetAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+
+                <!-- Icon Container -->
+
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_notification_icon">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Budget Alerts"
+                        android:src="@drawable/ic_budget"
+                        app:tint="#22C55E" />
+
+                </FrameLayout>
+
+
+                <!-- Text Container -->
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Budget Alerts"
+                        android:textColor="#111827"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Alerts when you exceed your budget"
+                        android:textColor="#6B7280"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+
+                <!-- Switch -->
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchBudgetAlerts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    app:thumbTint="@color/notification_switch_thumb"
+                    app:trackTint="@color/notification_switch_track" />
+
+            </LinearLayout>
+
+
+            <!-- Divider -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E5E7EB" />
+
+
+            <!-- ================================================= -->
+            <!-- FAMILY ALERTS                                     -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutFamilyAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+
+                <!-- Icon Container -->
+
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_notification_icon">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Family Alerts"
+                        android:src="@drawable/ic_family"
+                        app:tint="#22C55E" />
+
+                </FrameLayout>
+
+
+                <!-- Text Container -->
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Family Alerts"
+                        android:textColor="#111827"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Updates about family activities"
+                        android:textColor="#6B7280"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+
+                <!-- Switch -->
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchFamilyAlerts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    app:thumbTint="@color/notification_switch_thumb"
+                    app:trackTint="@color/notification_switch_track" />
+
+            </LinearLayout>
+
+
+            <!-- Divider -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E5E7EB" />
+
+
+            <!-- ================================================= -->
+            <!-- SMART INSIGHTS                                    -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutSmartInsights"
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+
+                <!-- Icon Container -->
+
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_notification_icon">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Smart Insights"
+                        android:src="@drawable/ic_insight"
+                        app:tint="#22C55E" />
+
+                </FrameLayout>
+
+
+                <!-- Text Container -->
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Smart Insights"
+                        android:textColor="#111827"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="AI-powered tips and suggestions"
+                        android:textColor="#6B7280"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+
+                <!-- Switch -->
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchSmartInsights"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    app:thumbTint="@color/notification_switch_thumb"
+                    app:trackTint="@color/notification_switch_track" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ===================================================== -->
+        <!-- SAVE BUTTON                                           -->
+        <!-- ===================================================== -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSavePreferences"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="20dp"
+            android:text="Save Preferences"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="#22C55E"
+            app:cornerRadius="16dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- CANCEL BUTTON                                         -->
+        <!-- ===================================================== -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelPreferences"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="12dp"
+            android:text="Cancel"
+            android:textAllCaps="false"
+            android:textColor="#111827"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="16dp"
+            app:strokeColor="#D1D5DB"
+            app:strokeWidth="1dp" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
