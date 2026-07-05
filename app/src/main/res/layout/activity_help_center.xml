@@ -199,7 +199,7 @@
                         <FrameLayout
                             android:layout_width="54dp"
                             android:layout_height="54dp"
-                            android:background="@drawable/bg_notification_icon">
+                            android:background="@drawable/expense1">
 
                             <ImageView
                                 android:layout_width="28dp"
@@ -264,7 +264,7 @@
                         <FrameLayout
                             android:layout_width="54dp"
                             android:layout_height="54dp"
-                            android:background="@drawable/bg_notification_icon">
+                            android:background="@drawable/budget1">
 
                             <ImageView
                                 android:layout_width="28dp"
@@ -341,7 +341,7 @@
                         <FrameLayout
                             android:layout_width="54dp"
                             android:layout_height="54dp"
-                            android:background="@drawable/bg_notification_icon">
+                            android:background="@drawable/subs1">
 
                             <ImageView
                                 android:layout_width="28dp"
@@ -406,7 +406,7 @@
                         <FrameLayout
                             android:layout_width="54dp"
                             android:layout_height="54dp"
-                            android:background="@drawable/bg_notification_icon">
+                            android:background="@drawable/fam">
 
                             <ImageView
                                 android:layout_width="28dp"
@@ -723,7 +723,7 @@
                     <FrameLayout
                         android:layout_width="76dp"
                         android:layout_height="76dp"
-                        android:background="@drawable/bg_notification_icon">
+                        android:background="@drawable/condact_support">
 
                         <ImageView
                             android:layout_width="40dp"

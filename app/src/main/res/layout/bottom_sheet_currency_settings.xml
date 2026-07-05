@@ -100,7 +100,7 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/currency">
 
                     <ImageView
                         android:layout_width="26dp"

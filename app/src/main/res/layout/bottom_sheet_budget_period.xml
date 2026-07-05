@@ -110,7 +110,7 @@
                         android:layout_width="52dp"
                         android:layout_height="52dp"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_notification_icon">
+                        android:background="@drawable/weekly">
 
                         <ImageView
                             android:layout_width="26dp"
@@ -187,7 +187,7 @@
                         android:layout_width="52dp"
                         android:layout_height="52dp"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_notification_icon">
+                        android:background="@drawable/monthly">
 
                         <ImageView
                             android:layout_width="26dp"
@@ -198,7 +198,6 @@
                             app:tint="#22C55E" />
 
                     </FrameLayout>
-
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -263,7 +262,7 @@
                         android:layout_width="52dp"
                         android:layout_height="52dp"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_notification_icon">
+                        android:background="@drawable/quarterly">
 
                         <ImageView
                             android:layout_width="26dp"
@@ -339,7 +338,7 @@
                         android:layout_width="52dp"
                         android:layout_height="52dp"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_notification_icon">
+                        android:background="@drawable/yearly">
 
                         <ImageView
                             android:layout_width="26dp"

@@ -147,7 +147,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNav">
+        android:layout_above="@id/bottomNav"
+        android:layout_marginBottom="-77dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -163,11 +164,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:text="Expenses"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
                     android:textColor="#111827"
-                    android:layout_centerVertical="true"/>
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -182,21 +183,20 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_sort_by_size"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:contentDescription="Filter"/>
+                    android:contentDescription="Filter"
+                    android:src="@android:drawable/ic_menu_sort_by_size" />
             </RelativeLayout>
 
             <!-- Total Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/bg_input_rounded"
                 android:layout_marginTop="12dp"
-                >
+                android:background="@drawable/bg_input_rounded"
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -237,7 +237,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_input_rounded"                        android:padding="10dp"
+                        android:background="@drawable/bg_input_rounded"
+                        android:padding="10dp"
                         android:text="All"
                         android:textColor="#473E3E" />
 
@@ -245,22 +246,24 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_input_rounded"                        android:padding="10dp"
+                        android:background="@drawable/bg_input_rounded"
+                        android:padding="10dp"
                         android:text="Food" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Transport"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_input_rounded"
                         android:padding="10dp"
-                        android:background="@drawable/bg_input_rounded"                        android:layout_marginEnd="8dp"/>
+                        android:text="Transport" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Utilities"
+                        android:background="@drawable/bg_input_rounded"
                         android:padding="10dp"
-                        android:background="@drawable/bg_input_rounded"/>
+                        android:text="Utilities" />
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -274,26 +277,26 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Transactions"
-                    android:textStyle="bold"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:text="View Report"
-                    android:textColor="#22C55E"
-                    android:layout_alignParentEnd="true"/>
+                    android:textColor="#22C55E" />
             </RelativeLayout>
 
             <!-- RecyclerView -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="12dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/bg_item_card"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
 
                 <!-- Icon -->
                 <LinearLayout
@@ -323,17 +326,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Keells Super"
+                        android:textColor="#111827"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#111827"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvSub"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Today, 2:30 PM  Food"
-                        android:textSize="12sp"
-                        android:textColor="#6B7280"/>
+                        android:textColor="#6B7280"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <!-- Amount -->
@@ -342,19 +345,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Rs 4,500"
+                    android:textColor="#111827"
                     android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="#111827"/>
+                    android:textStyle="bold" />
 
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="12dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/bg_item_card"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
 
                 <!-- Uber Icon -->
                 <LinearLayout
@@ -385,9 +389,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Uber Ride"
+                        android:textColor="#111827"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#111827"/>
+                        android:textStyle="bold" />
 
                     <!-- Sub Text -->
                     <TextView
@@ -395,8 +399,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Today, 3:45 PM  Transport"
-                        android:textSize="12sp"
-                        android:textColor="#6B7280"/>
+                        android:textColor="#6B7280"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <!-- Amount -->
