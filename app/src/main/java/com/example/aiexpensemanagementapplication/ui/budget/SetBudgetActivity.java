@@ -23,7 +23,8 @@ public class SetBudgetActivity extends AppCompatActivity {
     private EditText etGroceriesLimit, etRentUtilitiesLimit, etEntertainmentLimit;
 
     private TextView btnDeleteGroceries, btnDeleteRentUtilities, btnDeleteEntertainment;
-    private TextView tvBudgetError, btnPersonalScope, btnFamilySharedScope;
+    private TextView tvBudgetError;
+    private View btnPersonalScope, btnFamilySharedScope;
     private TextView tvBudgetSuggestion, btnApplySuggestion, btnCreateBudget, btnCancel;
 
     @Override
