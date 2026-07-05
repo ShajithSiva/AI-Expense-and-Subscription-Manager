@@ -129,7 +129,6 @@
                 app:boxStrokeColor="#E2E8F0"
                 app:boxStrokeWidth="1dp"
                 app:boxStrokeWidthFocused="2dp"
-                app:startIconDrawable="@drawable/ic_search"
                 app:startIconTint="#64748B">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -206,7 +205,6 @@
                                 android:layout_height="28dp"
                                 android:layout_gravity="center"
                                 android:contentDescription="Expenses"
-                                android:src="@drawable/ic_expenses"
                                 app:tint="#22C55E" />
 
                         </FrameLayout>
@@ -271,7 +269,6 @@
                                 android:layout_height="28dp"
                                 android:layout_gravity="center"
                                 android:contentDescription="Budgets"
-                                android:src="@drawable/ic_budget"
                                 app:tint="#22C55E" />
 
                         </FrameLayout>
@@ -348,7 +345,6 @@
                                 android:layout_height="28dp"
                                 android:layout_gravity="center"
                                 android:contentDescription="Subscriptions"
-                                android:src="@drawable/ic_subscription"
                                 app:tint="#22C55E" />
 
                         </FrameLayout>
@@ -413,7 +409,6 @@
                                 android:layout_height="28dp"
                                 android:layout_gravity="center"
                                 android:contentDescription="Family"
-                                android:src="@drawable/ic_family"
                                 app:tint="#22C55E" />
 
                         </FrameLayout>
@@ -730,7 +725,6 @@
                             android:layout_height="40dp"
                             android:layout_gravity="center"
                             android:contentDescription="Contact Support"
-                            android:src="@drawable/ic_support"
                             app:tint="#22C55E" />
 
                     </FrameLayout>
