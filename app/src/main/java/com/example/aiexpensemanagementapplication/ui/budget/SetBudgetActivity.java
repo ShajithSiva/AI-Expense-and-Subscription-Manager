@@ -3,6 +3,7 @@ package com.example.aiexpensemanagementapplication.ui.budget;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,7 +15,8 @@ import com.example.aiexpensemanagementapplication.R;
 public class SetBudgetActivity extends AppCompatActivity {
 
     private TextView btnBack, btnSaveTop, btnAddCategory;
-    private TextView tvBudgetPeriod, tvStartDate;
+    private TextView tvBudgetPeriod;
+    private View tvStartDate;
     private EditText etTotalBudgetAmount;
 
     private TextView tvCategoryGroceries, tvCategoryRentUtilities, tvCategoryEntertainment;
@@ -42,6 +44,7 @@ public class SetBudgetActivity extends AppCompatActivity {
 
         tvBudgetPeriod = findViewById(R.id.tvBudgetPeriod);
         tvStartDate = findViewById(R.id.tvStartDate);
+
         etTotalBudgetAmount = findViewById(R.id.etTotalBudgetAmount);
 
         tvCategoryGroceries = findViewById(R.id.tvCategoryGroceries);
@@ -57,20 +60,23 @@ public class SetBudgetActivity extends AppCompatActivity {
         btnDeleteEntertainment = findViewById(R.id.btnDeleteEntertainment);
 
         tvBudgetError = findViewById(R.id.tvBudgetError);
+
         btnPersonalScope = findViewById(R.id.btnPersonalScope);
         btnFamilySharedScope = findViewById(R.id.btnFamilySharedScope);
 
         tvBudgetSuggestion = findViewById(R.id.tvBudgetSuggestion);
         btnApplySuggestion = findViewById(R.id.btnApplySuggestion);
+
         btnCreateBudget = findViewById(R.id.btnCreateBudget);
         btnCancel = findViewById(R.id.btnCancel);
     }
 
     private void loadDefaultUiValues() {
-        // UI placeholder values. Later Room DB / ViewModel can update these.
+
+        // Placeholder values for UI phase only
         etTotalBudgetAmount.setText("");
+
         tvBudgetPeriod.setText("Monthly        ˅");
-        tvStartDate.setText("▣  Today");
 
         tvCategoryGroceries.setText("Groceries &\nFood        ˅");
         tvCategoryRentUtilities.setText("Rent & Utilities        ˅");
@@ -80,15 +86,23 @@ public class SetBudgetActivity extends AppCompatActivity {
         etRentUtilitiesLimit.setText("Rs 25000");
         etEntertainmentLimit.setText("Rs 8000");
 
-        tvBudgetError.setText("Category limits exceed total budget (Rs 48,000 > Rs 45,000)");
-        tvBudgetSuggestion.setText("Based on your past spending, suggested monthly budget is Rs 45,000.");
+        tvBudgetError.setText(
+                "Category limits exceed total budget (Rs 48,000 > Rs 45,000)"
+        );
+
+        tvBudgetSuggestion.setText(
+                "Based on your past spending, suggested monthly budget is Rs 45,000."
+        );
     }
 
     private void setupClickEvents() {
+
         btnBack.setOnClickListener(v -> finish());
+
         btnCancel.setOnClickListener(v -> finish());
 
         btnSaveTop.setOnClickListener(v -> validateBudget());
+
         btnCreateBudget.setOnClickListener(v -> validateBudget());
 
         btnAddCategory.setOnClickListener(v ->
@@ -100,44 +114,77 @@ public class SetBudgetActivity extends AppCompatActivity {
             showToast("Suggestion applied");
         });
 
-        btnDeleteGroceries.setOnClickListener(v -> showToast("Delete Groceries & Food"));
-        btnDeleteRentUtilities.setOnClickListener(v -> showToast("Delete Rent & Utilities"));
-        btnDeleteEntertainment.setOnClickListener(v -> showToast("Delete Entertainment"));
+        btnDeleteGroceries.setOnClickListener(v ->
+                showToast("Delete Groceries & Food"));
 
-        tvBudgetPeriod.setOnClickListener(v -> showToast("Open period selector"));
-        tvStartDate.setOnClickListener(v -> showToast("Open date picker"));
+        btnDeleteRentUtilities.setOnClickListener(v ->
+                showToast("Delete Rent & Utilities"));
 
-        btnPersonalScope.setOnClickListener(v -> showToast("Personal scope selected"));
-        btnFamilySharedScope.setOnClickListener(v -> showToast("Family Shared scope selected"));
+        btnDeleteEntertainment.setOnClickListener(v ->
+                showToast("Delete Entertainment"));
+
+        tvBudgetPeriod.setOnClickListener(v ->
+                showToast("Open period selector"));
+
+        tvStartDate.setOnClickListener(v ->
+                showToast("Open date picker"));
+
+        btnPersonalScope.setOnClickListener(v ->
+                showToast("Personal scope selected"));
+
+        btnFamilySharedScope.setOnClickListener(v ->
+                showToast("Family shared scope selected"));
     }
 
     private void setupAmountWatcher() {
+
         etTotalBudgetAmount.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Later: recalculate category allocation validation here.
+            public void beforeTextChanged(
+                    CharSequence s,
+                    int start,
+                    int count,
+                    int after) {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void onTextChanged(
+                    CharSequence s,
+                    int start,
+                    int before,
+                    int count) {
+
+                // Future implementation:
+                // Validate category allocations here
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
     }
 
     private void validateBudget() {
-        String totalBudget = etTotalBudgetAmount.getText().toString().trim();
+
+        String totalBudget =
+                etTotalBudgetAmount.getText().toString().trim();
 
         if (totalBudget.isEmpty()) {
             showToast("Please enter total budget amount");
             return;
         }
 
-        showToast("Budget UI validated. Ready to save using Room DB later.");
+        showToast(
+                "Budget UI validated. Ready for database integration later."
+        );
     }
 
     private void showToast(String message) {
-        Toast.makeText(SetBudgetActivity.this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(
+                SetBudgetActivity.this,
+                message,
+                Toast.LENGTH_SHORT
+        ).show();
     }
 }

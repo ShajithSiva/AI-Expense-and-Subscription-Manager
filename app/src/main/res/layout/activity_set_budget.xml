@@ -119,18 +119,32 @@
                         android:textStyle="bold"
                         android:textColor="#374151" />
 
-                    <TextView
+                    <LinearLayout
                         android:id="@+id/tvStartDate"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:layout_marginTop="12dp"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
-                        android:text="▣  Today"
-                        android:textSize="16sp"
-                        android:textColor="#111827"
-                        android:background="@drawable/bg_input_rounded" />
+                        android:background="@drawable/bg_input_rounded">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/calendar"
+                            android:scaleType="fitCenter" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="Today"
+                            android:textSize="16sp"
+                            android:textColor="#111827" />
+
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
