@@ -4,55 +4,50 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
-
-import com.example.aiexpensemanagementapplication.R;
-import com.example.aiexpensemanagementapplication.ui.BaseActivity;
-import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 import android.widget.Toast;
 
-public class LoginActivity extends BaseActivity {
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
-    private TextInputEditText etEmail, etPassword;
-    private TextInputLayout tilEmail, tilPassword;
+import com.example.aiexpensemanagementapplication.R;
+import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+public class LoginActivity extends AppCompatActivity {
+
+    private EditText etEmail, etPassword;
     private Button btnLogin;
-    private TextView tvRegister, tvForgotPassword;
+    private TextView tvForgotPassword, tvRegister;
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        initViews();
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        tvRegister = findViewById(R.id.tvRegister);
 
         mAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
 
         btnLogin.setOnClickListener(v -> loginUser());
 
-        tvRegister.setOnClickListener(v ->
-                startActivity(new Intent(this, RegisterActivity.class))
-        );
+        tvRegister.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+        });
 
-        tvForgotPassword.setOnClickListener(v ->
-                Toast.makeText(this, "Forgot Password not implemented yet", Toast.LENGTH_SHORT).show()
-        );
-    }
-
-    private void initViews() {
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        tilEmail = findViewById(R.id.tilEmail);
-        tilPassword = findViewById(R.id.tilPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        tvRegister = findViewById(R.id.tvRegister);
-        tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        tvForgotPassword.setOnClickListener(v -> resetPassword());
     }
 
     private void loginUser() {
@@ -60,69 +55,200 @@ public class LoginActivity extends BaseActivity {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // 🔹 Validation
-        if (!validateInputs(email, password)) return;
-
-        // 🔹 Firebase Login
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-
-                    if (task.isSuccessful()) {
-
-                        FirebaseUser user = mAuth.getCurrentUser();
-
-                        if (user != null) {
-
-                            if (user.isEmailVerified()) {
-
-                                Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
-
-                                startActivity(new Intent(this, PersonalDashboardActivity.class));
-                                finish();
-
-                            } else {
-
-                                Toast.makeText(this,
-                                        "Please verify your email first",
-                                        Toast.LENGTH_LONG).show();
-
-                                startActivity(new Intent(this, VerifyEmailActivity.class));
-                            }
-                        }
-
-                    } else {
-                        Toast.makeText(this,
-                                "Login Failed: " + task.getException().getMessage(),
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
-
-    private boolean validateInputs(String email, String password) {
-
-        tilEmail.setError(null);
-        tilPassword.setError(null);
-
         if (email.isEmpty()) {
-            tilEmail.setError("Email required");
-            return false;
+            etEmail.setError("Enter your email");
+            etEmail.requestFocus();
+            return;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Invalid email");
-            return false;
+            etEmail.setError("Enter a valid email");
+            etEmail.requestFocus();
+            return;
         }
 
         if (password.isEmpty()) {
-            tilPassword.setError("Password required");
-            return false;
+            etPassword.setError("Enter your password");
+            etPassword.requestFocus();
+            return;
         }
 
-        if (password.length() < 6) {
-            tilPassword.setError("Minimum 6 characters");
-            return false;
+        btnLogin.setEnabled(false);
+
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+
+                    btnLogin.setEnabled(true);
+
+                    if (!task.isSuccessful()) {
+
+                        Toast.makeText(
+                                LoginActivity.this,
+                                task.getException().getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                        return;
+                    }
+
+                    FirebaseUser user = mAuth.getCurrentUser();
+
+                    if (user == null) {
+                        Toast.makeText(
+                                this,
+                                "Login failed.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        return;
+                    }
+
+                    user.reload().addOnCompleteListener(reloadTask -> {
+
+                        if (!user.isEmailVerified()) {
+
+                            Toast.makeText(
+                                    this,
+                                    "Please verify your email first.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            startActivity(new Intent(
+                                    LoginActivity.this,
+                                    VerifyEmailActivity.class));
+
+                            finish();
+
+                            return;
+                        }
+
+                        firestore.collection("users")
+                                .document(user.getUid())
+                                .get()
+                                .addOnSuccessListener(documentSnapshot ->
+                                        checkUserStatus(documentSnapshot, user));
+                    });
+
+                });
+    }
+
+    private void checkUserStatus(DocumentSnapshot document, FirebaseUser user) {
+
+        if (!document.exists()) {
+
+            Toast.makeText(
+                    this,
+                    "User profile not found.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            return;
         }
 
-        return true;
+        Boolean phoneVerified =
+                document.getBoolean("phoneVerified");
+
+        Boolean accountCompleted =
+                document.getBoolean("accountCompleted");
+
+        if (phoneVerified == null)
+            phoneVerified = false;
+
+        if (accountCompleted == null)
+            accountCompleted = false;
+
+        if (!phoneVerified) {
+
+            startActivity(new Intent(
+                    this,
+                    VerifyMobileActivity.class));
+
+            finish();
+
+            return;
+        }
+
+        if (!accountCompleted) {
+
+            startActivity(new Intent(
+                    this,
+                    CreatePasswordActivity.class));
+
+            finish();
+
+            return;
+        }
+
+        Toast.makeText(
+                this,
+                "Login Successful",
+                Toast.LENGTH_SHORT
+        ).show();
+
+        Intent intent = new Intent(
+                LoginActivity.this,
+                PersonalDashboardActivity.class);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        startActivity(intent);
+        finish();
+    }
+
+    private void resetPassword() {
+
+        String email = etEmail.getText().toString().trim();
+
+        if (email.isEmpty()) {
+
+            etEmail.setError("Enter your email first");
+            etEmail.requestFocus();
+            return;
+        }
+
+        mAuth.sendPasswordResetEmail(email)
+                .addOnSuccessListener(unused ->
+
+                        Toast.makeText(
+                                LoginActivity.this,
+                                "Password reset email sent.",
+                                Toast.LENGTH_LONG
+                        ).show())
+
+                .addOnFailureListener(e ->
+
+                        Toast.makeText(
+                                LoginActivity.this,
+                                e.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if (user != null && user.isEmailVerified()) {
+
+            firestore.collection("users")
+                    .document(user.getUid())
+                    .get()
+                    .addOnSuccessListener(document -> {
+
+                        Boolean accountCompleted =
+                                document.getBoolean("accountCompleted");
+
+                        if (Boolean.TRUE.equals(accountCompleted)) {
+
+                            startActivity(new Intent(
+                                    this,
+                                    PersonalDashboardActivity.class));
+
+                            finish();
+                        }
+                    });
+        }
     }
 }
