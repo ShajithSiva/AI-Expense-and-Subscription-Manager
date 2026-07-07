@@ -5,52 +5,133 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
-import com.example.aiexpensemanagementapplication.ui.auth.VerifyEmailActivity;
-import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
+import androidx.annotation.NonNull;
 
+import com.example.aiexpensemanagementapplication.ui.auth.CreatePasswordActivity;
+import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
+import com.example.aiexpensemanagementapplication.ui.auth.RegisterActivity;
+import com.example.aiexpensemanagementapplication.ui.auth.VerifyEmailActivity;
+import com.example.aiexpensemanagementapplication.ui.auth.VerifyMobileActivity;
+import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SplashActivity extends BaseActivity {
 
-    private static final int SPLASH_DELAY = 2000; // 2 seconds
+    private static final int SPLASH_DELAY = 2000;
+
     private FirebaseAuth mAuth;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
 
-        // Delay for splash effect
-        new Handler(Looper.getMainLooper()).postDelayed(this::checkUserSession, SPLASH_DELAY);
+        new Handler(Looper.getMainLooper()).postDelayed(
+                this::checkUserSession,
+                SPLASH_DELAY
+        );
     }
 
     private void checkUserSession() {
 
         FirebaseUser user = mAuth.getCurrentUser();
 
-        if (user != null) {
+        // No logged in user
+        if (user == null) {
 
-            // ✅ User already logged in
-            if (user.isEmailVerified()) {
+            startActivity(new Intent(
+                    SplashActivity.this,
+                    RegisterActivity.class));
 
-                // 👉 Go to Dashboard
-                startActivity(new Intent(this, PersonalDashboardActivity.class));
-
-            } else {
-
-                // 👉 Email not verified
-                startActivity(new Intent(this, VerifyEmailActivity.class));
-            }
-
-        } else {
-
-            // 👉 No user → go to Login
-            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
         }
 
-        finish(); // close splash
+        user.reload().addOnCompleteListener(task -> {
+
+            if (!user.isEmailVerified()) {
+
+                Intent intent = new Intent(
+                        SplashActivity.this,
+                        VerifyEmailActivity.class);
+
+                intent.putExtra("email", user.getEmail());
+
+                startActivity(intent);
+                finish();
+                return;
+            }
+
+            firestore.collection("users")
+                    .document(user.getUid())
+                    .get()
+                    .addOnSuccessListener(this::checkFirestoreStatus)
+                    .addOnFailureListener(e -> {
+
+                        startActivity(new Intent(
+                                SplashActivity.this,
+                                LoginActivity.class));
+
+                        finish();
+                    });
+
+        });
+    }
+
+    private void checkFirestoreStatus(@NonNull DocumentSnapshot document) {
+
+        if (!document.exists()) {
+
+            startActivity(new Intent(
+                    this,
+                    RegisterActivity.class));
+
+            finish();
+            return;
+        }
+
+        Boolean phoneVerified = document.getBoolean("phoneVerified");
+        Boolean accountCompleted = document.getBoolean("accountCompleted");
+
+        if (phoneVerified == null)
+            phoneVerified = false;
+
+        if (accountCompleted == null)
+            accountCompleted = false;
+
+        // Phone not verified
+        if (!phoneVerified) {
+
+            startActivity(new Intent(
+                    this,
+                    VerifyMobileActivity.class));
+
+            finish();
+            return;
+        }
+
+        // Password not created
+        if (!accountCompleted) {
+
+            startActivity(new Intent(
+                    this,
+                    CreatePasswordActivity.class));
+
+            finish();
+            return;
+        }
+
+        // Everything completed
+        startActivity(new Intent(
+                this,
+                PersonalDashboardActivity.class));
+
+        finish();
     }
 }
