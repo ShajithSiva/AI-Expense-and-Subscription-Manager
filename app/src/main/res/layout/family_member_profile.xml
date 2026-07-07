@@ -26,7 +26,6 @@
             android:id="@+id/ivBack"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/ic_arrow_left"
             android:padding="6dp"
             android:layout_marginEnd="4dp"/>
 
@@ -45,7 +44,6 @@
             android:id="@+id/ivMenu"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/ic_more_vertical"
             android:padding="6dp"/>
     </LinearLayout>
 
@@ -104,7 +102,6 @@
                         android:layout_width="88dp"
                         android:layout_height="88dp"
                         android:src="@drawable/profile"
-                        android:background="@drawable/circle_crimson"
                         android:padding="18dp"
                         android:imageTintList="@null"/>
 
@@ -112,7 +109,6 @@
                     <View
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:background="@drawable/dot_green_online"
                         android:layout_gravity="bottom|end"
                         android:layout_marginEnd="2dp"
                         android:layout_marginBottom="2dp"/>
@@ -155,7 +151,6 @@
                         android:text="Family Member"
                         android:textSize="12sp"
                         android:textColor="#374151"
-                        android:background="@drawable/bg_pill_gray"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="5dp"/>
 
@@ -163,7 +158,6 @@
                     <View
                         android:layout_width="4dp"
                         android:layout_height="4dp"
-                        android:background="@drawable/dot_gray"
                         android:layout_marginHorizontal="10dp"/>
 
                     <!-- Joined date -->
@@ -212,7 +206,6 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_clock"
                         android:imageTintList="@color/nav_icon_gray"/>
                 </LinearLayout>
 
@@ -275,7 +268,6 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@drawable/ic_flash"
                             android:imageTintList="@color/nav_icon_gray"
                             android:layout_marginBottom="8dp"/>
 
@@ -316,7 +308,6 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@drawable/ic_calendar"
                             android:imageTintList="@color/nav_icon_gray"
                             android:layout_marginBottom="8dp"/>
 
@@ -393,14 +384,13 @@
                     <LinearLayout
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:gravity="center"
-                        android:background="@drawable/bg_icon_box"
-                        android:layout_marginEnd="12dp">
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/home"
+                        android:gravity="center">
 
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_basket"
                             android:imageTintList="@color/nav_icon_gray"/>
                     </LinearLayout>
 
@@ -453,14 +443,13 @@
                     <LinearLayout
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:gravity="center"
-                        android:background="@drawable/bg_icon_box"
-                        android:layout_marginEnd="12dp">
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/coffee"
+                        android:gravity="center">
 
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_coffee"
                             android:imageTintList="@color/nav_icon_gray"/>
                     </LinearLayout>
 
@@ -513,15 +502,14 @@
                     <LinearLayout
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:gravity="center"
-                        android:background="@drawable/bg_icon_box"
-                        android:layout_marginEnd="12dp">
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/current_bill"
+                        android:gravity="center">
 
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_bolt"
-                            android:imageTintList="@color/nav_icon_gray"/>
+                            android:imageTintList="@color/nav_icon_gray" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -588,7 +576,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:background="@drawable/bg_role_card"
                     android:padding="14dp">
 
                     <!-- Person icon box -->
@@ -596,7 +583,6 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:gravity="center"
-                        android:background="@drawable/bg_icon_box"
                         android:layout_marginEnd="12dp">
 
                         <ImageView
@@ -635,7 +621,6 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:background="@drawable/bg_pill_gray"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="6dp">
 
@@ -674,13 +659,11 @@
                     android:layout_height="52dp"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:background="@drawable/bg_remove_btn"
                     android:padding="12dp">
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:src="@drawable/ic_trash"
                         android:imageTintList="@color/color_danger"
                         android:layout_marginEnd="8dp"/>
 

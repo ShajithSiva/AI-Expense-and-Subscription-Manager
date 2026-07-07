@@ -97,14 +97,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/renual">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Renewal Reminders"
-                        android:src="@drawable/ic_refresh"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -219,14 +218,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/price_change_alert">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Price Change Alerts"
-                        android:src="@drawable/ic_card"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -299,14 +297,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/unused_subscription">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Unused Subscription Alerts"
-                        android:src="@drawable/ic_phone"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -421,14 +418,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/subs_detect">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Auto Detect Subscriptions"
-                        android:src="@drawable/ic_search"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -501,14 +497,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/alert">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Trial Ending Alerts"
-                        android:src="@drawable/ic_notification"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -581,14 +576,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/saving_subscription">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Subscription Insights"
-                        android:src="@drawable/ic_insight"
                         app:tint="#22C55E" />
 
                 </FrameLayout>

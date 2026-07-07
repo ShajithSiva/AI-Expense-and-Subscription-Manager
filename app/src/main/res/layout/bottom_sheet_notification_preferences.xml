@@ -97,14 +97,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/expens_alert">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Expense Alerts"
-                        android:src="@drawable/ic_notification"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -177,14 +176,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/subscription_alert">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Subscription Alerts"
-                        android:src="@drawable/ic_card"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -257,14 +255,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/budget_alert">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Budget Alerts"
-                        android:src="@drawable/ic_budget"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -337,14 +334,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/famly_alert">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Family Alerts"
-                        android:src="@drawable/ic_family"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -417,14 +413,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/suggestions">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Smart Insights"
-                        android:src="@drawable/ic_insight"
                         app:tint="#22C55E" />
 
                 </FrameLayout>

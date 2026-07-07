@@ -97,15 +97,15 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/budget_cycle1">
 
                     <ImageView
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
+                        android:layout_width="1dp"
+                        android:layout_height="1dp"
                         android:layout_gravity="center"
                         android:contentDescription="Monthly Budget Cycle"
                         android:src="@drawable/calender"
-                        app:tint="#22C55E" />
+                        app:tint="@color/nav_icon_gray" />
 
                 </FrameLayout>
 
@@ -180,23 +180,22 @@
 
                 <!-- Icon Container -->
 
+
+                <!-- Text Container -->
+
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/default_amount">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Default Budget Amount"
-                        android:src="@drawable/ic_budget"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
-
-
-                <!-- Text Container -->
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -271,14 +270,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/budget_warning1">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Budget Warning Alert"
-                        android:src="@drawable/ic_notification"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -351,23 +349,21 @@
 
                 <!-- Icon Container -->
 
+
+                <!-- Threshold Content -->
+
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/remaining_budget">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
-                        android:contentDescription="Warning Threshold"
-                        android:src="@drawable/ic_budget"
-                        app:tint="#22C55E" />
+                        android:contentDescription="Warning Threshold"/>
 
                 </FrameLayout>
-
-
-                <!-- Threshold Content -->
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -498,14 +494,13 @@
                 <FrameLayout
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:background="@drawable/overspending">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Overspending Alerts"
-                        android:src="@drawable/ic_notification"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
@@ -576,16 +571,15 @@
                 <!-- Icon Container -->
 
                 <FrameLayout
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_notification_icon">
+                    android:layout_width="47dp"
+                    android:layout_height="51dp"
+                    android:background="@drawable/remaining_budget">
 
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Rollover Remaining Budget"
-                        android:src="@drawable/ic_refresh"
                         app:tint="#22C55E" />
 
                 </FrameLayout>

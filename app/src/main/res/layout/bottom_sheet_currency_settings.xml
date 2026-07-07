@@ -107,7 +107,6 @@
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:contentDescription="Primary Currency"
-                        android:src="@drawable/ic_currency"
                         app:tint="#22C55E" />
 
                 </FrameLayout>
