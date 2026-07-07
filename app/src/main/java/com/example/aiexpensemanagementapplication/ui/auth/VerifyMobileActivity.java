@@ -2,37 +2,41 @@ package com.example.aiexpensemanagementapplication.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.EditText;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.aiexpensemanagementapplication.R;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
+import com.hbb20.CountryCodePicker;
 
 import java.util.concurrent.TimeUnit;
-import androidx.appcompat.app.AppCompatActivity;
-import com.example.aiexpensemanagementapplication.R;
-
-
 
 public class VerifyMobileActivity extends AppCompatActivity {
 
-    EditText etPhoneNumber;
-    Button btnSendOtp;
+    private EditText etPhone;
+    private Button btnSendOtp;
+    private CountryCodePicker countryCodePicker;
 
-    FirebaseAuth mAuth;
-    String verificationId;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_mobile);
 
-        etPhoneNumber = findViewById(R.id.etPhoneNumber);
+        countryCodePicker = findViewById(R.id.countryCodePicker);
+        etPhone = findViewById(R.id.etPhone);
         btnSendOtp = findViewById(R.id.btnSendOtp);
+
+        countryCodePicker.registerCarrierNumberEditText(etPhone);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -41,16 +45,40 @@ public class VerifyMobileActivity extends AppCompatActivity {
 
     private void sendOtp() {
 
-        String phone = etPhoneNumber.getText().toString().trim();
+        FirebaseUser user = mAuth.getCurrentUser();
 
-        if (phone.isEmpty()) {
-            Toast.makeText(this, "Enter phone number", Toast.LENGTH_SHORT).show();
+        if (user == null) {
+            Toast.makeText(this,
+                    "Session expired. Please register again.",
+                    Toast.LENGTH_LONG).show();
+
+            startActivity(new Intent(this, RegisterActivity.class));
+            finish();
             return;
         }
 
+        String phone = etPhone.getText().toString().trim();
+
+        if (phone.isEmpty()) {
+            etPhone.setError("Enter your phone number");
+            etPhone.requestFocus();
+            return;
+        }
+
+        if (!countryCodePicker.isValidFullNumber()) {
+            Toast.makeText(this,
+                    "Enter a valid phone number",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String fullPhoneNumber = countryCodePicker.getFullNumberWithPlus();
+
+        btnSendOtp.setEnabled(false);
+
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
-                        .setPhoneNumber("+91" + phone)
+                        .setPhoneNumber(fullPhoneNumber)
                         .setTimeout(60L, TimeUnit.SECONDS)
                         .setActivity(this)
                         .setCallbacks(callbacks)
@@ -59,27 +87,47 @@ public class VerifyMobileActivity extends AppCompatActivity {
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
-    PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks =
+    private final PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks =
             new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
                 @Override
-                public void onVerificationCompleted(PhoneAuthCredential credential) {}
+                public void onVerificationCompleted(PhoneAuthCredential credential) {
 
-                @Override
-                public void onVerificationFailed(FirebaseException e) {
-                    Toast.makeText(VerifyMobileActivity.this,
-                            e.getMessage(),
-                            Toast.LENGTH_LONG).show();
+                    // Auto verification (optional)
                 }
 
                 @Override
-                public void onCodeSent(String id,
+                public void onVerificationFailed(FirebaseException e) {
+
+                    btnSendOtp.setEnabled(true);
+
+                    Toast.makeText(
+                            VerifyMobileActivity.this,
+                            e.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
+
+                @Override
+                public void onCodeSent(String verificationId,
                                        PhoneAuthProvider.ForceResendingToken token) {
 
-                    verificationId = id;
+                    btnSendOtp.setEnabled(true);
 
-                    Intent intent = new Intent(VerifyMobileActivity.this, VerifyOtpActivity.class);
-                    intent.putExtra("verificationId", id);
+                    Toast.makeText(
+                            VerifyMobileActivity.this,
+                            "OTP sent successfully",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    Intent intent = new Intent(
+                            VerifyMobileActivity.this,
+                            VerifyOtpActivity.class);
+
+                    intent.putExtra("verificationId", verificationId);
+                    intent.putExtra("phoneNumber",
+                            countryCodePicker.getFullNumberWithPlus());
+
                     startActivity(intent);
                 }
             };
