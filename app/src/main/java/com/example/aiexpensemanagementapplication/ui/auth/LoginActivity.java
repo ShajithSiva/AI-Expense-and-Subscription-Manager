@@ -74,11 +74,13 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         btnLogin.setEnabled(false);
+        btnLogin.setText("Signing In...");
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
 
                     btnLogin.setEnabled(true);
+                    btnLogin.setText("Login →");
 
                     if (!task.isSuccessful()) {
 
@@ -158,25 +160,54 @@ public class LoginActivity extends AppCompatActivity {
 
         if (!phoneVerified) {
 
-            startActivity(new Intent(
+            mAuth.signOut();
+
+            Toast.makeText(
                     this,
-                    VerifyMobileActivity.class));
+                    "Please complete phone verification.",
+                    Toast.LENGTH_LONG
+            ).show();
 
+            Intent intent = new Intent(
+                    this,
+                    VerifyMobileActivity.class);
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            startActivity(intent);
             finish();
-
             return;
         }
 
         if (!accountCompleted) {
 
-            startActivity(new Intent(
+            mAuth.signOut();
+
+            Toast.makeText(
                     this,
-                    CreatePasswordActivity.class));
+                    "Please complete your account setup.",
+                    Toast.LENGTH_LONG
+            ).show();
 
+            Intent intent = new Intent(
+                    this,
+                    CreatePasswordActivity.class);
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            startActivity(intent);
             finish();
-
             return;
         }
+
+        firestore.collection("users")
+                .document(user.getUid())
+                .update(
+                        "lastLogin",
+                        com.google.firebase.firestore.FieldValue.serverTimestamp()
+                );
 
         Toast.makeText(
                 this,
@@ -200,6 +231,12 @@ public class LoginActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
 
         if (email.isEmpty()) {
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+
+                etEmail.setError("Enter a valid email");
+                etEmail.requestFocus();
+                return;
+            }
 
             etEmail.setError("Enter your email first");
             etEmail.requestFocus();
@@ -240,7 +277,11 @@ public class LoginActivity extends AppCompatActivity {
                         Boolean accountCompleted =
                                 document.getBoolean("accountCompleted");
 
-                        if (Boolean.TRUE.equals(accountCompleted)) {
+                        Boolean phoneVerified =
+                                document.getBoolean("phoneVerified");
+
+                        if (Boolean.TRUE.equals(accountCompleted)
+                                && Boolean.TRUE.equals(phoneVerified)) {
 
                             startActivity(new Intent(
                                     this,

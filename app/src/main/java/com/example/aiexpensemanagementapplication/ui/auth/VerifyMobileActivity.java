@@ -84,7 +84,22 @@ public class VerifyMobileActivity extends AppCompatActivity {
                         .setCallbacks(callbacks)
                         .build();
 
-        PhoneAuthProvider.verifyPhoneNumber(options);
+        try {
+
+            PhoneAuthProvider.verifyPhoneNumber(options);
+
+        } catch (Exception e) {
+
+            btnSendOtp.setEnabled(true);
+
+            Toast.makeText(
+                    this,
+                    e.getMessage() != null
+                            ? e.getMessage()
+                            : "Unable to send OTP.",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
     }
 
     private final PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks =
@@ -93,7 +108,40 @@ public class VerifyMobileActivity extends AppCompatActivity {
                 @Override
                 public void onVerificationCompleted(PhoneAuthCredential credential) {
 
-                    // Auto verification (optional)
+                    Toast.makeText(
+                            VerifyMobileActivity.this,
+                            "Phone number verified automatically.",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    FirebaseUser user = mAuth.getCurrentUser();
+
+                    if (user != null) {
+
+                        user.linkWithCredential(credential)
+                                .addOnCompleteListener(task -> {
+
+                                    if (task.isSuccessful()) {
+
+                                        Intent intent = new Intent(
+                                                VerifyMobileActivity.this,
+                                                CreatePasswordActivity.class);
+
+                                        startActivity(intent);
+                                        finish();
+
+                                    } else {
+
+                                        Toast.makeText(
+                                                VerifyMobileActivity.this,
+                                                task.getException() != null ?
+                                                        task.getException().getMessage() :
+                                                        "Verification failed.",
+                                                Toast.LENGTH_LONG
+                                        ).show();
+                                    }
+                                });
+                    }
                 }
 
                 @Override
@@ -101,9 +149,11 @@ public class VerifyMobileActivity extends AppCompatActivity {
 
                     btnSendOtp.setEnabled(true);
 
+                    e.printStackTrace();
+
                     Toast.makeText(
                             VerifyMobileActivity.this,
-                            e.getMessage(),
+                            e.toString(),
                             Toast.LENGTH_LONG
                     ).show();
                 }
@@ -125,10 +175,12 @@ public class VerifyMobileActivity extends AppCompatActivity {
                             VerifyOtpActivity.class);
 
                     intent.putExtra("verificationId", verificationId);
-                    intent.putExtra("phoneNumber",
-                            countryCodePicker.getFullNumberWithPlus());
+
+                    String fullPhoneNumber = countryCodePicker.getFullNumberWithPlus();
+                    intent.putExtra("phoneNumber", fullPhoneNumber);
 
                     startActivity(intent);
+                    finish(); // <-- Add this line
                 }
             };
 }

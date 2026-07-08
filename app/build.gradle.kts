@@ -37,7 +37,7 @@ dependencies {
     implementation("com.hbb20:ccp:2.7.3")
 
     // Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
 
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth")

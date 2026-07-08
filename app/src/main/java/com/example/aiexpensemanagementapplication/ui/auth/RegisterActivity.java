@@ -105,7 +105,11 @@ public class RegisterActivity extends AppCompatActivity {
                                         .setDisplayName(fullName)
                                         .build();
 
-                        user.updateProfile(profile);
+                        user.updateProfile(profile)
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(RegisterActivity.this,
+                                                "Failed to update profile.",
+                                                Toast.LENGTH_SHORT).show());
 
                         // Save user to Firestore
                         Map<String, Object> userData = new HashMap<>();
@@ -114,44 +118,65 @@ public class RegisterActivity extends AppCompatActivity {
                         userData.put("email", email);
                         userData.put("emailVerified", false);
                         userData.put("phoneVerified", false);
+                        userData.put("phone", "");
+                        userData.put("role", "USER");
+                        userData.put("isActive", true);
+                        userData.put("lastLogin", null);
                         userData.put("accountCompleted", false);
                         userData.put("createdAt",
                                 com.google.firebase.firestore.FieldValue.serverTimestamp());
 
                         firestore.collection("users")
                                 .document(user.getUid())
-                                .set(userData);
-
-                        // Send verification email
-                        user.sendEmailVerification()
+                                .set(userData)
                                 .addOnSuccessListener(unused -> {
 
-                                    Toast.makeText(RegisterActivity.this,
-                                            "Verification email sent successfully.",
-                                            Toast.LENGTH_LONG).show();
+                                    user.sendEmailVerification()
+                                            .addOnSuccessListener(unused1 -> {
 
-                                    Intent intent = new Intent(
-                                            RegisterActivity.this,
-                                            VerifyEmailActivity.class);
+                                                Toast.makeText(RegisterActivity.this,
+                                                        "Verification email sent successfully.",
+                                                        Toast.LENGTH_LONG).show();
 
-                                    intent.putExtra("email", email);
-                                    startActivity(intent);
-                                    finish();
+                                                Intent intent = new Intent(
+                                                        RegisterActivity.this,
+                                                        VerifyEmailActivity.class);
+
+                                                intent.putExtra("email", email);
+
+                                                startActivity(intent);
+                                                finish();
+
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    Toast.makeText(RegisterActivity.this,
+                                                            e.getMessage(),
+                                                            Toast.LENGTH_LONG).show());
 
                                 })
                                 .addOnFailureListener(e ->
-
                                         Toast.makeText(RegisterActivity.this,
-                                                "Failed to send verification email.\n"
-                                                        + e.getMessage(),
-                                                Toast.LENGTH_LONG).show()
-                                );
+                                                "Failed to save user information.",
+                                                Toast.LENGTH_LONG).show());
 
                     } else {
 
-                        Toast.makeText(RegisterActivity.this,
-                                task.getException().getMessage(),
-                                Toast.LENGTH_LONG).show();
+                        Exception e = task.getException();
+
+                        if (e instanceof com.google.firebase.auth.FirebaseAuthUserCollisionException) {
+
+                            Toast.makeText(this,
+                                    "This email is already registered.",
+                                    Toast.LENGTH_LONG).show();
+
+                        } else {
+
+                            Toast.makeText(
+                                    this,
+                                    e != null ? e.getMessage() : "Registration failed.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
                     }
 
                 });

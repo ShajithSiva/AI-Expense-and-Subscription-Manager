@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.os.CountDownTimer;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,6 +29,14 @@ public class VerifyOtpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
 
+    private TextView tvPhoneNumber;
+    private TextView tvTimer;
+    private TextView tvResendOtp;
+
+    private ImageView btnBack;
+
+    private CountDownTimer countDownTimer;
+
     private String verificationId;
     private String phoneNumber;
 
@@ -43,13 +54,35 @@ public class VerifyOtpActivity extends AppCompatActivity {
 
         btnVerify = findViewById(R.id.btnVerifyOtp);
 
+        tvPhoneNumber = findViewById(R.id.tvPhoneNumber);
+        tvTimer = findViewById(R.id.tvTimer);
+        tvResendOtp = findViewById(R.id.tvResendOtp);
+
+        btnBack = findViewById(R.id.btnBack);
+
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
         verificationId = getIntent().getStringExtra("verificationId");
         phoneNumber = getIntent().getStringExtra("phoneNumber");
+        if (phoneNumber != null) {
+            tvPhoneNumber.setText(maskPhoneNumber(phoneNumber));
+        }
+        btnBack.setOnClickListener(v -> finish());
 
         btnVerify.setOnClickListener(v -> verifyOtp());
+
+        startTimer();
+
+        tvResendOtp.setOnClickListener(v -> {
+
+            Toast.makeText(
+                    this,
+                    "Resend OTP will be implemented next.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+        });
     }
 
     private void verifyOtp() {
@@ -81,11 +114,8 @@ public class VerifyOtpActivity extends AppCompatActivity {
 
         if (currentUser == null) {
             Toast.makeText(this,
-                    "Session expired. Please register again.",
-                    Toast.LENGTH_LONG).show();
-
-            startActivity(new Intent(this, RegisterActivity.class));
-            finish();
+                    "Session expired.",
+                    Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -136,10 +166,21 @@ public class VerifyOtpActivity extends AppCompatActivity {
 
                     } else {
 
+                        Exception exception = task.getException();
+
                         String message = "OTP verification failed.";
 
-                        if (task.getException() != null) {
-                            message = task.getException().getMessage();
+                        if (exception instanceof com.google.firebase.auth.FirebaseAuthUserCollisionException) {
+
+                            message = "This phone number is already linked to another account.";
+
+                        } else if (exception instanceof com.google.firebase.auth.FirebaseAuthInvalidCredentialsException) {
+
+                            message = "Invalid OTP. Please try again.";
+
+                        } else if (exception != null) {
+
+                            message = exception.getMessage();
                         }
 
                         Toast.makeText(
@@ -150,5 +191,50 @@ public class VerifyOtpActivity extends AppCompatActivity {
                     }
 
                 });
+    }
+    private String maskPhoneNumber(String phone) {
+
+        if (phone == null || phone.length() < 7)
+            return phone;
+
+        return phone.substring(0, 6)
+                + "*****"
+                + phone.substring(phone.length() - 3);
+    }
+    private void startTimer() {
+
+        tvResendOtp.setEnabled(false);
+
+        countDownTimer = new CountDownTimer(30000, 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+                long seconds = millisUntilFinished / 1000;
+
+                tvTimer.setText(String.format("00:%02d", seconds));
+            }
+
+            @Override
+            public void onFinish() {
+
+                tvTimer.setText("00:00");
+
+                tvResendOtp.setEnabled(true);
+
+                tvResendOtp.setTextColor(
+                        getResources().getColor(android.R.color.holo_green_dark)
+                );
+            }
+
+        }.start();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 }

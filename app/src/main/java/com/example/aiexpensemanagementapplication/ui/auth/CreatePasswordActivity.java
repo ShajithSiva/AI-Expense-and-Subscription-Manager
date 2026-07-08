@@ -132,6 +132,7 @@ public class CreatePasswordActivity extends AppCompatActivity {
             Toast.makeText(this,
                     "Password does not meet requirements",
                     Toast.LENGTH_LONG).show();
+            etPassword.requestFocus();
             return;
         }
 
@@ -147,39 +148,82 @@ public class CreatePasswordActivity extends AppCompatActivity {
             finish();
             return;
         }
+        if (!user.isEmailVerified()) {
+
+            Toast.makeText(this,
+                    "Email is not verified.",
+                    Toast.LENGTH_SHORT).show();
+
+            return;
+        }
 
         btnCreateAccount.setEnabled(false);
+
+        btnCreateAccount.setText("Creating...");
 
         user.updatePassword(password)
                 .addOnSuccessListener(unused -> {
 
                     firestore.collection("users")
                             .document(user.getUid())
-                            .update("accountCompleted", true);
+                            .update(
+                                    "accountCompleted", true,
+                                    "emailVerified", true,
+                                    "phoneVerified", true,
+                                    "lastLogin",
+                                    com.google.firebase.firestore.FieldValue.serverTimestamp()
+                            )
 
-                    Toast.makeText(this,
-                            "Account created successfully!",
-                            Toast.LENGTH_LONG).show();
+                            .addOnSuccessListener(unused1 -> {
 
-                    mAuth.signOut();
+                                Toast.makeText(
+                                        CreatePasswordActivity.this,
+                                        "Account created successfully!",
+                                        Toast.LENGTH_LONG
+                                ).show();
 
-                    Intent intent =
-                            new Intent(CreatePasswordActivity.this,
-                                    LoginActivity.class);
+                                mAuth.signOut();
 
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                            Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                Intent intent =
+                                        new Intent(
+                                                CreatePasswordActivity.this,
+                                                LoginActivity.class);
 
-                    startActivity(intent);
+                                intent.setFlags(
+                                        Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                                startActivity(intent);
+                                finish();
+
+                            })
+
+                            .addOnFailureListener(e -> {
+
+                                btnCreateAccount.setEnabled(true);
+                                btnCreateAccount.setText("Create Account");
+
+                                Toast.makeText(
+                                        CreatePasswordActivity.this,
+                                        e.getMessage(),
+                                        Toast.LENGTH_LONG
+                                ).show();
+
+                            });
 
                 })
+
                 .addOnFailureListener(e -> {
 
                     btnCreateAccount.setEnabled(true);
+                    btnCreateAccount.setText("Create Account");
 
-                    Toast.makeText(this,
+                    Toast.makeText(
+                            CreatePasswordActivity.this,
                             e.getMessage(),
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG
+                    ).show();
+
                 });
     }
 }

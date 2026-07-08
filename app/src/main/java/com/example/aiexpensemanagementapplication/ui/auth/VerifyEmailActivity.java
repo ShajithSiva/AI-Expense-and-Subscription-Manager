@@ -51,10 +51,42 @@ public class VerifyEmailActivity extends AppCompatActivity {
         tvResendEmail.setOnClickListener(v -> resendVerificationEmail());
 
         tvChangeEmail.setOnClickListener(v -> {
-            startActivity(new Intent(
-                    VerifyEmailActivity.this,
-                    RegisterActivity.class));
-            finish();
+
+            FirebaseUser user = mAuth.getCurrentUser();
+
+            if (user != null) {
+
+                firestore.collection("users")
+                        .document(user.getUid())
+                        .delete()
+                        .addOnSuccessListener(unused -> {
+
+                            user.delete()
+                                    .addOnCompleteListener(task -> {
+
+                                        mAuth.signOut();
+
+                                        Intent intent = new Intent(
+                                                VerifyEmailActivity.this,
+                                                RegisterActivity.class);
+
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                                        startActivity(intent);
+                                        finish();
+
+                                    });
+
+                        });
+            } else {
+
+                startActivity(new Intent(
+                        VerifyEmailActivity.this,
+                        RegisterActivity.class));
+
+                finish();
+            }
         });
     }
 
@@ -87,10 +119,20 @@ public class VerifyEmailActivity extends AppCompatActivity {
                 return;
             }
 
-            if (user.isEmailVerified()) {
+            FirebaseUser refreshedUser = mAuth.getCurrentUser();
+
+            if (refreshedUser == null) {
+
+                Toast.makeText(this,
+                        "Session expired.",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (refreshedUser.isEmailVerified()) {
 
                 firestore.collection("users")
-                        .document(user.getUid())
+                        .document(refreshedUser.getUid())
                         .update("emailVerified", true)
                         .addOnSuccessListener(unused -> {
 
@@ -137,21 +179,34 @@ public class VerifyEmailActivity extends AppCompatActivity {
             return;
         }
 
+        // Disable resend temporarily
+        tvResendEmail.setEnabled(false);
+
         user.sendEmailVerification()
-                .addOnSuccessListener(unused ->
+                .addOnCompleteListener(task -> {
+
+                    // Re-enable after 30 seconds
+                    tvResendEmail.postDelayed(() ->
+                            tvResendEmail.setEnabled(true), 30000);
+
+                    if (task.isSuccessful()) {
 
                         Toast.makeText(
                                 VerifyEmailActivity.this,
                                 "Verification email sent again.",
                                 Toast.LENGTH_LONG
-                        ).show())
+                        ).show();
 
-                .addOnFailureListener(e ->
+                    } else {
 
                         Toast.makeText(
                                 VerifyEmailActivity.this,
-                                e.getMessage(),
+                                task.getException() != null
+                                        ? task.getException().getMessage()
+                                        : "Failed to send verification email.",
                                 Toast.LENGTH_LONG
-                        ).show());
+                        ).show();
+                    }
+                });
     }
 }
