@@ -90,7 +90,7 @@
             <FrameLayout
                 android:layout_width="104dp"
                 android:layout_height="104dp"
-                android:background="@drawable/bg_security_circle">
+                android:background="@drawable/badge_green">
 
                 <FrameLayout
                     android:layout_width="76dp"
@@ -103,8 +103,9 @@
                         android:layout_height="42dp"
                         android:layout_gravity="center"
                         android:contentDescription="Security"
-                        android:src="@drawable/ic_security_shield"
-                        app:tint="#22C55E" />
+                        app:tint="#22C55E"
+                        android:src="@drawable/lock"
+                        />
 
                 </FrameLayout>
 
@@ -162,37 +163,37 @@
             <!-- ================================================= -->
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/passwordInputLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:id="@+id/passwordInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:boxBackgroundColor="#FFFFFF"
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxStrokeColor="#22C55E"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:startIconDrawable="@drawable/ic_lock"
+            app:startIconTint="#6B7280"
+            app:endIconMode="password_toggle"
+            app:endIconTint="#6B7280">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCurrentPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:boxBackgroundColor="#FFFFFF"
-                app:boxCornerRadiusBottomEnd="14dp"
-                app:boxCornerRadiusBottomStart="14dp"
-                app:boxCornerRadiusTopEnd="14dp"
-                app:boxCornerRadiusTopStart="14dp"
-                app:boxStrokeColor="#22C55E"
-                app:boxStrokeWidth="1dp"
-                app:boxStrokeWidthFocused="2dp"
-                app:endIconMode="password_toggle"
-                app:endIconTint="#6B7280"
-                app:startIconDrawable="@drawable/ic_lock"
-                app:startIconTint="#6B7280">
+                android:paddingStart="50dp"
+                android:hint="Enter your current password"
+                android:inputType="textPassword"
+                android:minHeight="58dp"
+                android:textColor="#111827"
+                android:textColorHint="#9CA3AF"
+                android:textSize="14sp"/>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCurrentPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:hint="Enter your current password"
-                    android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:paddingStart="4dp"
-                    android:textColor="#111827"
-                    android:textColorHint="#9CA3AF"
-                    android:textSize="14sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
             <!-- ================================================= -->

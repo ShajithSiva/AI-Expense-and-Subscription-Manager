@@ -609,7 +609,7 @@
                             android:layout_height="42dp"
                             android:background="@drawable/badge_light_gray"
                             android:padding="10dp"
-                            android:src="@drawable/calender"
+                            android:src="@drawable/calendar"
                             app:tint="#111827"/>
 
                         <TextView

@@ -117,8 +117,7 @@
                             android:layout_height="26dp"
                             android:layout_gravity="center"
                             android:contentDescription="Weekly"
-                            android:src="@drawable/ic_calendar_week"
-                            app:tint="#22C55E" />
+                             />
 
                     </FrameLayout>
 
@@ -193,9 +192,7 @@
                             android:layout_width="26dp"
                             android:layout_height="26dp"
                             android:layout_gravity="center"
-                            android:contentDescription="Monthly"
-                            android:src="@drawable/ic_calendar_month"
-                            app:tint="#22C55E" />
+                            android:contentDescription="Monthly" />
 
                     </FrameLayout>
 
@@ -268,9 +265,7 @@
                             android:layout_width="26dp"
                             android:layout_height="26dp"
                             android:layout_gravity="center"
-                            android:contentDescription="Quarterly"
-                            android:src="@drawable/ic_calendar_quarter"
-                            app:tint="#22C55E" />
+                            android:contentDescription="Quarterly"/>
 
                     </FrameLayout>
 
@@ -344,9 +339,7 @@
                             android:layout_width="26dp"
                             android:layout_height="26dp"
                             android:layout_gravity="center"
-                            android:contentDescription="Yearly"
-                            android:src="@drawable/ic_calendar_year"
-                            app:tint="#22C55E" />
+                            android:contentDescription="Yearly" />
 
                     </FrameLayout>
 
@@ -397,7 +390,6 @@
             android:textStyle="bold"
             app:backgroundTint="#22C55E"
             app:cornerRadius="16dp"
-            app:icon="@drawable/ic_check_circle"
             app:iconGravity="textStart"
             app:iconPadding="10dp"
             app:iconTint="#FFFFFF" />

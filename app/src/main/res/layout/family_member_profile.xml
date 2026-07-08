@@ -102,8 +102,7 @@
                         android:layout_width="88dp"
                         android:layout_height="88dp"
                         android:src="@drawable/profile"
-                        android:padding="18dp"
-                        android:imageTintList="@null"/>
+                        android:padding="18dp" />
 
                     <!-- Online / active indicator dot -->
                     <View
@@ -206,7 +205,8 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:imageTintList="@color/nav_icon_gray"/>
+                        app:tint="#000000"/>
+
                 </LinearLayout>
 
                 <!-- Stats row: Contributed | Active Subs | Last Active -->
@@ -228,7 +228,6 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:src="@drawable/expense"
-                            android:imageTintList="@color/nav_icon_gray"
                             android:layout_marginBottom="8dp"/>
 
                         <TextView
@@ -268,7 +267,6 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:imageTintList="@color/nav_icon_gray"
                             android:layout_marginBottom="8dp"/>
 
                         <TextView
@@ -308,7 +306,6 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:imageTintList="@color/nav_icon_gray"
                             android:layout_marginBottom="8dp"/>
 
                         <TextView
@@ -390,8 +387,7 @@
 
                         <ImageView
                             android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:imageTintList="@color/nav_icon_gray"/>
+                            android:layout_height="20dp"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -449,8 +445,7 @@
 
                         <ImageView
                             android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:imageTintList="@color/nav_icon_gray"/>
+                            android:layout_height="20dp"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -508,8 +503,7 @@
 
                         <ImageView
                             android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:imageTintList="@color/nav_icon_gray" />
+                            android:layout_height="20dp"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -588,8 +582,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/profile"
-                            android:imageTintList="@color/nav_icon_gray"/>
+                            android:src="@drawable/profile"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -635,8 +628,7 @@
                             android:layout_width="14dp"
                             android:layout_height="14dp"
                             android:src="@drawable/ic_arrow_right"
-                            android:layout_marginStart="4dp"
-                            android:imageTintList="@color/nav_icon_gray"/>
+                            android:layout_marginStart="4dp"/>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -664,7 +656,6 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:imageTintList="@color/color_danger"
                         android:layout_marginEnd="8dp"/>
 
                     <TextView

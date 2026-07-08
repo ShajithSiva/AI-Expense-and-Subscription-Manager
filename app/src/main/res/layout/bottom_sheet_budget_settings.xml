@@ -425,9 +425,7 @@
                         android:valueTo="100"
                         android:stepSize="5"
                         app:haloColor="#3322C55E"
-                        app:thumbColor="#22C55E"
-                        app:trackActiveTint="#22C55E"
-                        app:trackInactiveTint="#D1D5DB" />
+                        app:thumbColor="#22C55E" />
 
 
                     <!-- Slider Values -->
