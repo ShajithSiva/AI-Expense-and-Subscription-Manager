@@ -25,22 +25,36 @@
         </activity>
 
         <!-- AUTH SCREENS -->
-        <activity android:name=".ui.auth.LoginActivity" />
-        <activity android:name=".ui.auth.RegisterActivity" />
-        <activity android:name=".ui.auth.VerifyEmailActivity" />
-        <activity android:name=".ui.auth.VerifyMobileActivity" />
-        <activity android:name=".ui.auth.VerifyOtpActivity" />
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ui.auth.RegisterActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.auth.VerifyEmailActivity"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ui.auth.VerifyMobileActivity"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ui.auth.VerifyOtpActivity"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity
+            android:name=".ui.auth.CreatePasswordActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- MAIN DASHBOARD -->
-        <activity android:name=".ui.dashboard.PersonalDashboardActivity" />
+        <activity android:name=".ui.dashboard.PersonalDashboardActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- BUDGET SCREENS -->
-        <activity android:name=".ui.budget.BudgetActivity" />
-        <activity android:name=".ui.budget.SetBudgetActivity" />
-        <activity android:name=".ui.budget.EditBudgetActivity" />
+        <activity android:name=".ui.budget.BudgetActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.budget.SetBudgetActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.budget.EditBudgetActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- REPORT GENERATION SCREEN -->
-        <activity android:name=".ui.report.ReportActivity" />
+        <activity android:name=".ui.report.ReportActivity"
+            android:windowSoftInputMode="adjustResize" />
 
     </application>
 

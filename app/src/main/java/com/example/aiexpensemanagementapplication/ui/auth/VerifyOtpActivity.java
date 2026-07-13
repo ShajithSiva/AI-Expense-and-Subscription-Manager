@@ -8,7 +8,11 @@ import android.widget.Toast;
 import android.os.CountDownTimer;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 
+import android.view.inputmethod.InputMethodManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
@@ -39,6 +43,8 @@ public class VerifyOtpActivity extends AppCompatActivity {
 
     private String verificationId;
     private String phoneNumber;
+
+    private boolean isVerifying = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +78,8 @@ public class VerifyOtpActivity extends AppCompatActivity {
 
         btnVerify.setOnClickListener(v -> verifyOtp());
 
+        setupOtpInputs();
+
         startTimer();
 
         tvResendOtp.setOnClickListener(v -> {
@@ -83,11 +91,31 @@ public class VerifyOtpActivity extends AppCompatActivity {
             ).show();
 
         });
+        otp1.requestFocus();
+
+        otp1.postDelayed(() -> {
+
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+            if (imm != null) {
+
+                imm.showSoftInput(otp1, InputMethodManager.SHOW_IMPLICIT);
+            }
+
+        },200);
     }
 
     private void verifyOtp() {
 
+        if (isVerifying) {
+            return;
+        }
+
+        isVerifying = true;
+
         if (verificationId == null || verificationId.isEmpty()) {
+            isVerifying = false;
             Toast.makeText(this,
                     "Verification session expired. Please request a new OTP.",
                     Toast.LENGTH_LONG).show();
@@ -104,6 +132,7 @@ public class VerifyOtpActivity extends AppCompatActivity {
                         otp6.getText().toString().trim();
 
         if (otp.length() != 6) {
+            isVerifying = false;
             Toast.makeText(this,
                     "Please enter the complete 6-digit OTP.",
                     Toast.LENGTH_SHORT).show();
@@ -113,6 +142,7 @@ public class VerifyOtpActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if (currentUser == null) {
+            isVerifying = false;
             Toast.makeText(this,
                     "Session expired.",
                     Toast.LENGTH_SHORT).show();
@@ -140,6 +170,8 @@ public class VerifyOtpActivity extends AppCompatActivity {
                                 .update(updates)
                                 .addOnSuccessListener(unused -> {
 
+                                    isVerifying = false;
+
                                     Toast.makeText(
                                             VerifyOtpActivity.this,
                                             "Phone number verified successfully.",
@@ -157,14 +189,20 @@ public class VerifyOtpActivity extends AppCompatActivity {
                                     finish();
 
                                 })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(
-                                                VerifyOtpActivity.this,
-                                                e.getMessage(),
-                                                Toast.LENGTH_LONG
-                                        ).show());
+                                .addOnFailureListener(e -> {
+
+                                    isVerifying = false;
+
+                                    Toast.makeText(
+                                            VerifyOtpActivity.this,
+                                            e.getMessage(),
+                                            Toast.LENGTH_LONG
+                                    ).show();
+                                });
 
                     } else {
+
+                        isVerifying = false;
 
                         Exception exception = task.getException();
 
@@ -191,6 +229,84 @@ public class VerifyOtpActivity extends AppCompatActivity {
                     }
 
                 });
+    }
+
+    private void setupOtpInputs() {
+
+        EditText[] otp = {
+                otp1,
+                otp2,
+                otp3,
+                otp4,
+                otp5,
+                otp6
+        };
+
+        for (int i = 0; i < otp.length; i++) {
+
+            final int index = i;
+
+            otp[i].addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    // Handle pasting the entire OTP into the first field
+                    if (index == 0 && s.length() == 6) {
+
+                        otp1.setText(String.valueOf(s.charAt(0)));
+                        otp2.setText(String.valueOf(s.charAt(1)));
+                        otp3.setText(String.valueOf(s.charAt(2)));
+                        otp4.setText(String.valueOf(s.charAt(3)));
+                        otp5.setText(String.valueOf(s.charAt(4)));
+                        otp6.setText(String.valueOf(s.charAt(5)));
+
+                        otp6.requestFocus();
+                        verifyOtp();
+                        return;
+                    }
+
+                    if (s.length() == 1) {
+
+                        if (index < otp.length - 1) {
+
+                            otp[index + 1].requestFocus();
+
+                        } else {
+
+                            verifyOtp();
+                        }
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+
+            });
+
+            otp[i].setOnKeyListener((v, keyCode, event) -> {
+
+                if (event.getAction() == KeyEvent.ACTION_DOWN &&
+                        keyCode == KeyEvent.KEYCODE_DEL &&
+                        otp[index].getText().toString().isEmpty()) {
+
+                    if (index > 0) {
+
+                        otp[index - 1].requestFocus();
+                        otp[index - 1].setSelection(
+                                otp[index - 1].getText().length()
+                        );
+                    }
+                }
+
+                return false;
+            });
+        }
     }
     private String maskPhoneNumber(String phone) {
 
