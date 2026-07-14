@@ -21,4 +21,14 @@ dependencyResolutionManagement {
 
 rootProject.name = "AI Expense Management Application"
 include(":app")
- 
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+
+        // JitPack
+        maven(url = "https://jitpack.io")
+    }
+}
