@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
+    private TextView tvLogin;
 
     private static final String TEMP_PASSWORD = "Temp@123";
 
@@ -41,12 +43,20 @@ public class RegisterActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         cbTerms = findViewById(R.id.cbTerms);
         btnVerifyEmail = findViewById(R.id.btnVerifyEmail);
+        tvLogin = findViewById(R.id.tvLogin);
 
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
         btnVerifyEmail.setOnClickListener(v -> registerUser());
+
+        tvLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish(); // Optional: closes RegisterActivity
+        });
     }
+
 
     private void registerUser() {
 
