@@ -19,7 +19,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     //========================================================
     // USER TABLE
@@ -77,15 +77,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CATEGORY_TYPE = "CategoryType";
 
     //========================================================
-    // ACCOUNT
+    // PAYMENTMETHOD
     //========================================================
+    public static final String TABLE_PAYMENT_METHOD = "PaymentMethod";
 
-    public static final String TABLE_ACCOUNT = "Account";
+    public static final String PAYMENT_METHOD_ID = "PaymentMethodID";
 
-    public static final String ACCOUNT_ID = "AccountID";
-    public static final String ACCOUNT_TYPE = "AccountType";
-    public static final String PROVIDER_NAME = "ProviderName";
-    public static final String BALANCE = "Balance";
+    public static final String METHOD_NAME = "MethodName";
+
 
     //========================================================
     // TRANSACTION
@@ -95,6 +94,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String TRANSACTION_ID = "TransactionID";
     public static final String AMOUNT = "Amount";
+    public static final String EXPENSE_MODE = "ExpenseMode";
     public static final String TRANSACTION_TYPE = "TransactionType";
     public static final String TRANSACTION_DATE = "TransactionDate";
     public static final String SOURCE = "Source";
@@ -180,7 +180,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_CATEGORY_TABLE);
 
-        db.execSQL(CREATE_ACCOUNT_TABLE);
+        db.execSQL(CREATE_PAYMENT_METHOD_TABLE);
 
         db.execSQL(CREATE_TRANSACTION_TABLE);
 
@@ -195,6 +195,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_REPORT_TABLE);
 
         insertDefaultCategories(db);
+
+        insertDefaultPaymentMethods(db);
     }
 
     private static final String CREATE_USER_TABLE =
@@ -243,30 +245,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     CATEGORY_NAME + " TEXT NOT NULL," +
                     CATEGORY_TYPE + " TEXT NOT NULL" +
                     ");";
-    private static final String CREATE_ACCOUNT_TABLE =
-            "CREATE TABLE " + TABLE_ACCOUNT + " (" +
-                    ACCOUNT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    USER_ID + " INTEGER," +
-                    ACCOUNT_TYPE + " TEXT," +
-                    PROVIDER_NAME + " TEXT," +
-                    BALANCE + " REAL DEFAULT 0," +
-                    "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
-                    TABLE_USER + "(" + USER_ID + ")" +
+
+    private static final String CREATE_PAYMENT_METHOD_TABLE =
+            "CREATE TABLE " + TABLE_PAYMENT_METHOD + " (" +
+                    PAYMENT_METHOD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    METHOD_NAME + " TEXT NOT NULL" +
                     ");";
+
     private static final String CREATE_TRANSACTION_TABLE =
             "CREATE TABLE " + TABLE_TRANSACTION + " (" +
                     TRANSACTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     USER_ID + " INTEGER," +
-                    ACCOUNT_ID + " INTEGER," +
+                    PAYMENT_METHOD_ID + " INTEGER," +
                     CATEGORY_ID + " INTEGER," +
                     AMOUNT + " REAL," +
                     TRANSACTION_TYPE + " TEXT," +
                     TRANSACTION_DATE + " TEXT," +
                     SOURCE + " TEXT," +
+                    EXPENSE_MODE + " TEXT," +
                     "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
                     TABLE_USER + "(" + USER_ID + ")," +
-                    "FOREIGN KEY(" + ACCOUNT_ID + ") REFERENCES " +
-                    TABLE_ACCOUNT + "(" + ACCOUNT_ID + ")," +
+                    "FOREIGN KEY(" + PAYMENT_METHOD_ID + ") REFERENCES " +
+                    TABLE_PAYMENT_METHOD + "(" + PAYMENT_METHOD_ID + ")," +
                     "FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " +
                     TABLE_CATEGORY + "(" + CATEGORY_ID + ")" +
                     ");";
@@ -350,7 +350,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSACTION);
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCOUNT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENT_METHOD);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
 
@@ -375,6 +375,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+    private void insertDefaultPaymentMethods(SQLiteDatabase db){
+
+        db.execSQL("INSERT INTO PaymentMethod(MethodName) VALUES('Cash')");
+
+        db.execSQL("INSERT INTO PaymentMethod(MethodName) VALUES('Debit Card')");
+
+        db.execSQL("INSERT INTO PaymentMethod(MethodName) VALUES('Credit Card')");
+
+        db.execSQL("INSERT INTO PaymentMethod(MethodName) VALUES('Online Banking')");
+
+        db.execSQL("INSERT INTO PaymentMethod(MethodName) VALUES('Mobile Wallet')");
+
+        db.execSQL("INSERT INTO PaymentMethod(MethodName) VALUES('Bank Transfer')");
+    }
     private void insertDefaultCategories(SQLiteDatabase db) {
 
         db.execSQL("INSERT INTO Category(CategoryName,CategoryType) VALUES('Food','Expense')");
@@ -393,6 +407,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public long insertUser(String name,
                            String email,
+                           String firebaseUid,
                            String mobile,
                            String passwordHash,
                            String status,
@@ -404,12 +419,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         values.put(USER_NAME, name);
         values.put(USER_EMAIL, email);
+        values.put(FIREBASE_UID, firebaseUid);
         values.put(USER_MOBILE, mobile);
         values.put(USER_PASSWORD, passwordHash);
         values.put(USER_STATUS, status);
         values.put(USER_CREATED_AT, createdAt);
 
         return db.insert(TABLE_USER, null, values);
+    }
+    public boolean isFirebaseUserExists(String firebaseUid) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + TABLE_USER +
+                        " WHERE " + FIREBASE_UID + "=?",
+                new String[]{firebaseUid});
+
+        boolean exists = cursor.moveToFirst();
+
+        cursor.close();
+
+        return exists;
     }
     public int getUserIdByFirebaseUid(String firebaseUid) {
 
@@ -676,223 +707,92 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return total;
     }
 
-    public long insertAccount(int userId,
-                              String accountType,
-                              String providerName,
-                              double balance) {
+    public Cursor getAllPaymentMethods(){
 
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(USER_ID, userId);
-        values.put(ACCOUNT_TYPE, accountType);
-        values.put(PROVIDER_NAME, providerName);
-        values.put(BALANCE, balance);
-
-        return db.insert(TABLE_ACCOUNT, null, values);
-    }
-
-    public Cursor getAccounts(int userId) {
-
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
 
         return db.rawQuery(
 
-                "SELECT * FROM " + TABLE_ACCOUNT +
-                        " WHERE " + USER_ID + "=? " +
-                        "ORDER BY " + ACCOUNT_ID + " DESC",
+                "SELECT * FROM " + TABLE_PAYMENT_METHOD +
+                        " ORDER BY " + METHOD_NAME,
 
-                new String[]{
-                        String.valueOf(userId)
-                });
+                null);
 
     }
 
-    public Cursor getAccount(int accountId) {
+    public int getPaymentMethodIdByName(String methodName){
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
 
-        return db.rawQuery(
-
-                "SELECT * FROM " + TABLE_ACCOUNT +
-                        " WHERE " + ACCOUNT_ID + "=?",
-
-                new String[]{
-                        String.valueOf(accountId)
-                });
-
-    }
-
-    public int updateAccount(int accountId,
-                             String accountType,
-                             String providerName,
-                             double balance) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(ACCOUNT_TYPE, accountType);
-        values.put(PROVIDER_NAME, providerName);
-        values.put(BALANCE, balance);
-
-        return db.update(
-
-                TABLE_ACCOUNT,
-                values,
-                ACCOUNT_ID + "=?",
-                new String[]{
-                        String.valueOf(accountId)
-                });
-
-    }
-
-    public int deleteAccount(int accountId) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        return db.delete(
-
-                TABLE_ACCOUNT,
-
-                ACCOUNT_ID + "=?",
-
-                new String[]{
-                        String.valueOf(accountId)
-                });
-
-    }
-
-    public int updateAccountBalance(int accountId,
-                                    double newBalance) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(BALANCE, newBalance);
-
-        return db.update(
-
-                TABLE_ACCOUNT,
-
-                values,
-
-                ACCOUNT_ID + "=?",
-
-                new String[]{
-                        String.valueOf(accountId)
-                });
-
-    }
-
-    public double getCurrentBalance(int accountId) {
-
-        SQLiteDatabase db = this.getReadableDatabase();
+        int id = -1;
 
         Cursor cursor = db.rawQuery(
 
-                "SELECT " + BALANCE +
-                        " FROM " + TABLE_ACCOUNT +
-                        " WHERE " + ACCOUNT_ID + "=?",
+                "SELECT " + PAYMENT_METHOD_ID +
+                        " FROM " + TABLE_PAYMENT_METHOD +
+                        " WHERE " + METHOD_NAME + "=?",
 
-                new String[]{
-                        String.valueOf(accountId)
-                });
+                new String[]{methodName});
 
-        double balance = 0;
+        if(cursor.moveToFirst()){
 
-        if (cursor.moveToFirst()) {
-
-            balance = cursor.getDouble(0);
+            id = cursor.getInt(0);
 
         }
 
         cursor.close();
 
-        return balance;
-
+        return id;
     }
 
-    public int getTotalAccounts(int userId) {
+    public ArrayList<String> getPaymentMethodNames(){
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<String> list = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery(
+        Cursor cursor = getAllPaymentMethods();
 
-                "SELECT COUNT(*)" +
-                        " FROM " + TABLE_ACCOUNT +
-                        " WHERE " + USER_ID + "=?",
+        while(cursor.moveToNext()){
 
-                new String[]{
-                        String.valueOf(userId)
-                });
+            list.add(
 
-        int total = 0;
+                    cursor.getString(
 
-        if (cursor.moveToFirst()) {
+                            cursor.getColumnIndexOrThrow(METHOD_NAME)
 
-            total = cursor.getInt(0);
+                    )
+
+            );
 
         }
 
         cursor.close();
 
-        return total;
-
+        return list;
     }
 
-    public boolean accountExists(int userId,
-                                 String providerName) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.rawQuery(
-
-                "SELECT * FROM " + TABLE_ACCOUNT +
-
-                        " WHERE " +
-
-                        USER_ID + "=? AND " +
-
-                        PROVIDER_NAME + "=?",
-
-                new String[]{
-
-                        String.valueOf(userId),
-
-                        providerName
-
-                });
-
-        boolean exists = cursor.getCount() > 0;
-
-        cursor.close();
-
-        return exists;
-
-    }
 
     public long insertTransaction(int userId,
-                                  int accountId,
+                                  int paymentMethodId,
                                   int categoryId,
                                   double amount,
                                   String transactionType,
                                   String transactionDate,
-                                  String source) {
+                                  String source,
+                                  String expenseMode) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
         values.put(USER_ID, userId);
-        values.put(ACCOUNT_ID, accountId);
+        values.put(PAYMENT_METHOD_ID, paymentMethodId);
         values.put(CATEGORY_ID, categoryId);
         values.put(AMOUNT, amount);
         values.put(TRANSACTION_TYPE, transactionType);
         values.put(TRANSACTION_DATE, transactionDate);
         values.put(SOURCE, source);
+        values.put(EXPENSE_MODE, expenseMode);
 
         return db.insert(TABLE_TRANSACTION, null, values);
     }
@@ -932,7 +832,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                  int categoryId,
                                  double amount,
                                  String transactionDate,
-                                 String source) {
+                                 String source,
+                                 String expenseMode) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -942,6 +843,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(AMOUNT, amount);
         values.put(TRANSACTION_DATE, transactionDate);
         values.put(SOURCE, source);
+        values.put(EXPENSE_MODE, expenseMode);
 
         return db.update(
 
@@ -2247,29 +2149,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public double getTotalBalance(int userId) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        return getTotalIncome(userId) - getTotalExpense(userId);
 
-        Cursor cursor = db.rawQuery(
+    }
 
-                "SELECT IFNULL(SUM(" + BALANCE + "),0) FROM " +
-                        TABLE_ACCOUNT +
-                        " WHERE " +
-                        USER_ID + "=?",
+    public ArrayList<String> getExpenseCategoryNames() {
 
-                new String[]{
-                        String.valueOf(userId)
-                });
+        ArrayList<String> list = new ArrayList<>();
 
-        double balance = 0;
+        Cursor cursor = getExpenseCategories();
 
-        if (cursor.moveToFirst()) {
-            balance = cursor.getDouble(0);
+        while (cursor.moveToNext()) {
+
+            list.add(
+                    cursor.getString(
+                            cursor.getColumnIndexOrThrow(
+                                    CATEGORY_NAME)));
+
         }
 
         cursor.close();
 
-        return balance;
-
+        return list;
     }
 
     public double getMonthlyIncome(int userId, String month) {
@@ -2563,64 +2464,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return userId;
     }
-    public double getDashboardIncome(int userId) {
-
-        SQLiteDatabase db = getReadableDatabase();
-
-        double totalIncome = 0;
-
-        Cursor cursor = db.rawQuery(
-
-                "SELECT IFNULL(SUM(" + AMOUNT + "),0) " +
-                        "FROM " + TABLE_TRANSACTION +
-                        " WHERE " + USER_ID + "=? " +
-                        "AND " + TRANSACTION_TYPE + "='Income'",
-
-                new String[]{
-                        String.valueOf(userId)
-                });
-
-        if (cursor.moveToFirst()) {
-            totalIncome = cursor.getDouble(0);
-        }
-
-        cursor.close();
-
-        return totalIncome;
-    }
-    public double getDashboardExpense(int userId) {
-
-        SQLiteDatabase db = getReadableDatabase();
-
-        double totalExpense = 0;
-
-        Cursor cursor = db.rawQuery(
-
-                "SELECT IFNULL(SUM(" + AMOUNT + "),0) " +
-                        "FROM " + TABLE_TRANSACTION +
-                        " WHERE " + USER_ID + "=? " +
-                        "AND " + TRANSACTION_TYPE + "='Expense'",
-
-                new String[]{
-                        String.valueOf(userId)
-                });
-
-        if (cursor.moveToFirst()) {
-            totalExpense = cursor.getDouble(0);
-        }
-
-        cursor.close();
-
-        return totalExpense;
-    }
-    public double getDashboardBalance(int userId) {
-
-        double income = getDashboardIncome(userId);
-
-        double expense = getDashboardExpense(userId);
-
-        return income - expense;
-    }
 
     public double getDashboardRemainingBudget(int userId) {
 
@@ -2646,7 +2489,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
-        double totalExpense = getDashboardExpense(userId);
+        double totalExpense = getTotalExpense(userId);
 
         return totalBudget - totalExpense;
 
@@ -2679,7 +2522,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if(totalBudget==0)
             return 0;
 
-        double expense = getDashboardExpense(userId);
+        double expense = getTotalExpense(userId);
 
         return (expense / totalBudget) * 100;
 
@@ -2719,4 +2562,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return entries;
     }
+    public int getCategoryIdByName(String categoryName) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        int categoryId = -1;
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT " + CATEGORY_ID +
+                        " FROM " + TABLE_CATEGORY +
+                        " WHERE " + CATEGORY_NAME + "=?",
+
+                new String[]{categoryName});
+
+        if (cursor.moveToFirst()) {
+
+            categoryId = cursor.getInt(0);
+
+        }
+
+        cursor.close();
+
+        return categoryId;
+    }
+
+
 }

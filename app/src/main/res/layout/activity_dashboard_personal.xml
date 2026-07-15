@@ -742,7 +742,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:layout_marginTop="22dp"
-                        android:backgroundTint="#22C55E"
+                        android:backgroundTint="#2563EB"
                         android:text="View Detailed Insights"
                         android:textAllCaps="false"
                         android:textColor="@android:color/white"
@@ -753,37 +753,37 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-            <!-- ================================================= -->
-            <!-- FLOATING ACTION BUTTON -->
-            <!-- ================================================= -->
+    <!-- ================================================= -->
+    <!-- FLOATING ACTION BUTTON -->
+    <!-- ================================================= -->
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabAddExpense"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="90dp"
-                android:contentDescription="Add Expense"
-                android:src="@android:drawable/ic_input_add"
-                app:backgroundTint="#22C55E"
-                app:tint="#FFFFFF"
-                app:borderWidth="0dp"
-                app:elevation="10dp"/>
-            <!-- ================================================= -->
-            <!-- BOTTOM NAVIGATION -->
-            <!-- ================================================= -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddExpense"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="90dp"
+        android:contentDescription="Add Expense"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="#22C55E"
+        app:tint="#FFFFFF"
+        app:borderWidth="0dp"
+        app:elevation="10dp"/>
+    <!-- ================================================= -->
+    <!-- BOTTOM NAVIGATION -->
+    <!-- ================================================= -->
 
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottomNavigation"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_gravity="bottom"
-                android:background="@android:color/white"
-                android:elevation="12dp"
-                app:itemIconTint="@color/bottom_nav_colors"
-                app:itemTextColor="@color/bottom_nav_colors"
-                app:labelVisibilityMode="labeled"
-                app:menu="@menu/bottom_menu"/>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom"
+        android:background="@android:color/white"
+        android:elevation="12dp"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="@color/bottom_nav_colors"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_menu"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
