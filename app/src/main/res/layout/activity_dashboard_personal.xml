@@ -742,7 +742,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:layout_marginTop="22dp"
-                        android:backgroundTint="#2563EB"
+                        android:backgroundTint="#22C55E"
                         android:text="View Detailed Insights"
                         android:textAllCaps="false"
                         android:textColor="@android:color/white"
@@ -765,9 +765,9 @@
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="90dp"
                 android:contentDescription="Add Expense"
-                android:src="@drawable/ic_add"
-                android:tint="@android:color/white"
-                app:backgroundTint="#2563EB"
+                android:src="@android:drawable/ic_input_add"
+                app:backgroundTint="#22C55E"
+                app:tint="#FFFFFF"
                 app:borderWidth="0dp"
                 app:elevation="10dp"/>
             <!-- ================================================= -->

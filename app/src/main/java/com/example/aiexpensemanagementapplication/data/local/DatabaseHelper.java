@@ -2,6 +2,11 @@ package com.example.aiexpensemanagementapplication.data.local;
 
 
 import android.content.Context;
+import com.github.mikephil.charting.data.PieEntry;
+import java.util.List;
+import java.util.ArrayList;
+
+import com.github.mikephil.charting.data.Entry;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.ContentValues;
@@ -20,6 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // USER TABLE
     //========================================================
 
+    public static final String FIREBASE_UID = "FirebaseUid";
     public static final String TABLE_USER = "User";
 
     public static final String USER_ID = "UserID";
@@ -196,6 +202,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     USER_NAME + " TEXT NOT NULL," +
                     USER_EMAIL + " TEXT UNIQUE NOT NULL," +
+                    FIREBASE_UID + " TEXT UNIQUE," +
                     USER_MOBILE + " TEXT," +
                     USER_PASSWORD + " TEXT NOT NULL," +
                     USER_STATUS + " TEXT," +
@@ -403,6 +410,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(USER_CREATED_AT, createdAt);
 
         return db.insert(TABLE_USER, null, values);
+    }
+    public int getUserIdByFirebaseUid(String firebaseUid) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT " + USER_ID +
+                        " FROM " + TABLE_USER +
+                        " WHERE " + FIREBASE_UID + "=?",
+
+                new String[]{firebaseUid});
+
+        int userId = -1;
+
+        if(cursor.moveToFirst()){
+            userId = cursor.getInt(0);
+        }
+
+        cursor.close();
+
+        return userId;
     }
 
     public boolean isUserExists(String email) {
@@ -2343,5 +2372,351 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         String.valueOf(userId)
                 });
 
+    }
+    public double getCategoryExpense(int userId, int categoryId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(SUM(" + AMOUNT + "),0) " +
+                        "FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=?" +
+                        " AND " + CATEGORY_ID + "=?" +
+                        " AND " + TRANSACTION_TYPE + "='Expense'",
+
+                new String[]{
+                        String.valueOf(userId),
+                        String.valueOf(categoryId)
+                });
+
+        double total = 0;
+
+        if(cursor.moveToFirst()){
+            total = cursor.getDouble(0);
+        }
+
+        cursor.close();
+
+        return total;
+    }
+
+    public double getCategoryExpense(int userId,String categoryName){
+
+        SQLiteDatabase db=getReadableDatabase();
+
+        Cursor cursor=db.rawQuery(
+
+                "SELECT IFNULL(SUM(t."+AMOUNT+"),0) " +
+                        "FROM "+TABLE_TRANSACTION+" t " +
+                        "INNER JOIN "+TABLE_CATEGORY+" c " +
+                        "ON t."+CATEGORY_ID+"=c."+CATEGORY_ID+
+                        " WHERE t."+USER_ID+"=?" +
+                        " AND c."+CATEGORY_NAME+"=?" +
+                        " AND t."+TRANSACTION_TYPE+"='Expense'",
+
+                new String[]{
+                        String.valueOf(userId),
+                        categoryName
+                });
+
+        double total=0;
+
+        if(cursor.moveToFirst())
+            total=cursor.getDouble(0);
+
+        cursor.close();
+
+        return total;
+    }
+
+    public List<Entry> getWeeklyExpenseEntries(int userId){
+
+        ArrayList<Entry> entries = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT strftime('%w'," + TRANSACTION_DATE + "), " +
+                        "SUM(" + AMOUNT + ") " +
+                        "FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=?" +
+                        " AND " + TRANSACTION_TYPE + "='Expense'" +
+                        " GROUP BY strftime('%w'," + TRANSACTION_DATE + ")",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        while(cursor.moveToNext()){
+
+            entries.add(
+                    new Entry(
+                            cursor.getFloat(0),
+                            cursor.getFloat(1)
+                    )
+            );
+
+        }
+
+        cursor.close();
+
+        return entries;
+    }
+    public int getActiveSubscriptionCount(int userId){
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT COUNT(*) FROM " + TABLE_SUBSCRIPTION +
+                        " WHERE " + USER_ID + "=?",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        int count = 0;
+
+        if(cursor.moveToFirst())
+            count = cursor.getInt(0);
+
+        cursor.close();
+
+        return count;
+    }
+    public double getMonthlySubscriptionAmount(int userId){
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(SUM(" + AMOUNT + "),0) FROM " +
+                        TABLE_SUBSCRIPTION +
+                        " WHERE " + USER_ID + "=?",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        double total = 0;
+
+        if(cursor.moveToFirst())
+            total = cursor.getDouble(0);
+
+        cursor.close();
+
+        return total;
+    }
+    public String generateAIInsight(int userId) {
+
+        double income = getTotalIncome(userId);
+
+        double expense = getTotalExpense(userId);
+
+        if(income==0){
+
+            return "Add your first income to start receiving AI insights.";
+
+        }
+
+        if(expense>income){
+
+            return "Warning! Your expenses are higher than your income.";
+
+        }
+
+        if(expense>income*0.80){
+
+            return "You have spent more than 80% of your income this month.";
+
+        }
+
+        return "Great! Your spending is under control.";
+
+    }
+
+    // =====================================================
+    // DASHBOARD METHODS
+    // =====================================================
+    public int getUserIdByEmail(String email) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        int userId = -1;
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT " + USER_ID +
+                        " FROM " + TABLE_USER +
+                        " WHERE " + USER_EMAIL + "=?",
+
+                new String[]{email}
+        );
+
+        if (cursor.moveToFirst()) {
+            userId = cursor.getInt(0);
+        }
+
+        cursor.close();
+
+        return userId;
+    }
+    public double getDashboardIncome(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        double totalIncome = 0;
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(SUM(" + AMOUNT + "),0) " +
+                        "FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=? " +
+                        "AND " + TRANSACTION_TYPE + "='Income'",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        if (cursor.moveToFirst()) {
+            totalIncome = cursor.getDouble(0);
+        }
+
+        cursor.close();
+
+        return totalIncome;
+    }
+    public double getDashboardExpense(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        double totalExpense = 0;
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(SUM(" + AMOUNT + "),0) " +
+                        "FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=? " +
+                        "AND " + TRANSACTION_TYPE + "='Expense'",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        if (cursor.moveToFirst()) {
+            totalExpense = cursor.getDouble(0);
+        }
+
+        cursor.close();
+
+        return totalExpense;
+    }
+    public double getDashboardBalance(int userId) {
+
+        double income = getDashboardIncome(userId);
+
+        double expense = getDashboardExpense(userId);
+
+        return income - expense;
+    }
+
+    public double getDashboardRemainingBudget(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        double totalBudget = 0;
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(SUM(" + LIMIT_AMOUNT + "),0) " +
+                        " FROM " + TABLE_BUDGET +
+                        " WHERE " + USER_ID + "=?",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        if(cursor.moveToFirst()){
+
+            totalBudget = cursor.getDouble(0);
+
+        }
+
+        cursor.close();
+
+        double totalExpense = getDashboardExpense(userId);
+
+        return totalBudget - totalExpense;
+
+    }
+
+    public double getDashboardBudgetUsed(int userId){
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        double totalBudget = 0;
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(SUM(" + LIMIT_AMOUNT + "),0) " +
+                        " FROM " + TABLE_BUDGET +
+                        " WHERE " + USER_ID + "=?",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        if(cursor.moveToFirst()){
+
+            totalBudget = cursor.getDouble(0);
+
+        }
+
+        cursor.close();
+
+        if(totalBudget==0)
+            return 0;
+
+        double expense = getDashboardExpense(userId);
+
+        return (expense / totalBudget) * 100;
+
+    }
+
+    public ArrayList<PieEntry> getCategoryPieEntries(int userId) {
+
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String sql =
+                "SELECT c." + CATEGORY_NAME +
+                        ", IFNULL(SUM(t." + AMOUNT + "),0) " +
+                        "FROM " + TABLE_TRANSACTION + " t " +
+                        "INNER JOIN " + TABLE_CATEGORY + " c " +
+                        "ON t." + CATEGORY_ID + " = c." + CATEGORY_ID +
+                        " WHERE t." + USER_ID + "=? " +
+                        "AND t." + TRANSACTION_TYPE + "='Expense' " +
+                        "GROUP BY c." + CATEGORY_NAME;
+
+        Cursor cursor = db.rawQuery(
+                sql,
+                new String[]{String.valueOf(userId)}
+        );
+
+        while (cursor.moveToNext()) {
+
+            String category = cursor.getString(0);
+
+            float amount = cursor.getFloat(1);
+
+            entries.add(new PieEntry(amount, category));
+        }
+
+        cursor.close();
+
+        return entries;
     }
 }
