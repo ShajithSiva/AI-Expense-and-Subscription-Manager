@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Category Icon -->
+
+        <ImageView
+            android:id="@+id/imgCategory"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_food"
+            android:background="@drawable/bg_icon_circle"
+            android:padding="10dp" />
+
+        <!-- Category Name -->
+
+        <TextView
+            android:id="@+id/tvCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/imgCategory"
+            android:layout_marginStart="16dp"
+            android:text="Food"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#111827"/>
+
+        <!-- Amount -->
+
+        <TextView
+            android:id="@+id/tvAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="Rs.450.00"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#DC2626"/>
+
+        <!-- Note -->
+
+        <TextView
+            android:id="@+id/tvNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvCategory"
+            android:layout_toEndOf="@id/imgCategory"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="Lunch with friends"
+            android:textSize="14sp"
+            android:textColor="#6B7280"/>
+
+        <!-- Payment Method -->
+
+        <TextView
+            android:id="@+id/tvPayment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvNote"
+            android:layout_toEndOf="@id/imgCategory"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:text="Cash"
+            android:textStyle="bold"
+            android:textColor="#2563EB"
+            android:textSize="13sp"/>
+
+        <!-- Divider -->
+
+        <TextView
+            android:id="@+id/tvDivider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/tvPayment"
+            android:layout_alignBaseline="@id/tvPayment"
+            android:layout_marginStart="8dp"
+            android:text="•"
+            android:textColor="#9CA3AF"/>
+
+        <!-- Expense Mode -->
+
+        <TextView
+            android:id="@+id/tvMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/tvDivider"
+            android:layout_alignBaseline="@id/tvPayment"
+            android:layout_marginStart="8dp"
+            android:text="Personal"
+            android:textColor="#6B7280"
+            android:textSize="13sp"/>
+
+        <!-- Date -->
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvPayment"
+            android:layout_toEndOf="@id/imgCategory"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:text="15 Jul 2026"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp"/>
+
+        <!-- Menu -->
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            android:src="@drawable/ic_more_vert"/>
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

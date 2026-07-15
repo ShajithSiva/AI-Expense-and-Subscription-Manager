@@ -1,4 +1,5 @@
 package com.example.aiexpensemanagementapplication.data.local;
+import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
 
 
 import android.content.Context;
@@ -2586,6 +2587,440 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return categoryId;
     }
+    public ArrayList<ExpenseModel> getAllExpenses(int userId) {
 
+        ArrayList<ExpenseModel> expenseList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT t." + TRANSACTION_ID +
+                        ", c." + CATEGORY_NAME +
+                        ", p." + METHOD_NAME +
+                        ", t." + AMOUNT +
+                        ", t." + TRANSACTION_DATE +
+                        ", t." + SOURCE +
+                        ", t." + EXPENSE_MODE +
+
+                        " FROM " + TABLE_TRANSACTION + " t " +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c " +
+                        " ON t." + CATEGORY_ID + " = c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p " +
+                        " ON t." + PAYMENT_METHOD_ID + " = p." + PAYMENT_METHOD_ID +
+
+                        " WHERE t." + USER_ID + "=? " +
+                        " AND t." + TRANSACTION_TYPE + "='Expense' " +
+
+                        " ORDER BY t." + TRANSACTION_DATE + " DESC";
+
+        Cursor cursor = db.rawQuery(
+                query,
+                new String[]{String.valueOf(userId)}
+        );
+
+        while (cursor.moveToNext()) {
+
+            ExpenseModel expense = new ExpenseModel();
+
+            expense.setTransactionId(cursor.getInt(0));
+
+            expense.setCategoryName(cursor.getString(1));
+
+            expense.setPaymentMethod(cursor.getString(2));
+
+            expense.setAmount(cursor.getDouble(3));
+
+            expense.setTransactionDate(cursor.getString(4));
+
+            expense.setNote(cursor.getString(5));
+
+            expense.setExpenseMode(cursor.getString(6));
+
+            expenseList.add(expense);
+        }
+
+        cursor.close();
+
+        return expenseList;
+    }
+    public int deleteExpense(int transactionId) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        return db.delete(
+                TABLE_TRANSACTION,
+                TRANSACTION_ID + "=?",
+                new String[]{String.valueOf(transactionId)}
+        );
+    }
+    public Cursor getExpenseById(int transactionId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT " +
+
+                        "t." + TRANSACTION_ID + "," +
+
+                        "t." + CATEGORY_ID + "," +
+
+                        "t." + PAYMENT_METHOD_ID + "," +
+
+                        "t." + AMOUNT + "," +
+
+                        "t." + TRANSACTION_DATE + "," +
+
+                        "t." + SOURCE + "," +
+
+                        "t." + EXPENSE_MODE + "," +
+
+                        "c." + CATEGORY_NAME + "," +
+
+                        "p." + METHOD_NAME +
+
+                        " FROM " + TABLE_TRANSACTION + " t " +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c " +
+
+                        " ON t." + CATEGORY_ID +
+
+                        "=c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p " +
+
+                        " ON t." + PAYMENT_METHOD_ID +
+
+                        "=p." + PAYMENT_METHOD_ID +
+
+                        " WHERE t." + TRANSACTION_ID + "=?";
+
+        return db.rawQuery(
+
+                query,
+
+                new String[]{
+
+                        String.valueOf(transactionId)
+
+                });
+
+    }
+    public int updateExpense(int transactionId,
+                             int paymentMethodId,
+                             int categoryId,
+                             double amount,
+                             String transactionDate,
+                             String source,
+                             String expenseMode) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(PAYMENT_METHOD_ID, paymentMethodId);
+        values.put(CATEGORY_ID, categoryId);
+        values.put(AMOUNT, amount);
+        values.put(TRANSACTION_DATE, transactionDate);
+        values.put(SOURCE, source);
+        values.put(EXPENSE_MODE, expenseMode);
+
+        return db.update(
+                TABLE_TRANSACTION,
+                values,
+                TRANSACTION_ID + "=?",
+                new String[]{String.valueOf(transactionId)}
+        );
+    }
+
+    public int getExpenseCount(int userId) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT COUNT(*) FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=? " +
+                        " AND " + TRANSACTION_TYPE + "='Expense'",
+
+                new String[]{String.valueOf(userId)}
+        );
+
+        int count = 0;
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+
+        cursor.close();
+
+        return count;
+    }
+
+    public ArrayList<ExpenseModel> searchExpenses(int userId, String keyword) {
+
+        ArrayList<ExpenseModel> expenseList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT t." + TRANSACTION_ID +
+                        ", c." + CATEGORY_NAME +
+                        ", p." + METHOD_NAME +
+                        ", t." + AMOUNT +
+                        ", t." + TRANSACTION_DATE +
+                        ", t." + SOURCE +
+                        ", t." + EXPENSE_MODE +
+
+                        " FROM " + TABLE_TRANSACTION + " t " +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c ON " +
+                        "t." + CATEGORY_ID + "=c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p ON " +
+                        "t." + PAYMENT_METHOD_ID + "=p." + PAYMENT_METHOD_ID +
+
+                        " WHERE t." + USER_ID + "=?" +
+                        " AND t." + TRANSACTION_TYPE + "='Expense'" +
+
+                        " AND (" +
+
+                        "c." + CATEGORY_NAME + " LIKE ?" +
+
+                        " OR " +
+
+                        "p." + METHOD_NAME + " LIKE ?" +
+
+                        " OR " +
+
+                        "t." + SOURCE + " LIKE ?" +
+
+                        " OR " +
+
+                        "t." + TRANSACTION_DATE + " LIKE ? )" +
+
+                        " ORDER BY t." + TRANSACTION_DATE + " DESC";
+
+        String search = "%" + keyword + "%";
+
+        Cursor cursor = db.rawQuery(query,
+
+                new String[]{
+
+                        String.valueOf(userId),
+
+                        search,
+
+                        search,
+
+                        search,
+
+                        search
+
+                });
+
+        while (cursor.moveToNext()) {
+
+            ExpenseModel expense = new ExpenseModel();
+
+            expense.setTransactionId(cursor.getInt(0));
+            expense.setCategoryName(cursor.getString(1));
+            expense.setPaymentMethod(cursor.getString(2));
+            expense.setAmount(cursor.getDouble(3));
+            expense.setTransactionDate(cursor.getString(4));
+            expense.setNote(cursor.getString(5));
+            expense.setExpenseMode(cursor.getString(6));
+
+            expenseList.add(expense);
+
+        }
+
+        cursor.close();
+
+        return expenseList;
+
+    }
+
+    public ArrayList<ExpenseModel> getExpensesByCategory(int userId,
+                                                         String category) {
+
+        ArrayList<ExpenseModel> expenseList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT t." + TRANSACTION_ID +
+                        ", c." + CATEGORY_NAME +
+                        ", p." + METHOD_NAME +
+                        ", t." + AMOUNT +
+                        ", t." + TRANSACTION_DATE +
+                        ", t." + SOURCE +
+                        ", t." + EXPENSE_MODE +
+
+                        " FROM " + TABLE_TRANSACTION + " t " +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c " +
+                        " ON t." + CATEGORY_ID + "=c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p " +
+                        " ON t." + PAYMENT_METHOD_ID + "=p." + PAYMENT_METHOD_ID +
+
+                        " WHERE t." + USER_ID + "=?" +
+
+                        " AND t." + TRANSACTION_TYPE + "='Expense'" +
+
+                        " AND c." + CATEGORY_NAME + "=?" +
+
+                        " ORDER BY t." + TRANSACTION_DATE + " DESC";
+
+        Cursor cursor = db.rawQuery(
+
+                query,
+
+                new String[]{
+
+                        String.valueOf(userId),
+
+                        category
+
+                });
+
+        while (cursor.moveToNext()) {
+
+            ExpenseModel expense = new ExpenseModel();
+
+            expense.setTransactionId(cursor.getInt(0));
+            expense.setCategoryName(cursor.getString(1));
+            expense.setPaymentMethod(cursor.getString(2));
+            expense.setAmount(cursor.getDouble(3));
+            expense.setTransactionDate(cursor.getString(4));
+            expense.setNote(cursor.getString(5));
+            expense.setExpenseMode(cursor.getString(6));
+
+            expenseList.add(expense);
+        }
+
+        cursor.close();
+
+        return expenseList;
+    }
+
+    public ArrayList<ExpenseModel> filterExpenses(int userId,
+                                                  String category,
+                                                  String paymentMethod,
+                                                  String expenseMode,
+                                                  String sort) {
+
+        ArrayList<ExpenseModel> expenseList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        StringBuilder query = new StringBuilder();
+
+        query.append("SELECT t.")
+                .append(TRANSACTION_ID)
+                .append(", c.")
+                .append(CATEGORY_NAME)
+                .append(", p.")
+                .append(METHOD_NAME)
+                .append(", t.")
+                .append(AMOUNT)
+                .append(", t.")
+                .append(TRANSACTION_DATE)
+                .append(", t.")
+                .append(SOURCE)
+                .append(", t.")
+                .append(EXPENSE_MODE)
+                .append(" FROM ")
+                .append(TABLE_TRANSACTION)
+                .append(" t ")
+                .append("INNER JOIN ")
+                .append(TABLE_CATEGORY)
+                .append(" c ON t.")
+                .append(CATEGORY_ID)
+                .append(" = c.")
+                .append(CATEGORY_ID)
+                .append(" INNER JOIN ")
+                .append(TABLE_PAYMENT_METHOD)
+                .append(" p ON t.")
+                .append(PAYMENT_METHOD_ID)
+                .append(" = p.")
+                .append(PAYMENT_METHOD_ID)
+                .append(" WHERE t.")
+                .append(USER_ID)
+                .append("=?")
+                .append(" AND t.")
+                .append(TRANSACTION_TYPE)
+                .append("='Expense'");
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add(String.valueOf(userId));
+
+        if (!category.equals("All")) {
+            query.append(" AND c.").append(CATEGORY_NAME).append("=?");
+            args.add(category);
+        }
+
+        if (!paymentMethod.equals("All")) {
+            query.append(" AND p.").append(METHOD_NAME).append("=?");
+            args.add(paymentMethod);
+        }
+
+        if (!expenseMode.equals("All")) {
+            query.append(" AND t.").append(EXPENSE_MODE).append("=?");
+            args.add(expenseMode);
+        }
+
+        switch (sort) {
+
+            case "Oldest":
+                query.append(" ORDER BY t.")
+                        .append(TRANSACTION_DATE)
+                        .append(" ASC");
+                break;
+
+            case "Highest Amount":
+                query.append(" ORDER BY t.")
+                        .append(AMOUNT)
+                        .append(" DESC");
+                break;
+
+            case "Lowest Amount":
+                query.append(" ORDER BY t.")
+                        .append(AMOUNT)
+                        .append(" ASC");
+                break;
+
+            default:
+                query.append(" ORDER BY t.")
+                        .append(TRANSACTION_DATE)
+                        .append(" DESC");
+                break;
+        }
+
+        Cursor cursor = db.rawQuery(
+                query.toString(),
+                args.toArray(new String[0]));
+
+        while (cursor.moveToNext()) {
+
+            ExpenseModel expense = new ExpenseModel();
+
+            expense.setTransactionId(cursor.getInt(0));
+            expense.setCategoryName(cursor.getString(1));
+            expense.setPaymentMethod(cursor.getString(2));
+            expense.setAmount(cursor.getDouble(3));
+            expense.setTransactionDate(cursor.getString(4));
+            expense.setNote(cursor.getString(5));
+            expense.setExpenseMode(cursor.getString(6));
+
+            expenseList.add(expense);
+        }
+
+        cursor.close();
+
+        return expenseList;
+    }
 
 }

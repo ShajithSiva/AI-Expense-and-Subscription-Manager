@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aiexpensemanagementapplication.ui.expense.AddExpenseActivity;
+import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -91,6 +92,9 @@ public class PersonalDashboardActivity extends AppCompatActivity {
         initialize();
 
         loadDashboard();
+
+        setupBottomNavigation();
+
         fabAddExpense.setOnClickListener(v -> {
 
             startActivity(
@@ -177,6 +181,38 @@ public class PersonalDashboardActivity extends AppCompatActivity {
         loadSubscriptions();
 
         loadAIInsights();
+    }
+
+    private void setupBottomNavigation() {
+
+        bottomNavigation.setSelectedItemId(R.id.nav_dashboard);
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+
+            int id = item.getItemId();
+
+            if (id == R.id.nav_dashboard) {
+
+                return true;
+
+            } else if (id == R.id.nav_expenses) {
+
+                Intent intent = new Intent(
+                        PersonalDashboardActivity.this,
+                        ExpenseListActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
+
+                return true;
+
+            }
+
+            return false;
+
+        });
+
     }
 
     private void loadUser() {
