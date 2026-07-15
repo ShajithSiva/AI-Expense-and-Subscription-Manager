@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
@@ -25,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvForgotPassword, tvRegister;
 
     private FirebaseAuth mAuth;
+    private DatabaseHelper databaseHelper;
     private FirebaseFirestore firestore;
 
     @Override
@@ -40,6 +42,8 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
+
+        databaseHelper = new DatabaseHelper(this);
 
         btnLogin.setOnClickListener(v -> loginUser());
 
@@ -133,6 +137,69 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
+    private void syncUserToSQLite(FirebaseUser user) {
+
+        firestore.collection("users")
+                .document(user.getUid())
+                .get()
+                .addOnSuccessListener(document -> {
+
+                    String fullName = document.getString("fullName");
+                    String email = document.getString("email");
+                    String mobile = document.getString("mobileNumber");
+
+                    if (fullName == null) fullName = "";
+                    if (email == null) email = user.getEmail();
+                    if (mobile == null) mobile = "";
+
+                    if (!databaseHelper.isFirebaseUserExists(user.getUid())) {
+
+                        databaseHelper.insertUser(
+                                fullName,
+                                email,
+                                user.getUid(),
+                                mobile,
+                                "",
+                                "Active",
+                                String.valueOf(System.currentTimeMillis())
+                        );
+                    }
+
+                    openDashboard();
+
+                })
+                .addOnFailureListener(e -> {
+
+                    Toast.makeText(
+                            this,
+                            "Failed to sync local database.",
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                });
+    }
+
+    private void openDashboard() {
+
+        Toast.makeText(
+                this,
+                "Login Successful",
+                Toast.LENGTH_SHORT
+        ).show();
+
+        Intent intent = new Intent(
+                LoginActivity.this,
+                PersonalDashboardActivity.class);
+
+        intent.setFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        startActivity(intent);
+
+        finish();
+    }
+
     private void checkUserStatus(DocumentSnapshot document, FirebaseUser user) {
 
         if (!document.exists()) {
@@ -208,22 +275,7 @@ public class LoginActivity extends AppCompatActivity {
                         "lastLogin",
                         com.google.firebase.firestore.FieldValue.serverTimestamp()
                 );
-
-        Toast.makeText(
-                this,
-                "Login Successful",
-                Toast.LENGTH_SHORT
-        ).show();
-
-        Intent intent = new Intent(
-                LoginActivity.this,
-                PersonalDashboardActivity.class);
-
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        startActivity(intent);
-        finish();
+        syncUserToSQLite(user);
     }
 
     private void resetPassword() {

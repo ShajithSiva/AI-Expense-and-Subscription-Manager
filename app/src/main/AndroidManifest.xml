@@ -40,11 +40,14 @@
             android:name=".ui.auth.CreatePasswordActivity"
             android:windowSoftInputMode="adjustResize" />
 
+
         <!-- MAIN DASHBOARD -->
         <activity android:name=".ui.dashboard.PersonalDashboardActivity"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- BUDGET SCREENS -->
+        <activity
+            android:name=".ui.expense.AddExpenseActivity"/>
         <activity android:name=".ui.budget.BudgetActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.budget.SetBudgetActivity"

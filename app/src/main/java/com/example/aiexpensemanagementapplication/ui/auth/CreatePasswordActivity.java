@@ -30,7 +30,6 @@ public class CreatePasswordActivity extends AppCompatActivity {
     private TextView checkNumber;
     private TextView checkSpecialCharacter;
     private TextView checkPasswordsMatch;
-
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
 
@@ -148,17 +147,16 @@ public class CreatePasswordActivity extends AppCompatActivity {
             finish();
             return;
         }
+
         if (!user.isEmailVerified()) {
 
             Toast.makeText(this,
                     "Email is not verified.",
                     Toast.LENGTH_SHORT).show();
-
             return;
         }
 
         btnCreateAccount.setEnabled(false);
-
         btnCreateAccount.setText("Creating...");
 
         user.updatePassword(password)
@@ -173,7 +171,6 @@ public class CreatePasswordActivity extends AppCompatActivity {
                                     "lastLogin",
                                     com.google.firebase.firestore.FieldValue.serverTimestamp()
                             )
-
                             .addOnSuccessListener(unused1 -> {
 
                                 Toast.makeText(
@@ -184,10 +181,9 @@ public class CreatePasswordActivity extends AppCompatActivity {
 
                                 mAuth.signOut();
 
-                                Intent intent =
-                                        new Intent(
-                                                CreatePasswordActivity.this,
-                                                LoginActivity.class);
+                                Intent intent = new Intent(
+                                        CreatePasswordActivity.this,
+                                        LoginActivity.class);
 
                                 intent.setFlags(
                                         Intent.FLAG_ACTIVITY_NEW_TASK |
@@ -197,7 +193,6 @@ public class CreatePasswordActivity extends AppCompatActivity {
                                 finish();
 
                             })
-
                             .addOnFailureListener(e -> {
 
                                 btnCreateAccount.setEnabled(true);
@@ -205,14 +200,13 @@ public class CreatePasswordActivity extends AppCompatActivity {
 
                                 Toast.makeText(
                                         CreatePasswordActivity.this,
-                                        e.getMessage(),
+                                        "Failed to update account: " + e.getMessage(),
                                         Toast.LENGTH_LONG
                                 ).show();
 
                             });
 
                 })
-
                 .addOnFailureListener(e -> {
 
                     btnCreateAccount.setEnabled(true);

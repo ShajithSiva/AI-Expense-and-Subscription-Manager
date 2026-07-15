@@ -2,10 +2,13 @@ package com.example.aiexpensemanagementapplication.ui.dashboard;
 
 import android.os.Bundle;
 import android.widget.TextView;
+import android.content.Intent;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.aiexpensemanagementapplication.ui.expense.AddExpenseActivity;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -86,6 +89,23 @@ public class PersonalDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard_personal);
 
         initialize();
+
+        loadDashboard();
+        fabAddExpense.setOnClickListener(v -> {
+
+            startActivity(
+                    new Intent(
+                            PersonalDashboardActivity.this,
+                            AddExpenseActivity.class
+                    )
+            );
+
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         loadDashboard();
     }
@@ -205,11 +225,11 @@ public class PersonalDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        double income = databaseHelper.getDashboardIncome(userId);
+        double income = databaseHelper.getTotalIncome(userId);
 
-        double expense = databaseHelper.getDashboardExpense(userId);
+        double expense = databaseHelper.getTotalExpense(userId);
 
-        double balance = databaseHelper.getDashboardBalance(userId);
+        double balance = databaseHelper.getTotalBalance(userId);
 
         double budgetRemaining = databaseHelper.getDashboardRemainingBudget(userId);
 
