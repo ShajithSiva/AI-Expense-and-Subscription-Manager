@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Income Icon -->
+
+        <ImageView
+            android:id="@+id/imgCategory"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_icon_circle"
+            android:contentDescription="Income Category"
+            android:padding="10dp"
+            android:src="@drawable/money" />
+
+        <!-- Category -->
+
+        <TextView
+            android:id="@+id/tvCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@id/imgCategory"
+            android:text="Salary"
+            android:textColor="#111827"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Amount -->
+
+        <TextView
+            android:id="@+id/tvAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="12dp"
+            android:text="Rs. 50,000.00"
+            android:textColor="#16A34A"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Notes -->
+
+        <TextView
+            android:id="@+id/tvNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvCategory"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_toEndOf="@id/imgCategory"
+            android:text="Monthly Salary"
+            android:textColor="#6B7280"
+            android:textSize="14sp" />
+
+        <!-- Income Source -->
+
+        <TextView
+            android:id="@+id/tvPayment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvNote"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@id/imgCategory"
+            android:text="Bank Transfer"
+            android:textColor="#16A34A"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <!-- Date -->
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvPayment"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@id/imgCategory"
+            android:text="15 Jul 2026"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp" />
+
+        <!-- Menu -->
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Income Options"
+            android:padding="6dp"
+            android:src="@drawable/ic_more_vert" />
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

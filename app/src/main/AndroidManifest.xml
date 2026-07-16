@@ -70,6 +70,27 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- Income -->
+        <activity
+            android:name=".ui.income.AddIncomeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.income.EditIncomeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.income.IncomeDetailsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.income.IncomeListActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- Budget -->
         <activity
             android:name=".ui.budget.BudgetActivity"

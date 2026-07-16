@@ -1,5 +1,6 @@
 package com.example.aiexpensemanagementapplication.data.local;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
+import com.example.aiexpensemanagementapplication.ui.income.IncomeModel;
 
 
 import android.content.Context;
@@ -2174,6 +2175,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    public ArrayList<String> getIncomeCategoryNames() {
+
+        ArrayList<String> list = new ArrayList<>();
+
+        Cursor cursor = getIncomeCategories();
+
+        while (cursor.moveToNext()) {
+
+            list.add(
+                    cursor.getString(
+                            cursor.getColumnIndexOrThrow(
+                                    CATEGORY_NAME
+                            )
+                    )
+            );
+        }
+
+        cursor.close();
+
+        return list;
+    }
+
     public double getMonthlyIncome(int userId, String month) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -2707,6 +2730,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 });
 
     }
+
+    public Cursor getIncomeById(int transactionId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT " +
+
+                        "t." + TRANSACTION_ID + "," +
+                        "t." + CATEGORY_ID + "," +
+                        "t." + PAYMENT_METHOD_ID + "," +
+                        "t." + AMOUNT + "," +
+                        "t." + TRANSACTION_DATE + "," +
+                        "t." + SOURCE + "," +
+                        "t." + EXPENSE_MODE + "," +
+                        "c." + CATEGORY_NAME + "," +
+                        "p." + METHOD_NAME +
+
+                        " FROM " + TABLE_TRANSACTION + " t" +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c" +
+                        " ON t." + CATEGORY_ID +
+                        "=c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p" +
+                        " ON t." + PAYMENT_METHOD_ID +
+                        "=p." + PAYMENT_METHOD_ID +
+
+                        " WHERE t." + TRANSACTION_ID + "=?" +
+
+                        " AND t." + TRANSACTION_TYPE + "='Income'";
+
+        return db.rawQuery(
+                query,
+                new String[]{String.valueOf(transactionId)}
+        );
+    }
     public int updateExpense(int transactionId,
                              int paymentMethodId,
                              int categoryId,
@@ -2725,6 +2785,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(TRANSACTION_DATE, transactionDate);
         values.put(SOURCE, source);
         values.put(EXPENSE_MODE, expenseMode);
+
+        return db.update(
+                TABLE_TRANSACTION,
+                values,
+                TRANSACTION_ID + "=?",
+                new String[]{String.valueOf(transactionId)}
+        );
+    }
+
+    public int updateIncome(int transactionId,
+                            int paymentMethodId,
+                            int categoryId,
+                            double amount,
+                            String transactionDate,
+                            String source,
+                            String incomeMode) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(PAYMENT_METHOD_ID, paymentMethodId);
+        values.put(CATEGORY_ID, categoryId);
+        values.put(AMOUNT, amount);
+        values.put(TRANSACTION_DATE, transactionDate);
+        values.put(SOURCE, source);
+        values.put(EXPENSE_MODE, incomeMode);
+        values.put(TRANSACTION_TYPE, "Income");
 
         return db.update(
                 TABLE_TRANSACTION,
@@ -3021,6 +3109,334 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return expenseList;
+    }
+
+    public ArrayList<IncomeModel> getAllIncome(int userId) {
+
+        ArrayList<IncomeModel> incomeList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT t." + TRANSACTION_ID +
+                        ", c." + CATEGORY_NAME +
+                        ", p." + METHOD_NAME +
+                        ", t." + AMOUNT +
+                        ", t." + TRANSACTION_DATE +
+                        ", t." + SOURCE +
+                        ", t." + EXPENSE_MODE +
+
+                        " FROM " + TABLE_TRANSACTION + " t " +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c " +
+                        " ON t." + CATEGORY_ID + " = c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p " +
+                        " ON t." + PAYMENT_METHOD_ID + " = p." + PAYMENT_METHOD_ID +
+
+                        " WHERE t." + USER_ID + "=? " +
+                        " AND t." + TRANSACTION_TYPE + "='Income' " +
+
+                        " ORDER BY t." + TRANSACTION_DATE + " DESC";
+
+        Cursor cursor = db.rawQuery(
+                query,
+                new String[]{String.valueOf(userId)}
+        );
+
+        while (cursor.moveToNext()) {
+
+            IncomeModel income = createIncomeFromCursor(cursor);
+
+            incomeList.add(income);
+        }
+
+        cursor.close();
+
+        return incomeList;
+    }
+
+
+    public int getIncomeCount(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=?" +
+                        " AND " + TRANSACTION_TYPE + "='Income'",
+                new String[]{String.valueOf(userId)}
+        );
+
+        int count = 0;
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+
+        cursor.close();
+
+        return count;
+    }
+
+
+    public ArrayList<IncomeModel> searchIncome(int userId,
+                                               String keyword) {
+
+        ArrayList<IncomeModel> incomeList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT t." + TRANSACTION_ID +
+                        ", c." + CATEGORY_NAME +
+                        ", p." + METHOD_NAME +
+                        ", t." + AMOUNT +
+                        ", t." + TRANSACTION_DATE +
+                        ", t." + SOURCE +
+                        ", t." + EXPENSE_MODE +
+
+                        " FROM " + TABLE_TRANSACTION + " t " +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c " +
+                        " ON t." + CATEGORY_ID + "=c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p " +
+                        " ON t." + PAYMENT_METHOD_ID + "=p." + PAYMENT_METHOD_ID +
+
+                        " WHERE t." + USER_ID + "=?" +
+                        " AND t." + TRANSACTION_TYPE + "='Income'" +
+
+                        " AND (" +
+                        "c." + CATEGORY_NAME + " LIKE ?" +
+                        " OR p." + METHOD_NAME + " LIKE ?" +
+                        " OR t." + SOURCE + " LIKE ?" +
+                        " OR t." + TRANSACTION_DATE + " LIKE ?)" +
+
+                        " ORDER BY t." + TRANSACTION_DATE + " DESC";
+
+        String search = "%" + keyword + "%";
+
+        Cursor cursor = db.rawQuery(
+                query,
+                new String[]{
+                        String.valueOf(userId),
+                        search,
+                        search,
+                        search,
+                        search
+                }
+        );
+
+        while (cursor.moveToNext()) {
+
+            IncomeModel income = createIncomeFromCursor(cursor);
+
+            incomeList.add(income);
+        }
+
+        cursor.close();
+
+        return incomeList;
+    }
+
+
+    public ArrayList<IncomeModel> getIncomeByCategory(int userId,
+                                                      String category) {
+
+        ArrayList<IncomeModel> incomeList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT t." + TRANSACTION_ID +
+                        ", c." + CATEGORY_NAME +
+                        ", p." + METHOD_NAME +
+                        ", t." + AMOUNT +
+                        ", t." + TRANSACTION_DATE +
+                        ", t." + SOURCE +
+                        ", t." + EXPENSE_MODE +
+
+                        " FROM " + TABLE_TRANSACTION + " t " +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c " +
+                        " ON t." + CATEGORY_ID + "=c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p " +
+                        " ON t." + PAYMENT_METHOD_ID + "=p." + PAYMENT_METHOD_ID +
+
+                        " WHERE t." + USER_ID + "=?" +
+                        " AND t." + TRANSACTION_TYPE + "='Income'" +
+                        " AND c." + CATEGORY_NAME + "=?" +
+
+                        " ORDER BY t." + TRANSACTION_DATE + " DESC";
+
+        Cursor cursor = db.rawQuery(
+                query,
+                new String[]{
+                        String.valueOf(userId),
+                        category
+                }
+        );
+
+        while (cursor.moveToNext()) {
+
+            IncomeModel income = createIncomeFromCursor(cursor);
+
+            incomeList.add(income);
+        }
+
+        cursor.close();
+
+        return incomeList;
+    }
+
+
+    public ArrayList<IncomeModel> filterIncome(int userId,
+                                               String category,
+                                               String incomeSource,
+                                               String incomeMode,
+                                               String sort) {
+
+        ArrayList<IncomeModel> incomeList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        StringBuilder query = new StringBuilder();
+
+        query.append("SELECT t.")
+                .append(TRANSACTION_ID)
+                .append(", c.")
+                .append(CATEGORY_NAME)
+                .append(", p.")
+                .append(METHOD_NAME)
+                .append(", t.")
+                .append(AMOUNT)
+                .append(", t.")
+                .append(TRANSACTION_DATE)
+                .append(", t.")
+                .append(SOURCE)
+                .append(", t.")
+                .append(EXPENSE_MODE)
+                .append(" FROM ")
+                .append(TABLE_TRANSACTION)
+                .append(" t ")
+                .append("INNER JOIN ")
+                .append(TABLE_CATEGORY)
+                .append(" c ON t.")
+                .append(CATEGORY_ID)
+                .append("=c.")
+                .append(CATEGORY_ID)
+                .append(" INNER JOIN ")
+                .append(TABLE_PAYMENT_METHOD)
+                .append(" p ON t.")
+                .append(PAYMENT_METHOD_ID)
+                .append("=p.")
+                .append(PAYMENT_METHOD_ID)
+                .append(" WHERE t.")
+                .append(USER_ID)
+                .append("=?")
+                .append(" AND t.")
+                .append(TRANSACTION_TYPE)
+                .append("='Income'");
+
+        ArrayList<String> arguments = new ArrayList<>();
+
+        arguments.add(String.valueOf(userId));
+
+        if (!category.equals("All")) {
+
+            query.append(" AND c.")
+                    .append(CATEGORY_NAME)
+                    .append("=?");
+
+            arguments.add(category);
+        }
+
+        if (!incomeSource.equals("All")) {
+
+            query.append(" AND p.")
+                    .append(METHOD_NAME)
+                    .append("=?");
+
+            arguments.add(incomeSource);
+        }
+
+        if (!incomeMode.equals("All")) {
+
+            query.append(" AND t.")
+                    .append(EXPENSE_MODE)
+                    .append("=?");
+
+            arguments.add(incomeMode);
+        }
+
+        switch (sort) {
+
+            case "Oldest":
+
+                query.append(" ORDER BY t.")
+                        .append(TRANSACTION_DATE)
+                        .append(" ASC");
+
+                break;
+
+            case "Highest Amount":
+
+                query.append(" ORDER BY t.")
+                        .append(AMOUNT)
+                        .append(" DESC");
+
+                break;
+
+            case "Lowest Amount":
+
+                query.append(" ORDER BY t.")
+                        .append(AMOUNT)
+                        .append(" ASC");
+
+                break;
+
+            default:
+
+                query.append(" ORDER BY t.")
+                        .append(TRANSACTION_DATE)
+                        .append(" DESC");
+
+                break;
+        }
+
+        Cursor cursor = db.rawQuery(
+                query.toString(),
+                arguments.toArray(new String[0])
+        );
+
+        while (cursor.moveToNext()) {
+
+            IncomeModel income = createIncomeFromCursor(cursor);
+
+            incomeList.add(income);
+        }
+
+        cursor.close();
+
+        return incomeList;
+    }
+
+
+    private IncomeModel createIncomeFromCursor(Cursor cursor) {
+
+        IncomeModel income = new IncomeModel();
+
+        income.setTransactionId(cursor.getInt(0));
+        income.setCategoryName(cursor.getString(1));
+        income.setIncomeSource(cursor.getString(2));
+        income.setAmount(cursor.getDouble(3));
+        income.setTransactionDate(cursor.getString(4));
+        income.setNote(cursor.getString(5));
+        income.setIncomeMode(cursor.getString(6));
+
+        return income;
     }
 
 }
