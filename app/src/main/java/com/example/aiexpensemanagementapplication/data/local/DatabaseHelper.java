@@ -3439,4 +3439,70 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return income;
     }
 
+    public boolean updateUserProfile(int userId,
+                                     String name,
+                                     String mobile) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(USER_NAME, name);
+
+        values.put(USER_MOBILE, mobile);
+
+        int rows = db.update(
+
+                TABLE_USER,
+
+                values,
+
+                USER_ID + "=?",
+
+                new String[]{String.valueOf(userId)}
+
+        );
+
+        return rows > 0;
+    }
+
+    public boolean updateUserMobile(int userId, String mobile) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(USER_MOBILE, mobile);
+
+        int rows = db.update(
+                TABLE_USER,
+                values,
+                USER_ID + "=?",
+                new String[]{String.valueOf(userId)}
+        );
+
+        return rows > 0;
+    }
+
+    public boolean isMobileExists(String mobile) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                TABLE_USER,
+                new String[]{USER_ID},
+                USER_MOBILE + "=?",
+                new String[]{mobile},
+                null,
+                null,
+                null
+        );
+
+        boolean exists = cursor.moveToFirst();
+
+        cursor.close();
+
+        return exists;
+    }
+
 }

@@ -18,97 +18,81 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Authentication -->
+        </activity> <!-- Authentication -->
         <activity
             android:name=".ui.auth.LoginActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.auth.VerifyEmailActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.auth.VerifyMobileActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.auth.VerifyOtpActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.auth.CreatePasswordActivity"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- Dashboard -->
+            android:windowSoftInputMode="adjustResize" /> <!-- Dashboard -->
         <activity
             android:name=".ui.dashboard.PersonalDashboardActivity"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- Expense -->
+            android:windowSoftInputMode="adjustResize" /> <!-- Expense -->
         <activity
             android:name=".ui.expense.ExpenseListActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.expense.AddExpenseActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.expense.EditExpenseActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.expense.ExpenseDetailsActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- Income -->
+            android:windowSoftInputMode="adjustResize" /> <!-- Income -->
         <activity
             android:name=".ui.income.AddIncomeActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.income.EditIncomeActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.income.IncomeDetailsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.income.IncomeListActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- Budget -->
+            android:windowSoftInputMode="adjustResize" /> <!-- Budget -->
         <activity
             android:name=".ui.budget.BudgetActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.budget.SetBudgetActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.budget.EditBudgetActivity"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- Reports -->
+            android:windowSoftInputMode="adjustResize" /> <!-- Reports -->
         <activity
             android:name=".ui.report.ReportActivity"
             android:windowSoftInputMode="adjustResize" />
-
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity
+            android:name=".ui.profile.EditProfileActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.profile.ChangeMobileVerificationActivity"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 
 </manifest>

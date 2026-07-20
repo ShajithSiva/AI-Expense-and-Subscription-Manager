@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 
+import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import android.view.inputmethod.InputMethodManager;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -170,25 +171,39 @@ public class VerifyOtpActivity extends AppCompatActivity {
                                 .update(updates)
                                 .addOnSuccessListener(unused -> {
 
-                                    isVerifying = false;
+                                    DatabaseHelper databaseHelper = new DatabaseHelper(this);
 
-                                    Toast.makeText(
-                                            VerifyOtpActivity.this,
-                                            "Phone number verified successfully.",
-                                            Toast.LENGTH_SHORT
-                                    ).show();
+                                    int userId = databaseHelper.getUserIdByFirebaseUid(currentUser.getUid());
 
-                                    Intent intent = new Intent(
-                                            VerifyOtpActivity.this,
-                                            CreatePasswordActivity.class);
+                                    String mobile = phoneNumber;
 
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                                            Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    if (mobile.startsWith("+94")) {
+                                        mobile = "0" + mobile.substring(3);
+                                    }
 
-                                    startActivity(intent);
-                                    finish();
+                                    databaseHelper.updateUserMobile(userId, mobile)
+                            ;
 
-                                })
+                            isVerifying = false;
+
+                            Toast.makeText(
+                                    VerifyOtpActivity.this,
+                                    "Phone number verified successfully.",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            Intent intent = new Intent(
+                                    VerifyOtpActivity.this,
+                                    CreatePasswordActivity.class);
+
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                            startActivity(intent);
+
+                            finish();
+
+                        })
                                 .addOnFailureListener(e -> {
 
                                     isVerifying = false;

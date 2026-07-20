@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
+import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -558,9 +559,13 @@ public class ExpenseListActivity extends AppCompatActivity {
 
             } else if (id == R.id.nav_profile) {
 
-                Toast.makeText(this,
-                        "Profile Coming Soon",
-                        Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(
+                        ExpenseListActivity.this,
+                        ProfileActivity.class);
+
+                startActivity(intent);
+
+                finish();
 
                 return true;
 
