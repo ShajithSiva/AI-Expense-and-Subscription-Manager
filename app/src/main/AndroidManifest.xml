@@ -93,6 +93,9 @@
         <activity
             android:name=".ui.profile.ChangeMobileVerificationActivity"
             android:windowSoftInputMode="adjustResize"/>
+        <activity
+            android:name=".ui.profile.ChangePasswordActivity"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 
 </manifest>

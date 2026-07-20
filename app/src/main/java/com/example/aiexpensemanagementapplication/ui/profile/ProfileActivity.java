@@ -220,14 +220,14 @@ public class ProfileActivity extends AppCompatActivity{
 
         });
 
-//        layoutChangePassword.setOnClickListener(v -> {
-//
-//            startActivity(new Intent(
-//                    this,
-//                    ChangePasswordActivity.class));
-//
-//        });
-//
+        layoutChangePassword.setOnClickListener(v -> {
+
+            startActivity(new Intent(
+                    this,
+                    ChangePasswordActivity.class));
+
+        });
+
 //        layoutBudget.setOnClickListener(v -> {
 //
 //            startActivity(new Intent(
