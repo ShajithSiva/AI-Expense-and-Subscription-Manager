@@ -14,7 +14,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
@@ -36,14 +36,14 @@ import com.example.aiexpensemanagementapplication.R;
 public class NotificationPreferancesActivity extends AppCompatActivity {
     private MaterialToolbar toolbar;
 
-    private SwitchMaterial switchEnableNotifications;
-    private SwitchMaterial switchExpenseReminder;
-    private SwitchMaterial switchBudgetAlert;
-    private SwitchMaterial switchLargeTransaction;
-    private SwitchMaterial switchSubscriptionReminder;
-    private SwitchMaterial switchRenewalReminder;
-    private SwitchMaterial switchWeeklyReport;
-    private SwitchMaterial switchMonthlyReport;
+    private MaterialSwitch switchEnableNotifications;
+    private MaterialSwitch switchExpenseReminder;
+    private MaterialSwitch switchBudgetAlert;
+    private MaterialSwitch switchLargeTransaction;
+    private MaterialSwitch switchSubscriptionReminder;
+    private MaterialSwitch switchRenewalReminder;
+    private MaterialSwitch switchWeeklyReport;
+    private MaterialSwitch switchMonthlyReport;
 
     private TextView tvReminderTime;
 
