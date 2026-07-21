@@ -1,6 +1,7 @@
 package com.example.aiexpensemanagementapplication.data.local;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeModel;
+import com.example.aiexpensemanagementapplication.model.NotificationPreferences;
 
 
 import android.content.Context;
@@ -21,7 +22,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     //========================================================
     // USER TABLE
@@ -160,6 +161,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String GENERATED_DATE = "GeneratedDate";
 
     //========================================================
+    // Notification Preferences Table
+    //========================================================
+    private static final String TABLE_NOTIFICATION_PREFERENCES = "notification_preferences";
+
+    private static final String COLUMN_USER_ID = "user_id";
+
+    private static final String COLUMN_NOTIFICATIONS_ENABLED = "notifications_enabled";
+    private static final String COLUMN_EXPENSE_REMINDER = "expense_reminder";
+    private static final String COLUMN_BUDGET_ALERT = "budget_alert";
+    private static final String COLUMN_LARGE_TRANSACTION_ALERT = "large_transaction_alert";
+
+    private static final String COLUMN_SUBSCRIPTION_REMINDER = "subscription_reminder";
+    private static final String COLUMN_RENEWAL_REMINDER = "renewal_reminder";
+
+    private static final String COLUMN_WEEKLY_REPORT = "weekly_report";
+    private static final String COLUMN_MONTHLY_REPORT = "monthly_report";
+
+    private static final String COLUMN_REMINDER_HOUR = "reminder_hour";
+    private static final String COLUMN_REMINDER_MINUTE = "reminder_minute";
+
+    private static final String COLUMN_UPDATED_AT = "updated_at";
+
+    //========================================================
     // CONSTRUCTOR
     //========================================================
 
@@ -199,6 +223,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertDefaultCategories(db);
 
         insertDefaultPaymentMethods(db);
+
+        db.execSQL(CREATE_NOTIFICATION_PREFERENCES_TABLE);
     }
 
     private static final String CREATE_USER_TABLE =
@@ -329,6 +355,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
                     TABLE_USER + "(" + USER_ID + ")" +
                     ");";
+
+    private static final String CREATE_NOTIFICATION_PREFERENCES_TABLE =
+            "CREATE TABLE " + TABLE_NOTIFICATION_PREFERENCES + " (" +
+
+                    COLUMN_USER_ID + " TEXT PRIMARY KEY," +
+
+                    COLUMN_NOTIFICATIONS_ENABLED + " INTEGER," +
+                    COLUMN_EXPENSE_REMINDER + " INTEGER," +
+                    COLUMN_BUDGET_ALERT + " INTEGER," +
+                    COLUMN_LARGE_TRANSACTION_ALERT + " INTEGER," +
+
+                    COLUMN_SUBSCRIPTION_REMINDER + " INTEGER," +
+                    COLUMN_RENEWAL_REMINDER + " INTEGER," +
+
+                    COLUMN_WEEKLY_REPORT + " INTEGER," +
+                    COLUMN_MONTHLY_REPORT + " INTEGER," +
+
+                    COLUMN_REMINDER_HOUR + " INTEGER," +
+                    COLUMN_REMINDER_MINUTE + " INTEGER," +
+
+                    COLUMN_UPDATED_AT + " INTEGER" +
+
+                    ")";
 
     @Override
     public void onConfigure(SQLiteDatabase db) {
@@ -797,6 +846,129 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(EXPENSE_MODE, expenseMode);
 
         return db.insert(TABLE_TRANSACTION, null, values);
+    }
+
+    public boolean saveNotificationPreferences(
+            String userId,
+            NotificationPreferences preferences) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_USER_ID, userId);
+
+        values.put(COLUMN_NOTIFICATIONS_ENABLED,
+                preferences.isNotificationsEnabled() ? 1 : 0);
+
+        values.put(COLUMN_EXPENSE_REMINDER,
+                preferences.isExpenseReminder() ? 1 : 0);
+
+        values.put(COLUMN_BUDGET_ALERT,
+                preferences.isBudgetAlert() ? 1 : 0);
+
+        values.put(COLUMN_LARGE_TRANSACTION_ALERT,
+                preferences.isLargeTransactionAlert() ? 1 : 0);
+
+        values.put(COLUMN_SUBSCRIPTION_REMINDER,
+                preferences.isSubscriptionReminder() ? 1 : 0);
+
+        values.put(COLUMN_RENEWAL_REMINDER,
+                preferences.isRenewalReminder() ? 1 : 0);
+
+        values.put(COLUMN_WEEKLY_REPORT,
+                preferences.isWeeklyReport() ? 1 : 0);
+
+        values.put(COLUMN_MONTHLY_REPORT,
+                preferences.isMonthlyReport() ? 1 : 0);
+
+        values.put(COLUMN_REMINDER_HOUR,
+                preferences.getReminderHour());
+
+        values.put(COLUMN_REMINDER_MINUTE,
+                preferences.getReminderMinute());
+
+        values.put(COLUMN_UPDATED_AT,
+                System.currentTimeMillis());
+
+        long result = db.replace(
+                TABLE_NOTIFICATION_PREFERENCES,
+                null,
+                values);
+
+        db.close();
+
+        return result != -1;
+    }
+
+    public NotificationPreferences getNotificationPreferences(String userId) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                TABLE_NOTIFICATION_PREFERENCES,
+                null,
+                COLUMN_USER_ID + "=?",
+                new String[]{userId},
+                null,
+                null,
+                null);
+
+        if (cursor.moveToFirst()) {
+
+            NotificationPreferences preferences =
+                    new NotificationPreferences();
+
+            preferences.setNotificationsEnabled(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_NOTIFICATIONS_ENABLED)) == 1);
+
+            preferences.setExpenseReminder(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_EXPENSE_REMINDER)) == 1);
+
+            preferences.setBudgetAlert(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_BUDGET_ALERT)) == 1);
+
+            preferences.setLargeTransactionAlert(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_LARGE_TRANSACTION_ALERT)) == 1);
+
+            preferences.setSubscriptionReminder(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_SUBSCRIPTION_REMINDER)) == 1);
+
+            preferences.setRenewalReminder(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_RENEWAL_REMINDER)) == 1);
+
+            preferences.setWeeklyReport(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_WEEKLY_REPORT)) == 1);
+
+            preferences.setMonthlyReport(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_MONTHLY_REPORT)) == 1);
+
+            preferences.setReminderHour(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_REMINDER_HOUR)));
+
+            preferences.setReminderMinute(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(
+                            COLUMN_REMINDER_MINUTE)));
+
+            cursor.close();
+            db.close();
+
+            return preferences;
+        }
+
+        cursor.close();
+        db.close();
+
+        return null;
     }
 
     public Cursor getTransactions(int userId) {

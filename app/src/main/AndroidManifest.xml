@@ -11,7 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AIExpenseManagementApplication">
-
+        <activity
+            android:name=".ui.profile.NotificationPreferancesActivity"
+            android:exported="false" />
         <!-- Splash Screen -->
         <activity
             android:name=".ui.SplashActivity"
@@ -86,16 +88,16 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.profile.ProfileActivity"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.profile.EditProfileActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.profile.ChangeMobileVerificationActivity"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.profile.ChangePasswordActivity"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

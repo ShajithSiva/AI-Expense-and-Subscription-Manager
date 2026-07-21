@@ -228,6 +228,14 @@ public class ProfileActivity extends AppCompatActivity{
 
         });
 
+        layoutNotifications.setOnClickListener(v -> {
+
+            startActivity(new Intent(
+                    this,
+                    NotificationPreferancesActivity.class));
+
+        });
+
 //        layoutBudget.setOnClickListener(v -> {
 //
 //            startActivity(new Intent(
