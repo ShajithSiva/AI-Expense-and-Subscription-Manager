@@ -1,201 +1,239 @@
 package com.example.aiexpensemanagementapplication.ui.budget;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ProgressBar;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aiexpensemanagementapplication.R;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BudgetActivity extends AppCompatActivity {
 
-    private TextView tvMonthlyBudget, tvBudgetUsedPercent, tvBudgetStatus;
-    private TextView tvSpentAmount, tvRemainingAmount, tvBudgetInsight;
-    private ProgressBar progressMonthlyBudget;
+    private ImageButton btnBack;
+    private ImageButton btnAddBudget;
 
-    private View cardFoodBudget, cardTransportBudget, cardUtilitiesBudget, cardShoppingBudget, cardHousingBudget;
-    private TextView btnBack, btnViewAllCategories, btnAddBudget;
+    private TextView tvCurrentMonth;
+    private TextView tvTotalBudget;
+    private TextView tvSpent;
+    private TextView tvRemaining;
+    private TextView tvBudgetPercentage;
+
+    private TextView tvBudgetStatus;
+    private TextView tvBudgetStatusMessage;
+
+    private TextView tvCarryForwardAmount;
+
+    private LinearProgressIndicator budgetProgress;
+
+    private RecyclerView recyclerCategoryBudgets;
+
+    private SwitchMaterial switchCarryForward;
+
+    private CategoryBudgetAdapter adapter;
+
+    private List<CategoryBudget> categoryList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_budget);
 
-        bindViews();
-        loadPlaceholderBudgetData();
-        setupClicks();
+        setContentView(
+                R.layout.activity_budget
+        );
+
+        initializeViews();
+
+        setupRecyclerView();
+
+        setupListeners();
+
+        loadBudgetData();
     }
 
-    private void bindViews() {
-        tvMonthlyBudget = findViewById(R.id.tvMonthlyBudget);
-        tvBudgetUsedPercent = findViewById(R.id.tvBudgetUsedPercent);
-        tvBudgetStatus = findViewById(R.id.tvBudgetStatus);
-        tvSpentAmount = findViewById(R.id.tvSpentAmount);
-        tvRemainingAmount = findViewById(R.id.tvRemainingAmount);
-        tvBudgetInsight = findViewById(R.id.tvBudgetInsight);
-        progressMonthlyBudget = findViewById(R.id.progressMonthlyBudget);
+    private void initializeViews() {
 
-        cardFoodBudget = findViewById(R.id.cardFoodBudget);
-        cardTransportBudget = findViewById(R.id.cardTransportBudget);
-        cardUtilitiesBudget = findViewById(R.id.cardUtilitiesBudget);
-        cardShoppingBudget = findViewById(R.id.cardShoppingBudget);
-        cardHousingBudget = findViewById(R.id.cardHousingBudget);
+        btnBack =
+                findViewById(R.id.btnBack);
 
-        btnBack = findViewById(R.id.btnBack);
-        btnViewAllCategories = findViewById(R.id.btnViewAllCategories);
-        btnAddBudget = findViewById(R.id.btnAddBudget);
+        btnAddBudget =
+                findViewById(R.id.btnAddBudget);
+
+        tvCurrentMonth =
+                findViewById(R.id.tvCurrentMonth);
+
+        tvTotalBudget =
+                findViewById(R.id.tvTotalBudget);
+
+        tvSpent =
+                findViewById(R.id.tvSpent);
+
+        tvRemaining =
+                findViewById(R.id.tvRemaining);
+
+        tvBudgetPercentage =
+                findViewById(R.id.tvBudgetPercentage);
+
+        tvBudgetStatus =
+                findViewById(R.id.tvBudgetStatus);
+
+        tvBudgetStatusMessage =
+                findViewById(
+                        R.id.tvBudgetStatusMessage
+                );
+
+        tvCarryForwardAmount =
+                findViewById(
+                        R.id.tvCarryForwardAmount
+                );
+
+        budgetProgress =
+                findViewById(
+                        R.id.budgetProgress
+                );
+
+        recyclerCategoryBudgets =
+                findViewById(
+                        R.id.recyclerCategoryBudgets
+                );
+
+        switchCarryForward =
+                findViewById(
+                        R.id.switchCarryForward
+                );
     }
 
-    private void loadPlaceholderBudgetData() {
-        /*
-         * Later your teammate can replace this method with Room DB values.
-         * Required Room data:
-         * monthlyBudget, spentAmount, remainingAmount, usedPercent, budgetStatus,
-         * budgetInsight, and category budget list.
-         */
+    private void setupRecyclerView() {
 
-        tvMonthlyBudget.setText("Rs. 45,000");
-        tvBudgetUsedPercent.setText("68% Used");
-        tvBudgetStatus.setText("On Track");
-        tvSpentAmount.setText("Rs. 30,600");
-        tvRemainingAmount.setText("Rs. 14,400");
-        tvBudgetInsight.setText("You are likely to exceed your Food budget by Rs 1,200 this month.\nConsider reducing weekend dining.");
-        progressMonthlyBudget.setProgress(68);
+        categoryList =
+                new ArrayList<>();
 
-        setCategoryData(
-                cardFoodBudget,
-                "🍴",
-                "Food & Dining",
-                "Limit: Rs. 8,000",
-                "Safe",
-                "RS. 5,440 SPENT",
-                "68%",
-                68,
-                false
+        adapter =
+                new CategoryBudgetAdapter(
+                        categoryList
+                );
+
+        recyclerCategoryBudgets.setLayoutManager(
+                new LinearLayoutManager(this)
         );
 
-        setCategoryData(
-                cardTransportBudget,
-                "🚗",
-                "Transport",
-                "Limit: Rs. 3,500",
-                "Near Limit",
-                "RS. 3,100 SPENT",
-                "89%",
-                89,
-                false
-        );
-
-        setCategoryData(
-                cardUtilitiesBudget,
-                "⚡",
-                "Utilities",
-                "Limit: Rs. 5,000",
-                "Safe",
-                "RS. 1,200 SPENT",
-                "24%",
-                24,
-                false
-        );
-
-        setCategoryData(
-                cardShoppingBudget,
-                "▣",
-                "Shopping",
-                "Limit: Rs. 4,000",
-                "Exceeded",
-                "RS. 4,500 SPENT",
-                "113%",
-                100,
-                true
-        );
-
-        setCategoryData(
-                cardHousingBudget,
-                "⌂",
-                "Housing",
-                "Limit: Rs. 15,000",
-                "Safe",
-                "RS. 15,000 SPENT",
-                "100%",
-                100,
-                false
+        recyclerCategoryBudgets.setAdapter(
+                adapter
         );
     }
 
-    private void setCategoryData(
-            View card,
-            String icon,
-            String name,
-            String limit,
-            String status,
-            String spent,
-            String percent,
-            int progress,
-            boolean exceeded
-    ) {
-        TextView tvCategoryIcon = card.findViewById(R.id.tvCategoryIcon);
-        TextView tvCategoryName = card.findViewById(R.id.tvCategoryName);
-        TextView tvCategoryLimit = card.findViewById(R.id.tvCategoryLimit);
-        TextView tvCategoryStatus = card.findViewById(R.id.tvCategoryStatus);
-        TextView tvCategorySpent = card.findViewById(R.id.tvCategorySpent);
-        TextView tvCategoryPercent = card.findViewById(R.id.tvCategoryPercent);
-        ProgressBar progressCategoryBudget = card.findViewById(R.id.progressCategoryBudget);
-        TextView btnEditCategoryBudget = card.findViewById(R.id.btnEditCategoryBudget);
+    private void setupListeners() {
 
-        tvCategoryIcon.setText(icon);
-        tvCategoryName.setText(name);
-        tvCategoryLimit.setText(limit);
-        tvCategoryStatus.setText(status);
-        tvCategorySpent.setText(spent);
-        tvCategoryPercent.setText(percent);
-        progressCategoryBudget.setProgress(progress);
+        btnBack.setOnClickListener(
+                v -> finish()
+        );
 
-        if (exceeded) {
-            tvCategoryStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            progressCategoryBudget.setProgressDrawable(getResources().getDrawable(R.drawable.progress_red));
-        } else {
-            tvCategoryStatus.setTextColor(getResources().getColor(android.R.color.black));
-            progressCategoryBudget.setProgressDrawable(getResources().getDrawable(R.drawable.progress_dark));
-        }
+        btnAddBudget.setOnClickListener(v -> {
 
-        btnEditCategoryBudget.setOnClickListener(v ->
-                Toast.makeText(this, "Edit " + name + " budget", Toast.LENGTH_SHORT).show()
+            Intent intent = new Intent(
+                    BudgetActivity.this,
+                    AddBudgetActivity.class
+            );
+
+            startActivity(intent);
+        });
+
+        switchCarryForward.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> {
+
+                    if (isChecked) {
+
+                        Toast.makeText(
+                                this,
+                                "Unused budget will be carried forward",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                    } else {
+
+                        Toast.makeText(
+                                this,
+                                "Carry forward disabled",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
         );
     }
 
-    private void setupClicks() {
-        btnBack.setOnClickListener(v -> finish());
+    private void loadBudgetData() {
 
-        btnViewAllCategories.setOnClickListener(v ->
-                Toast.makeText(this, "View all categories clicked", Toast.LENGTH_SHORT).show()
+        // Temporary data for UI testing.
+        // This will be replaced with DatabaseHelper data.
+
+        tvTotalBudget.setText(
+                "Rs. 50,000.00"
         );
 
-        btnAddBudget.setOnClickListener(v ->
-                Toast.makeText(this, "Add budget clicked", Toast.LENGTH_SHORT).show()
+        tvSpent.setText(
+                "Rs. 25,000.00"
         );
 
-        findViewById(R.id.navDashboard).setOnClickListener(v ->
-                Toast.makeText(this, "Dashboard clicked", Toast.LENGTH_SHORT).show()
+        tvRemaining.setText(
+                "Rs. 25,000.00"
         );
 
-        findViewById(R.id.navExpenses).setOnClickListener(v ->
-                Toast.makeText(this, "Expenses clicked", Toast.LENGTH_SHORT).show()
+        budgetProgress.setProgress(
+                50
         );
 
-        findViewById(R.id.navSubs).setOnClickListener(v ->
-                Toast.makeText(this, "Subscriptions clicked", Toast.LENGTH_SHORT).show()
+        tvBudgetPercentage.setText(
+                "50% used"
         );
 
-        findViewById(R.id.navFamily).setOnClickListener(v ->
-                Toast.makeText(this, "Family clicked", Toast.LENGTH_SHORT).show()
+        tvBudgetStatus.setText(
+                "You're within your budget"
         );
 
-        findViewById(R.id.navProfile).setOnClickListener(v ->
-                Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()
+        tvBudgetStatusMessage.setText(
+                "You have Rs. 25,000.00 remaining this month."
         );
+
+        tvCarryForwardAmount.setText(
+                "Unused budget: Rs. 25,000.00"
+        );
+
+        categoryList.clear();
+
+        categoryList.add(
+                new CategoryBudget(
+                        "Food",
+                        10000,
+                        5000
+                )
+        );
+
+        categoryList.add(
+                new CategoryBudget(
+                        "Transport",
+                        5000,
+                        2500
+                )
+        );
+
+        categoryList.add(
+                new CategoryBudget(
+                        "Shopping",
+                        10000,
+                        8000
+                )
+        );
+
+        adapter.notifyDataSetChanged();
     }
 }

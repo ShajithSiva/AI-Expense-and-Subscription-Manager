@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
+import com.example.aiexpensemanagementapplication.ui.budget.BudgetActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -236,13 +237,13 @@ public class ProfileActivity extends AppCompatActivity{
 
         });
 
-//        layoutBudget.setOnClickListener(v -> {
-//
-//            startActivity(new Intent(
-//                    this,
-//                    BudgetListActivity.class));
-//
-//        });
+        layoutBudget.setOnClickListener(v -> {
+
+            startActivity(new Intent(
+                    this,
+                    BudgetActivity.class));
+
+        });
 
     }
 

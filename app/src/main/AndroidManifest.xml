@@ -12,9 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AIExpenseManagementApplication">
         <activity
-            android:name=".ui.profile.NotificationPreferancesActivity"
+            android:name=".ui.budget.AddBudgetActivity"
             android:exported="false" />
-        <!-- Splash Screen -->
+        <activity
+            android:name=".ui.profile.NotificationPreferancesActivity"
+            android:exported="false" /> <!-- Splash Screen -->
         <activity
             android:name=".ui.SplashActivity"
             android:exported="true">
