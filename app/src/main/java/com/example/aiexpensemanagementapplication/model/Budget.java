@@ -2,91 +2,110 @@ package com.example.aiexpensemanagementapplication.model;
 
 public class Budget {
 
-    private int budgetId;
-    private int userId;
-    private String category;
-    private double amount;
-    private String month;
-    private String year;
+    private double monthlyBudget;
+
+    private double foodBudget;
+    private double transportBudget;
+    private double shoppingBudget;
+    private double billsBudget;
+    private double healthBudget;
+    private double educationBudget;
+    private double entertainmentBudget;
+    private double othersBudget;
 
     public Budget() {
     }
 
-    public Budget(int budgetId,
-                  int userId,
-                  String category,
-                  double amount,
-                  String month,
-                  String year) {
+    public Budget(double monthlyBudget,
+                  double foodBudget,
+                  double transportBudget,
+                  double shoppingBudget,
+                  double billsBudget,
+                  double healthBudget,
+                  double educationBudget,
+                  double entertainmentBudget,
+                  double othersBudget) {
 
-        this.budgetId = budgetId;
-        this.userId = userId;
-        this.category = category;
-        this.amount = amount;
-        this.month = month;
-        this.year = year;
+        this.monthlyBudget = monthlyBudget;
+        this.foodBudget = foodBudget;
+        this.transportBudget = transportBudget;
+        this.shoppingBudget = shoppingBudget;
+        this.billsBudget = billsBudget;
+        this.healthBudget = healthBudget;
+        this.educationBudget = educationBudget;
+        this.entertainmentBudget = entertainmentBudget;
+        this.othersBudget = othersBudget;
     }
 
-    public Budget(int userId,
-                  String category,
-                  double amount,
-                  String month,
-                  String year) {
-
-        this.userId = userId;
-        this.category = category;
-        this.amount = amount;
-        this.month = month;
-        this.year = year;
+    public double getMonthlyBudget() {
+        return monthlyBudget;
     }
 
-    public int getBudgetId() {
-        return budgetId;
+    public void setMonthlyBudget(double monthlyBudget) {
+        this.monthlyBudget = monthlyBudget;
     }
 
-    public void setBudgetId(int budgetId) {
-        this.budgetId = budgetId;
+    public double getFoodBudget() {
+        return foodBudget;
     }
 
-    public int getUserId() {
-        return userId;
+    public void setFoodBudget(double foodBudget) {
+        this.foodBudget = foodBudget;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public double getTransportBudget() {
+        return transportBudget;
     }
 
-    public String getCategory() {
-        return category;
+    public void setTransportBudget(double transportBudget) {
+        this.transportBudget = transportBudget;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public double getShoppingBudget() {
+        return shoppingBudget;
     }
 
-    public double getAmount() {
-        return amount;
+    public void setShoppingBudget(double shoppingBudget) {
+        this.shoppingBudget = shoppingBudget;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public double getBillsBudget() {
+        return billsBudget;
     }
 
-    public String getMonth() {
-        return month;
+    public void setBillsBudget(double billsBudget) {
+        this.billsBudget = billsBudget;
     }
 
-    public void setMonth(String month) {
-        this.month = month;
+    public double getHealthBudget() {
+        return healthBudget;
     }
 
-    public String getYear() {
-        return year;
+    public void setHealthBudget(double healthBudget) {
+        this.healthBudget = healthBudget;
     }
 
-    public void setYear(String year) {
-        this.year = year;
+    public double getEducationBudget() {
+        return educationBudget;
     }
 
+    public void setEducationBudget(double educationBudget) {
+        this.educationBudget = educationBudget;
+    }
 
+    public double getEntertainmentBudget() {
+        return entertainmentBudget;
+    }
+
+    public void setEntertainmentBudget(double entertainmentBudget) {
+        this.entertainmentBudget = entertainmentBudget;
+    }
+
+    public double getOthersBudget() {
+        return othersBudget;
+    }
+
+    public void setOthersBudget(double othersBudget) {
+        this.othersBudget = othersBudget;
+    }
 }
