@@ -22,7 +22,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     //========================================================
     // USER TABLE
@@ -105,13 +105,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
     // BUDGET
     //========================================================
+    public static final String TABLE_BUDGET = "budget";
 
-    public static final String TABLE_BUDGET = "Budget";
-
-    public static final String BUDGET_ID = "BudgetID";
-    public static final String LIMIT_AMOUNT = "LimitAmount";
-    public static final String START_DATE = "StartDate";
-    public static final String END_DATE = "EndDate";
+    public static final String BUDGET_ID = "budget_id";
+    public static final String BUDGET_USER_ID = "user_id";
+    public static final String BUDGET_MONTH = "budget_month";
+    public static final String BUDGET_AMOUNT = "budget_amount";
+    public static final String BUDGET_CARRY_FORWARD = "carry_forward";
 
     //========================================================
     // SUBSCRIPTION
@@ -159,6 +159,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String REPORT_TYPE = "ReportType";
     public static final String REPORT_PATH = "ReportPath";
     public static final String GENERATED_DATE = "GeneratedDate";
+
+    // =====================================================
+// BUDGET TABLE
+// =====================================================
+
+    public static final String BUDGET_USER_ID = "user_id";
+    public static final String BUDGET_CATEGORY = "category";
+    public static final String BUDGET_AMOUNT = "amount";
+    public static final String BUDGET_MONTH = "month";
+    public static final String BUDGET_YEAR = "year";
+    public static final String BUDGET_CARRY_FORWARD = "carry_forward";
 
     //========================================================
     // Notification Preferences Table
@@ -209,8 +220,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_PAYMENT_METHOD_TABLE);
 
         db.execSQL(CREATE_TRANSACTION_TABLE);
-
-        db.execSQL(CREATE_BUDGET_TABLE);
 
         db.execSQL(CREATE_SUBSCRIPTION_TABLE);
 
@@ -298,19 +307,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " +
                     TABLE_CATEGORY + "(" + CATEGORY_ID + ")" +
                     ");";
-    private static final String CREATE_BUDGET_TABLE =
-            "CREATE TABLE " + TABLE_BUDGET + " (" +
-                    BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    USER_ID + " INTEGER," +
-                    CATEGORY_ID + " INTEGER," +
-                    LIMIT_AMOUNT + " REAL," +
-                    START_DATE + " TEXT," +
-                    END_DATE + " TEXT," +
-                    "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
-                    TABLE_USER + "(" + USER_ID + ")," +
-                    "FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " +
-                    TABLE_CATEGORY + "(" + CATEGORY_ID + ")" +
-                    ");";
+
     private static final String CREATE_SUBSCRIPTION_TABLE =
             "CREATE TABLE " + TABLE_SUBSCRIPTION + " (" +
                     SUBSCRIPTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -416,7 +413,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
 
         onCreate(db);
+
+        if (oldVersion < 2) {
+
+            String CREATE_BUDGET_TABLE =
+                    "CREATE TABLE " + TABLE_BUDGET + "("
+                            + BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            + BUDGET_USER_ID + " INTEGER,"
+                            + BUDGET_MONTH + " TEXT,"
+                            + BUDGET_AMOUNT + " REAL,"
+                            + BUDGET_CARRY_FORWARD + " INTEGER DEFAULT 0,"
+                            + "FOREIGN KEY("
+                            + BUDGET_USER_ID
+                            + ") REFERENCES "
+                            + TABLE_USER
+                            + "("
+                            + USER_ID
+                            + "))";
+
+            db.execSQL(CREATE_BUDGET_TABLE);
+        }
     }
+
+
 
     @Override
     public void onDowngrade(SQLiteDatabase db,
@@ -969,6 +988,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
 
         return null;
+    }
+
+    public boolean addBudget(
+            int userId,
+            String category,
+            double amount,
+            int month,
+            int year,
+            double carryForward) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(BUDGET_USER_ID, userId);
+        values.put(BUDGET_CATEGORY, category);
+        values.put(BUDGET_AMOUNT, amount);
+        values.put(BUDGET_MONTH, month);
+        values.put(BUDGET_YEAR, year);
+        values.put(BUDGET_CARRY_FORWARD, carryForward);
+
+        long result = db.insert(
+                TABLE_BUDGET,
+                null,
+                values
+        );
+
+        return result != -1;
     }
 
     public Cursor getTransactions(int userId) {

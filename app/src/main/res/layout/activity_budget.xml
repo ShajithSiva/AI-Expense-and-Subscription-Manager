@@ -9,102 +9,176 @@
     android:background="#F7F8FA"
     tools:context=".ui.budget.BudgetActivity">
 
-    <!-- HEADER -->
-    <LinearLayout
-        android:id="@+id/headerLayout"
+    <!-- ========================================================= -->
+    <!-- TOP HEADER                                                -->
+    <!-- ========================================================= -->
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/topBar"
         android:layout_width="0dp"
-        android:layout_height="64dp"
-        android:background="#FFFFFF"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="72dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
-            android:padding="12dp"
-            android:src="@drawable/ic_back_arrow"
-            app:tint="#111827" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Budget"
-            android:textColor="#111827"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:padding="10dp"
+                android:src="@drawable/ic_back_arrow"
+                app:tint="#111827" />
 
-        <ImageButton
-            android:id="@+id/btnAddBudget"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Add Budget"
-            android:padding="12dp"
-            android:src="@drawable/ic_add"
-            app:tint="#22C55E" />
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Budget"
+                android:textColor="#111827"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
-    </LinearLayout>
+            <ImageButton
+                android:id="@+id/btnAddBudget"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Add Budget"
+                android:padding="10dp"
+                android:src="@drawable/ic_add"
+                app:tint="#22C55E" />
 
-    <View
-        android:id="@+id/headerDivider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="#E5E7EB"
-        app:layout_constraintTop_toBottomOf="@id/headerLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 
-    <!-- CONTENT -->
+    <!-- ========================================================= -->
+    <!-- SCROLL CONTENT                                            -->
+    <!-- ========================================================= -->
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:fillViewport="true"
         android:clipToPadding="false"
-        android:paddingBottom="24dp"
-        app:layout_constraintTop_toBottomOf="@id/headerDivider"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/topBar">
 
         <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp">
 
 
-            <!-- MONTH -->
-            <TextView
-                android:id="@+id/tvCurrentMonth"
-                android:layout_width="wrap_content"
+            <!-- ================================================= -->
+            <!-- MONTH SELECTOR                                    -->
+            <!-- ================================================= -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/monthSelectorCard"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="July 2026"
-                android:textColor="#111827"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageButton
+                        android:id="@+id/btnPreviousMonth"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Previous Month"
+                        android:rotation="180"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="#374151" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvSelectedMonth"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="July 2026"
+                            android:textColor="#111827"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvRemainingDays"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="18 days remaining"
+                            android:textColor="#6B7280"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btnNextMonth"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Next Month"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="#374151" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
 
-            <!-- BUDGET SUMMARY CARD -->
+            <!-- ================================================= -->
+            <!-- BUDGET SUMMARY CARD                               -->
+            <!-- ================================================= -->
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/budgetSummaryCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp">
+                app:cardCornerRadius="22dp"
+                app:cardElevation="3dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -112,28 +186,63 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Monthly Budget"
+                            android:textColor="#111827"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/btnEditBudget"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Edit Budget"
+                            android:padding="9dp"
+                            android:src="@drawable/edit" />
+
+                    </LinearLayout>
+
+
+                    <!-- TOTAL BUDGET -->
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Monthly Budget"
+                        android:layout_marginTop="20dp"
+                        android:text="Total Budget"
                         android:textColor="#6B7280"
-                        android:textSize="14sp" />
+                        android:textSize="13sp" />
 
                     <TextView
                         android:id="@+id/tvTotalBudget"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="Rs. 0.00"
+                        android:layout_marginTop="4dp"
+                        android:text="Rs. 50,000.00"
                         android:textColor="#111827"
                         android:textSize="28sp"
                         android:textStyle="bold" />
+
+
+                    <!-- BUDGET STATISTICS -->
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:orientation="horizontal">
+
+                        <!-- SPENT -->
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -149,21 +258,25 @@
                                 android:textSize="13sp" />
 
                             <TextView
-                                android:id="@+id/tvSpent"
+                                android:id="@+id/tvTotalSpent"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Rs. 0.00"
+                                android:text="Rs. 25,000.00"
                                 android:textColor="#EF4444"
-                                android:textSize="16sp"
+                                android:textSize="17sp"
                                 android:textStyle="bold" />
 
                         </LinearLayout>
+
+
+                        <!-- REMAINING -->
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:gravity="end"
                             android:orientation="vertical">
 
                             <TextView
@@ -178,88 +291,57 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Rs. 0.00"
+                                android:text="Rs. 25,000.00"
                                 android:textColor="#22C55E"
-                                android:textSize="16sp"
+                                android:textSize="17sp"
                                 android:textStyle="bold" />
 
                         </LinearLayout>
 
                     </LinearLayout>
 
+
+                    <!-- PROGRESS BAR -->
+
                     <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/budgetProgress"
+                        android:id="@+id/progressBudget"
                         android:layout_width="match_parent"
                         android:layout_height="10dp"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="22dp"
                         android:max="100"
-                        android:progress="0"
-                        app:trackCornerRadius="5dp" />
-
-                    <TextView
-                        android:id="@+id/tvBudgetPercentage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="8dp"
-                        android:text="0% used"
-                        android:textColor="#6B7280"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                        android:progress="50"
+                        app:indicatorColor="#22C55E"
+                        app:trackColor="#E5E7EB"
+                        app:trackCornerRadius="5dp"
+                        app:trackThickness="10dp" />
 
 
-            <!-- BUDGET STATUS -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/statusCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:id="@+id/ivStatusIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:padding="8dp"
-                        android:src="@drawable/budget1"
-                        app:tint="#22C55E" />
+                    <!-- PERCENTAGE + STATUS -->
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvBudgetPercentage"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="50% used"
+                            android:textColor="#6B7280"
+                            android:textSize="13sp" />
 
                         <TextView
                             android:id="@+id/tvBudgetStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="You're within your budget"
-                            android:textColor="#111827"
-                            android:textSize="15sp"
+                            android:text="On Track"
+                            android:textColor="#22C55E"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvBudgetStatusMessage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Keep tracking your expenses."
-                            android:textColor="#6B7280"
-                            android:textSize="13sp" />
 
                     </LinearLayout>
 
@@ -268,36 +350,70 @@
             </com.google.android.material.card.MaterialCardView>
 
 
-            <!-- CATEGORY BUDGET TITLE -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- ================================================= -->
+            <!-- CATEGORY BUDGETS                                  -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:text="Category Budgets"
-                android:textColor="#111827"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Category Budgets"
+                    android:textColor="#111827"
+                    android:textSize="19sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
 
-            <!-- CATEGORY BUDGET LIST -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerCategoryBudgets"
+            <!-- DYNAMIC CATEGORY BUDGETS -->
+
+            <LinearLayout
+                android:id="@+id/categoryBudgetContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_category_budget" />
+                android:orientation="vertical">
+
+            </LinearLayout>
 
 
-            <!-- CARRY FORWARD -->
+            <!-- ADD CATEGORY BUDGET -->
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddCategoryBudget"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:text="+ Add Category Budget"
+                android:textAllCaps="false"
+                android:textColor="#22C55E"
+                android:textSize="15sp"
+                app:cornerRadius="14dp"
+                app:strokeColor="#22C55E"
+                app:strokeWidth="1dp" />
+
+
+            <!-- ================================================= -->
+            <!-- CARRY FORWARD                                    -->
+            <!-- ================================================= -->
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/carryForwardCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp">
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -321,13 +437,13 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/tvCarryForwardAmount"
+                            android:id="@+id/tvCarryForwardDescription"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Unused budget: Rs. 0.00"
+                            android:text="Move unused budget to the next month"
                             android:textColor="#6B7280"
-                            android:textSize="13sp" />
+                            android:textSize="12sp" />
 
                     </LinearLayout>
 
@@ -340,6 +456,39 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- ================================================= -->
+            <!-- BUDGET HISTORY                                    -->
+            <!-- ================================================= -->
+
+            <TextView
+                android:id="@+id/tvBudgetHistoryTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Budget History"
+                android:textColor="#111827"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/budgetHistoryContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- BOTTOM SPACE                                      -->
+            <!-- ================================================= -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="30dp" />
 
         </LinearLayout>
 

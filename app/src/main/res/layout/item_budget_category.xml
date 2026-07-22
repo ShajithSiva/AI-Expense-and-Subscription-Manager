@@ -1,112 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="118dp"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_marginTop="14dp"
-    android:background="@drawable/bg_budget_card">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#E5E7EB"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="12dp">
 
-        <TextView
-            android:id="@+id/tvCategoryIcon"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilCategory"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:boxBackgroundColor="#F3F4F6"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Category"
+                android:inputType="none"
+                android:minHeight="55dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilCategoryBudget"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:boxBackgroundColor="#F3F4F6"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:prefixText="Rs. ">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCategoryBudget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Amount"
+                android:inputType="numberDecimal"
+                android:minHeight="55dp"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/btnRemoveCategory"
             android:layout_width="44dp"
             android:layout_height="44dp"
-            android:gravity="center"
-            android:text="•"
-            android:textSize="22sp"
-            android:textColor="#111827"
-            android:background="@drawable/bg_icon_circle" />
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Remove category"
+            android:src="@drawable/delete"
+            app:tint="#EF4444" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingStart="14dp">
-
-            <TextView
-                android:id="@+id/tvCategoryName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Category"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#111827" />
-
-            <TextView
-                android:id="@+id/tvCategoryLimit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Limit: Rs. 0"
-                android:textSize="13sp"
-                android:textColor="#6B7280" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="82dp"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvCategoryStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Safe"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="#111827" />
-
-            <TextView
-                android:id="@+id/btnEditCategoryBudget"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="✎"
-                android:textSize="20sp"
-                android:textColor="#111827" />
-        </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="12dp">
-
-        <TextView
-            android:id="@+id/tvCategorySpent"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="RS. 0 SPENT"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#374151" />
-
-        <TextView
-            android:id="@+id/tvCategoryPercent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0%"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#374151" />
-    </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progressCategoryBudget"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="7dp"
-        android:max="100"
-        android:progress="0"
-        android:layout_marginTop="7dp"
-        android:progressDrawable="@drawable/progress_dark" />
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>
