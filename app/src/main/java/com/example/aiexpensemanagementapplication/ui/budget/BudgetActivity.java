@@ -3,11 +3,15 @@ package com.example.aiexpensemanagementapplication.ui.budget;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import android.view.View;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import com.example.aiexpensemanagementapplication.model.Budget;
+import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -26,6 +30,9 @@ public class BudgetActivity extends AppCompatActivity {
 
     private LinearProgressIndicator progressBudget;
     private CircularProgressIndicator progressIndicator;
+
+    private DatabaseHelper databaseHelper;
+    private int userId;
 
     private TextInputEditText etMonthlyBudget;
 
@@ -51,6 +58,12 @@ public class BudgetActivity extends AppCompatActivity {
         setupToolbar();
 
         btnSaveBudget.setOnClickListener(v -> saveBudget());
+
+        databaseHelper = new DatabaseHelper(this);
+
+        initializeUser();
+
+        loadBudget();
     }
 
     private void initializeViews() {
@@ -101,7 +114,6 @@ public class BudgetActivity extends AppCompatActivity {
         Budget budget = new Budget();
 
         budget.setMonthlyBudget(getValue(etMonthlyBudget));
-
         budget.setFoodBudget(getValue(etFoodBudget));
         budget.setTransportBudget(getValue(etTransportBudget));
         budget.setShoppingBudget(getValue(etShoppingBudget));
@@ -111,11 +123,30 @@ public class BudgetActivity extends AppCompatActivity {
         budget.setEntertainmentBudget(getValue(etEntertainmentBudget));
         budget.setOthersBudget(getValue(etOthersBudget));
 
-        updateSummary(budget);
+        showLoading(true);
 
-        Toast.makeText(this,
-                "Budget Ready",
-                Toast.LENGTH_SHORT).show();
+        boolean success = databaseHelper.saveBudgetSettings(userId, budget);
+
+        showLoading(false);
+
+        if (success) {
+
+            updateSummary(budget);
+
+            Toast.makeText(
+                    this,
+                    "Budget Saved Successfully",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+        } else {
+
+            Toast.makeText(
+                    this,
+                    "Failed to Save Budget",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
     }
 
     private double getValue(TextInputEditText editText) {
@@ -131,11 +162,32 @@ public class BudgetActivity extends AppCompatActivity {
 
     private boolean validateInputs() {
 
-        if (etMonthlyBudget.getText().toString().trim().isEmpty()) {
+        double monthlyBudget = getValue(etMonthlyBudget);
 
-            etMonthlyBudget.setError("Enter Monthly Budget");
+        if (monthlyBudget <= 0) {
 
+            etMonthlyBudget.setError("Enter a valid monthly budget");
             etMonthlyBudget.requestFocus();
+            return false;
+        }
+
+        double totalCategories =
+                getValue(etFoodBudget)
+                        + getValue(etTransportBudget)
+                        + getValue(etShoppingBudget)
+                        + getValue(etBillsBudget)
+                        + getValue(etHealthBudget)
+                        + getValue(etEducationBudget)
+                        + getValue(etEntertainmentBudget)
+                        + getValue(etOthersBudget);
+
+        if (totalCategories > monthlyBudget) {
+
+            Toast.makeText(
+                    this,
+                    "Category budgets exceed Monthly Budget",
+                    Toast.LENGTH_LONG
+            ).show();
 
             return false;
         }
@@ -145,22 +197,98 @@ public class BudgetActivity extends AppCompatActivity {
 
     private void updateSummary(Budget budget) {
 
-        double monthly = budget.getMonthlyBudget();
+        double monthlyBudget = budget.getMonthlyBudget();
 
-        double spent = 0;
+        double spent = databaseHelper.getTotalExpense(userId);
 
-        double remaining = monthly - spent;
+        double remaining = monthlyBudget - spent;
+
+        if (remaining < 0)
+            remaining = 0;
 
         tvMonthlyBudget.setText(
-                "Budget : Rs. " + monthly);
+                "Budget : Rs. " + String.format("%.2f", monthlyBudget));
 
         tvSpentAmount.setText(
-                "Spent : Rs. " + spent);
+                "Spent : Rs. " + String.format("%.2f", spent));
 
         tvRemainingAmount.setText(
-                "Remaining : Rs. " + remaining);
+                "Remaining : Rs. " + String.format("%.2f", remaining));
 
-        progressBudget.setProgress(0);
+        int percentage = 0;
+
+        if (monthlyBudget > 0) {
+
+            percentage = (int) ((spent / monthlyBudget) * 100);
+
+            if (percentage > 100)
+                percentage = 100;
+        }
+
+        progressBudget.setProgress(percentage);
+    }
+
+    private void loadBudget() {
+
+        Budget budget = databaseHelper.getBudgetSettings(userId);
+
+        if (budget == null) {
+            return;
+        }
+
+        etMonthlyBudget.setText(String.valueOf(budget.getMonthlyBudget()));
+
+        etFoodBudget.setText(String.valueOf(budget.getFoodBudget()));
+        etTransportBudget.setText(String.valueOf(budget.getTransportBudget()));
+        etShoppingBudget.setText(String.valueOf(budget.getShoppingBudget()));
+        etBillsBudget.setText(String.valueOf(budget.getBillsBudget()));
+        etHealthBudget.setText(String.valueOf(budget.getHealthBudget()));
+        etEducationBudget.setText(String.valueOf(budget.getEducationBudget()));
+        etEntertainmentBudget.setText(String.valueOf(budget.getEntertainmentBudget()));
+        etOthersBudget.setText(String.valueOf(budget.getOthersBudget()));
+
+        updateSummary(budget);
+    }
+
+    private void initializeUser() {
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (firebaseUser == null) {
+
+            Toast.makeText(this,
+                    "User not logged in",
+                    Toast.LENGTH_SHORT).show();
+
+            finish();
+            return;
+        }
+
+        userId = databaseHelper.getUserIdByFirebaseUid(firebaseUser.getUid());
+
+        if (userId == -1) {
+
+            Toast.makeText(this,
+                    "User not found",
+                    Toast.LENGTH_SHORT).show();
+
+            finish();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadBudget();
+    }
+
+    private void showLoading(boolean show) {
+
+        progressIndicator.setVisibility(show ? View.VISIBLE : View.GONE);
+
+        btnSaveBudget.setEnabled(!show);
+
     }
 
 
