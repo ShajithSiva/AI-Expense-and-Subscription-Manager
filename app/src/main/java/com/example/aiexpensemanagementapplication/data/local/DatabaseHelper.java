@@ -2,6 +2,7 @@ package com.example.aiexpensemanagementapplication.data.local;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeModel;
 import com.example.aiexpensemanagementapplication.model.NotificationPreferences;
+import com.example.aiexpensemanagementapplication.model.Budget;
 
 
 import android.content.Context;
@@ -105,13 +106,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
     // BUDGET
     //========================================================
-
     public static final String TABLE_BUDGET = "Budget";
 
     public static final String BUDGET_ID = "BudgetID";
     public static final String LIMIT_AMOUNT = "LimitAmount";
     public static final String START_DATE = "StartDate";
     public static final String END_DATE = "EndDate";
+
+    public static final String TABLE_BUDGET_SETTINGS = "BudgetSettings";
+
+    public static final String MONTHLY_BUDGET = "MonthlyBudget";
+    public static final String FOOD_BUDGET = "FoodBudget";
+    public static final String TRANSPORT_BUDGET = "TransportBudget";
+    public static final String SHOPPING_BUDGET = "ShoppingBudget";
+    public static final String BILLS_BUDGET = "BillsBudget";
+    public static final String HEALTH_BUDGET = "HealthBudget";
+    public static final String EDUCATION_BUDGET = "EducationBudget";
+    public static final String ENTERTAINMENT_BUDGET = "EntertainmentBudget";
+    public static final String OTHERS_BUDGET = "OthersBudget";
 
     //========================================================
     // SUBSCRIPTION
@@ -252,6 +264,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_NOTIFICATION_PREFERENCES_TABLE);
 
         db.execSQL(CREATE_FINANCIAL_PREFERENCES_TABLE);
+
+        db.execSQL(CREATE_BUDGET_SETTINGS_TABLE);
     }
 
     private static final String CREATE_USER_TABLE =
@@ -349,6 +363,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
                     TABLE_USER + "(" + USER_ID + ")" +
                     ");";
+
+    private static final String CREATE_BUDGET_SETTINGS_TABLE =
+            "CREATE TABLE " + TABLE_BUDGET_SETTINGS + " (" +
+                    USER_ID + " INTEGER PRIMARY KEY," +
+                    MONTHLY_BUDGET + " REAL DEFAULT 0," +
+                    FOOD_BUDGET + " REAL DEFAULT 0," +
+                    TRANSPORT_BUDGET + " REAL DEFAULT 0," +
+                    SHOPPING_BUDGET + " REAL DEFAULT 0," +
+                    BILLS_BUDGET + " REAL DEFAULT 0," +
+                    HEALTH_BUDGET + " REAL DEFAULT 0," +
+                    EDUCATION_BUDGET + " REAL DEFAULT 0," +
+                    ENTERTAINMENT_BUDGET + " REAL DEFAULT 0," +
+                    OTHERS_BUDGET + " REAL DEFAULT 0," +
+                    "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
+                    TABLE_USER + "(" + USER_ID + ")" +
+                    ");";
     private static final String CREATE_USAGE_DATA_TABLE =
             "CREATE TABLE " + TABLE_USAGE_DATA + " (" +
                     USAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -439,15 +469,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(
-            SQLiteDatabase db,
-            int oldVersion,
-            int newVersion
-    ) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        if (oldVersion < 5) {
-            db.execSQL(CREATE_FINANCIAL_PREFERENCES_TABLE);
-        }
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REPORT);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ALERT);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USAGE_DATA);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SUBSCRIPTION);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSACTION);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENT_METHOD);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY_MEMBER);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY_USER);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PERSONAL_USER);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET_SETTINGS);
+
+        onCreate(db);
     }
 
     @Override
@@ -457,6 +509,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         onUpgrade(db, oldVersion, newVersion);
     }
+
 
     private void insertDefaultPaymentMethods(SQLiteDatabase db){
 
@@ -3752,6 +3805,85 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
 
         return insertedRow != -1;
+    }
+
+    public boolean saveBudgetSettings(int userId, Budget budget) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(USER_ID, userId);
+
+        values.put(MONTHLY_BUDGET, budget.getMonthlyBudget());
+        values.put(FOOD_BUDGET, budget.getFoodBudget());
+        values.put(TRANSPORT_BUDGET, budget.getTransportBudget());
+        values.put(SHOPPING_BUDGET, budget.getShoppingBudget());
+        values.put(BILLS_BUDGET, budget.getBillsBudget());
+        values.put(HEALTH_BUDGET, budget.getHealthBudget());
+        values.put(EDUCATION_BUDGET, budget.getEducationBudget());
+        values.put(ENTERTAINMENT_BUDGET, budget.getEntertainmentBudget());
+        values.put(OTHERS_BUDGET, budget.getOthersBudget());
+
+        long result = db.replace(TABLE_BUDGET_SETTINGS, null, values);
+
+        db.close();
+
+        return result != -1;
+    }
+
+    public Budget getBudgetSettings(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(
+                TABLE_BUDGET_SETTINGS,
+                null,
+                USER_ID + "=?",
+                new String[]{String.valueOf(userId)},
+                null,
+                null,
+                null
+        );
+
+        Budget budget = null;
+
+        if (cursor.moveToFirst()) {
+
+            budget = new Budget();
+
+            budget.setMonthlyBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(MONTHLY_BUDGET)));
+
+            budget.setFoodBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(FOOD_BUDGET)));
+
+            budget.setTransportBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(TRANSPORT_BUDGET)));
+
+            budget.setShoppingBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(SHOPPING_BUDGET)));
+
+            budget.setBillsBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(BILLS_BUDGET)));
+
+            budget.setHealthBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(HEALTH_BUDGET)));
+
+            budget.setEducationBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(EDUCATION_BUDGET)));
+
+            budget.setEntertainmentBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(ENTERTAINMENT_BUDGET)));
+
+            budget.setOthersBudget(
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(OTHERS_BUDGET)));
+        }
+
+        cursor.close();
+        db.close();
+
+        return budget;
     }
 
     public boolean saveCurrencyPreference(
