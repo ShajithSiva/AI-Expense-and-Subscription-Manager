@@ -42,6 +42,7 @@ public class ProfileActivity extends AppCompatActivity{
     private LinearLayout layoutChangePassword;
     private LinearLayout layoutNotifications;
 
+    private LinearLayout layoutCurrency;
     private TextView tvCurrency;
 
     private LinearLayout layoutBudgetPeriod;
@@ -102,6 +103,8 @@ public class ProfileActivity extends AppCompatActivity{
         layoutChangePassword = findViewById(R.id.layoutChangePassword);
 
         layoutNotifications = findViewById(R.id.layoutNotifications);
+
+        layoutCurrency = findViewById(R.id.layoutCurrency);
 
         tvCurrency = findViewById(R.id.tvCurrency);
 
@@ -254,6 +257,16 @@ public class ProfileActivity extends AppCompatActivity{
                     this,
                     NotificationPreferancesActivity.class));
 
+        });
+
+        layoutCurrency.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    ProfileActivity.this,
+                    CurrencySettingsActivity.class
+            );
+
+            startActivity(intent);
         });
 
         layoutBudgetPeriod.setOnClickListener(v -> {

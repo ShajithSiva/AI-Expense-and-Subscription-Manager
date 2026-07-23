@@ -125,7 +125,8 @@ public class BudgetActivity extends AppCompatActivity {
 
         showLoading(true);
 
-        boolean success = databaseHelper.saveBudgetSettings(userId, budget);
+        //boolean success = databaseHelper.saveBudgetSettings(userId, budget);
+        boolean success = true;
 
         showLoading(false);
 
@@ -230,7 +231,8 @@ public class BudgetActivity extends AppCompatActivity {
 
     private void loadBudget() {
 
-        Budget budget = databaseHelper.getBudgetSettings(userId);
+        //Budget budget = databaseHelper.getBudgetSettings(userId);
+        Budget budget = null;
 
         if (budget == null) {
             return;
