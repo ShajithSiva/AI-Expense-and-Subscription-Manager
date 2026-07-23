@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aiexpensemanagementapplication.ui.expense.AddExpenseActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
+import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -213,6 +214,18 @@ public class PersonalDashboardActivity extends AppCompatActivity {
                 Intent intent = new Intent(
                         PersonalDashboardActivity.this,
                         ProfileActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
+
+                return true;
+
+            } else if (id == R.id.nav_income) {
+
+                Intent intent = new Intent(
+                        PersonalDashboardActivity.this,
+                        IncomeListActivity.class);
 
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 

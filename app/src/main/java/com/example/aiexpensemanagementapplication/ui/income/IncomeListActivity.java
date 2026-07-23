@@ -22,6 +22,7 @@ import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
+import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
@@ -642,74 +643,58 @@ public class IncomeListActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
 
-        /*
-         * Existing bottom menu-la Income item illatha nala,
-         * specific item selected panna villai.
-         */
+        bottomNavigation.setSelectedItemId(R.id.nav_income);
 
         bottomNavigation.setOnItemSelectedListener(item -> {
 
-            int itemId = item.getItemId();
+            int id = item.getItemId();
 
-            if (itemId == R.id.nav_dashboard) {
+            if (id == R.id.nav_income) {
+
+                return true;
+
+            } else if (id == R.id.nav_expenses) {
 
                 Intent intent = new Intent(
                         IncomeListActivity.this,
-                        PersonalDashboardActivity.class
-                );
+                        ExpenseListActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
                 startActivity(intent);
 
-                finish();
-
                 return true;
 
-            } else if (itemId == R.id.nav_expenses) {
+            } else if (id == R.id.nav_profile) {
 
                 Intent intent = new Intent(
                         IncomeListActivity.this,
-                        ExpenseListActivity.class
-                );
+                        ProfileActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
                 startActivity(intent);
 
-                finish();
+                return true;
+
+            } else if (id == R.id.nav_dashboard) {
+
+                Intent intent = new Intent(
+                        IncomeListActivity.this,
+                        PersonalDashboardActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
 
                 return true;
 
-            } else if (itemId == R.id.nav_subscriptions) {
-
-                Toast.makeText(
-                        this,
-                        "Subscriptions Coming Soon",
-                        Toast.LENGTH_SHORT
-                ).show();
-
-                return true;
-
-            } else if (itemId == R.id.nav_family) {
-
-                Toast.makeText(
-                        this,
-                        "Family Dashboard Coming Soon",
-                        Toast.LENGTH_SHORT
-                ).show();
-
-                return true;
-
-            } else if (itemId == R.id.nav_profile) {
-
-                Toast.makeText(
-                        this,
-                        "Profile Coming Soon",
-                        Toast.LENGTH_SHORT
-                ).show();
-
-                return true;
             }
 
             return false;
+
         });
+
     }
 
     @Override

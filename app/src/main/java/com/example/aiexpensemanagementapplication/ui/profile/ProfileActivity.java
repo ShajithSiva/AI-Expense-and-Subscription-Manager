@@ -18,6 +18,7 @@ import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
 import com.example.aiexpensemanagementapplication.ui.budget.BudgetActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
+import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -185,27 +186,53 @@ public class ProfileActivity extends AppCompatActivity{
 
             int id = item.getItemId();
 
-            if (id == R.id.nav_dashboard) {
+            if (id == R.id.nav_profile) {
 
-                startActivity(new Intent(this, PersonalDashboardActivity.class));
-                finish();
                 return true;
 
             } else if (id == R.id.nav_expenses) {
 
-                startActivity(new Intent(this, ExpenseListActivity.class));
-                finish();
+                Intent intent = new Intent(
+                        ProfileActivity.this,
+                        ExpenseListActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
+
                 return true;
 
-            } else if (id == R.id.nav_profile) {
+            } else if (id == R.id.nav_dashboard) {
+
+                Intent intent = new Intent(
+                        ProfileActivity.this,
+                        PersonalDashboardActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
 
                 return true;
+
+            } else if (id == R.id.nav_income) {
+
+                Intent intent = new Intent(
+                        ProfileActivity.this,
+                        IncomeListActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
+
+                return true;
+
             }
 
             return false;
-        });
-    }
 
+        });
+
+    }
     private void listeners() {
 
         btnChangePhoto.setOnClickListener(v -> {

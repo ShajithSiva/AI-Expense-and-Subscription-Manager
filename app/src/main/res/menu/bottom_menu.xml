@@ -18,9 +18,9 @@
         android:title="Subs" />
 
     <item
-        android:id="@+id/nav_family"
-        android:icon="@drawable/family"
-        android:title="Family" />
+        android:id="@+id/nav_income"
+        android:icon="@drawable/subscribtion"
+        android:title="Income" />
 
     <item
         android:id="@+id/nav_profile"

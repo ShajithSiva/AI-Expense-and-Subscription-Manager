@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
+import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
@@ -525,35 +526,19 @@ public class ExpenseListActivity extends AppCompatActivity {
 
             int id = item.getItemId();
 
-            if (id == R.id.nav_dashboard) {
+            if (id == R.id.nav_expenses) {
+
+                return true;
+
+            } else if (id == R.id.nav_dashboard) {
 
                 Intent intent = new Intent(
                         ExpenseListActivity.this,
                         PersonalDashboardActivity.class);
 
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
                 startActivity(intent);
-
-                finish();
-
-                return true;
-
-            } else if (id == R.id.nav_expenses) {
-
-                return true;
-
-            } else if (id == R.id.nav_subscriptions) {
-
-                Toast.makeText(this,
-                        "Subscriptions Coming Soon",
-                        Toast.LENGTH_SHORT).show();
-
-                return true;
-
-            } else if (id == R.id.nav_family) {
-
-                Toast.makeText(this,
-                        "Family Dashboard Coming Soon",
-                        Toast.LENGTH_SHORT).show();
 
                 return true;
 
@@ -563,9 +548,21 @@ public class ExpenseListActivity extends AppCompatActivity {
                         ExpenseListActivity.this,
                         ProfileActivity.class);
 
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
                 startActivity(intent);
 
-                finish();
+                return true;
+
+            } else if (id == R.id.nav_income) {
+
+                Intent intent = new Intent(
+                        ExpenseListActivity.this,
+                        IncomeListActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
 
                 return true;
 
