@@ -22,7 +22,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     //========================================================
     // USER TABLE
@@ -184,6 +184,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_UPDATED_AT = "updated_at";
 
     //========================================================
+    // FINANCIAL PREFERENCES TABLE
+    //========================================================
+
+    public static final String TABLE_FINANCIAL_PREFERENCES =
+            "FinancialPreferences";
+
+    public static final String PREF_USER_ID =
+            "UserID";
+
+    public static final String PREF_CURRENCY_CODE =
+            "CurrencyCode";
+
+    public static final String PREF_CURRENCY_NAME =
+            "CurrencyName";
+
+    public static final String PREF_CURRENCY_SYMBOL =
+            "CurrencySymbol";
+
+    public static final String PREF_BUDGET_PERIOD =
+            "BudgetPeriod";
+
+    public static final String PREF_UPDATED_AT =
+            "UpdatedAt";
+
+    //========================================================
     // CONSTRUCTOR
     //========================================================
 
@@ -225,6 +250,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertDefaultPaymentMethods(db);
 
         db.execSQL(CREATE_NOTIFICATION_PREFERENCES_TABLE);
+
+        db.execSQL(CREATE_FINANCIAL_PREFERENCES_TABLE);
     }
 
     private static final String CREATE_USER_TABLE =
@@ -379,6 +406,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                     ")";
 
+    private static final String CREATE_FINANCIAL_PREFERENCES_TABLE =
+            "CREATE TABLE IF NOT EXISTS " +
+                    TABLE_FINANCIAL_PREFERENCES + " (" +
+
+                    PREF_USER_ID + " INTEGER PRIMARY KEY," +
+
+                    PREF_CURRENCY_CODE +
+                    " TEXT NOT NULL DEFAULT 'LKR'," +
+
+                    PREF_CURRENCY_NAME +
+                    " TEXT NOT NULL DEFAULT 'Sri Lankan Rupee'," +
+
+                    PREF_CURRENCY_SYMBOL +
+                    " TEXT NOT NULL DEFAULT '₨'," +
+
+                    PREF_BUDGET_PERIOD +
+                    " TEXT NOT NULL DEFAULT 'Monthly'," +
+
+                    PREF_UPDATED_AT + " INTEGER," +
+
+                    "FOREIGN KEY(" + PREF_USER_ID + ") REFERENCES " +
+                    TABLE_USER + "(" + USER_ID + ")" +
+
+                    ");";
+
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
@@ -387,35 +439,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(
+            SQLiteDatabase db,
+            int oldVersion,
+            int newVersion
+    ) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REPORT);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ALERT);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USAGE_DATA);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SUBSCRIPTION);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSACTION);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENT_METHOD);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY_MEMBER);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY_USER);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PERSONAL_USER);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-
-        onCreate(db);
+        if (oldVersion < 5) {
+            db.execSQL(CREATE_FINANCIAL_PREFERENCES_TABLE);
+        }
     }
 
     @Override
@@ -3675,6 +3707,179 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return exists;
+    }
+
+    public boolean saveBudgetPeriod(
+            int userId,
+            String budgetPeriod
+    ) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(PREF_BUDGET_PERIOD, budgetPeriod);
+
+        values.put(PREF_UPDATED_AT,
+                System.currentTimeMillis());
+
+        int updatedRows = db.update(
+                TABLE_FINANCIAL_PREFERENCES,
+                values,
+                PREF_USER_ID + "=?",
+                new String[]{
+                        String.valueOf(userId)
+                }
+        );
+
+        if (updatedRows > 0) {
+            return true;
+        }
+
+        values.put(PREF_USER_ID, userId);
+
+        values.put(PREF_CURRENCY_CODE, "LKR");
+
+        values.put(PREF_CURRENCY_NAME,
+                "Sri Lankan Rupee");
+
+        values.put(PREF_CURRENCY_SYMBOL, "₨");
+
+        long insertedRow = db.insert(
+                TABLE_FINANCIAL_PREFERENCES,
+                null,
+                values
+        );
+
+        return insertedRow != -1;
+    }
+
+    public boolean saveCurrencyPreference(
+            int userId,
+            String currencyCode,
+            String currencyName,
+            String currencySymbol
+    ) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(PREF_CURRENCY_CODE, currencyCode);
+        values.put(PREF_CURRENCY_NAME, currencyName);
+        values.put(PREF_CURRENCY_SYMBOL, currencySymbol);
+        values.put(PREF_UPDATED_AT, System.currentTimeMillis());
+
+        int updatedRows = db.update(
+                TABLE_FINANCIAL_PREFERENCES,
+                values,
+                PREF_USER_ID + "=?",
+                new String[]{String.valueOf(userId)}
+        );
+
+        if (updatedRows > 0) {
+            return true;
+        }
+
+        values.put(PREF_USER_ID, userId);
+        values.put(PREF_BUDGET_PERIOD, "Monthly");
+
+        long insertedRow = db.insert(
+                TABLE_FINANCIAL_PREFERENCES,
+                null,
+                values
+        );
+
+        return insertedRow != -1;
+    }
+
+    public Cursor getFinancialPreferences(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        return db.query(
+                TABLE_FINANCIAL_PREFERENCES,
+                null,
+                PREF_USER_ID + "=?",
+                new String[]{String.valueOf(userId)},
+                null,
+                null,
+                null
+        );
+    }
+
+    public String getSavedCurrencyCode(int userId) {
+
+        String currencyCode = "LKR";
+
+        Cursor cursor = getFinancialPreferences(userId);
+
+        if (cursor.moveToFirst()) {
+
+            currencyCode = cursor.getString(
+                    cursor.getColumnIndexOrThrow(
+                            PREF_CURRENCY_CODE
+                    )
+            );
+        }
+
+        cursor.close();
+
+        return currencyCode;
+    }
+
+    public String getSavedCurrencyDisplay(int userId) {
+
+        String display = "₨ (LKR)";
+
+        Cursor cursor = getFinancialPreferences(userId);
+
+        if (cursor.moveToFirst()) {
+
+            String symbol = cursor.getString(
+                    cursor.getColumnIndexOrThrow(
+                            PREF_CURRENCY_SYMBOL
+                    )
+            );
+
+            String code = cursor.getString(
+                    cursor.getColumnIndexOrThrow(
+                            PREF_CURRENCY_CODE
+                    )
+            );
+
+            display = symbol + " (" + code + ")";
+        }
+
+        cursor.close();
+
+        return display;
+    }
+
+    public String getSavedBudgetPeriod(
+            int userId
+    ) {
+
+        String budgetPeriod = "Monthly";
+
+        Cursor cursor =
+                getFinancialPreferences(userId);
+
+        if (cursor.moveToFirst()) {
+
+            budgetPeriod = cursor.getString(
+
+                    cursor.getColumnIndexOrThrow(
+                            PREF_BUDGET_PERIOD
+                    )
+
+            );
+
+        }
+
+        cursor.close();
+
+        return budgetPeriod;
     }
 
 }

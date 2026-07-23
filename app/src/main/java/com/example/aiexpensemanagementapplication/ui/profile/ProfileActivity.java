@@ -41,6 +41,12 @@ public class ProfileActivity extends AppCompatActivity{
     private LinearLayout layoutEditProfile;
     private LinearLayout layoutChangePassword;
     private LinearLayout layoutNotifications;
+
+    private TextView tvCurrency;
+
+    private LinearLayout layoutBudgetPeriod;
+    private TextView tvBudgetPeriod;
+
     private LinearLayout layoutBudget;
     private LinearLayout layoutSubscription;
 
@@ -60,6 +66,10 @@ public class ProfileActivity extends AppCompatActivity{
         loadProfile();
 
         loadStatistics();
+
+        loadCurrencyPreference();
+
+        loadBudgetPeriodPreference();
 
         listeners();
 
@@ -92,6 +102,12 @@ public class ProfileActivity extends AppCompatActivity{
         layoutChangePassword = findViewById(R.id.layoutChangePassword);
 
         layoutNotifications = findViewById(R.id.layoutNotifications);
+
+        tvCurrency = findViewById(R.id.tvCurrency);
+
+        layoutBudgetPeriod = findViewById(R.id.layoutBudgetPeriod);
+
+        tvBudgetPeriod = findViewById(R.id.tvBudgetPeriod);
 
         layoutBudget = findViewById(R.id.layoutBudget);
 
@@ -130,6 +146,10 @@ public class ProfileActivity extends AppCompatActivity{
         loadProfile();
 
         loadStatistics();
+
+        loadCurrencyPreference();
+
+        loadBudgetPeriodPreference();
     }
 
     private void loadStatistics() {
@@ -236,6 +256,16 @@ public class ProfileActivity extends AppCompatActivity{
 
         });
 
+        layoutBudgetPeriod.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    ProfileActivity.this,
+                    BudgetPeriodActivity.class
+            );
+
+            startActivity(intent);
+        });
+
 //        layoutBudget.setOnClickListener(v -> {
 //
 //            startActivity(new Intent(
@@ -244,6 +274,49 @@ public class ProfileActivity extends AppCompatActivity{
 //
 //        });
 
+    }
+
+    private void loadCurrencyPreference() {
+
+        if (currentUser == null) {
+            return;
+        }
+
+        int userId = databaseHelper.getUserIdByFirebaseUid(
+                currentUser.getUid()
+        );
+
+        if (userId == -1) {
+            return;
+        }
+
+        String currencyDisplay =
+                databaseHelper.getSavedCurrencyDisplay(userId);
+
+        tvCurrency.setText(currencyDisplay);
+    }
+
+    private void loadBudgetPeriodPreference() {
+
+        if (currentUser == null) {
+            return;
+        }
+
+        int userId =
+                databaseHelper.getUserIdByFirebaseUid(
+                        currentUser.getUid()
+                );
+
+        if (userId == -1) {
+            return;
+        }
+
+        String budgetPeriod =
+                databaseHelper.getSavedBudgetPeriod(
+                        userId
+                );
+
+        tvBudgetPeriod.setText(budgetPeriod);
     }
 
 
