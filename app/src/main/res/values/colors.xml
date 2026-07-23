@@ -5,4 +5,6 @@
     <color name="nav_icon_gray">#9CA3AF</color>
     <color name="nav_icon_white">#FFFFFF</color>
     <color name="blue">#2196F3</color>
+    <color name="currency_selected_border">#16A34A</color>
+    <color name="currency_normal_border">#E5E7EB</color>
 </resources>

@@ -37,7 +37,7 @@ dependencies {
 
     implementation("com.hbb20:ccp:2.7.3")
 
-    // Firebase BoM
+    // Firebase BoM♦
     implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
 
     // Firebase Authentication
@@ -48,6 +48,12 @@ dependencies {
 
     // Firebase Analytics
     implementation("com.google.firebase:firebase-analytics")
+
+    // Retrofit - REST API calls
+    implementation("com.squareup.retrofit2:retrofit:2.12.0")
+
+// Gson Converter - JSON response to Java objects
+    implementation("com.squareup.retrofit2:converter-gson:2.12.0")
 
     // RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.3.2")
