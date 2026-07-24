@@ -114,6 +114,9 @@
         <activity
             android:name=".ui.subscription.SubscriptionActivity"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.subscription.AddSubscriptionActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
