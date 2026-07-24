@@ -89,7 +89,7 @@
             android:name=".ui.budget.EditBudgetActivity"
             android:windowSoftInputMode="adjustResize" /> <!-- Reports -->
         <activity
-            android:name=".ui.report.ReportActivity"
+            android:name=".ui.reports.ReportsActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.profile.ProfileActivity"
