@@ -21,11 +21,16 @@ public class SubscriptionAdapter extends RecyclerView.Adapter<SubscriptionAdapte
     private final Context context;
     private final ArrayList<Subscription> subscriptionList;
 
-    public SubscriptionAdapter(Context context,
-                               ArrayList<Subscription> subscriptionList) {
+    private final OnSubscriptionClickListener listener;
+
+    public SubscriptionAdapter(
+            Context context,
+            ArrayList<Subscription> subscriptionList,
+            OnSubscriptionClickListener listener) {
 
         this.context = context;
         this.subscriptionList = subscriptionList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -58,6 +63,9 @@ public class SubscriptionAdapter extends RecyclerView.Adapter<SubscriptionAdapte
         holder.chipStatus.setText("Active");
 
         holder.tvUsage.setText("Subscription Active");
+
+        holder.itemView.setOnClickListener(v ->
+                listener.onSubscriptionClick(subscription));
     }
 
     @Override
@@ -94,6 +102,10 @@ public class SubscriptionAdapter extends RecyclerView.Adapter<SubscriptionAdapte
 
             chipStatus = itemView.findViewById(R.id.chipStatus);
         }
+    }
+
+    public interface OnSubscriptionClickListener {
+        void onSubscriptionClick(Subscription subscription);
     }
 
 

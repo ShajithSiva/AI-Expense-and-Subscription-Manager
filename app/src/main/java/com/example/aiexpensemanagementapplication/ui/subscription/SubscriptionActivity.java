@@ -149,7 +149,20 @@ public class SubscriptionActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
 
-        adapter = new SubscriptionAdapter(this, subscriptionList);
+        adapter = new SubscriptionAdapter(
+                this,
+                subscriptionList,
+                subscription -> {
+
+                    Intent intent = new Intent(
+                            SubscriptionActivity.this,
+                            EditSubscriptionActivity.class);
+
+                    intent.putExtra("subscriptionId",
+                            subscription.getSubscriptionId());
+
+                    startActivity(intent);
+                });
 
         rvSubscriptions.setLayoutManager(new LinearLayoutManager(this));
 
