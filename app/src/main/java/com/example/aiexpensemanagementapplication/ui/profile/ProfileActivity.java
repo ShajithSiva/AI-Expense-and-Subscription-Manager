@@ -19,6 +19,7 @@ import com.example.aiexpensemanagementapplication.ui.budget.BudgetActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
+import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -214,6 +215,18 @@ public class ProfileActivity extends AppCompatActivity{
 
                 return true;
 
+            }else if (id == R.id.nav_subscriptions) {
+
+                Intent intent = new Intent(
+                        ProfileActivity.this,
+                        SubscriptionActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
+
+                return true;
+
             } else if (id == R.id.nav_income) {
 
                 Intent intent = new Intent(
@@ -233,6 +246,7 @@ public class ProfileActivity extends AppCompatActivity{
         });
 
     }
+
     private void listeners() {
 
         btnChangePhoto.setOnClickListener(v -> {

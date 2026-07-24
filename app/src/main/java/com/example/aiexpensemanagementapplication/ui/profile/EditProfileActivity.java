@@ -89,16 +89,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
         btnSave.setOnClickListener(v -> saveProfile());
 
-        btnChangePhoto.setOnClickListener(v -> {
-
-            Toast.makeText(
-                    this,
-                    "Profile picture update coming soon",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-        });
-
     }
 
     private void loadUser() {
@@ -158,7 +148,6 @@ public class EditProfileActivity extends AppCompatActivity {
         if (cursor != null) {
             cursor.close();
         }
-
     }
 
     private void saveProfile() {
@@ -217,7 +206,6 @@ public class EditProfileActivity extends AppCompatActivity {
             updateProfile(name, mobile);
 
         }
-        finish();
     }
 
     private void updateProfile(String name, String mobile) {

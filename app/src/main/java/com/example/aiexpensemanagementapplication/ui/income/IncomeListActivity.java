@@ -23,6 +23,7 @@ import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
+import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
@@ -665,7 +666,19 @@ public class IncomeListActivity extends AppCompatActivity {
 
                 return true;
 
-            } else if (id == R.id.nav_profile) {
+            }else if (id == R.id.nav_subscriptions) {
+
+                Intent intent = new Intent(
+                        IncomeListActivity.this,
+                        SubscriptionActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
+
+                return true;
+
+            }   else if (id == R.id.nav_profile) {
 
                 Intent intent = new Intent(
                         IncomeListActivity.this,

@@ -111,6 +111,9 @@
         <activity
             android:name=".ui.profile.ChangePasswordActivity"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.subscription.SubscriptionActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

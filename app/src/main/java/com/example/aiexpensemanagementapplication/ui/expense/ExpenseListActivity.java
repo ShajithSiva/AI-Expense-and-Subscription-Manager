@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
+import com.example.aiexpensemanagementapplication.ui.profile.EditProfileActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
+import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -547,6 +549,18 @@ public class ExpenseListActivity extends AppCompatActivity {
                 Intent intent = new Intent(
                         ExpenseListActivity.this,
                         ProfileActivity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                startActivity(intent);
+
+                return true;
+
+            } else if (id == R.id.nav_subscriptions) {
+
+                Intent intent = new Intent(
+                        ExpenseListActivity.this,
+                        SubscriptionActivity.class);
 
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
