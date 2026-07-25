@@ -27,6 +27,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import android.view.View;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -122,14 +123,6 @@ public class PersonalDashboardActivity extends AppCompatActivity {
 
         }
 
-        ReminderScheduler scheduler =
-                new ReminderScheduler(this);
-
-        scheduler.scheduleDailyReminder(
-                20,
-                0
-        );
-
         fabAddExpense.setOnClickListener(v -> {
 
             startActivity(
@@ -159,6 +152,29 @@ public class PersonalDashboardActivity extends AppCompatActivity {
             startActivity(intent);
 
         });
+
+        int userId = databaseHelper.getUserIdByEmail(currentUser.getEmail());
+
+        ReminderScheduler scheduler = new ReminderScheduler(this);
+
+        scheduler.checkBudgetReminder(
+                databaseHelper,
+                userId
+        );
+
+        scheduler.checkSubscriptionReminder(
+                databaseHelper,
+                userId
+        );
+
+        Calendar calendar =
+                Calendar.getInstance();
+
+        if(calendar.get(Calendar.DAY_OF_MONTH)==1){
+
+            scheduler.showMonthlyReportReminder();
+
+        }
     }
 
     @Override

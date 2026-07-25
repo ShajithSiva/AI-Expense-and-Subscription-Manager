@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.notification.ReminderScheduler;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -266,6 +267,14 @@ public class AddExpenseActivity extends AppCompatActivity {
                 );
 
         if (result != -1) {
+
+            ReminderScheduler scheduler =
+                    new ReminderScheduler(this);
+
+            scheduler.checkBudgetReminder(
+                    databaseHelper,
+                    userId
+            );
 
             Toast.makeText(
                     this,

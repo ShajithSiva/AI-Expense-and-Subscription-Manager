@@ -1,4 +1,5 @@
 package com.example.aiexpensemanagementapplication.data.local;
+import com.example.aiexpensemanagementapplication.model.Subscription;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeModel;
 import com.example.aiexpensemanagementapplication.model.NotificationPreferences;
@@ -883,6 +884,77 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return id;
+    }
+
+    public ArrayList<Subscription> getUpcomingSubscriptions(int userId) {
+
+        ArrayList<Subscription> subscriptions = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Calendar today = Calendar.getInstance();
+
+        Calendar nextWeek = Calendar.getInstance();
+        nextWeek.add(Calendar.DAY_OF_YEAR, 7);
+
+        SimpleDateFormat sdf =
+                new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT * FROM " + TABLE_SUBSCRIPTION +
+                        " WHERE " + USER_ID + "=?" +
+                        " ORDER BY " + NEXT_BILLING_DATE + " ASC",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        while (cursor.moveToNext()) {
+
+            try {
+
+                String dateString = cursor.getString(
+                        cursor.getColumnIndexOrThrow(NEXT_BILLING_DATE));
+
+                Calendar billingDate = Calendar.getInstance();
+                billingDate.setTime(sdf.parse(dateString));
+
+                if (!billingDate.before(today)
+                        && !billingDate.after(nextWeek)) {
+
+                    Subscription subscription = new Subscription();
+
+                    subscription.setSubscriptionId(
+                            cursor.getInt(
+                                    cursor.getColumnIndexOrThrow(SUBSCRIPTION_ID)));
+
+                    subscription.setServiceName(
+                            cursor.getString(
+                                    cursor.getColumnIndexOrThrow(SERVICE_NAME)));
+
+                    subscription.setAmount(
+                            cursor.getDouble(
+                                    cursor.getColumnIndexOrThrow(AMOUNT)));
+
+                    subscription.setBillingCycle(
+                            cursor.getString(
+                                    cursor.getColumnIndexOrThrow(BILLING_CYCLE)));
+
+                    subscription.setNextBillingDate(dateString);
+
+                    subscriptions.add(subscription);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        cursor.close();
+
+        return subscriptions;
     }
 
     public ArrayList<String> getPaymentMethodNames(){
