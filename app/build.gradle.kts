@@ -35,6 +35,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
+    implementation("com.itextpdf:itext7-core:7.2.5")
+
     implementation("com.hbb20:ccp:2.7.3")
 
     // Firebase BoM♦

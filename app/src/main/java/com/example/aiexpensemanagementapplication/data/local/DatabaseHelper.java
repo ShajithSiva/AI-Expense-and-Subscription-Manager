@@ -10,6 +10,10 @@ import com.github.mikephil.charting.data.PieEntry;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import com.github.mikephil.charting.data.Entry;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -4012,6 +4016,347 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return budgetPeriod;
+    }
+
+    public String getHighestExpenseCategory(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String category = "No Data";
+
+        String query =
+                "SELECT c." + CATEGORY_NAME +
+                        ", SUM(t." + AMOUNT + ") AS Total " +
+
+                        "FROM " + TABLE_TRANSACTION + " t " +
+
+                        "INNER JOIN " + TABLE_CATEGORY + " c " +
+
+                        "ON t." + CATEGORY_ID + "=c." + CATEGORY_ID +
+
+                        " WHERE t." + USER_ID + "=?" +
+
+                        " AND t." + TRANSACTION_TYPE + "='Expense'" +
+
+                        " GROUP BY c." + CATEGORY_NAME +
+
+                        " ORDER BY Total DESC LIMIT 1";
+
+        Cursor cursor = db.rawQuery(
+                query,
+                new String[]{String.valueOf(userId)}
+        );
+
+        if (cursor.moveToFirst()) {
+
+            category = cursor.getString(0);
+
+        }
+
+        cursor.close();
+
+        return category;
+    }
+
+    public double getLargestExpense(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(MAX(" + AMOUNT + "),0) " +
+
+                        "FROM " + TABLE_TRANSACTION +
+
+                        " WHERE " + USER_ID + "=?" +
+
+                        " AND " + TRANSACTION_TYPE + "='Expense'",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        double amount = 0;
+
+        if (cursor.moveToFirst()) {
+
+            amount = cursor.getDouble(0);
+
+        }
+
+        cursor.close();
+
+        return amount;
+    }
+
+    public double getAverageDailyExpense(int userId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(AVG(DailyTotal),0) FROM ("
+
+                        +
+
+                        "SELECT SUM(" + AMOUNT + ") AS DailyTotal "
+
+                        +
+
+                        "FROM " + TABLE_TRANSACTION +
+
+                        " WHERE " + USER_ID + "=?" +
+
+                        " AND " + TRANSACTION_TYPE + "='Expense'" +
+
+                        " GROUP BY " + TRANSACTION_DATE +
+
+                        ")",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        double average = 0;
+
+        if (cursor.moveToFirst()) {
+
+            average = cursor.getDouble(0);
+
+        }
+
+        cursor.close();
+
+        return average;
+    }
+
+    public double getSavingsRate(int userId) {
+
+        double income = getTotalIncome(userId);
+
+        if (income == 0) {
+
+            return 0;
+
+        }
+
+        double savings = getTotalSavings(userId);
+
+        return (savings / income) * 100;
+    }
+
+    public ArrayList<String> getTopExpenseCategories(int userId){
+
+        ArrayList<String> categories = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query =
+                "SELECT c." + CATEGORY_NAME +
+                        ", SUM(t." + AMOUNT + ") AS Total " +
+                        "FROM " + TABLE_TRANSACTION + " t " +
+                        "INNER JOIN " + TABLE_CATEGORY + " c " +
+                        "ON t." + CATEGORY_ID + "=c." + CATEGORY_ID +
+                        " WHERE t." + USER_ID + "=?" +
+                        " AND t." + TRANSACTION_TYPE + "='Expense'" +
+                        " GROUP BY c." + CATEGORY_NAME +
+                        " ORDER BY Total DESC LIMIT 5";
+
+        Cursor cursor = db.rawQuery(
+                query,
+                new String[]{String.valueOf(userId)}
+        );
+
+        while(cursor.moveToNext()){
+
+            categories.add(cursor.getString(0));
+
+        }
+
+        cursor.close();
+
+        return categories;
+    }
+
+    public double getMonthlySubscriptionCost(int userId){
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT IFNULL(SUM(" + AMOUNT + "),0) " +
+
+                        "FROM " + TABLE_SUBSCRIPTION +
+
+                        " WHERE " + USER_ID + "=?",
+
+                new String[]{
+                        String.valueOf(userId)
+                });
+
+        double total = 0;
+
+        if(cursor.moveToFirst()){
+
+            total = cursor.getDouble(0);
+
+        }
+
+        cursor.close();
+
+        return total;
+
+    }
+
+    public double getBudgetRemaining(int userId){
+
+        Budget budget = getBudgetSettings(userId);
+
+        if(budget==null){
+
+            return 0;
+
+        }
+
+        double remaining =
+                budget.getMonthlyBudget()-
+                        getTotalExpense(userId);
+
+        return Math.max(remaining,0);
+
+    }
+
+    public String getBudgetStatus(int userId){
+
+        Budget budget = getBudgetSettings(userId);
+
+        if(budget==null){
+
+            return "Budget Not Set";
+
+        }
+
+        double monthlyBudget =
+                budget.getMonthlyBudget();
+
+        if(monthlyBudget==0){
+
+            return "Budget Not Set";
+
+        }
+
+        double used =
+                getTotalExpense(userId);
+
+        double percentage =
+                (used/monthlyBudget)*100;
+
+        if(percentage>=100){
+
+            return "Critical";
+
+        }
+
+        if(percentage>=80){
+
+            return "Warning";
+
+        }
+
+        return "Good";
+
+    }
+
+    public int getFinancialHealthScore(int userId){
+
+        double income =
+                getTotalIncome(userId);
+
+        double expense =
+                getTotalExpense(userId);
+
+        if(income<=0){
+
+            return 0;
+
+        }
+
+        double ratio =
+                expense/income;
+
+        int score;
+
+        if(ratio<=0.50){
+
+            score=100;
+
+        }else if(ratio<=0.60){
+
+            score=90;
+
+        }else if(ratio<=0.70){
+
+            score=80;
+
+        }else if(ratio<=0.80){
+
+            score=70;
+
+        }else if(ratio<=0.90){
+
+            score=60;
+
+        }else if(ratio<=1.00){
+
+            score=50;
+
+        }else{
+
+            score=20;
+
+        }
+
+        return score;
+
+    }
+
+    public String getSpendingTrend(int userId){
+
+        Calendar calendar =
+                Calendar.getInstance();
+
+        SimpleDateFormat format =
+                new SimpleDateFormat("yyyy-MM",
+                        Locale.getDefault());
+
+        String currentMonth =
+                format.format(calendar.getTime());
+
+        calendar.add(Calendar.MONTH,-1);
+
+        String previousMonth =
+                format.format(calendar.getTime());
+
+        double current =
+                getMonthlyExpense(userId,currentMonth);
+
+        double previous =
+                getMonthlyExpense(userId,previousMonth);
+
+        if(current>previous){
+
+            return "Increasing";
+
+        }
+
+        if(current<previous){
+
+            return "Decreasing";
+
+        }
+
+        return "Stable";
+
     }
 
 }
