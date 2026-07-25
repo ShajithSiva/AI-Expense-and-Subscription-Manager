@@ -8,7 +8,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.graphics.Color;
 
 import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
+
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import android.view.View;
+import android.graphics.Bitmap;
+
 
 import android.widget.Toast;
 
@@ -25,13 +33,10 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
 
 import java.io.File;
@@ -241,17 +246,45 @@ public class ReportsActivity extends AppCompatActivity {
 
     }
 
-    private void exportPDF(){
+    private void exportPDF() {
 
-        PdfDocument document = new PdfDocument();
+        File folder = getExternalFilesDir("Reports");
 
-        Paint paint = new Paint();
+        if (folder != null && !folder.exists()) {
+            folder.mkdirs();
+        }
+
+        File file = new File(folder, "ExpenseReport.pdf");
+
+        PdfDocument pdfDocument = new PdfDocument();
 
         Paint titlePaint = new Paint();
+        Paint headingPaint = new Paint();
+        Paint subHeadingPaint = new Paint();
+        Paint normalPaint = new Paint();
+        Paint smallPaint = new Paint();
+        Paint linePaint = new Paint();
 
-        titlePaint.setTextSize(22);
+        titlePaint.setColor(Color.BLACK);
+        titlePaint.setTextSize(28);
+        titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD));
 
-        titlePaint.setFakeBoldText(true);
+        headingPaint.setColor(Color.parseColor("#1976D2"));
+        headingPaint.setTextSize(20);
+        headingPaint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD));
+
+        subHeadingPaint.setColor(Color.parseColor("#424242"));
+        subHeadingPaint.setTextSize(16);
+        subHeadingPaint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD));
+
+        normalPaint.setColor(Color.BLACK);
+        normalPaint.setTextSize(14);
+
+        smallPaint.setColor(Color.DKGRAY);
+        smallPaint.setTextSize(11);
+
+        linePaint.setColor(Color.LTGRAY);
+        linePaint.setStrokeWidth(2);
 
         PdfDocument.PageInfo pageInfo =
                 new PdfDocument.PageInfo.Builder(
@@ -261,121 +294,609 @@ public class ReportsActivity extends AppCompatActivity {
                 ).create();
 
         PdfDocument.Page page =
-                document.startPage(pageInfo);
+                pdfDocument.startPage(pageInfo);
 
-        Canvas canvas = page.getCanvas();
+        Canvas canvas =
+                page.getCanvas();
 
-        int y = 60;
-
-        canvas.drawText(
-                "Expense Management Report",
-                140,
-                y,
-                titlePaint
-        );
-
-        y += 50;
+        int y = 45;
 
         canvas.drawText(
-                "Total Income : Rs "
-                        + tvTotalIncome.getText(),
+                "AI Expense Management Application",
                 40,
                 y,
-                paint
-        );
+                titlePaint);
+
+        y += 28;
+
+        canvas.drawText(
+                "Financial Report",
+                40,
+                y,
+                headingPaint);
+
+        y += 20;
+
+        String date =
+                new SimpleDateFormat(
+                        "dd MMM yyyy  HH:mm",
+                        Locale.getDefault())
+                        .format(new Date());
+
+        canvas.drawText(
+                "Generated on : " + date,
+                40,
+                y,
+                smallPaint);
+
+        y += 20;
+
+        canvas.drawLine(
+                40,
+                y,
+                555,
+                y,
+                linePaint);
 
         y += 30;
 
         canvas.drawText(
-                "Total Expense : Rs "
-                        + tvTotalExpense.getText(),
+                "Financial Summary",
                 40,
                 y,
-                paint
-        );
+                headingPaint);
+
+        y += 25;
+
+        canvas.drawText(
+                "Total Income",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                "Rs " +
+                        String.format(
+                                "%.2f",
+                                databaseHelper.getTotalIncome(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Total Expense",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                "Rs " +
+                        String.format(
+                                "%.2f",
+                                databaseHelper.getTotalExpense(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Savings",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                "Rs " +
+                        String.format(
+                                "%.2f",
+                                databaseHelper.getTotalSavings(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Budget Used",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                String.format(
+                        "%.1f%%",
+                        databaseHelper.getDashboardBudgetUsed(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 35;
+
+        canvas.drawLine(
+                40,
+                y,
+                555,
+                y,
+                linePaint);
+
+        y += 30;
+        // ================= FINANCIAL ANALYTICS =================
+
+        canvas.drawText(
+                "Financial Analytics",
+                40,
+                y,
+                headingPaint);
 
         y += 30;
 
         canvas.drawText(
-                "Savings : Rs "
-                        + tvSavings.getText(),
+                "Highest Expense Category",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                databaseHelper.getHighestExpenseCategory(userId),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Largest Expense",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                "Rs " +
+                        String.format(
+                                "%.2f",
+                                databaseHelper.getLargestExpense(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Average Daily Expense",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                "Rs " +
+                        String.format(
+                                "%.2f",
+                                databaseHelper.getAverageDailyExpense(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Savings Rate",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                String.format(
+                        "%.1f%%",
+                        databaseHelper.getSavingsRate(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 35;
+
+        canvas.drawLine(
                 40,
                 y,
-                paint
-        );
+                555,
+                y,
+                linePaint);
+
+        y += 30;
+
+        // ================= ADVANCED INSIGHTS =================
+
+        canvas.drawText(
+                "Advanced Financial Insights",
+                40,
+                y,
+                headingPaint);
 
         y += 30;
 
         canvas.drawText(
-                "Budget Used : "
-                        + tvBudgetUsed.getText(),
-                40,
+                "Financial Health Score",
+                60,
                 y,
-                paint
-        );
-
-        y += 50;
+                subHeadingPaint);
 
         canvas.drawText(
-                "AI Insight",
+                databaseHelper.getFinancialHealthScore(userId) + "/100",
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Budget Status",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                databaseHelper.getBudgetStatus(userId),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Budget Remaining",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                "Rs " +
+                        String.format(
+                                "%.2f",
+                                databaseHelper.getBudgetRemaining(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Monthly Subscription Cost",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                "Rs " +
+                        String.format(
+                                "%.2f",
+                                databaseHelper.getMonthlySubscriptionCost(userId)),
+                350,
+                y,
+                normalPaint);
+
+        y += 22;
+
+        canvas.drawText(
+                "Spending Trend",
+                60,
+                y,
+                subHeadingPaint);
+
+        canvas.drawText(
+                databaseHelper.getSpendingTrend(userId),
+                350,
+                y,
+                normalPaint);
+
+        y += 35;
+
+        canvas.drawLine(
                 40,
                 y,
-                titlePaint
-        );
+                555,
+                y,
+                linePaint);
 
         y += 30;
 
+        // ================= AI INSIGHT =================
+
         canvas.drawText(
-                tvAIInsights.getText().toString(),
+                "AI Financial Recommendation",
                 40,
                 y,
-                paint
-        );
+                headingPaint);
 
-        document.finishPage(page);
+        y += 25;
 
-        File folder =
-                getExternalFilesDir("Reports");
+        String insight =
+                databaseHelper.generateAIInsight(userId);
 
-        if(folder!=null && !folder.exists()){
+        String[] lines = insight.split("\\.");
 
-            folder.mkdirs();
+        for (String line : lines) {
 
+            line = line.trim();
+
+            if (!line.isEmpty()) {
+
+                canvas.drawText(
+                        "• " + line + ".",
+                        60,
+                        y,
+                        normalPaint);
+
+                y += 20;
+            }
         }
 
-        File file =
-                new File(folder,
-                        "ExpenseReport.pdf");
+        y += 20;
 
-        try{
+        canvas.drawLine(
+                40,
+                780,
+                555,
+                780,
+                linePaint);
+
+        canvas.drawText(
+                "Page 1",
+                280,
+                805,
+                smallPaint);
+
+        pdfDocument.finishPage(page);
+        // ================= PAGE 2 =================
+
+        PdfDocument.PageInfo pageInfo2 =
+                new PdfDocument.PageInfo.Builder(
+                        595,
+                        842,
+                        2
+                ).create();
+
+        PdfDocument.Page page2 =
+                pdfDocument.startPage(pageInfo2);
+
+        Canvas canvas2 =
+                page2.getCanvas();
+
+        int chartY = 45;
+
+        canvas2.drawText(
+                "Financial Charts",
+                40,
+                chartY,
+                titlePaint);
+
+        chartY += 30;
+
+        canvas2.drawLine(
+                40,
+                chartY,
+                555,
+                chartY,
+                linePaint);
+
+        chartY += 25;
+
+        // ================= PIE CHART =================
+
+        canvas2.drawText(
+                "Expense Category Breakdown",
+                40,
+                chartY,
+                headingPaint);
+
+        chartY += 20;
+
+        Bitmap pieBitmap =
+                getChartBitmap(pieChart);
+
+        Bitmap scaledPie =
+                Bitmap.createScaledBitmap(
+                        pieBitmap,
+                        250,
+                        250,
+                        true);
+
+        canvas2.drawBitmap(
+                scaledPie,
+                40,
+                chartY,
+                null);
+
+        chartY += 270;
+
+        canvas2.drawLine(
+                40,
+                chartY,
+                555,
+                chartY,
+                linePaint);
+
+        chartY += 25;
+
+        // ================= BAR CHART =================
+
+        canvas2.drawText(
+                "Weekly Expense Analysis",
+                40,
+                chartY,
+                headingPaint);
+
+        chartY += 20;
+
+        Bitmap barBitmap =
+                getChartBitmap(barChart);
+
+        Bitmap scaledBar =
+                Bitmap.createScaledBitmap(
+                        barBitmap,
+                        500,
+                        220,
+                        true);
+
+        canvas2.drawBitmap(
+                scaledBar,
+                40,
+                chartY,
+                null);
+
+        canvas2.drawLine(
+                40,
+                780,
+                555,
+                780,
+                linePaint);
+
+        canvas2.drawText(
+                "Page 2",
+                280,
+                805,
+                smallPaint);
+
+        pdfDocument.finishPage(page2);
+
+        // ================= PAGE 3 =================
+
+        PdfDocument.PageInfo pageInfo3 =
+                new PdfDocument.PageInfo.Builder(
+                        595,
+                        842,
+                        3
+                ).create();
+
+        PdfDocument.Page page3 =
+                pdfDocument.startPage(pageInfo3);
+
+        Canvas canvas3 =
+                page3.getCanvas();
+
+        int y3 = 45;
+
+        canvas3.drawText(
+                "Income vs Expense",
+                40,
+                y3,
+                titlePaint);
+
+        y3 += 30;
+
+        canvas3.drawLine(
+                40,
+                y3,
+                555,
+                y3,
+                linePaint);
+
+        y3 += 25;
+
+        Bitmap lineBitmap =
+                getChartBitmap(lineChart);
+
+        Bitmap scaledLine =
+                Bitmap.createScaledBitmap(
+                        lineBitmap,
+                        500,
+                        300,
+                        true);
+
+        canvas3.drawBitmap(
+                scaledLine,
+                40,
+                y3,
+                null);
+
+        y3 += 330;
+
+        canvas3.drawText(
+                "Report generated by AI Expense Management Application",
+                40,
+                y3,
+                normalPaint);
+
+        y3 += 20;
+
+        canvas3.drawText(
+                "Date : " + date,
+                40,
+                y3,
+                smallPaint);
+
+        canvas3.drawLine(
+                40,
+                780,
+                555,
+                780,
+                linePaint);
+
+        canvas3.drawText(
+                "Page 3",
+                280,
+                805,
+                smallPaint);
+
+        pdfDocument.finishPage(page3);
+        try {
 
             FileOutputStream outputStream =
                     new FileOutputStream(file);
 
-            document.writeTo(outputStream);
+            pdfDocument.writeTo(outputStream);
+
+            outputStream.flush();
 
             outputStream.close();
 
-            document.close();
+            pdfDocument.close();
 
             Toast.makeText(
-
                     this,
-
-                    "PDF Saved\n"
+                    "PDF exported successfully!\n\nLocation:\n"
                             + file.getAbsolutePath(),
-
                     Toast.LENGTH_LONG
-
             ).show();
 
-        }catch(IOException e){
+        } catch (IOException e) {
 
             e.printStackTrace();
 
+            pdfDocument.close();
+
+            Toast.makeText(
+                    this,
+                    "Failed to export PDF.",
+                    Toast.LENGTH_SHORT
+            ).show();
         }
 
     }
+
+    private Bitmap getChartBitmap(View chart){
+
+        if(chart.getWidth() <= 0 || chart.getHeight() <= 0){
+
+            throw new IllegalStateException("Chart is not ready.");
+
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(
+                chart.getWidth(),
+                chart.getHeight(),
+                Bitmap.Config.ARGB_8888
+        );
+
+        Canvas canvas = new Canvas(bitmap);
+
+        chart.draw(canvas);
+
+        return bitmap;
+
+    }
+
 
     private void exportCSV() {
 
@@ -697,24 +1218,28 @@ public class ReportsActivity extends AppCompatActivity {
                 )
         );
 
-        tvSpendingTrend.setText(
-                databaseHelper.getSpendingTrend(userId)
-        );
-
         ArrayList<String> list =
                 databaseHelper.getTopExpenseCategories(userId);
 
-        StringBuilder builder = new StringBuilder();
+        if(list.isEmpty()){
 
-        for(String item : list){
+            tvTopCategories.setText("No expense data available");
 
-            builder.append("• ")
-                    .append(item)
-                    .append("\n");
+        }else{
+
+            StringBuilder builder = new StringBuilder();
+
+            for(String item : list){
+
+                builder.append("• ")
+                        .append(item)
+                        .append("\n");
+
+            }
+
+            tvTopCategories.setText(builder.toString());
 
         }
-
-        tvTopCategories.setText(builder.toString());
 
         String trend =
                 databaseHelper.getSpendingTrend(userId);
@@ -734,13 +1259,11 @@ public class ReportsActivity extends AppCompatActivity {
 
         }
         else{
-
             tvSpendingTrend.setTextColor(
                     Color.parseColor("#2196F3"));
 
         }
     }
-
 
 
 
