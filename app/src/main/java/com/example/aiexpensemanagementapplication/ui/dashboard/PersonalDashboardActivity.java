@@ -1,5 +1,8 @@
 package com.example.aiexpensemanagementapplication.ui.dashboard;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.content.Intent;
@@ -8,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.aiexpensemanagementapplication.notification.ReminderScheduler;
 import com.example.aiexpensemanagementapplication.ui.expense.AddExpenseActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
@@ -103,6 +107,28 @@ public class PersonalDashboardActivity extends AppCompatActivity {
         loadDashboard();
 
         setupBottomNavigation();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                requestPermissions(
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        101
+                );
+
+            }
+
+        }
+
+        ReminderScheduler scheduler =
+                new ReminderScheduler(this);
+
+        scheduler.scheduleDailyReminder(
+                20,
+                0
+        );
 
         fabAddExpense.setOnClickListener(v -> {
 
