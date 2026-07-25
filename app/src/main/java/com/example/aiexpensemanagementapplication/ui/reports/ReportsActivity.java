@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.model.Budget;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -124,9 +125,13 @@ public class ReportsActivity extends AppCompatActivity {
         tvSavings.setText(
                 String.format("Rs %.2f",savings));
 
-        double budget =
-                databaseHelper.getBudgetSettings(userId)
-                        .getMonthlyBudget();
+        Budget budgetSettings = databaseHelper.getBudgetSettings(userId);
+
+        double budget = 0;
+
+        if (budgetSettings != null) {
+            budget = budgetSettings.getMonthlyBudget();
+        }
 
         if(budget>0){
 

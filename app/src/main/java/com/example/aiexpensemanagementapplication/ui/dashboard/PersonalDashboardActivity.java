@@ -13,6 +13,7 @@ import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
+import com.example.aiexpensemanagementapplication.ui.reports.ReportsActivity;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -32,7 +33,9 @@ import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -58,6 +61,8 @@ public class PersonalDashboardActivity extends AppCompatActivity {
     private TextView tvRemainingBudget;
     private TextView tvBudgetPercentage;
 
+    private ShapeableImageView imgProfile;
+
     // Category
 
     private PieChart pieChart;
@@ -65,6 +70,7 @@ public class PersonalDashboardActivity extends AppCompatActivity {
     // Weekly
 
     private LineChart lineChart;
+    private MaterialButton btnReports;
 
     // Subscription
 
@@ -108,6 +114,25 @@ public class PersonalDashboardActivity extends AppCompatActivity {
             );
 
         });
+        btnReports.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    PersonalDashboardActivity.this,
+                    ReportsActivity.class);
+
+            startActivity(intent);
+
+        });
+
+        imgProfile.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    PersonalDashboardActivity.this,
+                    ProfileActivity.class);
+
+            startActivity(intent);
+
+        });
     }
 
     @Override
@@ -147,6 +172,10 @@ public class PersonalDashboardActivity extends AppCompatActivity {
         pieChart = findViewById(R.id.pieChart);
 
         lineChart = findViewById(R.id.lineChart);
+
+        btnReports = findViewById(R.id.btnReports);
+
+        imgProfile = findViewById(R.id.imgProfile);
 
         // Subscription
 

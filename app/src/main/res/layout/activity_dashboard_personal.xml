@@ -309,150 +309,6 @@
                         android:layout_gravity="center"
                         android:layout_marginTop="24dp"/>
 
-                    <!-- Legend Row 1 -->
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
-
-                        <!-- Food -->
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center_vertical">
-
-                            <View
-                                android:layout_width="10dp"
-                                android:layout_height="10dp"
-                                android:background="@drawable/ic_food"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Food"
-                                android:textColor="#555555"
-                                android:textSize="14sp"/>
-
-                            <TextView
-                                android:id="@+id/tvFoodAmount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Rs 0"
-                                android:textStyle="bold"/>
-
-                        </LinearLayout>
-
-                        <!-- Transport -->
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center_vertical">
-
-                            <View
-                                android:layout_width="10dp"
-                                android:layout_height="10dp"
-                                android:background="@drawable/ic_transport"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Transport"
-                                android:textColor="#555555"
-                                android:textSize="14sp"/>
-
-                            <TextView
-                                android:id="@+id/tvTransportAmount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Rs 0"
-                                android:textStyle="bold"/>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- Legend Row 2 -->
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-                        <!-- Utilities -->
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center_vertical">
-
-                            <View
-                                android:layout_width="10dp"
-                                android:layout_height="10dp"
-                                android:background="@drawable/ic_utilities"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Utilities"
-                                android:textColor="#555555"
-                                android:textSize="14sp"/>
-
-                            <TextView
-                                android:id="@+id/tvUtilitiesAmount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Rs 0"
-                                android:textStyle="bold"/>
-
-                        </LinearLayout>
-
-                        <!-- Entertainment -->
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center_vertical">
-
-                            <View
-                                android:layout_width="10dp"
-                                android:layout_height="10dp"
-                                android:background="@drawable/expense"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Entertainment"
-                                android:textColor="#555555"
-                                android:textSize="14sp"/>
-
-                            <TextView
-                                android:id="@+id/tvEntertainmentAmount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Rs 0"
-                                android:textStyle="bold"/>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -653,6 +509,21 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReports"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:text="View Financial Reports"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:backgroundTint="#2563EB"
+                android:textColor="@android:color/white"/>
             <!-- ================================================= -->
             <!-- AI SAVINGS INSIGHTS -->
             <!-- ================================================= -->
