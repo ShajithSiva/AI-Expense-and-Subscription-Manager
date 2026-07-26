@@ -268,8 +268,12 @@ public class AddExpenseActivity extends AppCompatActivity {
 
         if (result != -1) {
 
-            ReminderScheduler scheduler =
-                    new ReminderScheduler(this);
+            ReminderScheduler scheduler = new ReminderScheduler(this);
+
+            scheduler.checkBudgetReminder(
+                    databaseHelper,
+                    userId
+            );
 
             scheduler.checkCategoryBudgetReminder(
                     databaseHelper,
