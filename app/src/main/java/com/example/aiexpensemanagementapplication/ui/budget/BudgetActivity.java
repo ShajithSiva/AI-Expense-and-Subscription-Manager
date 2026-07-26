@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import android.view.View;
+import android.content.Intent;
+import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
@@ -138,6 +140,15 @@ public class BudgetActivity extends AppCompatActivity {
                     "Budget Saved Successfully",
                     Toast.LENGTH_SHORT
             ).show();
+
+            Intent intent = new Intent(BudgetActivity.this, ProfileActivity.class);
+
+            // Prevent going back to BudgetActivity
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            startActivity(intent);
+
+            finish();
 
         } else {
 
