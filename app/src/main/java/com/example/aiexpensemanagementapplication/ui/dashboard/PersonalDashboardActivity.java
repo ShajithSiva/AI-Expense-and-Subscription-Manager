@@ -440,30 +440,6 @@ public class PersonalDashboardActivity extends AppCompatActivity {
 
         ArrayList<PieEntry> entries = databaseHelper.getCategoryPieEntries(userId);
 
-        float food =
-                (float) databaseHelper.getCategoryExpense(userId, "Food");
-
-        float transport =
-                (float) databaseHelper.getCategoryExpense(userId, "Transport");
-
-        float utilities =
-                (float) databaseHelper.getCategoryExpense(userId, "Utilities");
-
-        float entertainment =
-                (float) databaseHelper.getCategoryExpense(userId, "Entertainment");
-
-        if (food > 0)
-            entries.add(new PieEntry(food, "Food"));
-
-        if (transport > 0)
-            entries.add(new PieEntry(transport, "Transport"));
-
-        if (utilities > 0)
-            entries.add(new PieEntry(utilities, "Utilities"));
-
-        if (entertainment > 0)
-            entries.add(new PieEntry(entertainment, "Entertainment"));
-
         PieDataSet dataSet =
                 new PieDataSet(entries, "");
 

@@ -271,9 +271,10 @@ public class AddExpenseActivity extends AppCompatActivity {
             ReminderScheduler scheduler =
                     new ReminderScheduler(this);
 
-            scheduler.checkBudgetReminder(
+            scheduler.checkCategoryBudgetReminder(
                     databaseHelper,
-                    userId
+                    userId,
+                    categoryName
             );
 
             Toast.makeText(

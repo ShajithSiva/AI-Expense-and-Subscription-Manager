@@ -4647,4 +4647,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public double getBudgetByCategory(int userId, String category) {
+
+        Budget budget = getBudgetSettings(userId);
+
+        if (budget == null) {
+            return 0;
+        }
+
+        switch (category) {
+
+            case "Food":
+                return budget.getFoodBudget();
+
+            case "Transport":
+                return budget.getTransportBudget();
+
+            case "Shopping":
+                return budget.getShoppingBudget();
+
+            case "Bills":
+                return budget.getBillsBudget();
+
+            case "Health":
+                return budget.getHealthBudget();
+
+            case "Education":
+                return budget.getEducationBudget();
+
+            case "Entertainment":
+                return budget.getEntertainmentBudget();
+
+            case "Travel":
+            case "Others":
+                return budget.getOthersBudget();
+
+            default:
+                return 0;
+        }
+    }
+
+    public double getBudgetPercentageByCategory(int userId, String category) {
+
+        double budget = getBudgetByCategory(userId, category);
+
+        if (budget == 0) {
+            return 0;
+        }
+
+        double expense = getCategoryExpense(userId, category);
+
+        return (expense / budget) * 100;
+    }
+
+
+
 }

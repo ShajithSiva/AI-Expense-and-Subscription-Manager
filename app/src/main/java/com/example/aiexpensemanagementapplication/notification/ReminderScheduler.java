@@ -141,6 +141,48 @@ public class ReminderScheduler {
         }
     }
 
+    public void checkCategoryBudgetReminder(
+            DatabaseHelper db,
+            int userId,
+            String categoryName
+    ) {
+
+        double budget = db.getBudgetByCategory(userId, categoryName);
+
+        if (budget <= 0) {
+            return;
+        }
+
+        double expense = db.getCategoryExpense(userId, categoryName);
+
+        double percentage = (expense / budget) * 100;
+
+        NotificationHelper helper =
+                new NotificationHelper(context);
+
+        if (percentage >= 100) {
+
+            helper.showNotification(
+                    NotificationConstants.BUDGET_WARNING_ID,
+                    "Budget Exceeded",
+                    "You have exceeded your " + categoryName + " budget.",
+                    categoryName + " Budget"
+            );
+
+        } else if (percentage >= 90) {
+
+            helper.showNotification(
+                    NotificationConstants.BUDGET_WARNING_ID,
+                    "Budget Warning",
+                    "You have used " + (int) percentage +
+                            "% of your " + categoryName + " budget.",
+                    categoryName + " Budget"
+            );
+
+        }
+
+    }
+
     /*--------------------------------------------------
      * Subscription Reminder
      *--------------------------------------------------*/
