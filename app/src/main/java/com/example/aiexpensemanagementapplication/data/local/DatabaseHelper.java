@@ -29,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     //========================================================
     // USER TABLE
@@ -229,10 +229,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
     // NOTIFICATION
     //========================================================
-
-
     private static final String TABLE_NOTIFICATION = "notifications";
 
+    private static final String COL_NOTIFICATION_SUBTITLE = "subtitle";
+    private static final String COL_NOTIFICATION_TIMESTAMP = "timestamp";
     private static final String COL_NOTIFICATION_ID = "id";
     private static final String COL_NOTIFICATION_TITLE = "title";
     private static final String COL_NOTIFICATION_MESSAGE = "message";
@@ -293,6 +293,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + COL_NOTIFICATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                         + COL_NOTIFICATION_TITLE + " TEXT,"
                         + COL_NOTIFICATION_MESSAGE + " TEXT,"
+                        + COL_NOTIFICATION_SUBTITLE + " TEXT,"
+                        + COL_NOTIFICATION_TIMESTAMP + " INTEGER,"
                         + COL_NOTIFICATION_TYPE + " TEXT,"
                         + COL_NOTIFICATION_DATE + " TEXT,"
                         + COL_NOTIFICATION_TIME + " TEXT,"
@@ -532,6 +534,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET_SETTINGS);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFICATION);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFICATION_PREFERENCES);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FINANCIAL_PREFERENCES);
 
         onCreate(db);
     }
@@ -4460,20 +4468,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public long insertNotification(String title,
-                                   String message,
-                                   String type,
-                                   String date,
-                                   String time) {
+    public long insertNotification(
+            String title,
+            String message,
+            String subtitle,
+            String type,
+            long timestamp
+    ) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(COL_NOTIFICATION_TITLE, title);
         values.put(COL_NOTIFICATION_MESSAGE, message);
+        values.put(COL_NOTIFICATION_SUBTITLE, subtitle);
         values.put(COL_NOTIFICATION_TYPE, type);
-        values.put(COL_NOTIFICATION_DATE, date);
-        values.put(COL_NOTIFICATION_TIME, time);
+        values.put(COL_NOTIFICATION_TIMESTAMP, timestamp);
         values.put(COL_NOTIFICATION_READ, 0);
 
         long result = db.insert(TABLE_NOTIFICATION, null, values);
@@ -4520,21 +4530,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         )
                 );
 
+                notification.setSubtitle(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_SUBTITLE)
+                        )
+                );
+
                 notification.setType(
                         cursor.getString(
                                 cursor.getColumnIndexOrThrow(COL_NOTIFICATION_TYPE)
                         )
                 );
 
-                notification.setDate(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_DATE)
-                        )
-                );
-
-                notification.setTime(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_TIME)
+                notification.setTimestamp(
+                        cursor.getLong(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_TIMESTAMP)
                         )
                 );
 

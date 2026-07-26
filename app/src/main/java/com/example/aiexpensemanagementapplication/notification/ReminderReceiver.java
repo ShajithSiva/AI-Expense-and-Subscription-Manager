@@ -15,10 +15,13 @@ public class ReminderReceiver extends BroadcastReceiver {
 
         NotificationHelper helper = new NotificationHelper(context);
 
+        String subtitle = intent.getStringExtra("subtitle");
+
         helper.showNotification(
                 notificationId,
                 title,
-                message
+                message,
+                subtitle
         );
 
     }

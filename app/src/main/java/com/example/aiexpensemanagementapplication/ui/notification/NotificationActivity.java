@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
@@ -24,6 +26,7 @@ public class NotificationActivity extends AppCompatActivity {
     private TextView txtEmpty;
     private TextView tvMarkAll;
     private NotificationAdapter adapter;
+    private SwipeRefreshLayout swipeRefresh;
     private ArrayList<Notification> notificationList;
     private DatabaseHelper databaseHelper;
 
@@ -33,6 +36,8 @@ public class NotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification);
 
         recyclerView = findViewById(R.id.rvNotifications);
+
+        swipeRefresh = findViewById(R.id.swipeRefresh);
 
         ImageView btnBack = findViewById(R.id.btnBack);
 
@@ -60,6 +65,56 @@ public class NotificationActivity extends AppCompatActivity {
         );
 
         recyclerView.setAdapter(adapter);
+
+        swipeRefresh.setOnRefreshListener(() -> {
+
+            // Clear current list
+            notificationList.clear();
+
+            // Load latest notifications from database
+            notificationList.addAll(databaseHelper.getAllNotifications());
+
+            // Refresh RecyclerView
+            adapter.notifyDataSetChanged();
+
+            // Stop refresh animation
+            swipeRefresh.setRefreshing(false);
+
+        });
+
+        ItemTouchHelper.SimpleCallback simpleCallback =
+                new ItemTouchHelper.SimpleCallback(0,
+                        ItemTouchHelper.LEFT) {
+
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView,
+                                          RecyclerView.ViewHolder viewHolder,
+                                          RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder,
+                                         int direction) {
+
+                        int position = viewHolder.getAdapterPosition();
+
+                        Notification notification =
+                                notificationList.get(position);
+
+                        databaseHelper.deleteNotification(
+                                notification.getId()
+                        );
+
+                        notificationList.remove(position);
+
+                        adapter.notifyItemRemoved(position);
+
+                    }
+                };
+
+        new ItemTouchHelper(simpleCallback)
+                .attachToRecyclerView(recyclerView);
 
         if(notificationList.isEmpty()){
 
@@ -99,4 +154,5 @@ public class NotificationActivity extends AppCompatActivity {
 
         });
     }
+
 }

@@ -9,10 +9,6 @@ import androidx.core.content.ContextCompat;
 
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -92,13 +88,10 @@ public class NotificationHelper {
     }
 
     public void showNotification(
-
             int id,
-
             String title,
-
-            String message
-
+            String message,
+            String subtitle
     ){
 
         NotificationCompat.Builder builder =
@@ -130,22 +123,14 @@ public class NotificationHelper {
         NotificationManagerCompat.from(context)
                 .notify(id, builder.build());
 
-        String date = new SimpleDateFormat(
-                "dd MMM yyyy",
-                Locale.getDefault()
-        ).format(new Date());
-
-        String time = new SimpleDateFormat(
-                "hh:mm a",
-                Locale.getDefault()
-        ).format(new Date());
+        long timestamp = System.currentTimeMillis();
 
         databaseHelper.insertNotification(
                 title,
                 message,
+                subtitle,
                 getNotificationType(id),
-                date,
-                time
+                timestamp
         );
 
     }

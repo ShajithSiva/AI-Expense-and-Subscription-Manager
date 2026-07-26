@@ -5,9 +5,9 @@ public class Notification {
     private int id;
     private String title;
     private String message;
+    private String subtitle;
     private String type;
-    private String date;
-    private String time;
+    private long timestamp;
     private boolean isRead;
 
     public Notification() {
@@ -16,17 +16,17 @@ public class Notification {
     public Notification(int id,
                         String title,
                         String message,
+                        String subtitle,
                         String type,
-                        String date,
-                        String time,
+                        long timestamp,
                         boolean isRead) {
 
         this.id = id;
         this.title = title;
         this.message = message;
+        this.subtitle = subtitle;
         this.type = type;
-        this.date = date;
-        this.time = time;
+        this.timestamp = timestamp;
         this.isRead = isRead;
     }
 
@@ -62,27 +62,27 @@ public class Notification {
         this.type = type;
     }
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
     public boolean isRead() {
         return isRead;
     }
 
     public void setRead(boolean read) {
         isRead = read;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

@@ -33,6 +33,7 @@ public class ReminderScheduler {
 
         intent.putExtra("title", "Daily Expense Reminder");
         intent.putExtra("message", "Don't forget to record today's expenses.");
+        intent.putExtra("subtitle", "Track your daily spending");
         intent.putExtra("id", NotificationConstants.DAILY_REMINDER_ID);
 
         PendingIntent pendingIntent =
@@ -120,7 +121,8 @@ public class ReminderScheduler {
                 helper.showNotification(
                         NotificationConstants.BUDGET_WARNING_ID,
                         "Budget Exceeded",
-                        "You have exceeded your monthly budget."
+                        "You have exceeded your monthly budget.",
+                        "Current Budget Status"
                 );
 
                 prefs.saveBudgetNotificationDate();
@@ -130,7 +132,8 @@ public class ReminderScheduler {
                 helper.showNotification(
                         NotificationConstants.BUDGET_WARNING_ID,
                         "Budget Warning",
-                        "You have used over 80% of your monthly budget."
+                        "You have used over 80% of your monthly budget.",
+                        "Spend Carefully"
                 );
 
                 prefs.saveBudgetNotificationDate();
@@ -167,7 +170,8 @@ public class ReminderScheduler {
                 helper.showNotification(
                         NotificationConstants.SUBSCRIPTION_REMINDER_ID + subscription.getSubscriptionId(),
                         "Subscription Reminder",
-                        subscription.getServiceName() + " renews soon."
+                        subscription.getServiceName() + " renews soon.",
+                        "Renewal Date: " + subscription.getNextBillingDate()
                 );
             }
 
@@ -199,7 +203,8 @@ public class ReminderScheduler {
             helper.showNotification(
                     NotificationConstants.MONTHLY_REPORT_ID,
                     "Monthly Report Ready",
-                    "Your monthly financial report is now available."
+                    "Your monthly financial report is now available.",
+                    "Tap to view your financial insights"
             );
 
             prefs.saveMonthlyReportDate();

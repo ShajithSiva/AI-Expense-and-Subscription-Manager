@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.text.format.DateUtils;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,8 +32,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView title, message, time;
-        ImageView icon;
+        TextView title, message, subtitle, time;
+        ImageView icon, delete;
         View unread;
 
         ViewHolder(View itemView) {
@@ -39,9 +41,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             title = itemView.findViewById(R.id.txtTitle);
             message = itemView.findViewById(R.id.txtMessage);
+            subtitle = itemView.findViewById(R.id.txtSubtitle);
             time = itemView.findViewById(R.id.txtTime);
             icon = itemView.findViewById(R.id.imgType);
             unread = itemView.findViewById(R.id.viewUnread);
+            delete = itemView.findViewById(R.id.imgDelete);
         }
     }
 
@@ -62,10 +66,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         holder.title.setText(notification.getTitle());
         holder.message.setText(notification.getMessage());
+        holder.subtitle.setText(notification.getSubtitle());
 
-        holder.time.setText(
-                notification.getDate() + " • " + notification.getTime()
+        CharSequence relativeTime = DateUtils.getRelativeTimeSpanString(
+                notification.getTimestamp(),
+                System.currentTimeMillis(),
+                DateUtils.MINUTE_IN_MILLIS
         );
+
+        holder.time.setText(relativeTime);
 
         if (notification.isRead()) {
             holder.unread.setVisibility(View.GONE);
@@ -104,6 +113,26 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 notifyItemChanged(position);
 
             }
+        });
+
+        holder.delete.setOnClickListener(v -> {
+
+            new MaterialAlertDialogBuilder(context)
+                    .setTitle("Delete Notification")
+                    .setMessage("Are you sure you want to delete this notification?\n\nThis action cannot be undone.")
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Delete", (dialog, which) -> {
+
+                        db.deleteNotification(notification.getId());
+
+                        list.remove(position);
+
+                        notifyItemRemoved(position);
+
+                        notifyItemRangeChanged(position, list.size());
+
+                    })
+                    .show();
 
         });
     }
