@@ -1,4 +1,5 @@
 package com.example.aiexpensemanagementapplication.data.local;
+import com.example.aiexpensemanagementapplication.model.Notification;
 import com.example.aiexpensemanagementapplication.model.Subscription;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeModel;
@@ -28,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     //========================================================
     // USER TABLE
@@ -226,6 +227,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "UpdatedAt";
 
     //========================================================
+    // NOTIFICATION
+    //========================================================
+
+
+    private static final String TABLE_NOTIFICATION = "notifications";
+
+    private static final String COL_NOTIFICATION_ID = "id";
+    private static final String COL_NOTIFICATION_TITLE = "title";
+    private static final String COL_NOTIFICATION_MESSAGE = "message";
+    private static final String COL_NOTIFICATION_TYPE = "type";
+    private static final String COL_NOTIFICATION_DATE = "date";
+    private static final String COL_NOTIFICATION_TIME = "time";
+    private static final String COL_NOTIFICATION_READ = "is_read";
+
+    //========================================================
     // CONSTRUCTOR
     //========================================================
 
@@ -271,6 +287,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_FINANCIAL_PREFERENCES_TABLE);
 
         db.execSQL(CREATE_BUDGET_SETTINGS_TABLE);
+
+        String CREATE_NOTIFICATION_TABLE =
+                "CREATE TABLE " + TABLE_NOTIFICATION + "("
+                        + COL_NOTIFICATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        + COL_NOTIFICATION_TITLE + " TEXT,"
+                        + COL_NOTIFICATION_MESSAGE + " TEXT,"
+                        + COL_NOTIFICATION_TYPE + " TEXT,"
+                        + COL_NOTIFICATION_DATE + " TEXT,"
+                        + COL_NOTIFICATION_TIME + " TEXT,"
+                        + COL_NOTIFICATION_READ + " INTEGER DEFAULT 0"
+                        + ")";
+
+        db.execSQL(CREATE_NOTIFICATION_TABLE);
     }
 
     private static final String CREATE_USER_TABLE =
@@ -4429,6 +4458,183 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return "Stable";
 
+    }
+
+    public long insertNotification(String title,
+                                   String message,
+                                   String type,
+                                   String date,
+                                   String time) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COL_NOTIFICATION_TITLE, title);
+        values.put(COL_NOTIFICATION_MESSAGE, message);
+        values.put(COL_NOTIFICATION_TYPE, type);
+        values.put(COL_NOTIFICATION_DATE, date);
+        values.put(COL_NOTIFICATION_TIME, time);
+        values.put(COL_NOTIFICATION_READ, 0);
+
+        long result = db.insert(TABLE_NOTIFICATION, null, values);
+
+        db.close();
+
+        return result;
+    }
+
+    public ArrayList<Notification> getAllNotifications() {
+
+        ArrayList<Notification> list = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + TABLE_NOTIFICATION +
+                        " ORDER BY " +
+                        COL_NOTIFICATION_ID + " DESC",
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+
+            do {
+
+                Notification notification = new Notification();
+
+                notification.setId(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_ID)
+                        )
+                );
+
+                notification.setTitle(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_TITLE)
+                        )
+                );
+
+                notification.setMessage(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_MESSAGE)
+                        )
+                );
+
+                notification.setType(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_TYPE)
+                        )
+                );
+
+                notification.setDate(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_DATE)
+                        )
+                );
+
+                notification.setTime(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_TIME)
+                        )
+                );
+
+                notification.setRead(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow(COL_NOTIFICATION_READ)
+                        ) == 1
+                );
+
+                list.add(notification);
+
+            } while (cursor.moveToNext());
+
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
+    public void markNotificationAsRead(int id) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COL_NOTIFICATION_READ, 1);
+
+        db.update(
+                TABLE_NOTIFICATION,
+                values,
+                COL_NOTIFICATION_ID + "=?",
+                new String[]{String.valueOf(id)}
+        );
+
+        db.close();
+    }
+
+    public void markAllNotificationsAsRead() {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COL_NOTIFICATION_READ, 1);
+
+        db.update(
+                TABLE_NOTIFICATION,
+                values,
+                null,
+                null
+        );
+
+        db.close();
+    }
+
+    public void deleteNotification(int id) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(
+                TABLE_NOTIFICATION,
+                COL_NOTIFICATION_ID + "=?",
+                new String[]{String.valueOf(id)}
+        );
+
+        db.close();
+    }
+
+    public int getUnreadNotificationCount() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM " +
+                        TABLE_NOTIFICATION +
+                        " WHERE " +
+                        COL_NOTIFICATION_READ +
+                        "=0",
+                null
+        );
+
+        int count = 0;
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+
+        cursor.close();
+        db.close();
+
+        return count;
+    }
+
+    public void clearAllNotifications() {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_NOTIFICATION, null, null);
+
+        db.close();
     }
 
 }

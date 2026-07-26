@@ -72,12 +72,18 @@
                         android:layout_gravity="center"
                         android:src="@drawable/notification"/>
 
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
+                    <TextView
+                        android:id="@+id/tvNotificationBadge"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:layout_gravity="top|end"
-                        android:background="@drawable/dot_orange"/>
-
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="@android:color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:background="@drawable/badge_red"
+                        android:visibility="gone"/>
                 </FrameLayout>
 
                 <FrameLayout

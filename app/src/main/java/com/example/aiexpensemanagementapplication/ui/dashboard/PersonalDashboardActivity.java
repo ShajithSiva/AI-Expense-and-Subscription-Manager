@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Intent;
 
@@ -15,6 +16,7 @@ import com.example.aiexpensemanagementapplication.notification.ReminderScheduler
 import com.example.aiexpensemanagementapplication.ui.expense.AddExpenseActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
+import com.example.aiexpensemanagementapplication.ui.notification.NotificationActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
 import com.example.aiexpensemanagementapplication.ui.reports.ReportsActivity;
@@ -48,6 +50,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class PersonalDashboardActivity extends AppCompatActivity {
 
     private DatabaseHelper databaseHelper;
+    private DatabaseHelper db;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
@@ -103,6 +106,8 @@ public class PersonalDashboardActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_dashboard_personal);
 
+        db = new DatabaseHelper(this);
+
         initialize();
 
         loadDashboard();
@@ -133,6 +138,20 @@ public class PersonalDashboardActivity extends AppCompatActivity {
             );
 
         });
+
+        ImageView imgNotification = findViewById(R.id.imgNotification);
+
+        imgNotification.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    PersonalDashboardActivity.this,
+                    NotificationActivity.class
+            );
+
+            startActivity(intent);
+
+        });
+
         btnReports.setOnClickListener(v -> {
 
             Intent intent = new Intent(
@@ -182,6 +201,7 @@ public class PersonalDashboardActivity extends AppCompatActivity {
         super.onResume();
 
         loadDashboard();
+        updateNotificationBadge();
     }
 
     private void initialize() {
@@ -323,6 +343,20 @@ public class PersonalDashboardActivity extends AppCompatActivity {
 
         });
 
+    }
+
+    private void updateNotificationBadge() {
+
+        TextView badge = findViewById(R.id.tvNotificationBadge);
+
+        int unread = db.getUnreadNotificationCount();
+
+        if (unread > 0) {
+            badge.setVisibility(View.VISIBLE);
+            badge.setText(String.valueOf(unread));
+        } else {
+            badge.setVisibility(View.GONE);
+        }
     }
 
     private void loadUser() {

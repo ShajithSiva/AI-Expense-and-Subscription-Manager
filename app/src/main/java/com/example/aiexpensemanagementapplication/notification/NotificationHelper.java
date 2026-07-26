@@ -7,6 +7,12 @@ import android.content.pm.PackageManager;
 
 import androidx.core.content.ContextCompat;
 
+import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -21,12 +27,36 @@ public class NotificationHelper {
 
     private final Context context;
 
-    public NotificationHelper(Context context){
+    private final DatabaseHelper databaseHelper;
+
+    public NotificationHelper(Context context) {
 
         this.context = context;
 
-        createChannel();
+        databaseHelper = new DatabaseHelper(context);
 
+        createNotificationChannel();
+    }
+
+    private void createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            NotificationChannel channel = new NotificationChannel(
+                    NotificationConstants.CHANNEL_ID,
+                    NotificationConstants.CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+
+            channel.setDescription(NotificationConstants.CHANNEL_DESCRIPTION);
+
+            NotificationManager manager =
+                    context.getSystemService(NotificationManager.class);
+
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
     }
 
     private void createChannel(){
@@ -100,6 +130,45 @@ public class NotificationHelper {
         NotificationManagerCompat.from(context)
                 .notify(id, builder.build());
 
+        String date = new SimpleDateFormat(
+                "dd MMM yyyy",
+                Locale.getDefault()
+        ).format(new Date());
+
+        String time = new SimpleDateFormat(
+                "hh:mm a",
+                Locale.getDefault()
+        ).format(new Date());
+
+        databaseHelper.insertNotification(
+                title,
+                message,
+                getNotificationType(id),
+                date,
+                time
+        );
+
+    }
+
+    private String getNotificationType(int id) {
+
+        switch (id) {
+
+            case NotificationConstants.BUDGET_WARNING_ID:
+                return "budget";
+
+            case NotificationConstants.SUBSCRIPTION_REMINDER_ID:
+                return "subscription";
+
+            case NotificationConstants.MONTHLY_REPORT_ID:
+                return "report";
+
+            case NotificationConstants.DAILY_REMINDER_ID:
+                return "daily";
+
+            default:
+                return "general";
+        }
     }
 
 }
