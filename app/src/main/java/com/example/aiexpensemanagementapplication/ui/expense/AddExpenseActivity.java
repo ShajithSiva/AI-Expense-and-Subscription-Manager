@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class AddExpenseActivity extends AppCompatActivity {
@@ -265,6 +266,20 @@ public class AddExpenseActivity extends AppCompatActivity {
                         expenseMode
 
                 );
+
+        List<String> alerts = databaseHelper.generateAIAlerts(userId);
+
+        for (String alert : alerts) {
+
+            databaseHelper.insertNotification(
+                    "🤖 AI Smart Alert",
+                    alert,
+                    "Financial Assistant",
+                    "AI",
+                    System.currentTimeMillis()
+            );
+
+        }
 
         if (result != -1) {
 

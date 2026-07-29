@@ -22,6 +22,9 @@
             android:name=".ui.budget.AddBudgetActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.ai.AIInsightsActivity"
+            android:exported="false"/>
+        <activity
             android:name=".ui.profile.NotificationPreferancesActivity"
             android:exported="false" /> <!-- Splash Screen -->
         <activity
