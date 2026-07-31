@@ -2811,610 +2811,374 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         double income = getTotalIncome(userId);
         double expense = getTotalExpense(userId);
 
-        if (income == 0) {
-            return "💡 Add your first income to start receiving AI insights.";
+        if (income <= 0) {
+            return "💡 Add your income to receive AI Financial Insights.";
         }
 
         double savings = income - expense;
-
-        // ================= Budget Analysis =================
-
-        if (expense > income) {
-
-            insight.append("⚠ Your expenses exceed your income.\n\n");
-
-        } else if (expense >= income * 0.8) {
-
-            insight.append("⚠ You have spent more than 80% of your income.\n\n");
-
-        } else {
-
-            insight.append("✅ Your spending is under control.\n\n");
-
-        }
-
-        // ================= Savings =================
-
-        insight.append("💰 Savings : Rs ")
-                .append(String.format("%.2f", savings))
-                .append("\n\n");
-
-        // ================= Highest Category =================
-
-        String highestCategory = getHighestExpenseCategory(userId);
-
-        insight.append("🍔 Highest Spending Category : ")
-                .append(highestCategory)
-                .append("\n\n");
-
-        // ================= Category Recommendation =================
-
-        switch (highestCategory.toLowerCase()) {
-
-            case "food":
-                insight.append("💡 Try cooking at home more often to reduce food expenses.\n\n");
-                break;
-
-            case "shopping":
-                insight.append("💡 Consider setting a monthly shopping limit to avoid impulse purchases.\n\n");
-                break;
-
-            case "transport":
-                insight.append("💡 Consider public transportation or carpooling to reduce transport costs.\n\n");
-                break;
-
-            case "entertainment":
-                insight.append("💡 Look for free or low-cost entertainment options to save money.\n\n");
-                break;
-
-            case "health":
-                insight.append("💡 Compare prices for medicines and health services whenever possible.\n\n");
-                break;
-
-            case "education":
-                insight.append("💡 Investing in education is valuable. Plan these expenses within your budget.\n\n");
-                break;
-
-            case "bills":
-                insight.append("💡 Review your utility usage regularly to reduce monthly bills.\n\n");
-                break;
-
-            default:
-                insight.append("💡 Review your highest spending category regularly to improve your savings.\n\n");
-                break;
-        }
-
-        // ================= Personalized Savings Recommendation =================
-
-        double categoryExpense = getCategoryExpense(userId, highestCategory);
-
-        double percentage;
-        String suggestion;
-
-        switch (highestCategory.toLowerCase()) {
-
-            case "food":
-                percentage = 0.15;
-                suggestion = "Cooking at home more often";
-                break;
-
-            case "shopping":
-                percentage = 0.20;
-                suggestion = "Reducing impulse purchases";
-                break;
-
-            case "transport":
-                percentage = 0.10;
-                suggestion = "Using public transportation";
-                break;
-
-            case "entertainment":
-                percentage = 0.15;
-                suggestion = "Choosing low-cost entertainment";
-                break;
-
-            default:
-                percentage = 0.10;
-                suggestion = "Reducing unnecessary spending";
-                break;
-        }
-
-        double saving = categoryExpense * percentage;
-
-        insight.append("\n💰 Personalized Recommendation\n");
-
-        insight.append(suggestion)
-                .append(" could save approximately Rs ")
-                .append(String.format("%.2f", saving))
-                .append(" this month.\n\n");
-
-        // ================= Largest Expense =================
-
-        double largestExpense = getLargestExpense(userId);
-
-        insight.append("🏆 Largest Expense : Rs ")
-                .append(String.format("%.2f", largestExpense))
-                .append("\n\n");
-
-        // ================= Health Score =================
-
-        int healthScore = getFinancialHealthScore(userId);
-
-        insight.append("❤️ Financial Health Score : ")
-                .append(healthScore)
-                .append("/100");
-
-        if (healthScore >= 80) {
-
-            insight.append(" (Excellent)");
-
-        } else if (healthScore >= 60) {
-
-            insight.append(" (Good)");
-
-        } else {
-
-            insight.append(" (Needs Improvement)");
-
-        }
-
-        insight.append("\n\n");
-
-        // ================= Budget Status =================
-
-        insight.append("📊 Budget Status : ")
-                .append(getBudgetStatus(userId));
-
-        // ================= Spending Risk Prediction =================
-
-        Budget budget = getBudgetSettings(userId);
-
-        if (budget != null) {
-
-            double monthlyBudget = budget.getMonthlyBudget();
-
-            if (monthlyBudget > 0) {
-
-                double usedPercentage = (expense / monthlyBudget) * 100;
-
-                if (usedPercentage >= 100) {
-
-                    insight.append("\n\n🚨 Prediction: You have already exceeded your monthly budget.");
-
-                } else if (usedPercentage >= 90) {
-
-                    insight.append("\n\n⚠ Prediction: You are very likely to exceed your monthly budget soon.");
-
-                } else if (usedPercentage >= 75) {
-
-                    insight.append("\n\n📈 Prediction: Continue spending carefully to stay within your budget.");
-
-                } else {
-
-                    insight.append("\n\n✅ Prediction: You are on track to stay within your monthly budget.");
-
-                }
-
-            }
-
-        }
-
-        // ================= Spending Trend =================
-
-        String trend = getSpendingTrend(userId);
-
-        if (trend.equalsIgnoreCase("Increasing")) {
-
-            insight.append("\n\n📈 Your spending has increased compared to previous months.");
-
-        } else if (trend.equalsIgnoreCase("Decreasing")) {
-
-            insight.append("\n\n📉 Great! Your spending is decreasing.");
-
-        } else {
-
-            insight.append("\n\n📊 Your spending is stable.");
-
-        }
-
-        // ================= Subscription =================
-
-        double subscriptionCost = getMonthlySubscriptionCost(userId);
-
-        if (subscriptionCost > 0) {
-
-            insight.append("\n\n📺 Monthly subscription cost: Rs ")
-                    .append(String.format("%.2f", subscriptionCost));
-
-        }
-
-        // ================= Saving Tip =================
-
-        if (expense > income * 0.90) {
-
-            insight.append("\n\n💡 Saving Tip: Try reducing unnecessary expenses this month.");
-
-        } else if (expense > income * 0.75) {
-
-            insight.append("\n\n💡 Saving Tip: You are close to your budget. Spend carefully.");
-
-        } else {
-
-            insight.append("\n\n💡 Excellent! Keep following your current spending habits.");
-
-        }
-
-        // ================= Congratulations =================
-
-        if (savings > 10000) {
-
-            insight.append("\n\n🎉 Congratulations! You saved more than Rs ")
-                    .append(String.format("%.0f", savings))
-                    .append(".");
-
-        }
-
-        // ================= Savings Score =================
-
-        int savingsScore;
-
         double savingRate = (savings / income) * 100;
 
-        if (savingRate >= 30) {
+        String highestCategory = getHighestExpenseCategory(userId);
+        double categoryExpense = getCategoryExpense(userId, highestCategory);
 
-            savingsScore = 100;
+        String budgetStatus = getBudgetStatus(userId);
+        String spendingTrend = getSpendingTrend(userId);
 
-        } else if (savingRate >= 20) {
+        Budget budget = getBudgetSettings(userId);
+        double subscriptionCost = getMonthlySubscriptionCost(userId);
 
-            savingsScore = 85;
+        // ==========================
+        // Financial Wellness Score
+        // ==========================
 
-        } else if (savingRate >= 10) {
+        int score = 100;
 
-            savingsScore = 70;
+        if (expense > income)
+            score -= 30;
+        else if (expense > income * 0.90)
+            score -= 20;
+        else if (expense > income * 0.80)
+            score -= 10;
 
-        } else if (savingRate >= 0) {
+        if (savingRate < 10)
+            score -= 20;
+        else if (savingRate < 20)
+            score -= 10;
 
-            savingsScore = 50;
+        if (budget != null && budget.getMonthlyBudget() > 0) {
 
-        } else {
+            double budgetUsed =
+                    (expense / budget.getMonthlyBudget()) * 100;
 
-            savingsScore = 20;
-
+            if (budgetUsed > 100)
+                score -= 20;
+            else if (budgetUsed > 90)
+                score -= 10;
         }
 
-        // ================= Budget Discipline Score =================
-
-        int budgetScore;
-
-        if (budget == null || budget.getMonthlyBudget() == 0) {
-
-            budgetScore = 50;
-
-        } else {
-
-            double used = (expense / budget.getMonthlyBudget()) * 100;
-
-            if (used <= 70) {
-
-                budgetScore = 100;
-
-            } else if (used <= 85) {
-
-                budgetScore = 80;
-
-            } else if (used <= 100) {
-
-                budgetScore = 60;
-
-            } else {
-
-                budgetScore = 20;
-
-            }
-
-        }
-
-        // ================= Spending Balance =================
-
-        int spendingScore;
-
-        double highestExpense =
-                getCategoryExpense(userId, highestCategory);
-
-        double categoryPercentage  =
-                (highestExpense / expense) * 100;
-
-        if (categoryPercentage  <= 25) {
-
-            spendingScore = 100;
-
-        } else if (categoryPercentage  <= 40) {
-
-            spendingScore = 80;
-
-        } else if (categoryPercentage  <= 60) {
-
-            spendingScore = 60;
-
-        } else {
-
-            spendingScore = 30;
-
-        }
-
-        // ================= Subscription Score =================
-
-        int subscriptionScore;
-
-        double subscriptionRatio =
-                (subscriptionCost / income) * 100;
-
-        if (subscriptionRatio <= 5) {
-
-            subscriptionScore = 100;
-
-        } else if (subscriptionRatio <= 10) {
-
-            subscriptionScore = 80;
-
-        } else if (subscriptionRatio <= 20) {
-
-            subscriptionScore = 60;
-
-        } else {
-
-            subscriptionScore = 40;
-
-        }
-
-        // ================= Overall AI Score =================
-
-        int overallScore =
-                (savingsScore +
-                        budgetScore +
-                        spendingScore +
-                        subscriptionScore) / 4;
-
-        insight.append("\n\n");
-        insight.append("══════════════════════\n");
-        insight.append("🤖 AI Financial Scorecard\n");
-        insight.append("══════════════════════\n");
-
-        insight.append("💰 Savings Score : ")
-                .append(savingsScore)
-                .append("/100\n");
-
-        insight.append("📊 Budget Discipline : ")
-                .append(budgetScore)
-                .append("/100\n");
-
-        insight.append("🍔 Spending Balance : ")
-                .append(spendingScore)
-                .append("/100\n");
-
-        insight.append("📺 Subscription Score : ")
-                .append(subscriptionScore)
-                .append("/100\n");
-
-        insight.append("\n🏆 Overall Financial Wellness : ")
-                .append(overallScore)
-                .append("/100\n\n");
-
-        if (overallScore >= 90) {
-
-            insight.append("🌟 Excellent Financial Health");
-
-        } else if (overallScore >= 75) {
-
-            insight.append("✅ Very Good Financial Health");
-
-        } else if (overallScore >= 60) {
-
-            insight.append("👍 Good Financial Health");
-
-        } else if (overallScore >= 40) {
-
-            insight.append("⚠ Needs Financial Improvement");
-
-        } else {
-
-            insight.append("🚨 Critical Financial Situation");
-
-        }
-
-        // ================= AI Monthly Challenges =================
-
-        insight.append("\n\n");
-        insight.append("══════════════════════\n");
-        insight.append("🎯 AI Monthly Challenges\n");
-        insight.append("══════════════════════\n");
-
-        double targetSaving = Math.max(1000, savings * 0.10);
-
-        insight.append("🎯 Save an additional Rs ")
-                .append(String.format("%.0f", targetSaving))
-                .append(" this month.\n");
-
-        double reduction = categoryExpense * 0.15;
-
-        insight.append("🎯 Reduce ")
-                .append(highestCategory)
-                .append(" expenses by Rs ")
-                .append(String.format("%.0f", reduction))
-                .append(".\n");
-
-
-        if (budget != null) {
-
-            double remaining =
-                    budget.getMonthlyBudget() - expense;
-
-            if (remaining > 0) {
-
-                insight.append("🎯 Stay within your remaining budget of Rs ")
-                        .append(String.format("%.0f", remaining))
-                        .append(".\n");
-
-            } else {
-
-                insight.append("🎯 Avoid exceeding your monthly budget next month.\n");
-
-            }
-
-        }
-
-        if (subscriptionCost > income * 0.10) {
-
-            insight.append("🎯 Review unnecessary subscriptions this month.\n");
-
-        } else {
-
-            insight.append("🎯 Keep subscription costs below 10% of your income.\n");
-
-        }
-
-        if (expense > income * 0.80) {
-
-            insight.append("🎯 Limit this week's spending to essential purchases only.\n");
-
-        } else {
-
-            insight.append("🎯 Maintain your current spending discipline this week.\n");
-
-        }
-
-        insight.append("\n\n");
-        insight.append("══════════════════════\n");
-        insight.append("📅 AI Monthly Financial Report\n");
-        insight.append("══════════════════════\n");
-
-        insight.append("📈 Income : Rs ")
+        if (subscriptionCost > income * 0.10)
+            score -= 10;
+
+        score = Math.max(0, Math.min(score, 100));
+
+        String rating;
+
+        if (score >= 90)
+            rating = "Excellent";
+        else if (score >= 75)
+            rating = "Very Good";
+        else if (score >= 60)
+            rating = "Good";
+        else if (score >= 40)
+            rating = "Needs Improvement";
+        else
+            rating = "Critical";
+
+        // ==========================
+        // Header
+        // ==========================
+
+        insight.append("══════════════════════════════\n");
+        insight.append("🤖 AI FINANCIAL INSIGHTS\n");
+        insight.append("══════════════════════════════\n\n");
+
+        insight.append("🏆 Financial Score\n");
+        insight.append(score)
+                .append("/100 (")
+                .append(rating)
+                .append(")\n\n");
+
+        // ==========================
+        // Financial Summary
+        // ==========================
+
+        insight.append("💰 THIS MONTH\n");
+
+        insight.append("Income   : Rs ")
                 .append(String.format("%.2f", income))
                 .append("\n");
 
-        insight.append("💸 Expense : Rs ")
+        insight.append("Expense  : Rs ")
                 .append(String.format("%.2f", expense))
                 .append("\n");
 
-        insight.append("💰 Savings : Rs ")
+        insight.append("Savings  : Rs ")
                 .append(String.format("%.2f", savings))
-                .append("\n\n");
-
-        insight.append("📊 Performance Summary\n");
-
-        insight.append("Financial Wellness : ")
-                .append(overallScore)
-                .append("/100\n");
-
-        insight.append("Budget Status : ")
-                .append(getBudgetStatus(userId))
                 .append("\n");
 
-        insight.append("Highest Spending : ")
+        insight.append("Saving Rate : ")
+                .append(String.format("%.1f", savingRate))
+                .append("%\n\n");
+
+        // ==========================
+        // Current Status
+        // ==========================
+
+        insight.append("📊 CURRENT STATUS\n");
+
+        insight.append("Budget : ")
+                .append(budgetStatus)
+                .append("\n");
+
+        insight.append("Trend  : ")
+                .append(spendingTrend)
+                .append("\n");
+
+        insight.append("Highest Category : ")
                 .append(highestCategory)
                 .append("\n\n");
+        // ==========================
+        // Main Concern
+        // ==========================
 
-        insight.append("🏆 Achievements\n");
+        insight.append("⚠ MAIN CONCERN\n");
 
-        if (savings > 0) {
+        if (expense > income) {
 
-            insight.append("✔ You saved money this month.\n");
+            insight.append("You are spending more than your income.\n");
+            insight.append("Reduce unnecessary expenses immediately.\n\n");
 
+        } else {
+
+            double categoryPercentage = expense > 0
+                    ? (categoryExpense / expense) * 100
+                    : 0;
+
+            insight.append(highestCategory)
+                    .append(" accounts for ")
+                    .append(String.format("%.1f", categoryPercentage))
+                    .append("% of your total expenses.\n");
+
+            if (categoryPercentage >= 40) {
+
+                insight.append("This category needs immediate attention.\n\n");
+
+            } else if (categoryPercentage >= 25) {
+
+                insight.append("Try reducing this category to improve your savings.\n\n");
+
+            } else {
+
+                insight.append("Your spending is fairly balanced.\n\n");
+
+            }
         }
 
-        if (overallScore >= 80) {
+        // ==========================
+        // Smart Recommendations
+        // ==========================
 
-            insight.append("✔ Excellent financial discipline.\n");
+        insight.append("💡 SMART RECOMMENDATIONS\n");
 
-        }
-
-        if (subscriptionCost <= income * 0.10) {
-
-            insight.append("✔ Subscription spending is healthy.\n");
-
-        }
-
-        if (expense < income) {
-
-            insight.append("✔ Stayed within your income.\n");
-
-        }
-
-        insight.append("\n");
-
-        insight.append("⚠ Areas to Improve\n");
+        int recommendation = 1;
 
         if (expense > income * 0.80) {
 
-            insight.append("• Reduce unnecessary spending.\n");
-
-        }
-
-        if (savingRate < 20) {
-
-            insight.append("• Increase monthly savings.\n");
+            insight.append(recommendation++)
+                    .append(". Reduce unnecessary spending this week.\n");
 
         }
 
         if (categoryExpense > expense * 0.30) {
 
-            insight.append("• Reduce ")
+            double reduceAmount = categoryExpense * 0.15;
+
+            insight.append(recommendation++)
+                    .append(". Reduce ")
                     .append(highestCategory)
-                    .append(" expenses.\n");
+                    .append(" by about Rs ")
+                    .append(String.format("%.0f", reduceAmount))
+                    .append(".\n");
 
         }
 
         if (subscriptionCost > income * 0.10) {
 
-            insight.append("• Review your subscriptions.\n");
+            insight.append(recommendation++)
+                    .append(". Review your subscriptions to lower monthly costs.\n");
+
+        }
+
+        if (savingRate < 20) {
+
+            insight.append(recommendation++)
+                    .append(". Aim to save at least 20% of your income.\n");
+
+        }
+
+        if (recommendation == 1) {
+
+            insight.append("1. Keep following your current financial habits.\n");
 
         }
 
         insight.append("\n");
 
-        insight.append("🎯 Goals for Next Month\n");
+        // ==========================
+        // Next Goal
+        // ==========================
 
-        insight.append("• Save at least Rs ")
-                .append(String.format("%.0f", savings + 2000))
-                .append("\n");
+        insight.append("🎯 NEXT GOAL\n");
 
-        insight.append("• Reduce ")
-                .append(highestCategory)
-                .append(" expenses by 10%.\n");
+        double targetSaving = Math.max(5000, savings + 2000);
+
+        insight.append("Save at least Rs ")
+                .append(String.format("%.0f", targetSaving))
+                .append(" next month.\n");
 
         if (budget != null) {
 
-            insight.append("• Stay within your monthly budget.\n");
+            insight.append("Stay within your monthly budget.\n");
+
+        }
+
+        insight.append("Increase your Financial Score to ");
+
+        if (score < 90) {
+
+            insight.append(Math.min(score + 10, 100));
+
+        } else {
+
+            insight.append("100");
+
+        }
+
+        insight.append("/100.\n\n");
+
+        // ==========================
+        // Spending Prediction
+        // ==========================
+
+        insight.append("📈 SPENDING PREDICTION\n");
+
+        if (budget != null && budget.getMonthlyBudget() > 0) {
+
+            double used = (expense / budget.getMonthlyBudget()) * 100;
+
+            if (used >= 100) {
+
+                insight.append("Budget exceeded. Reduce spending immediately.\n\n");
+
+            } else if (used >= 90) {
+
+                insight.append("You are likely to exceed your budget soon.\n\n");
+
+            } else if (used >= 75) {
+
+                insight.append("Spend carefully for the rest of the month.\n\n");
+
+            } else {
+
+                insight.append("You are on track to stay within your budget.\n\n");
+
+            }
+
+        } else {
+
+            insight.append("Set a monthly budget for better predictions.\n\n");
+
+        }
+        // ==========================
+        // Achievement
+        // ==========================
+
+        insight.append("🏅 ACHIEVEMENT\n");
+
+        if (savings > 0) {
+
+            insight.append("✔ You saved Rs ")
+                    .append(String.format("%.2f", savings))
+                    .append(" this month.\n");
+
+        } else {
+
+            insight.append("⚠ No savings recorded this month.\n");
+
+        }
+
+        if (expense < income) {
+
+            insight.append("✔ Your expenses are within your income.\n");
+
+        }
+
+        if (subscriptionCost <= income * 0.10) {
+
+            insight.append("✔ Subscription costs are under control.\n");
+
+        }
+
+        if ("Decreasing".equalsIgnoreCase(spendingTrend)) {
+
+            insight.append("✔ Your spending is decreasing.\n");
 
         }
 
         insight.append("\n");
 
-        insight.append("🤖 AI Conclusion\n");
+        // ==========================
+        // AI Summary
+        // ==========================
 
-        if (overallScore >= 90) {
+        insight.append("🤖 AI SUMMARY\n");
 
-            insight.append("Outstanding financial management. Keep maintaining your current habits.");
+        if (score >= 90) {
 
-        } else if (overallScore >= 75) {
+            insight.append("Excellent financial management! ")
+                    .append("Maintain your current spending habits and continue growing your savings.");
 
-            insight.append("Your finances are in good shape. Small improvements in your highest spending category can make an even bigger difference.");
+        } else if (score >= 75) {
 
-        } else if (overallScore >= 60) {
+            insight.append("Your finances are in good shape. ")
+                    .append("Reducing ")
+                    .append(highestCategory)
+                    .append(" expenses will further improve your savings.");
 
-            insight.append("Your financial situation is stable. Focus on reducing unnecessary expenses and increasing your savings.");
+        } else if (score >= 60) {
+
+            insight.append("Your financial position is stable. ")
+                    .append("Focus on controlling unnecessary expenses and increasing your monthly savings.");
+
+        } else if (score >= 40) {
+
+            insight.append("Your finances need improvement. ")
+                    .append("Create a stricter budget and prioritize essential spending.");
 
         } else {
 
-            insight.append("Your finances need attention. Following your budget and reducing non-essential expenses should be your priority next month.");
+            insight.append("Your financial situation is critical. ")
+                    .append("Reduce non-essential expenses immediately and focus on rebuilding your savings.");
 
         }
 
+        // ==========================
+        // AI Tip
+        // ==========================
 
+        insight.append("\n\n");
+        insight.append("💬 AI TIP\n");
 
+        if (savingRate >= 20) {
+
+            insight.append("Keep saving at least 20% of your income every month for long-term financial stability.");
+
+        } else {
+
+            insight.append("Try following the 50/30/20 budgeting rule to improve your savings consistently.");
+
+        }
+
+        // ==========================
+        // Footer
+        // ==========================
+
+        insight.append("\n\n");
+        insight.append("══════════════════════════════\n");
+        insight.append("Generated by AI Financial Assistant");
+        insight.append("\n══════════════════════════════");
 
         return insight.toString();
-
 
     }
 
@@ -3429,64 +3193,143 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Budget budget = getBudgetSettings(userId);
 
-        if (budget != null && expense > budget.getMonthlyBudget() * 0.90) {
+        // ==========================
+        // Budget Alerts
+        // ==========================
 
-            alerts.add("⚠ You have already used over 90% of your monthly budget.");
+        if (budget != null && budget.getMonthlyBudget() > 0) {
+
+            double budgetAmount = budget.getMonthlyBudget();
+
+            if (expense > budgetAmount) {
+
+                alerts.add("🚨 You have exceeded your monthly budget.");
+
+            } else if (expense >= budgetAmount * 0.90) {
+
+                alerts.add("⚠ You have already used over 90% of your monthly budget.");
+
+            }
 
         }
 
-        if (expense > income) {
+        // ==========================
+        // Expense vs Income
+        // ==========================
+
+        if (income > 0 && expense > income) {
 
             alerts.add("🚨 Your expenses are higher than your income.");
 
         }
 
-        if (savings > 10000) {
+        // ==========================
+        // Savings Analysis
+        // ==========================
 
-            alerts.add("🎉 Congratulations! You saved more than Rs " +
-                    String.format("%.0f", savings));
+        if (income > 0) {
+
+            double savingRate = (savings / income) * 100;
+
+            if (savingRate >= 20) {
+
+                alerts.add("🎉 Great job! You saved "
+                        + String.format("%.1f", savingRate)
+                        + "% of your income this month.");
+
+            } else if (savingRate < 10) {
+
+                alerts.add("💰 Your savings rate is below 10%. Try saving at least 20% of your income.");
+
+            }
 
         }
 
+        // ==========================
+        // Spending Trend
+        // ==========================
+
         String trend = getSpendingTrend(userId);
-        if (trend.equalsIgnoreCase("Increasing")) {
+
+        if ("Increasing".equalsIgnoreCase(trend)) {
 
             alerts.add("📈 Your spending is increasing compared to previous months.");
 
+        } else if ("Decreasing".equalsIgnoreCase(trend)) {
+
+            alerts.add("📉 Great! Your spending is decreasing.");
+
         }
+
+        // ==========================
+        // Highest Expense Category
+        // ==========================
 
         String category = getHighestExpenseCategory(userId);
 
-        double categoryExpense =
-                getCategoryExpense(userId, category);
+        if (category != null && !category.trim().isEmpty()) {
 
-        if (expense > 0 && categoryExpense / expense > 0.40) {
+            double categoryExpense = getCategoryExpense(userId, category);
 
-            alerts.add("🍔 " + category +
-                    " accounts for over 40% of your total spending.");
+            if (expense > 0) {
+
+                double percentage = (categoryExpense / expense) * 100;
+
+                if (percentage >= 40) {
+
+                    alerts.add("🍔 " + category
+                            + " accounts for "
+                            + String.format("%.1f", percentage)
+                            + "% of your total spending.");
+
+                }
+
+            }
 
         }
+
+        // ==========================
+        // Subscription Analysis
+        // ==========================
+
+        double subscriptionCost = getMonthlySubscriptionCost(userId);
+
+        if (income > 0 && subscriptionCost > income * 0.10) {
+
+            alerts.add("📺 Your monthly subscription cost exceeds 10% of your income.");
+
+        }
+
+        // ==========================
+        // Financial Health Score
+        // ==========================
 
         int score = getFinancialHealthScore(userId);
 
         if (score >= 90) {
 
-            alerts.add("🌟 Outstanding financial health!");
+            alerts.add("🌟 Outstanding financial health! Keep up the excellent work.");
 
-        } else if (score < 50) {
+        } else if (score >= 75) {
 
-            alerts.add("🚨 Your financial health score is low. Review your spending.");
+            alerts.add("✅ Your financial health is very good. Keep maintaining your budget.");
+
+        } else if (score >= 60) {
+
+            alerts.add("👍 Your financial health is good, but there is room for improvement.");
+
+        } else if (score >= 40) {
+
+            alerts.add("⚠ Your financial health needs improvement. Review your spending habits.");
+
+        } else {
+
+            alerts.add("🚨 Your financial health score is low. Take immediate action to reduce unnecessary expenses.");
 
         }
 
-
-
-
         return alerts;
-
     }
-
-
 
     // =====================================================
     // DASHBOARD METHODS
