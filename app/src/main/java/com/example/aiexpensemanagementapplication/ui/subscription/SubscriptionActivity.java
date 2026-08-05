@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.example.aiexpensemanagementapplication.model.Subscription;
+import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
@@ -116,7 +117,7 @@ public class SubscriptionActivity extends AppCompatActivity {
 
             if (itemId == R.id.nav_dashboard) {
 
-                startActivity(new Intent(this, PersonalDashboardActivity.class));
+                startActivity(new Intent(this, DashboardActivity.class));
                 finish();
                 return true;
 

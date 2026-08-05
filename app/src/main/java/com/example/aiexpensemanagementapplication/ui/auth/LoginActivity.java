@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 
 import com.example.aiexpensemanagementapplication.R;
+import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -189,7 +190,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Intent intent = new Intent(
                 LoginActivity.this,
-                PersonalDashboardActivity.class);
+                DashboardActivity.class);
 
         intent.setFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK |
@@ -337,7 +338,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             startActivity(new Intent(
                                     this,
-                                    PersonalDashboardActivity.class));
+                                    DashboardActivity.class));
 
                             finish();
                         }

@@ -7,6 +7,7 @@ import android.widget.Toast;
 import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.EditProfileActivity;
@@ -536,7 +537,7 @@ public class ExpenseListActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(
                         ExpenseListActivity.this,
-                        PersonalDashboardActivity.class);
+                        DashboardActivity.class);
 
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
