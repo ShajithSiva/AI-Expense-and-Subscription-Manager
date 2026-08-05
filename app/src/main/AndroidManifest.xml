@@ -36,6 +36,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity> <!-- Authentication -->
+
+        <activity
+            android:name=".ui.family.CreateFamilyActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.auth.LoginActivity"
             android:windowSoftInputMode="adjustResize" />
@@ -54,9 +60,19 @@
         <activity
             android:name=".ui.auth.CreatePasswordActivity"
             android:windowSoftInputMode="adjustResize" /> <!-- Dashboard -->
+        <!-- Dashboard -->
+
+        <!-- New Main Dashboard -->
+        <activity
+            android:name=".ui.dashboard.DashboardActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Old Personal Dashboard - keep temporarily -->
         <activity
             android:name=".ui.dashboard.PersonalDashboardActivity"
-            android:windowSoftInputMode="adjustResize" /> <!-- Expense -->
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.expense.ExpenseListActivity"
             android:windowSoftInputMode="adjustResize" />
@@ -127,6 +143,15 @@
         <activity
             android:name=".ui.subscription.EditSubscriptionActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.family.InviteMemberActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.family.JoinFamilyActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <receiver
             android:name=".notification.ReminderReceiver"

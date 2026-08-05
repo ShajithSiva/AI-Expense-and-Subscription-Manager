@@ -12,7 +12,7 @@ import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.RegisterActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.VerifyEmailActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.VerifyMobileActivity;
-import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
+import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -130,7 +130,7 @@ public class SplashActivity extends BaseActivity {
         // Everything completed
         startActivity(new Intent(
                 this,
-                PersonalDashboardActivity.class));
+                DashboardActivity.class));
 
         finish();
     }

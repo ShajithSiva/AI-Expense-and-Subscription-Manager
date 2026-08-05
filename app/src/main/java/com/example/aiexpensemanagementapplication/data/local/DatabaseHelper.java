@@ -2806,529 +2806,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     public String generateAIInsight(int userId) {
 
-        StringBuilder insight = new StringBuilder();
-
         double income = getTotalIncome(userId);
+
         double expense = getTotalExpense(userId);
 
-        if (income <= 0) {
-            return "💡 Add your income to receive AI Financial Insights.";
-        }
+        if(income==0){
 
-        double savings = income - expense;
-        double savingRate = (savings / income) * 100;
-
-        String highestCategory = getHighestExpenseCategory(userId);
-        double categoryExpense = getCategoryExpense(userId, highestCategory);
-
-        String budgetStatus = getBudgetStatus(userId);
-        String spendingTrend = getSpendingTrend(userId);
-
-        Budget budget = getBudgetSettings(userId);
-        double subscriptionCost = getMonthlySubscriptionCost(userId);
-
-        // ==========================
-        // Financial Wellness Score
-        // ==========================
-
-        int score = 100;
-
-        if (expense > income)
-            score -= 30;
-        else if (expense > income * 0.90)
-            score -= 20;
-        else if (expense > income * 0.80)
-            score -= 10;
-
-        if (savingRate < 10)
-            score -= 20;
-        else if (savingRate < 20)
-            score -= 10;
-
-        if (budget != null && budget.getMonthlyBudget() > 0) {
-
-            double budgetUsed =
-                    (expense / budget.getMonthlyBudget()) * 100;
-
-            if (budgetUsed > 100)
-                score -= 20;
-            else if (budgetUsed > 90)
-                score -= 10;
-        }
-
-        if (subscriptionCost > income * 0.10)
-            score -= 10;
-
-        score = Math.max(0, Math.min(score, 100));
-
-        String rating;
-
-        if (score >= 90)
-            rating = "Excellent";
-        else if (score >= 75)
-            rating = "Very Good";
-        else if (score >= 60)
-            rating = "Good";
-        else if (score >= 40)
-            rating = "Needs Improvement";
-        else
-            rating = "Critical";
-
-        // ==========================
-        // Header
-        // ==========================
-
-        insight.append("══════════════════════════════\n");
-        insight.append("🤖 AI FINANCIAL INSIGHTS\n");
-        insight.append("══════════════════════════════\n\n");
-
-        insight.append("🏆 Financial Score\n");
-        insight.append(score)
-                .append("/100 (")
-                .append(rating)
-                .append(")\n\n");
-
-        // ==========================
-        // Financial Summary
-        // ==========================
-
-        insight.append("💰 THIS MONTH\n");
-
-        insight.append("Income   : Rs ")
-                .append(String.format("%.2f", income))
-                .append("\n");
-
-        insight.append("Expense  : Rs ")
-                .append(String.format("%.2f", expense))
-                .append("\n");
-
-        insight.append("Savings  : Rs ")
-                .append(String.format("%.2f", savings))
-                .append("\n");
-
-        insight.append("Saving Rate : ")
-                .append(String.format("%.1f", savingRate))
-                .append("%\n\n");
-
-        // ==========================
-        // Current Status
-        // ==========================
-
-        insight.append("📊 CURRENT STATUS\n");
-
-        insight.append("Budget : ")
-                .append(budgetStatus)
-                .append("\n");
-
-        insight.append("Trend  : ")
-                .append(spendingTrend)
-                .append("\n");
-
-        insight.append("Highest Category : ")
-                .append(highestCategory)
-                .append("\n\n");
-        // ==========================
-        // Main Concern
-        // ==========================
-
-        insight.append("⚠ MAIN CONCERN\n");
-
-        if (expense > income) {
-
-            insight.append("You are spending more than your income.\n");
-            insight.append("Reduce unnecessary expenses immediately.\n\n");
-
-        } else {
-
-            double categoryPercentage = expense > 0
-                    ? (categoryExpense / expense) * 100
-                    : 0;
-
-            insight.append(highestCategory)
-                    .append(" accounts for ")
-                    .append(String.format("%.1f", categoryPercentage))
-                    .append("% of your total expenses.\n");
-
-            if (categoryPercentage >= 40) {
-
-                insight.append("This category needs immediate attention.\n\n");
-
-            } else if (categoryPercentage >= 25) {
-
-                insight.append("Try reducing this category to improve your savings.\n\n");
-
-            } else {
-
-                insight.append("Your spending is fairly balanced.\n\n");
-
-            }
-        }
-
-        // ==========================
-        // Smart Recommendations
-        // ==========================
-
-        insight.append("💡 SMART RECOMMENDATIONS\n");
-
-        int recommendation = 1;
-
-        if (expense > income * 0.80) {
-
-            insight.append(recommendation++)
-                    .append(". Reduce unnecessary spending this week.\n");
+            return "Add your first income to start receiving AI insights.";
 
         }
 
-        if (categoryExpense > expense * 0.30) {
+        if(expense>income){
 
-            double reduceAmount = categoryExpense * 0.15;
-
-            insight.append(recommendation++)
-                    .append(". Reduce ")
-                    .append(highestCategory)
-                    .append(" by about Rs ")
-                    .append(String.format("%.0f", reduceAmount))
-                    .append(".\n");
+            return "Warning! Your expenses are higher than your income.";
 
         }
 
-        if (subscriptionCost > income * 0.10) {
+        if(expense>income*0.80){
 
-            insight.append(recommendation++)
-                    .append(". Review your subscriptions to lower monthly costs.\n");
-
-        }
-
-        if (savingRate < 20) {
-
-            insight.append(recommendation++)
-                    .append(". Aim to save at least 20% of your income.\n");
+            return "You have spent more than 80% of your income this month.";
 
         }
 
-        if (recommendation == 1) {
+        return "Great! Your spending is under control.";
 
-            insight.append("1. Keep following your current financial habits.\n");
-
-        }
-
-        insight.append("\n");
-
-        // ==========================
-        // Next Goal
-        // ==========================
-
-        insight.append("🎯 NEXT GOAL\n");
-
-        double targetSaving = Math.max(5000, savings + 2000);
-
-        insight.append("Save at least Rs ")
-                .append(String.format("%.0f", targetSaving))
-                .append(" next month.\n");
-
-        if (budget != null) {
-
-            insight.append("Stay within your monthly budget.\n");
-
-        }
-
-        insight.append("Increase your Financial Score to ");
-
-        if (score < 90) {
-
-            insight.append(Math.min(score + 10, 100));
-
-        } else {
-
-            insight.append("100");
-
-        }
-
-        insight.append("/100.\n\n");
-
-        // ==========================
-        // Spending Prediction
-        // ==========================
-
-        insight.append("📈 SPENDING PREDICTION\n");
-
-        if (budget != null && budget.getMonthlyBudget() > 0) {
-
-            double used = (expense / budget.getMonthlyBudget()) * 100;
-
-            if (used >= 100) {
-
-                insight.append("Budget exceeded. Reduce spending immediately.\n\n");
-
-            } else if (used >= 90) {
-
-                insight.append("You are likely to exceed your budget soon.\n\n");
-
-            } else if (used >= 75) {
-
-                insight.append("Spend carefully for the rest of the month.\n\n");
-
-            } else {
-
-                insight.append("You are on track to stay within your budget.\n\n");
-
-            }
-
-        } else {
-
-            insight.append("Set a monthly budget for better predictions.\n\n");
-
-        }
-        // ==========================
-        // Achievement
-        // ==========================
-
-        insight.append("🏅 ACHIEVEMENT\n");
-
-        if (savings > 0) {
-
-            insight.append("✔ You saved Rs ")
-                    .append(String.format("%.2f", savings))
-                    .append(" this month.\n");
-
-        } else {
-
-            insight.append("⚠ No savings recorded this month.\n");
-
-        }
-
-        if (expense < income) {
-
-            insight.append("✔ Your expenses are within your income.\n");
-
-        }
-
-        if (subscriptionCost <= income * 0.10) {
-
-            insight.append("✔ Subscription costs are under control.\n");
-
-        }
-
-        if ("Decreasing".equalsIgnoreCase(spendingTrend)) {
-
-            insight.append("✔ Your spending is decreasing.\n");
-
-        }
-
-        insight.append("\n");
-
-        // ==========================
-        // AI Summary
-        // ==========================
-
-        insight.append("🤖 AI SUMMARY\n");
-
-        if (score >= 90) {
-
-            insight.append("Excellent financial management! ")
-                    .append("Maintain your current spending habits and continue growing your savings.");
-
-        } else if (score >= 75) {
-
-            insight.append("Your finances are in good shape. ")
-                    .append("Reducing ")
-                    .append(highestCategory)
-                    .append(" expenses will further improve your savings.");
-
-        } else if (score >= 60) {
-
-            insight.append("Your financial position is stable. ")
-                    .append("Focus on controlling unnecessary expenses and increasing your monthly savings.");
-
-        } else if (score >= 40) {
-
-            insight.append("Your finances need improvement. ")
-                    .append("Create a stricter budget and prioritize essential spending.");
-
-        } else {
-
-            insight.append("Your financial situation is critical. ")
-                    .append("Reduce non-essential expenses immediately and focus on rebuilding your savings.");
-
-        }
-
-        // ==========================
-        // AI Tip
-        // ==========================
-
-        insight.append("\n\n");
-        insight.append("💬 AI TIP\n");
-
-        if (savingRate >= 20) {
-
-            insight.append("Keep saving at least 20% of your income every month for long-term financial stability.");
-
-        } else {
-
-            insight.append("Try following the 50/30/20 budgeting rule to improve your savings consistently.");
-
-        }
-
-        // ==========================
-        // Footer
-        // ==========================
-
-        insight.append("\n\n");
-        insight.append("══════════════════════════════\n");
-        insight.append("Generated by AI Financial Assistant");
-        insight.append("\n══════════════════════════════");
-
-        return insight.toString();
-
-    }
-
-
-    public List<String> generateAIAlerts(int userId) {
-
-        List<String> alerts = new ArrayList<>();
-
-        double income = getTotalIncome(userId);
-        double expense = getTotalExpense(userId);
-        double savings = income - expense;
-
-        Budget budget = getBudgetSettings(userId);
-
-        // ==========================
-        // Budget Alerts
-        // ==========================
-
-        if (budget != null && budget.getMonthlyBudget() > 0) {
-
-            double budgetAmount = budget.getMonthlyBudget();
-
-            if (expense > budgetAmount) {
-
-                alerts.add("🚨 You have exceeded your monthly budget.");
-
-            } else if (expense >= budgetAmount * 0.90) {
-
-                alerts.add("⚠ You have already used over 90% of your monthly budget.");
-
-            }
-
-        }
-
-        // ==========================
-        // Expense vs Income
-        // ==========================
-
-        if (income > 0 && expense > income) {
-
-            alerts.add("🚨 Your expenses are higher than your income.");
-
-        }
-
-        // ==========================
-        // Savings Analysis
-        // ==========================
-
-        if (income > 0) {
-
-            double savingRate = (savings / income) * 100;
-
-            if (savingRate >= 20) {
-
-                alerts.add("🎉 Great job! You saved "
-                        + String.format("%.1f", savingRate)
-                        + "% of your income this month.");
-
-            } else if (savingRate < 10) {
-
-                alerts.add("💰 Your savings rate is below 10%. Try saving at least 20% of your income.");
-
-            }
-
-        }
-
-        // ==========================
-        // Spending Trend
-        // ==========================
-
-        String trend = getSpendingTrend(userId);
-
-        if ("Increasing".equalsIgnoreCase(trend)) {
-
-            alerts.add("📈 Your spending is increasing compared to previous months.");
-
-        } else if ("Decreasing".equalsIgnoreCase(trend)) {
-
-            alerts.add("📉 Great! Your spending is decreasing.");
-
-        }
-
-        // ==========================
-        // Highest Expense Category
-        // ==========================
-
-        String category = getHighestExpenseCategory(userId);
-
-        if (category != null && !category.trim().isEmpty()) {
-
-            double categoryExpense = getCategoryExpense(userId, category);
-
-            if (expense > 0) {
-
-                double percentage = (categoryExpense / expense) * 100;
-
-                if (percentage >= 40) {
-
-                    alerts.add("🍔 " + category
-                            + " accounts for "
-                            + String.format("%.1f", percentage)
-                            + "% of your total spending.");
-
-                }
-
-            }
-
-        }
-
-        // ==========================
-        // Subscription Analysis
-        // ==========================
-
-        double subscriptionCost = getMonthlySubscriptionCost(userId);
-
-        if (income > 0 && subscriptionCost > income * 0.10) {
-
-            alerts.add("📺 Your monthly subscription cost exceeds 10% of your income.");
-
-        }
-
-        // ==========================
-        // Financial Health Score
-        // ==========================
-
-        int score = getFinancialHealthScore(userId);
-
-        if (score >= 90) {
-
-            alerts.add("🌟 Outstanding financial health! Keep up the excellent work.");
-
-        } else if (score >= 75) {
-
-            alerts.add("✅ Your financial health is very good. Keep maintaining your budget.");
-
-        } else if (score >= 60) {
-
-            alerts.add("👍 Your financial health is good, but there is room for improvement.");
-
-        } else if (score >= 40) {
-
-            alerts.add("⚠ Your financial health needs improvement. Review your spending habits.");
-
-        } else {
-
-            alerts.add("🚨 Your financial health score is low. Take immediate action to reduce unnecessary expenses.");
-
-        }
-
-        return alerts;
     }
 
     // =====================================================
@@ -5200,5 +4701,882 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    // =====================================================
+// FAMILY MANAGEMENT METHODS
+// =====================================================
+
+
+// =====================================================
+// CREATE FAMILY
+// =====================================================
+
+    public long createFamily(String familyName, int creatorUserId) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        long familyId = -1;
+
+        db.beginTransaction();
+
+        try {
+
+            // ---------------------------------------------
+            // CREATE FAMILY
+            // ---------------------------------------------
+
+            ContentValues familyValues = new ContentValues();
+
+            familyValues.put(
+                    FAMILY_NAME,
+                    familyName
+            );
+
+            familyValues.put(
+                    FAMILY_CREATED_AT,
+                    System.currentTimeMillis()
+            );
+
+
+            familyId = db.insert(
+                    TABLE_FAMILY,
+                    null,
+                    familyValues
+            );
+
+
+            if (familyId == -1) {
+
+                return -1;
+            }
+
+
+            // ---------------------------------------------
+            // ADD CREATOR AS PRIMARY MEMBER
+            // ---------------------------------------------
+
+            ContentValues memberValues =
+                    new ContentValues();
+
+            memberValues.put(
+                    FAMILY_ID,
+                    familyId
+            );
+
+            memberValues.put(
+                    USER_ID,
+                    creatorUserId
+            );
+
+            memberValues.put(
+                    FAMILY_ROLE,
+                    "PRIMARY"
+            );
+
+
+            long memberResult =
+                    db.insert(
+                            TABLE_FAMILY_MEMBER,
+                            null,
+                            memberValues
+                    );
+
+
+            if (memberResult == -1) {
+
+                return -1;
+            }
+
+
+            // ---------------------------------------------
+            // ADD USER TO FAMILY USER TABLE
+            // ---------------------------------------------
+
+            ContentValues familyUserValues =
+                    new ContentValues();
+
+            familyUserValues.put(
+                    USER_ID,
+                    creatorUserId
+            );
+
+
+            db.insertWithOnConflict(
+                    TABLE_FAMILY_USER,
+                    null,
+                    familyUserValues,
+                    SQLiteDatabase.CONFLICT_IGNORE
+            );
+
+
+            db.setTransactionSuccessful();
+
+        } finally {
+
+            db.endTransaction();
+        }
+
+
+        return familyId;
+    }
+
+
+// =====================================================
+// CHECK WHETHER USER HAS FAMILY
+// =====================================================
+
+    public boolean userHasFamily(int userId) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT COUNT(*) " +
+                                "FROM " + TABLE_FAMILY_MEMBER +
+                                " WHERE " + USER_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(userId)
+                        }
+                );
+
+
+        boolean hasFamily = false;
+
+
+        if (cursor.moveToFirst()) {
+
+            hasFamily =
+                    cursor.getInt(0) > 0;
+        }
+
+
+        cursor.close();
+
+
+        return hasFamily;
+    }
+
+
+// =====================================================
+// GET ONE FAMILY ID FOR USER
+// =====================================================
+
+    public int getFamilyIdForUser(int userId) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT " + FAMILY_ID +
+                                " FROM " + TABLE_FAMILY_MEMBER +
+                                " WHERE " + USER_ID + "=?" +
+                                " LIMIT 1",
+
+                        new String[]{
+                                String.valueOf(userId)
+                        }
+                );
+
+
+        int familyId = -1;
+
+
+        if (cursor.moveToFirst()) {
+
+            familyId =
+                    cursor.getInt(0);
+        }
+
+
+        cursor.close();
+
+
+        return familyId;
+    }
+
+
+// =====================================================
+// GET ALL FAMILIES FOR USER
+// =====================================================
+
+    public Cursor getFamiliesForUser(int userId) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        String query =
+
+                "SELECT " +
+
+                        "f." + FAMILY_ID +
+                        " AS " + FAMILY_ID + ", " +
+
+                        "f." + FAMILY_NAME +
+                        " AS " + FAMILY_NAME + ", " +
+
+                        "fm." + FAMILY_ROLE +
+                        " AS " + FAMILY_ROLE +
+
+                        " FROM " +
+                        TABLE_FAMILY_MEMBER + " fm " +
+
+                        "INNER JOIN " +
+                        TABLE_FAMILY + " f " +
+
+                        "ON fm." + FAMILY_ID +
+                        " = f." + FAMILY_ID +
+
+                        " WHERE fm." + USER_ID + "=?" +
+
+                        " ORDER BY f." +
+                        FAMILY_CREATED_AT + " DESC";
+
+
+        return db.rawQuery(
+                query,
+                new String[]{
+                        String.valueOf(userId)
+                }
+        );
+    }
+
+
+// =====================================================
+// GET FAMILY NAME
+// =====================================================
+
+    public String getFamilyName(int familyId) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT " + FAMILY_NAME +
+                                " FROM " + TABLE_FAMILY +
+                                " WHERE " + FAMILY_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(familyId)
+                        }
+                );
+
+
+        String familyName = null;
+
+
+        if (cursor.moveToFirst()) {
+
+            familyName =
+                    cursor.getString(0);
+        }
+
+
+        cursor.close();
+
+
+        return familyName;
+    }
+
+
+// =====================================================
+// GET USER ROLE IN SPECIFIC FAMILY
+// =====================================================
+
+    public String getFamilyRole(
+            int userId,
+            int familyId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT " + FAMILY_ROLE +
+
+                                " FROM " +
+                                TABLE_FAMILY_MEMBER +
+
+                                " WHERE " +
+                                USER_ID + "=?" +
+
+                                " AND " +
+                                FAMILY_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(userId),
+                                String.valueOf(familyId)
+                        }
+                );
+
+
+        String role = null;
+
+
+        if (cursor.moveToFirst()) {
+
+            role =
+                    cursor.getString(0);
+        }
+
+
+        cursor.close();
+
+
+        return role;
+    }
+
+
+// =====================================================
+// GET FAMILY MEMBER COUNT
+// =====================================================
+
+    public int getFamilyMemberCount(int familyId) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT COUNT(*) " +
+
+                                "FROM " +
+                                TABLE_FAMILY_MEMBER +
+
+                                " WHERE " +
+                                FAMILY_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(familyId)
+                        }
+                );
+
+
+        int count = 0;
+
+
+        if (cursor.moveToFirst()) {
+
+            count =
+                    cursor.getInt(0);
+        }
+
+
+        cursor.close();
+
+
+        return count;
+    }
+
+
+// =====================================================
+// CHECK IF USER IS MEMBER OF SPECIFIC FAMILY
+// =====================================================
+
+    public boolean isFamilyMember(
+            int familyId,
+            int userId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT COUNT(*) " +
+
+                                "FROM " +
+                                TABLE_FAMILY_MEMBER +
+
+                                " WHERE " +
+                                FAMILY_ID + "=?" +
+
+                                " AND " +
+                                USER_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(familyId),
+                                String.valueOf(userId)
+                        }
+                );
+
+
+        boolean exists = false;
+
+
+        if (cursor.moveToFirst()) {
+
+            exists =
+                    cursor.getInt(0) > 0;
+        }
+
+
+        cursor.close();
+
+
+        return exists;
+    }
+
+
+// =====================================================
+// ADD MEMBER TO FAMILY
+// =====================================================
+
+    public boolean addFamilyMember(
+            int familyId,
+            int userId,
+            String role
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        // Already member
+        if (isFamilyMember(
+                familyId,
+                userId
+        )) {
+
+            return false;
+        }
+
+
+        ContentValues values =
+                new ContentValues();
+
+
+        values.put(
+                FAMILY_ID,
+                familyId
+        );
+
+
+        values.put(
+                USER_ID,
+                userId
+        );
+
+
+        values.put(
+                FAMILY_ROLE,
+                role
+        );
+
+
+        long result =
+                db.insert(
+                        TABLE_FAMILY_MEMBER,
+                        null,
+                        values
+                );
+
+
+        if (result == -1) {
+
+            return false;
+        }
+
+
+        // ---------------------------------------------
+        // ADD USER TO FAMILY USER TABLE
+        // ---------------------------------------------
+
+        ContentValues familyUserValues =
+                new ContentValues();
+
+
+        familyUserValues.put(
+                USER_ID,
+                userId
+        );
+
+
+        db.insertWithOnConflict(
+                TABLE_FAMILY_USER,
+                null,
+                familyUserValues,
+                SQLiteDatabase.CONFLICT_IGNORE
+        );
+
+
+        return true;
+    }
+
+
+// =====================================================
+// LEAVE FAMILY
+// =====================================================
+
+    public boolean leaveFamily(
+            int familyId,
+            int userId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        // ---------------------------------------------
+        // PRIMARY USER SHOULD NOT LEAVE
+        // ---------------------------------------------
+
+        String role =
+                getFamilyRole(
+                        userId,
+                        familyId
+                );
+
+
+        if ("PRIMARY".equalsIgnoreCase(role)) {
+
+            return false;
+        }
+
+
+        int deletedRows =
+                db.delete(
+
+                        TABLE_FAMILY_MEMBER,
+
+                        FAMILY_ID + "=? AND " +
+                                USER_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(familyId),
+                                String.valueOf(userId)
+                        }
+                );
+
+
+        // ---------------------------------------------
+        // CHECK IF USER STILL BELONGS TO OTHER FAMILIES
+        // ---------------------------------------------
+
+        if (deletedRows > 0 &&
+                !userHasFamily(userId)) {
+
+
+            db.delete(
+
+                    TABLE_FAMILY_USER,
+
+                    USER_ID + "=?",
+
+                    new String[]{
+                            String.valueOf(userId)
+                    }
+            );
+        }
+
+
+        return deletedRows > 0;
+    }
+
+
+// =====================================================
+// REMOVE MEMBER FROM FAMILY
+// =====================================================
+
+    public boolean removeFamilyMember(
+            int familyId,
+            int userId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        String role =
+                getFamilyRole(
+                        userId,
+                        familyId
+                );
+
+
+        // Do not remove PRIMARY this way
+        if ("PRIMARY".equalsIgnoreCase(role)) {
+
+            return false;
+        }
+
+
+        int deletedRows =
+                db.delete(
+
+                        TABLE_FAMILY_MEMBER,
+
+                        FAMILY_ID + "=? AND " +
+                                USER_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(familyId),
+                                String.valueOf(userId)
+                        }
+                );
+
+
+        return deletedRows > 0;
+    }
+
+
+// =====================================================
+// DELETE FAMILY
+// =====================================================
+
+    public boolean deleteFamily(
+            int familyId,
+            int requestingUserId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        // ---------------------------------------------
+        // CHECK USER ROLE
+        // ---------------------------------------------
+
+        String role =
+                getFamilyRole(
+                        requestingUserId,
+                        familyId
+                );
+
+
+        if (!"PRIMARY".equalsIgnoreCase(role)) {
+
+            return false;
+        }
+
+
+        boolean success = false;
+
+
+        db.beginTransaction();
+
+
+        try {
+
+            // ---------------------------------------------
+            // DELETE FAMILY MEMBERS
+            // ---------------------------------------------
+
+            db.delete(
+
+                    TABLE_FAMILY_MEMBER,
+
+                    FAMILY_ID + "=?",
+
+                    new String[]{
+                            String.valueOf(familyId)
+                    }
+            );
+
+
+            // ---------------------------------------------
+            // DELETE FAMILY
+            // ---------------------------------------------
+
+            int deletedFamily =
+                    db.delete(
+
+                            TABLE_FAMILY,
+
+                            FAMILY_ID + "=?",
+
+                            new String[]{
+                                    String.valueOf(familyId)
+                            }
+                    );
+
+
+            if (deletedFamily > 0) {
+
+                db.setTransactionSuccessful();
+
+                success = true;
+            }
+
+        } finally {
+
+            db.endTransaction();
+        }
+
+
+        return success;
+    }
+
+
+// =====================================================
+// CHECK IF FAMILY EXISTS
+// =====================================================
+
+    public boolean familyExists(int familyId) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT COUNT(*) " +
+
+                                "FROM " +
+                                TABLE_FAMILY +
+
+                                " WHERE " +
+                                FAMILY_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(familyId)
+                        }
+                );
+
+
+        boolean exists = false;
+
+
+        if (cursor.moveToFirst()) {
+
+            exists =
+                    cursor.getInt(0) > 0;
+        }
+
+
+        cursor.close();
+
+
+        return exists;
+    }
+
+    // =====================================================
+// GENERATE AI FINANCIAL ALERTS
+// =====================================================
+
+    public List<String> generateAIAlerts(int userId) {
+
+        List<String> alerts = new ArrayList<>();
+
+        double income = getTotalIncome(userId);
+        double expense = getTotalExpense(userId);
+
+        // No financial data yet
+        if (income <= 0 && expense <= 0) {
+
+            alerts.add(
+                    "Add income and expenses to start receiving AI financial alerts."
+            );
+
+            return alerts;
+        }
+
+        // Expense exceeds income
+        if (income > 0 && expense > income) {
+
+            alerts.add(
+                    "Warning! Your total expenses are higher than your income."
+            );
+        }
+
+        // Spending above 80%
+        if (income > 0) {
+
+            double spendingPercentage =
+                    (expense / income) * 100;
+
+            if (spendingPercentage >= 80 &&
+                    spendingPercentage <= 100) {
+
+                alerts.add(
+                        "You have spent more than 80% of your income."
+                );
+            }
+        }
+
+        // Budget check
+        Budget budget =
+                getBudgetSettings(userId);
+
+        if (budget != null &&
+                budget.getMonthlyBudget() > 0) {
+
+            double monthlyBudget =
+                    budget.getMonthlyBudget();
+
+            double budgetPercentage =
+                    (expense / monthlyBudget) * 100;
+
+            if (budgetPercentage >= 100) {
+
+                alerts.add(
+                        "Your monthly budget has been exceeded."
+                );
+
+            } else if (budgetPercentage >= 80) {
+
+                alerts.add(
+                        "You have used more than 80% of your monthly budget."
+                );
+            }
+        }
+
+        // Highest spending category
+        String highestCategory =
+                getHighestExpenseCategory(userId);
+
+        if (highestCategory != null &&
+                !highestCategory.equals("No Data")) {
+
+            alerts.add(
+                    "Your highest spending category is "
+                            + highestCategory + "."
+            );
+        }
+
+        // Savings check
+        if (income > 0) {
+
+            double savings =
+                    income - expense;
+
+            double savingsRate =
+                    (savings / income) * 100;
+
+            if (savingsRate < 10) {
+
+                alerts.add(
+                        "Your savings rate is below 10%. Consider reducing unnecessary expenses."
+                );
+            }
+        }
+
+        // Everything looks okay
+        if (alerts.isEmpty()) {
+
+            alerts.add(
+                    "Your finances look healthy. Keep managing your spending wisely."
+            );
+        }
+
+        return alerts;
+    }
 
 }

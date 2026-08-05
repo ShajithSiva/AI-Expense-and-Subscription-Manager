@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
-import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
+import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
@@ -694,7 +694,7 @@ public class IncomeListActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(
                         IncomeListActivity.this,
-                        PersonalDashboardActivity.class);
+                        DashboardActivity.class);
 
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 

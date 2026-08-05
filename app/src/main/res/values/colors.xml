@@ -7,4 +7,7 @@
     <color name="blue">#2196F3</color>
     <color name="currency_selected_border">#16A34A</color>
     <color name="currency_normal_border">#E5E7EB</color>
+    <color name="dashboard_selected">#22C55E</color>
+    <color name="dashboard_unselected">#E9ECEF</color>
+    <color name="dashboard_unselected_text">#6B7280</color>
 </resources>

@@ -16,7 +16,7 @@ import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
 import com.example.aiexpensemanagementapplication.ui.budget.BudgetActivity;
-import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
+import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
 import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
@@ -207,7 +207,7 @@ public class ProfileActivity extends AppCompatActivity{
 
                 Intent intent = new Intent(
                         ProfileActivity.this,
-                        PersonalDashboardActivity.class);
+                        DashboardActivity.class);
 
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 

@@ -1,0 +1,1427 @@
+package com.example.aiexpensemanagementapplication.ui.dashboard;
+
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+
+import com.example.aiexpensemanagementapplication.R;
+import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.ui.family.CreateFamilyActivity;
+import com.example.aiexpensemanagementapplication.ui.family.InviteMemberActivity;
+import com.example.aiexpensemanagementapplication.ui.family.JoinFamilyActivity;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class FamilyDashboardFragment extends Fragment {
+
+    // =====================================================
+    // DATABASE
+    // =====================================================
+
+    private DatabaseHelper databaseHelper;
+
+
+    // =====================================================
+    // CURRENT USER / SELECTED FAMILY
+    // =====================================================
+
+    private int currentUserId = -1;
+    private int selectedFamilyId = -1;
+
+    private boolean userHasFamily = false;
+
+    private String selectedFamilyRole = null;
+
+
+    // =====================================================
+    // FAMILY LIST
+    // =====================================================
+
+    private final List<Integer> familyIds =
+            new ArrayList<>();
+
+    private final List<String> familyNames =
+            new ArrayList<>();
+
+    private final List<String> familyRoles =
+            new ArrayList<>();
+
+
+    // =====================================================
+    // NO FAMILY SCREEN VIEWS
+    // =====================================================
+
+    private MaterialCardView cardCreateFamily;
+    private MaterialCardView cardJoinFamily;
+
+
+    // =====================================================
+    // FAMILY DASHBOARD VIEWS
+    // =====================================================
+
+    private View layoutFamilySelector;
+
+    private TextView tvFamilyName;
+    private TextView tvMemberCount;
+
+    private ImageButton btnFamilyOptions;
+
+    private MaterialButton btnInviteMember;
+
+
+    // =====================================================
+    // CONSTRUCTOR
+    // =====================================================
+
+    public FamilyDashboardFragment() {
+        // Required empty constructor
+    }
+
+
+    // =====================================================
+    // ON CREATE
+    // =====================================================
+
+    @Override
+    public void onCreate(
+            @Nullable Bundle savedInstanceState
+    ) {
+
+        super.onCreate(savedInstanceState);
+
+        databaseHelper =
+                new DatabaseHelper(
+                        requireContext()
+                );
+
+        loadCurrentUser();
+
+        loadUserFamilies();
+    }
+
+
+    // =====================================================
+    // LOAD CURRENT USER
+    // =====================================================
+
+    private void loadCurrentUser() {
+
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+
+        if (firebaseUser == null) {
+
+            currentUserId = -1;
+
+            return;
+        }
+
+
+        currentUserId =
+                databaseHelper
+                        .getUserIdByFirebaseUid(
+                                firebaseUser.getUid()
+                        );
+    }
+
+
+    // =====================================================
+    // LOAD ALL FAMILIES OF CURRENT USER
+    // =====================================================
+
+    private void loadUserFamilies() {
+
+        /*
+         * Remember selected family before refreshing.
+         *
+         * This prevents the dashboard from returning
+         * to the first family every time onResume()
+         * is called.
+         */
+
+        int previousSelectedFamilyId =
+                selectedFamilyId;
+
+
+        familyIds.clear();
+        familyNames.clear();
+        familyRoles.clear();
+
+
+        selectedFamilyRole = null;
+
+        userHasFamily = false;
+
+
+        // -------------------------------------------------
+        // CHECK USER
+        // -------------------------------------------------
+
+        if (currentUserId == -1) {
+
+            selectedFamilyId = -1;
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // GET USER FAMILIES
+        // -------------------------------------------------
+
+        Cursor cursor =
+                databaseHelper
+                        .getFamiliesForUser(
+                                currentUserId
+                        );
+
+
+        if (cursor == null) {
+
+            selectedFamilyId = -1;
+
+            return;
+        }
+
+
+        try {
+
+            int familyIdIndex =
+                    cursor.getColumnIndex(
+                            "FamilyID"
+                    );
+
+
+            int familyNameIndex =
+                    cursor.getColumnIndex(
+                            "FamilyName"
+                    );
+
+
+            int familyRoleIndex =
+                    cursor.getColumnIndex(
+                            "Role"
+                    );
+
+
+            // -------------------------------------------------
+            // VALIDATE COLUMNS
+            // -------------------------------------------------
+
+            if (familyIdIndex == -1 ||
+                    familyNameIndex == -1 ||
+                    familyRoleIndex == -1) {
+
+                selectedFamilyId = -1;
+
+                return;
+            }
+
+
+            // -------------------------------------------------
+            // READ FAMILIES
+            // -------------------------------------------------
+
+            while (cursor.moveToNext()) {
+
+                int familyId =
+                        cursor.getInt(
+                                familyIdIndex
+                        );
+
+
+                String familyName =
+                        cursor.getString(
+                                familyNameIndex
+                        );
+
+
+                String familyRole =
+                        cursor.getString(
+                                familyRoleIndex
+                        );
+
+
+                familyIds.add(
+                        familyId
+                );
+
+
+                familyNames.add(
+                        familyName
+                );
+
+
+                familyRoles.add(
+                        familyRole
+                );
+            }
+
+        } finally {
+
+            cursor.close();
+        }
+
+
+        // -------------------------------------------------
+        // CHECK FAMILY STATUS
+        // -------------------------------------------------
+
+        userHasFamily =
+                !familyIds.isEmpty();
+
+
+        if (!userHasFamily) {
+
+            selectedFamilyId = -1;
+
+            selectedFamilyRole = null;
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // KEEP PREVIOUS SELECTED FAMILY
+        // -------------------------------------------------
+
+        int previousIndex =
+                familyIds.indexOf(
+                        previousSelectedFamilyId
+                );
+
+
+        if (previousIndex != -1) {
+
+            selectedFamilyId =
+                    familyIds.get(
+                            previousIndex
+                    );
+
+
+            selectedFamilyRole =
+                    familyRoles.get(
+                            previousIndex
+                    );
+
+        } else {
+
+            /*
+             * No previously selected family.
+             *
+             * Select first available family.
+             */
+
+            selectedFamilyId =
+                    familyIds.get(0);
+
+
+            selectedFamilyRole =
+                    familyRoles.get(0);
+        }
+    }
+
+
+    // =====================================================
+    // CREATE VIEW
+    // =====================================================
+
+    @Override
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState
+    ) {
+
+        if (userHasFamily) {
+
+            return inflater.inflate(
+                    R.layout.fragment_family_dashboard,
+                    container,
+                    false
+            );
+
+        } else {
+
+            return inflater.inflate(
+                    R.layout.view_no_family,
+                    container,
+                    false
+            );
+        }
+    }
+
+
+    // =====================================================
+    // VIEW CREATED
+    // =====================================================
+
+    @Override
+    public void onViewCreated(
+            @NonNull View view,
+            @Nullable Bundle savedInstanceState
+    ) {
+
+        super.onViewCreated(
+                view,
+                savedInstanceState
+        );
+
+
+        if (userHasFamily) {
+
+            setupFamilyDashboard(
+                    view
+            );
+
+        } else {
+
+            setupNoFamilyScreen(
+                    view
+            );
+        }
+    }
+
+
+    // =====================================================
+    // NO FAMILY SCREEN
+    // =====================================================
+
+    private void setupNoFamilyScreen(
+            View view
+    ) {
+
+        cardCreateFamily =
+                view.findViewById(
+                        R.id.cardCreateFamily
+                );
+
+
+        cardJoinFamily =
+                view.findViewById(
+                        R.id.cardJoinFamily
+                );
+
+
+        // -------------------------------------------------
+        // CREATE FAMILY
+        // -------------------------------------------------
+
+        if (cardCreateFamily != null) {
+
+            cardCreateFamily
+                    .setOnClickListener(v -> {
+
+                        openCreateFamilyActivity();
+
+                    });
+        }
+
+
+        // -------------------------------------------------
+        // JOIN FAMILY
+        // -------------------------------------------------
+
+        if (cardJoinFamily != null) {
+
+            cardJoinFamily
+                    .setOnClickListener(v -> {
+
+                        openJoinFamilyActivity();
+
+                    });
+        }
+    }
+
+
+    // =====================================================
+    // SETUP FAMILY DASHBOARD
+    // =====================================================
+
+    private void setupFamilyDashboard(
+            View view
+    ) {
+
+        layoutFamilySelector =
+                view.findViewById(
+                        R.id.layoutFamilySelector
+                );
+
+
+        tvFamilyName =
+                view.findViewById(
+                        R.id.tvFamilyName
+                );
+
+
+        tvMemberCount =
+                view.findViewById(
+                        R.id.tvMemberCount
+                );
+
+
+        btnFamilyOptions =
+                view.findViewById(
+                        R.id.btnFamilyOptions
+                );
+
+
+        btnInviteMember =
+                view.findViewById(
+                        R.id.btnInviteMember
+                );
+
+
+        // -------------------------------------------------
+        // FAMILY SELECTOR
+        // -------------------------------------------------
+
+        if (layoutFamilySelector != null) {
+
+            layoutFamilySelector
+                    .setOnClickListener(v -> {
+
+                        showFamilySelectorMenu();
+
+                    });
+        }
+
+
+        // -------------------------------------------------
+        // FAMILY OPTIONS
+        // -------------------------------------------------
+
+        if (btnFamilyOptions != null) {
+
+            btnFamilyOptions
+                    .setOnClickListener(v -> {
+
+                        showFamilyOptionsMenu();
+
+                    });
+        }
+
+
+        // -------------------------------------------------
+        // INVITE MEMBER
+        // -------------------------------------------------
+
+        if (btnInviteMember != null) {
+
+            btnInviteMember
+                    .setOnClickListener(v -> {
+
+                        openInviteMemberActivity();
+
+                    });
+        }
+
+
+        // -------------------------------------------------
+        // LOAD SELECTED FAMILY
+        // -------------------------------------------------
+
+        loadSelectedFamilyDashboard();
+    }
+
+
+    // =====================================================
+    // LOAD SELECTED FAMILY DASHBOARD
+    // =====================================================
+
+    private void loadSelectedFamilyDashboard() {
+
+        if (selectedFamilyId == -1) {
+
+            return;
+        }
+
+
+        if (currentUserId == -1) {
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // FAMILY NAME
+        // -------------------------------------------------
+
+        String familyName =
+                databaseHelper
+                        .getFamilyName(
+                                selectedFamilyId
+                        );
+
+
+        if (familyName == null ||
+                familyName.trim().isEmpty()) {
+
+            familyName = "Family";
+        }
+
+
+        if (tvFamilyName != null) {
+
+            tvFamilyName.setText(
+                    familyName
+            );
+        }
+
+
+        // -------------------------------------------------
+        // CURRENT USER ROLE
+        // -------------------------------------------------
+
+        selectedFamilyRole =
+                databaseHelper
+                        .getFamilyRole(
+                                currentUserId,
+                                selectedFamilyId
+                        );
+
+
+        // -------------------------------------------------
+        // MEMBER COUNT
+        // -------------------------------------------------
+
+        int memberCount =
+                databaseHelper
+                        .getFamilyMemberCount(
+                                selectedFamilyId
+                        );
+
+
+        if (tvMemberCount != null) {
+
+            if (memberCount == 1) {
+
+                tvMemberCount.setText(
+                        "1 Member"
+                );
+
+            } else {
+
+                tvMemberCount.setText(
+                        memberCount +
+                                " Members"
+                );
+            }
+        }
+
+
+        // -------------------------------------------------
+        // APPLY ROLE PERMISSIONS
+        // -------------------------------------------------
+
+        updateRoleBasedUI();
+
+
+        /*
+         * NEXT DEVELOPMENT:
+         *
+         * loadFamilyMembers();
+         *
+         * loadSharedExpenses();
+         *
+         * loadSharedIncome();
+         *
+         * loadSharedSubscriptions();
+         *
+         * loadFamilyBudget();
+         *
+         * loadFamilyTransactions();
+         *
+         * loadAIInsights();
+         */
+    }
+
+
+    // =====================================================
+    // UPDATE ROLE BASED UI
+    // =====================================================
+
+    private void updateRoleBasedUI() {
+
+        if (btnInviteMember == null) {
+
+            return;
+        }
+
+
+        if (selectedFamilyRole == null) {
+
+            btnInviteMember.setVisibility(
+                    View.GONE
+            );
+
+            return;
+        }
+
+
+        // PRIMARY can invite members
+        if ("PRIMARY".equalsIgnoreCase(
+                selectedFamilyRole
+        )) {
+
+            btnInviteMember.setVisibility(
+                    View.VISIBLE
+            );
+
+        } else {
+
+            btnInviteMember.setVisibility(
+                    View.GONE
+            );
+        }
+    }
+
+
+    // =====================================================
+    // SHOW FAMILY SELECTOR
+    // =====================================================
+
+    private void showFamilySelectorMenu() {
+
+        if (layoutFamilySelector == null) {
+
+            return;
+        }
+
+
+        PopupMenu popupMenu =
+                new PopupMenu(
+                        requireContext(),
+                        layoutFamilySelector
+                );
+
+
+        Menu menu =
+                popupMenu.getMenu();
+
+
+        // -------------------------------------------------
+        // ADD EXISTING FAMILIES
+        // -------------------------------------------------
+
+        for (int i = 0;
+             i < familyIds.size();
+             i++) {
+
+
+            int familyId =
+                    familyIds.get(i);
+
+
+            String familyName =
+                    familyNames.get(i);
+
+
+            String role =
+                    familyRoles.get(i);
+
+
+            String title =
+                    familyName +
+                            "  •  " +
+                            role;
+
+
+            MenuItem item =
+                    menu.add(
+                            Menu.NONE,
+                            familyId,
+                            Menu.NONE,
+                            title
+                    );
+
+
+            item.setCheckable(
+                    true
+            );
+
+
+            if (familyId ==
+                    selectedFamilyId) {
+
+                item.setChecked(
+                        true
+                );
+            }
+        }
+
+
+        // -------------------------------------------------
+        // MENU IDs
+        // -------------------------------------------------
+
+        final int MENU_CREATE_FAMILY =
+                900001;
+
+
+        final int MENU_JOIN_FAMILY =
+                900002;
+
+
+        // -------------------------------------------------
+        // CREATE NEW FAMILY
+        // -------------------------------------------------
+
+        menu.add(
+                Menu.NONE,
+                MENU_CREATE_FAMILY,
+                Menu.NONE,
+                "+ Create New Family"
+        );
+
+
+        // -------------------------------------------------
+        // JOIN ANOTHER FAMILY
+        // -------------------------------------------------
+
+        menu.add(
+                Menu.NONE,
+                MENU_JOIN_FAMILY,
+                Menu.NONE,
+                "+ Join Another Family"
+        );
+
+
+        // -------------------------------------------------
+        // MENU CLICK
+        // -------------------------------------------------
+
+        popupMenu.setOnMenuItemClickListener(
+                item -> {
+
+                    int itemId =
+                            item.getItemId();
+
+
+                    // -------------------------------------
+                    // CREATE FAMILY
+                    // -------------------------------------
+
+                    if (itemId ==
+                            MENU_CREATE_FAMILY) {
+
+                        openCreateFamilyActivity();
+
+                        return true;
+                    }
+
+
+                    // -------------------------------------
+                    // JOIN FAMILY
+                    // -------------------------------------
+
+                    if (itemId ==
+                            MENU_JOIN_FAMILY) {
+
+                        openJoinFamilyActivity();
+
+                        return true;
+                    }
+
+
+                    // -------------------------------------
+                    // SWITCH FAMILY
+                    // -------------------------------------
+
+                    int index =
+                            familyIds.indexOf(
+                                    itemId
+                            );
+
+
+                    if (index != -1) {
+
+                        selectFamily(
+                                index
+                        );
+
+                        return true;
+                    }
+
+
+                    return false;
+                }
+        );
+
+
+        popupMenu.show();
+    }
+
+
+    // =====================================================
+    // SELECT FAMILY
+    // =====================================================
+
+    private void selectFamily(
+            int index
+    ) {
+
+        if (index < 0 ||
+                index >= familyIds.size()) {
+
+            return;
+        }
+
+
+        selectedFamilyId =
+                familyIds.get(
+                        index
+                );
+
+
+        selectedFamilyRole =
+                familyRoles.get(
+                        index
+                );
+
+
+        loadSelectedFamilyDashboard();
+    }
+
+
+    // =====================================================
+    // FAMILY OPTIONS MENU
+    // =====================================================
+
+    private void showFamilyOptionsMenu() {
+
+        if (btnFamilyOptions == null) {
+
+            return;
+        }
+
+
+        if (selectedFamilyId == -1) {
+
+            return;
+        }
+
+
+        PopupMenu popupMenu =
+                new PopupMenu(
+                        requireContext(),
+                        btnFamilyOptions
+                );
+
+
+        Menu menu =
+                popupMenu.getMenu();
+
+
+        final int MENU_INVITE =
+                100001;
+
+
+        final int MENU_LEAVE =
+                100002;
+
+
+        final int MENU_DELETE =
+                100003;
+
+
+        // -------------------------------------------------
+        // PRIMARY USER
+        // -------------------------------------------------
+
+        if ("PRIMARY".equalsIgnoreCase(
+                selectedFamilyRole
+        )) {
+
+            menu.add(
+                    Menu.NONE,
+                    MENU_INVITE,
+                    Menu.NONE,
+                    "Invite Member"
+            );
+
+
+            menu.add(
+                    Menu.NONE,
+                    MENU_DELETE,
+                    Menu.NONE,
+                    "Delete Family"
+            );
+
+        } else {
+
+            // -------------------------------------------------
+            // MEMBER / VIEWER
+            // -------------------------------------------------
+
+            menu.add(
+                    Menu.NONE,
+                    MENU_LEAVE,
+                    Menu.NONE,
+                    "Leave Family"
+            );
+        }
+
+
+        // -------------------------------------------------
+        // MENU CLICK
+        // -------------------------------------------------
+
+        popupMenu.setOnMenuItemClickListener(
+                item -> {
+
+                    int itemId =
+                            item.getItemId();
+
+
+                    if (itemId ==
+                            MENU_INVITE) {
+
+                        openInviteMemberActivity();
+
+                        return true;
+                    }
+
+
+                    if (itemId ==
+                            MENU_LEAVE) {
+
+                        confirmLeaveFamily();
+
+                        return true;
+                    }
+
+
+                    if (itemId ==
+                            MENU_DELETE) {
+
+                        confirmDeleteFamily();
+
+                        return true;
+                    }
+
+
+                    return false;
+                }
+        );
+
+
+        popupMenu.show();
+    }
+
+
+    // =====================================================
+    // OPEN CREATE FAMILY
+    // =====================================================
+
+    private void openCreateFamilyActivity() {
+
+        Intent intent =
+                new Intent(
+                        requireContext(),
+                        CreateFamilyActivity.class
+                );
+
+
+        startActivity(
+                intent
+        );
+    }
+
+
+    // =====================================================
+    // OPEN JOIN FAMILY
+    // =====================================================
+
+    private void openJoinFamilyActivity() {
+
+        Intent intent =
+                new Intent(
+                        requireContext(),
+                        JoinFamilyActivity.class
+                );
+
+
+        startActivity(
+                intent
+        );
+    }
+
+
+    // =====================================================
+    // OPEN INVITE MEMBER
+    // =====================================================
+
+    private void openInviteMemberActivity() {
+
+        if (selectedFamilyId == -1) {
+
+            Toast.makeText(
+                    requireContext(),
+                    "No family selected",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+
+        Intent intent =
+                new Intent(
+                        requireContext(),
+                        InviteMemberActivity.class
+                );
+
+
+        /*
+         * Send selected FamilyID so
+         * InviteMemberActivity knows which
+         * family the invitation belongs to.
+         */
+
+        intent.putExtra(
+                "FAMILY_ID",
+                selectedFamilyId
+        );
+
+
+        startActivity(
+                intent
+        );
+    }
+
+
+    // =====================================================
+    // CONFIRM LEAVE FAMILY
+    // =====================================================
+
+    private void confirmLeaveFamily() {
+
+        if (selectedFamilyId == -1 ||
+                currentUserId == -1) {
+
+            return;
+        }
+
+
+        String familyName =
+                databaseHelper
+                        .getFamilyName(
+                                selectedFamilyId
+                        );
+
+
+        if (familyName == null) {
+
+            familyName = "this family";
+        }
+
+
+        new AlertDialog.Builder(
+                requireContext()
+        )
+                .setTitle(
+                        "Leave Family"
+                )
+
+                .setMessage(
+                        "Are you sure you want to leave " +
+                                familyName +
+                                "?"
+                )
+
+                .setNegativeButton(
+                        "Cancel",
+                        null
+                )
+
+                .setPositiveButton(
+                        "Leave",
+                        (dialog, which) ->
+                                leaveSelectedFamily()
+                )
+
+                .show();
+    }
+
+
+    // =====================================================
+    // LEAVE SELECTED FAMILY
+    // =====================================================
+
+    private void leaveSelectedFamily() {
+
+        if (selectedFamilyId == -1 ||
+                currentUserId == -1) {
+
+            return;
+        }
+
+
+        boolean success =
+                databaseHelper
+                        .leaveFamily(
+                                selectedFamilyId,
+                                currentUserId
+                        );
+
+
+        if (success) {
+
+            Toast.makeText(
+                    requireContext(),
+                    "You left the family",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+
+            reloadFragment();
+
+        } else {
+
+            Toast.makeText(
+                    requireContext(),
+                    "Unable to leave this family",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+    }
+
+
+    // =====================================================
+    // CONFIRM DELETE FAMILY
+    // =====================================================
+
+    private void confirmDeleteFamily() {
+
+        if (selectedFamilyId == -1 ||
+                currentUserId == -1) {
+
+            return;
+        }
+
+
+        String familyName =
+                databaseHelper
+                        .getFamilyName(
+                                selectedFamilyId
+                        );
+
+
+        if (familyName == null) {
+
+            familyName = "this family";
+        }
+
+
+        String message =
+                "Delete \"" +
+                        familyName +
+                        "\"?\n\n" +
+                        "All memberships for this family " +
+                        "will be removed.";
+
+
+        new AlertDialog.Builder(
+                requireContext()
+        )
+                .setTitle(
+                        "Delete Family"
+                )
+
+                .setMessage(
+                        message
+                )
+
+                .setNegativeButton(
+                        "Cancel",
+                        null
+                )
+
+                .setPositiveButton(
+                        "Delete",
+                        (dialog, which) ->
+                                deleteSelectedFamily()
+                )
+
+                .show();
+    }
+
+
+    // =====================================================
+    // DELETE SELECTED FAMILY
+    // =====================================================
+
+    private void deleteSelectedFamily() {
+
+        if (selectedFamilyId == -1 ||
+                currentUserId == -1) {
+
+            return;
+        }
+
+
+        boolean success =
+                databaseHelper
+                        .deleteFamily(
+                                selectedFamilyId,
+                                currentUserId
+                        );
+
+
+        if (success) {
+
+            Toast.makeText(
+                    requireContext(),
+                    "Family deleted",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+
+            reloadFragment();
+
+        } else {
+
+            Toast.makeText(
+                    requireContext(),
+                    "Only the primary user can delete this family",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+    }
+
+
+    // =====================================================
+    // RELOAD FRAGMENT
+    // =====================================================
+
+    private void reloadFragment() {
+
+        if (!isAdded()) {
+
+            return;
+        }
+
+
+        loadCurrentUser();
+
+        loadUserFamilies();
+
+
+        getParentFragmentManager()
+                .beginTransaction()
+                .detach(this)
+                .attach(this)
+                .commit();
+    }
+
+
+    // =====================================================
+    // ON RESUME
+    // =====================================================
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+
+
+        if (databaseHelper == null) {
+
+            return;
+        }
+
+
+        if (!isAdded()) {
+
+            return;
+        }
+
+
+        int oldFamilyCount =
+                familyIds.size();
+
+
+        loadCurrentUser();
+
+        loadUserFamilies();
+
+
+        int newFamilyCount =
+                familyIds.size();
+
+
+        /*
+         * Reload complete Fragment when:
+         *
+         * 1. User creates first family
+         * 2. User creates another family
+         * 3. User joins another family
+         * 4. User leaves/deletes a family
+         */
+
+        if (oldFamilyCount !=
+                newFamilyCount) {
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .detach(this)
+                    .attach(this)
+                    .commit();
+
+            return;
+        }
+
+
+        /*
+         * Family count did not change.
+         *
+         * Refresh currently selected family.
+         */
+
+        if (userHasFamily &&
+                getView() != null) {
+
+            loadSelectedFamilyDashboard();
+        }
+    }
+
+
+    // =====================================================
+    // CLEANUP
+    // =====================================================
+
+    @Override
+    public void onDestroy() {
+
+        super.onDestroy();
+
+
+        if (databaseHelper != null) {
+
+            databaseHelper.close();
+        }
+    }
+}

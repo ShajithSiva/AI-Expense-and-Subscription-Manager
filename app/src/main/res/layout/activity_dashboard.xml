@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FB"
+
+    tools:context=".ui.dashboard.DashboardActivity">
+
+
+    <!-- ========================================================= -->
+    <!-- MAIN DASHBOARD LAYOUT                                     -->
+    <!-- ========================================================= -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <!-- ===================================================== -->
+        <!-- APP BAR                                               -->
+        <!-- ===================================================== -->
+
+        <LinearLayout
+            android:id="@+id/layoutAppBar"
+            android:layout_width="0dp"
+            android:layout_height="82dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <!-- GREETING + USERNAME -->
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:id="@+id/tvGreeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Good Morning,"
+                    android:textColor="#707070"
+                    android:textSize="15sp" />
+
+
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="User"
+                    android:textColor="#111111"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    tools:text="Shajith" />
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- NOTIFICATION                                      -->
+            <!-- ================================================= -->
+
+            <FrameLayout
+                android:id="@+id/layoutNotification"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="14dp">
+
+
+                <ImageView
+                    android:id="@+id/imgNotification"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:clickable="true"
+                    android:contentDescription="Notifications"
+                    android:focusable="true"
+                    android:src="@drawable/notification" />
+
+
+                <TextView
+                    android:id="@+id/tvNotificationBadge"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/badge_red"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </FrameLayout>
+
+
+            <!-- ================================================= -->
+            <!-- PROFILE                                           -->
+            <!-- ================================================= -->
+
+            <FrameLayout
+                android:id="@+id/layoutProfile"
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imgProfile"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:contentDescription="Profile"
+                    android:focusable="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/profile"
+                    app:shapeAppearanceOverlay="@drawable/bg_icon_circle" />
+
+
+                <!-- ONLINE STATUS -->
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/status" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+
+        <!-- ===================================================== -->
+        <!-- HEADER DIVIDER                                        -->
+        <!-- ===================================================== -->
+
+        <View
+            android:id="@+id/headerDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#DDDDDD"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutAppBar" />
+
+
+        <!-- ===================================================== -->
+        <!-- PERSONAL / FAMILY SWITCH                              -->
+        <!-- ===================================================== -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardDashboardMode"
+            android:layout_width="0dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="20dp"
+            app:cardBackgroundColor="#E9ECEF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/headerDivider">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+
+                <!-- ============================================= -->
+                <!-- PERSONAL BUTTON                               -->
+                <!-- ============================================= -->
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPersonal"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Personal"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#22C55E"
+                    app:cornerRadius="12dp"
+                    app:elevation="0dp"
+                    app:strokeWidth="0dp" />
+
+
+                <!-- ============================================= -->
+                <!-- FAMILY BUTTON                                 -->
+                <!-- ============================================= -->
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFamily"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:text="Family"
+                    android:textAllCaps="false"
+                    android:textColor="#6B7280"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#E9ECEF"
+                    app:cornerRadius="12dp"
+                    app:elevation="0dp"
+                    app:strokeWidth="0dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ===================================================== -->
+        <!-- DASHBOARD CONTENT                                     -->
+        <!--                                                       -->
+        <!-- PersonalDashboardFragment OR                          -->
+        <!-- FamilyDashboardFragment will appear here              -->
+        <!-- ===================================================== -->
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/dashboardContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:background="#F8F9FB"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardDashboardMode"
+            tools:layout="@layout/fragment_personal_dashboard" />
+
+
+        <!-- ===================================================== -->
+        <!-- BOTTOM NAVIGATION                                     -->
+        <!-- ===================================================== -->
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigation"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:background="@android:color/white"
+            android:elevation="12dp"
+            app:itemIconTint="@color/bottom_nav_colors"
+            app:itemTextColor="@color/bottom_nav_colors"
+            app:labelVisibilityMode="labeled"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:menu="@menu/bottom_menu" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- ========================================================= -->
+    <!-- FLOATING ACTION BUTTON                                    -->
+    <!-- ========================================================= -->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddExpense"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="90dp"
+        android:contentDescription="Add Expense"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="#22C55E"
+        app:borderWidth="0dp"
+        app:elevation="10dp"
+        app:tint="#FFFFFF" />
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
