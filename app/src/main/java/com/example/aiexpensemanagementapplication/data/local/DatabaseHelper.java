@@ -29,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     //========================================================
     // USER TABLE
@@ -66,6 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String FAMILY_ID = "FamilyID";
     public static final String FAMILY_NAME = "FamilyName";
+    public static final String FIRESTORE_FAMILY_ID = "FirestoreFamilyID";
     public static final String FAMILY_CREATED_AT = "CreatedAt";
 
     //========================================================
@@ -331,6 +332,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_FAMILY + " (" +
                     FAMILY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     FAMILY_NAME + " TEXT NOT NULL," +
+                    FIRESTORE_FAMILY_ID + " TEXT UNIQUE," +
                     FAMILY_CREATED_AT + " TEXT" +
                     ");";
     private static final String CREATE_FAMILY_MEMBER_TABLE =
@@ -5577,6 +5579,292 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return alerts;
+    }
+
+    // =====================================================
+// SAVE A JOINED FAMILY INTO LOCAL SQLITE
+// =====================================================
+
+    // =====================================================
+// SAVE A JOINED FAMILY WITH FIRESTORE ID
+// =====================================================
+
+    public long createJoinedFamilyWithFirestoreId(
+            String familyName,
+            String firestoreFamilyId,
+            int userId,
+            String role
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        long localFamilyId = -1;
+
+        db.beginTransaction();
+
+        try {
+
+            // Check whether this Firestore family
+            // is already saved locally.
+            Cursor existingCursor =
+                    db.rawQuery(
+                            "SELECT " + FAMILY_ID +
+                                    " FROM " + TABLE_FAMILY +
+                                    " WHERE " +
+                                    FIRESTORE_FAMILY_ID + "=?",
+                            new String[]{
+                                    firestoreFamilyId
+                            }
+                    );
+
+            if (existingCursor.moveToFirst()) {
+
+                localFamilyId =
+                        existingCursor.getLong(0);
+
+                existingCursor.close();
+
+            } else {
+
+                existingCursor.close();
+
+                // Create local family
+                ContentValues familyValues =
+                        new ContentValues();
+
+                familyValues.put(
+                        FAMILY_NAME,
+                        familyName
+                );
+
+                familyValues.put(
+                        FIRESTORE_FAMILY_ID,
+                        firestoreFamilyId
+                );
+
+                familyValues.put(
+                        FAMILY_CREATED_AT,
+                        String.valueOf(
+                                System.currentTimeMillis()
+                        )
+                );
+
+                localFamilyId =
+                        db.insert(
+                                TABLE_FAMILY,
+                                null,
+                                familyValues
+                        );
+
+                if (localFamilyId == -1) {
+                    return -1;
+                }
+            }
+
+            // Add user to the selected family
+            ContentValues memberValues =
+                    new ContentValues();
+
+            memberValues.put(
+                    FAMILY_ID,
+                    localFamilyId
+            );
+
+            memberValues.put(
+                    USER_ID,
+                    userId
+            );
+
+            memberValues.put(
+                    FAMILY_ROLE,
+                    role
+            );
+
+            long memberResult =
+                    db.insertWithOnConflict(
+                            TABLE_FAMILY_MEMBER,
+                            null,
+                            memberValues,
+                            SQLiteDatabase.CONFLICT_IGNORE
+                    );
+
+            if (memberResult == -1 &&
+                    !isFamilyMember(
+                            (int) localFamilyId,
+                            userId
+                    )) {
+
+                return -1;
+            }
+
+            // Mark the user as a family user
+            ContentValues familyUserValues =
+                    new ContentValues();
+
+            familyUserValues.put(
+                    USER_ID,
+                    userId
+            );
+
+            db.insertWithOnConflict(
+                    TABLE_FAMILY_USER,
+                    null,
+                    familyUserValues,
+                    SQLiteDatabase.CONFLICT_IGNORE
+            );
+
+            db.setTransactionSuccessful();
+
+        } finally {
+
+            db.endTransaction();
+        }
+
+        return localFamilyId;
+    }
+
+    // =====================================================
+// CREATE FAMILY WITH FIRESTORE ID
+// =====================================================
+
+    public long createFamilyWithFirestoreId(
+            String familyName,
+            String firestoreFamilyId,
+            int creatorUserId
+    ) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        long localFamilyId = -1;
+
+        db.beginTransaction();
+
+        try {
+
+            ContentValues familyValues =
+                    new ContentValues();
+
+            familyValues.put(
+                    FAMILY_NAME,
+                    familyName
+            );
+
+            familyValues.put(
+                    FIRESTORE_FAMILY_ID,
+                    firestoreFamilyId
+            );
+
+            familyValues.put(
+                    FAMILY_CREATED_AT,
+                    String.valueOf(
+                            System.currentTimeMillis()
+                    )
+            );
+
+            localFamilyId =
+                    db.insert(
+                            TABLE_FAMILY,
+                            null,
+                            familyValues
+                    );
+
+            if (localFamilyId == -1) {
+                return -1;
+            }
+
+            ContentValues memberValues =
+                    new ContentValues();
+
+            memberValues.put(
+                    FAMILY_ID,
+                    localFamilyId
+            );
+
+            memberValues.put(
+                    USER_ID,
+                    creatorUserId
+            );
+
+            memberValues.put(
+                    FAMILY_ROLE,
+                    "PRIMARY"
+            );
+
+            long memberResult =
+                    db.insert(
+                            TABLE_FAMILY_MEMBER,
+                            null,
+                            memberValues
+                    );
+
+            if (memberResult == -1) {
+                return -1;
+            }
+
+            ContentValues familyUserValues =
+                    new ContentValues();
+
+            familyUserValues.put(
+                    USER_ID,
+                    creatorUserId
+            );
+
+            db.insertWithOnConflict(
+                    TABLE_FAMILY_USER,
+                    null,
+                    familyUserValues,
+                    SQLiteDatabase.CONFLICT_IGNORE
+            );
+
+            db.setTransactionSuccessful();
+
+        } finally {
+
+            db.endTransaction();
+        }
+
+        return localFamilyId;
+    }
+
+
+// =====================================================
+// GET FIRESTORE FAMILY ID
+// =====================================================
+
+    public String getFirestoreFamilyId(
+            int localFamilyId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        Cursor cursor =
+                db.rawQuery(
+                        "SELECT " +
+                                FIRESTORE_FAMILY_ID +
+                                " FROM " +
+                                TABLE_FAMILY +
+                                " WHERE " +
+                                FAMILY_ID + "=?",
+                        new String[]{
+                                String.valueOf(
+                                        localFamilyId
+                                )
+                        }
+                );
+
+        String firestoreFamilyId = null;
+
+        if (cursor.moveToFirst()) {
+
+            firestoreFamilyId =
+                    cursor.getString(0);
+        }
+
+        cursor.close();
+
+        return firestoreFamilyId;
     }
 
 }

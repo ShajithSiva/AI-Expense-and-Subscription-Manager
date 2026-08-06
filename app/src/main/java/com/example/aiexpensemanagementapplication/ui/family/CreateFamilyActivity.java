@@ -1,5 +1,6 @@
 package com.example.aiexpensemanagementapplication.ui.family;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,17 +22,15 @@ public class CreateFamilyActivity extends AppCompatActivity {
     // =====================================================
 
     private ImageButton btnBack;
-
     private TextInputEditText etFamilyName;
-    private TextInputEditText etFamilyDescription;
-
     private MaterialButton btnCreateFamily;
 
     // =====================================================
-    // DATABASE
+    // DATABASE / FIRESTORE
     // =====================================================
 
     private DatabaseHelper databaseHelper;
+    private FamilyFirestoreService familyFirestoreService;
 
     // =====================================================
     // ACTIVITY
@@ -43,9 +43,9 @@ public class CreateFamilyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_family);
 
         databaseHelper = new DatabaseHelper(this);
+        familyFirestoreService = new FamilyFirestoreService();
 
         initializeViews();
-
         setupListeners();
     }
 
@@ -56,12 +56,8 @@ public class CreateFamilyActivity extends AppCompatActivity {
     private void initializeViews() {
 
         btnBack = findViewById(R.id.btnBack);
-
         etFamilyName = findViewById(R.id.etFamilyName);
-
-
-        btnCreateFamily =
-                findViewById(R.id.btnCreateFamily);
+        btnCreateFamily = findViewById(R.id.btnCreateFamily);
     }
 
     // =====================================================
@@ -87,14 +83,12 @@ public class CreateFamilyActivity extends AppCompatActivity {
 
         if (etFamilyName.getText() != null) {
 
-            familyName =
-                    etFamilyName
-                            .getText()
-                            .toString()
-                            .trim();
+            familyName = etFamilyName
+                    .getText()
+                    .toString()
+                    .trim();
         }
 
-        // Empty validation
         if (familyName.isEmpty()) {
 
             etFamilyName.setError(
@@ -106,7 +100,6 @@ public class CreateFamilyActivity extends AppCompatActivity {
             return;
         }
 
-        // Minimum length
         if (familyName.length() < 3) {
 
             etFamilyName.setError(
@@ -127,7 +120,6 @@ public class CreateFamilyActivity extends AppCompatActivity {
 
     private void createFamily(String familyName) {
 
-        // Get currently logged-in Firebase user
         FirebaseUser firebaseUser =
                 FirebaseAuth
                         .getInstance()
@@ -146,10 +138,6 @@ public class CreateFamilyActivity extends AppCompatActivity {
 
         String firebaseUid = firebaseUser.getUid();
 
-        // -------------------------------------------------
-        // Get local SQLite UserID using Firebase UID
-        // -------------------------------------------------
-
         int userId =
                 databaseHelper.getUserIdByFirebaseUid(
                         firebaseUid
@@ -166,60 +154,122 @@ public class CreateFamilyActivity extends AppCompatActivity {
             return;
         }
 
-        // -------------------------------------------------
-        // Check whether user already belongs to a family
-        // -------------------------------------------------
+        String creatorName =
+                getLocalUserName(userId);
 
-        if (databaseHelper.userHasFamily(userId)) {
+        btnCreateFamily.setEnabled(false);
+        btnCreateFamily.setText("Creating...");
 
-            Toast.makeText(
-                    this,
-                    "You already belong to a family.",
-                    Toast.LENGTH_SHORT
-            ).show();
+        familyFirestoreService.createFamily(
+                familyName,
+                firebaseUid,
+                creatorName,
+                new FamilyFirestoreService.CreateFamilyCallback() {
 
-            finish();
+                    @Override
+                    public void onSuccess(
+                            String firestoreFamilyId,
+                            String inviteCode
+                    ) {
 
-            return;
+                        long localFamilyId =
+                                databaseHelper.createFamilyWithFirestoreId(
+                                        familyName,
+                                        firestoreFamilyId,
+                                        userId
+                                );
+
+                        btnCreateFamily.setEnabled(true);
+                        btnCreateFamily.setText("Create Family");
+
+                        if (localFamilyId == -1) {
+
+                            Toast.makeText(
+                                    CreateFamilyActivity.this,
+                                    "Family created online, but local save failed.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            return;
+                        }
+
+                        Toast.makeText(
+                                CreateFamilyActivity.this,
+                                "Family created successfully!",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+
+                        btnCreateFamily.setEnabled(true);
+                        btnCreateFamily.setText("Create Family");
+
+                        Toast.makeText(
+                                CreateFamilyActivity.this,
+                                message,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
+        );
+    }
+
+    // =====================================================
+    // GET LOCAL USER NAME
+    // =====================================================
+
+    private String getLocalUserName(int userId) {
+
+        Cursor cursor =
+                databaseHelper.getUserById(userId);
+
+        String userName = "";
+
+        if (cursor != null) {
+
+            try {
+
+                if (cursor.moveToFirst()) {
+
+                    int nameIndex =
+                            cursor.getColumnIndex(
+                                    DatabaseHelper.USER_NAME
+                            );
+
+                    if (nameIndex != -1) {
+
+                        userName =
+                                cursor.getString(
+                                        nameIndex
+                                );
+                    }
+                }
+
+            } finally {
+
+                cursor.close();
+            }
         }
 
-        // -------------------------------------------------
-        // Create family
-        // -------------------------------------------------
+        return userName == null
+                ? ""
+                : userName;
+    }
 
-        long familyId =
-                databaseHelper.createFamily(
-                        familyName,
-                        userId
-                );
+    // =====================================================
+    // CLEANUP
+    // =====================================================
 
-        if (familyId != -1) {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-            Toast.makeText(
-                    this,
-                    "Family created successfully!",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-            /*
-             * We simply close CreateFamilyActivity.
-             *
-             * User returns to DashboardActivity /
-             * FamilyDashboardFragment.
-             *
-             * FamilyDashboardFragment will then detect
-             * that the user belongs to a family.
-             */
-
-            finish();
-
-        } else {
-
-            Toast.makeText(
-                    this,
-                    "Failed to create family. Please try again.",
-                    Toast.LENGTH_SHORT
-            ).show();
+        if (databaseHelper != null) {
+            databaseHelper.close();
         }
     }
 }
