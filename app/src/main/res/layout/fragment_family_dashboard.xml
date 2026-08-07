@@ -307,6 +307,7 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- HEADER -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -314,6 +315,40 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Family Budget"
+                        android:textColor="#111827"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSetFamilyBudget"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:minHeight="0dp"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="Set Budget"
+                        android:textAllCaps="false"
+                        android:textColor="#16A34A"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="#EAF9F0"
+                        app:cornerRadius="10dp" />
+
+                </LinearLayout>
+
+                <!-- BUDGET VALUES -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:gravity="bottom"
+                    android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -324,23 +359,22 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Family Budget"
-                            android:textColor="#111827"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
+                            android:text="Spent"
+                            android:textColor="#8A909C"
+                            android:textSize="10sp" />
 
                         <TextView
                             android:id="@+id/tvBudgetAmount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="3dp"
                             android:text="Rs 0 / Rs 0"
-                            android:textColor="#7A8190"
-                            android:textSize="11sp"
+                            android:textColor="#111827"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
                             tools:text="Rs 86,450 / Rs 100,000" />
 
                     </LinearLayout>
-
 
                     <TextView
                         android:id="@+id/tvBudgetPercentage"
@@ -354,18 +388,48 @@
 
                 </LinearLayout>
 
+                <!-- PROGRESS -->
 
                 <ProgressBar
                     android:id="@+id/progressFamilyBudget"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="8dp"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="12dp"
                     android:max="100"
                     android:progress="0"
                     android:progressBackgroundTint="#E9ECEF"
                     android:progressTint="#22C55E"
                     tools:progress="86" />
+
+                <!-- REMAINING -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Remaining"
+                        android:textColor="#8A909C"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tvFamilyBudgetRemaining"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rs 0.00"
+                        android:textColor="#16A34A"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        tools:text="Rs 13,550.00" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -396,7 +460,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Spending by Category"
+                    android:text="Category Spending Overview"
                     android:textColor="#111827"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -409,35 +473,32 @@
                     android:textColor="#8A909C"
                     android:textSize="11sp" />
 
+                <!-- SAME CHART TYPE AS PERSONAL DASHBOARD -->
 
-                <FrameLayout
-                    android:id="@+id/familyCategoryChartContainer"
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/familyPieChart"
                     android:layout_width="match_parent"
-                    android:layout_height="190dp"
-                    android:layout_marginTop="10dp">
+                    android:layout_height="250dp"
+                    android:layout_marginTop="8dp" />
 
-                    <TextView
-                        android:id="@+id/tvNoCategoryData"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="No shared spending data yet"
-                        android:textColor="#9CA3AF"
-                        android:textSize="12sp" />
+                <!-- EMPTY STATE -->
 
-                </FrameLayout>
-
-
-                <LinearLayout
-                    android:id="@+id/categoryListContainer"
+                <TextView
+                    android:id="@+id/tvNoCategoryData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:text="No shared spending data yet"
+                    android:textColor="#9CA3AF"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
 
 
         <!-- ===================================================== -->

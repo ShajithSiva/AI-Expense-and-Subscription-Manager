@@ -147,25 +147,35 @@
                         android:layout_marginTop="18dp"
                         android:background="#E5E7EB"/>
 
-                    <!-- Expense Mode -->
+
+                    <!-- Family Sharing -->
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="18dp"
-                        android:text="Expense Mode"
+                        android:text="Family Sharing"
                         android:textStyle="bold"
                         android:textColor="#6B7280"/>
 
                     <TextView
-                        android:id="@+id/tvExpenseMode"
+                        android:id="@+id/tvFamilySharing"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Personal"
+                        android:text="Not Shared"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="#111827"/>
+
+                    <TextView
+                        android:id="@+id/tvFamilySharingHint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Visible only in your personal expenses"
+                        android:textSize="13sp"
+                        android:textColor="#9CA3AF"/>
 
                     <View
                         android:layout_width="match_parent"

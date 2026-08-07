@@ -21,6 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -29,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 10;
 
     //========================================================
     // USER TABLE
@@ -109,6 +110,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TRANSACTION_TYPE = "TransactionType";
     public static final String TRANSACTION_DATE = "TransactionDate";
     public static final String SOURCE = "Source";
+
+// EXPENSE FAMILY SHARE
+
+    public static final String TABLE_EXPENSE_FAMILY_SHARE =
+            "ExpenseFamilyShare";
+
+    public static final String SHARE_ID =
+            "ShareID";
+
+    public static final String SHARED_BY =
+            "SharedBy";
+
+    public static final String SHARED_AT =
+            "SharedAt";
+
+
+
 
     //========================================================
     // BUDGET
@@ -227,6 +245,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String PREF_UPDATED_AT =
             "UpdatedAt";
 
+//========================================================
+// FAMILY BUDGET
+//========================================================
+
+    public static final String TABLE_FAMILY_BUDGET = "FamilyBudget";
+
+    public static final String FAMILY_BUDGET_ID = "FamilyBudgetID";
+
+    public static final String FAMILY_BUDGET_LIMIT = "LimitAmount";
+
+    public static final String FAMILY_BUDGET_START_DATE = "StartDate";
+
+    public static final String FAMILY_BUDGET_END_DATE = "EndDate";
+
+    public static final String FAMILY_BUDGET_UPDATED_AT = "UpdatedAt";
+
     //========================================================
     // NOTIFICATION
     //========================================================
@@ -269,7 +303,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_TRANSACTION_TABLE);
 
+        db.execSQL(CREATE_EXPENSE_FAMILY_SHARE_TABLE);
+
         db.execSQL(CREATE_BUDGET_TABLE);
+
+        db.execSQL(CREATE_FAMILY_BUDGET_TABLE);
 
         db.execSQL(CREATE_SUBSCRIPTION_TABLE);
 
@@ -288,6 +326,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_FINANCIAL_PREFERENCES_TABLE);
 
         db.execSQL(CREATE_BUDGET_SETTINGS_TABLE);
+
+
 
         String CREATE_NOTIFICATION_TABLE =
                 "CREATE TABLE " + TABLE_NOTIFICATION + "("
@@ -377,6 +417,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " +
                     TABLE_CATEGORY + "(" + CATEGORY_ID + ")" +
                     ");";
+
+    private static final String CREATE_EXPENSE_FAMILY_SHARE_TABLE =
+            "CREATE TABLE " + TABLE_EXPENSE_FAMILY_SHARE + " (" +
+
+                    SHARE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                    TRANSACTION_ID + " INTEGER NOT NULL UNIQUE," +
+
+                    FAMILY_ID + " INTEGER NOT NULL," +
+
+                    SHARED_BY + " INTEGER NOT NULL," +
+
+                    SHARED_AT + " INTEGER NOT NULL," +
+
+                    "FOREIGN KEY(" + TRANSACTION_ID + ") REFERENCES " +
+                    TABLE_TRANSACTION + "(" + TRANSACTION_ID + ") " +
+                    "ON DELETE CASCADE," +
+
+                    "FOREIGN KEY(" + FAMILY_ID + ") REFERENCES " +
+                    TABLE_FAMILY + "(" + FAMILY_ID + ") " +
+                    "ON DELETE CASCADE," +
+
+                    "FOREIGN KEY(" + SHARED_BY + ") REFERENCES " +
+                    TABLE_USER + "(" + USER_ID + ") " +
+                    "ON DELETE CASCADE" +
+
+                    ");";
     private static final String CREATE_BUDGET_TABLE =
             "CREATE TABLE " + TABLE_BUDGET + " (" +
                     BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -389,6 +456,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     TABLE_USER + "(" + USER_ID + ")," +
                     "FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " +
                     TABLE_CATEGORY + "(" + CATEGORY_ID + ")" +
+                    ");";
+
+    //========================================================
+// CREATE FAMILY BUDGET TABLE
+//========================================================
+
+    private static final String CREATE_FAMILY_BUDGET_TABLE =
+            "CREATE TABLE " + TABLE_FAMILY_BUDGET + " (" +
+
+                    FAMILY_BUDGET_ID +
+                    " INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                    FAMILY_ID +
+                    " INTEGER NOT NULL," +
+
+                    FAMILY_BUDGET_LIMIT +
+                    " REAL NOT NULL DEFAULT 0," +
+
+                    FAMILY_BUDGET_START_DATE +
+                    " TEXT," +
+
+                    FAMILY_BUDGET_END_DATE +
+                    " TEXT," +
+
+                    FAMILY_BUDGET_UPDATED_AT +
+                    " INTEGER," +
+
+                    "FOREIGN KEY(" + FAMILY_ID + ") REFERENCES " +
+                    TABLE_FAMILY + "(" + FAMILY_ID + ") " +
+                    "ON DELETE CASCADE" +
+
                     ");";
     private static final String CREATE_SUBSCRIPTION_TABLE =
             "CREATE TABLE " + TABLE_SUBSCRIPTION + " (" +
@@ -507,51 +605,113 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(
+            SQLiteDatabase db,
+            int oldVersion,
+            int newVersion
+    ) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REPORT);
+        // -------------------------------------------------
+        // VERSION 8 -> VERSION 9
+        // Add expense-family sharing support
+        // -------------------------------------------------
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ALERT);
+        if (oldVersion < 9) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USAGE_DATA);
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                            TABLE_EXPENSE_FAMILY_SHARE + " (" +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SUBSCRIPTION);
+                            SHARE_ID +
+                            " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET);
+                            TRANSACTION_ID +
+                            " INTEGER NOT NULL UNIQUE," +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSACTION);
+                            FAMILY_ID +
+                            " INTEGER NOT NULL," +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENT_METHOD);
+                            SHARED_BY +
+                            " INTEGER NOT NULL," +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
+                            SHARED_AT +
+                            " INTEGER NOT NULL," +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY_MEMBER);
+                            "FOREIGN KEY(" +
+                            TRANSACTION_ID +
+                            ") REFERENCES " +
+                            TABLE_TRANSACTION +
+                            "(" + TRANSACTION_ID + ") " +
+                            "ON DELETE CASCADE," +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY);
+                            "FOREIGN KEY(" +
+                            FAMILY_ID +
+                            ") REFERENCES " +
+                            TABLE_FAMILY +
+                            "(" + FAMILY_ID + ") " +
+                            "ON DELETE CASCADE," +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAMILY_USER);
+                            "FOREIGN KEY(" +
+                            SHARED_BY +
+                            ") REFERENCES " +
+                            TABLE_USER +
+                            "(" + USER_ID + ") " +
+                            "ON DELETE CASCADE" +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PERSONAL_USER);
+                            ")"
+            );
+        }
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        // -------------------------------------------------
+// VERSION 9 -> VERSION 10
+// Add family budget support
+// -------------------------------------------------
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET_SETTINGS);
+        if (oldVersion < 10) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFICATION);
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                            TABLE_FAMILY_BUDGET + " (" +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFICATION_PREFERENCES);
+                            FAMILY_BUDGET_ID +
+                            " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FINANCIAL_PREFERENCES);
+                            FAMILY_ID +
+                            " INTEGER NOT NULL," +
 
-        onCreate(db);
+                            FAMILY_BUDGET_LIMIT +
+                            " REAL NOT NULL DEFAULT 0," +
+
+                            FAMILY_BUDGET_START_DATE +
+                            " TEXT," +
+
+                            FAMILY_BUDGET_END_DATE +
+                            " TEXT," +
+
+                            FAMILY_BUDGET_UPDATED_AT +
+                            " INTEGER," +
+
+                            "FOREIGN KEY(" + FAMILY_ID + ") REFERENCES " +
+                            TABLE_FAMILY + "(" + FAMILY_ID + ") " +
+                            "ON DELETE CASCADE" +
+
+                            ")"
+            );
+        }
     }
 
     @Override
-    public void onDowngrade(SQLiteDatabase db,
-                            int oldVersion,
-                            int newVersion) {
+    public void onDowngrade(
+            SQLiteDatabase db,
+            int oldVersion,
+            int newVersion
+    ) {
 
-        onUpgrade(db, oldVersion, newVersion);
+        throw new SQLiteException(
+                "Database downgrade is not supported. " +
+                        "Old version: " + oldVersion +
+                        ", New version: " + newVersion
+        );
     }
 
 
@@ -2982,6 +3142,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return categoryId;
     }
+
+
     public ArrayList<ExpenseModel> getAllExpenses(int userId) {
 
         ArrayList<ExpenseModel> expenseList = new ArrayList<>();
@@ -2989,49 +3151,116 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
 
         String query =
-                "SELECT t." + TRANSACTION_ID +
-                        ", c." + CATEGORY_NAME +
-                        ", p." + METHOD_NAME +
-                        ", t." + AMOUNT +
-                        ", t." + TRANSACTION_DATE +
-                        ", t." + SOURCE +
-                        ", t." + EXPENSE_MODE +
+                "SELECT " +
+
+                        "t." + TRANSACTION_ID + ", " +       // 0
+                        "t." + CATEGORY_ID + ", " +          // 1
+                        "t." + PAYMENT_METHOD_ID + ", " +    // 2
+                        "c." + CATEGORY_NAME + ", " +        // 3
+                        "p." + METHOD_NAME + ", " +          // 4
+                        "t." + AMOUNT + ", " +               // 5
+                        "t." + TRANSACTION_DATE + ", " +     // 6
+                        "t." + SOURCE + ", " +               // 7
+                        "t." + EXPENSE_MODE + ", " +         // 8
+
+                        "efs." + FAMILY_ID + ", " +          // 9
+                        "f." + FAMILY_NAME +                 // 10
 
                         " FROM " + TABLE_TRANSACTION + " t " +
 
                         " INNER JOIN " + TABLE_CATEGORY + " c " +
-                        " ON t." + CATEGORY_ID + " = c." + CATEGORY_ID +
+                        " ON t." + CATEGORY_ID +
+                        " = c." + CATEGORY_ID +
 
                         " INNER JOIN " + TABLE_PAYMENT_METHOD + " p " +
-                        " ON t." + PAYMENT_METHOD_ID + " = p." + PAYMENT_METHOD_ID +
+                        " ON t." + PAYMENT_METHOD_ID +
+                        " = p." + PAYMENT_METHOD_ID +
+
+                        // Family sharing is optional
+                        " LEFT JOIN " + TABLE_EXPENSE_FAMILY_SHARE + " efs " +
+                        " ON t." + TRANSACTION_ID +
+                        " = efs." + TRANSACTION_ID +
+
+                        " LEFT JOIN " + TABLE_FAMILY + " f " +
+                        " ON efs." + FAMILY_ID +
+                        " = f." + FAMILY_ID +
 
                         " WHERE t." + USER_ID + "=? " +
+
                         " AND t." + TRANSACTION_TYPE + "='Expense' " +
 
                         " ORDER BY t." + TRANSACTION_DATE + " DESC";
 
         Cursor cursor = db.rawQuery(
                 query,
-                new String[]{String.valueOf(userId)}
+                new String[]{
+                        String.valueOf(userId)
+                }
         );
 
         while (cursor.moveToNext()) {
 
             ExpenseModel expense = new ExpenseModel();
 
-            expense.setTransactionId(cursor.getInt(0));
+            expense.setTransactionId(
+                    cursor.getInt(0)
+            );
 
-            expense.setCategoryName(cursor.getString(1));
+            expense.setCategoryId(
+                    cursor.getInt(1)
+            );
 
-            expense.setPaymentMethod(cursor.getString(2));
+            expense.setPaymentMethodId(
+                    cursor.getInt(2)
+            );
 
-            expense.setAmount(cursor.getDouble(3));
+            expense.setCategoryName(
+                    cursor.getString(3)
+            );
 
-            expense.setTransactionDate(cursor.getString(4));
+            expense.setPaymentMethod(
+                    cursor.getString(4)
+            );
 
-            expense.setNote(cursor.getString(5));
+            expense.setAmount(
+                    cursor.getDouble(5)
+            );
 
-            expense.setExpenseMode(cursor.getString(6));
+            expense.setTransactionDate(
+                    cursor.getString(6)
+            );
+
+            expense.setNote(
+                    cursor.getString(7)
+            );
+
+            // Legacy field
+            expense.setExpenseMode(
+                    cursor.getString(8)
+            );
+
+
+            // =================================================
+            // FAMILY SHARING
+            // =================================================
+
+            if (!cursor.isNull(9)) {
+
+                expense.setSharedFamilyId(
+                        cursor.getInt(9)
+                );
+
+                expense.setSharedFamilyName(
+                        cursor.getString(10)
+                );
+
+            } else {
+
+                expense.setSharedFamilyId(-1);
+
+                expense.setSharedFamilyName(null);
+            }
+
 
             expenseList.add(expense);
         }
@@ -3039,16 +3268,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return expenseList;
-    }
-    public int deleteExpense(int transactionId) {
-
-        SQLiteDatabase db = getWritableDatabase();
-
-        return db.delete(
-                TABLE_TRANSACTION,
-                TRANSACTION_ID + "=?",
-                new String[]{String.valueOf(transactionId)}
-        );
     }
     public Cursor getExpenseById(int transactionId) {
 
@@ -4706,7 +4925,122 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // =====================================================
 // FAMILY MANAGEMENT METHODS
 // =====================================================
+// =====================================================
+// GET ALL FAMILY IDS FOR USER
+// =====================================================
 
+    public ArrayList<Integer> getFamilyIdsForUser(int userId) {
+
+        ArrayList<Integer> familyIds =
+                new ArrayList<>();
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        String query =
+
+                "SELECT f." +
+                        FAMILY_ID +
+
+                        " FROM " +
+                        TABLE_FAMILY_MEMBER +
+                        " fm " +
+
+                        "INNER JOIN " +
+                        TABLE_FAMILY +
+                        " f " +
+
+                        "ON fm." +
+                        FAMILY_ID +
+                        " = f." +
+                        FAMILY_ID +
+
+                        " WHERE fm." +
+                        USER_ID +
+                        "=?" +
+
+                        " ORDER BY f." +
+                        FAMILY_CREATED_AT +
+                        " DESC";
+
+        Cursor cursor =
+                db.rawQuery(
+                        query,
+                        new String[]{
+                                String.valueOf(userId)
+                        }
+                );
+
+        while (cursor.moveToNext()) {
+
+            familyIds.add(
+                    cursor.getInt(0)
+            );
+        }
+
+        cursor.close();
+
+        return familyIds;
+    }
+
+
+    // =====================================================
+// GET ALL FAMILY NAMES FOR USER
+// =====================================================
+
+    public ArrayList<String> getFamilyNamesForUser(int userId) {
+
+        ArrayList<String> familyNames =
+                new ArrayList<>();
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        String query =
+
+                "SELECT f." +
+                        FAMILY_NAME +
+
+                        " FROM " +
+                        TABLE_FAMILY_MEMBER +
+                        " fm " +
+
+                        "INNER JOIN " +
+                        TABLE_FAMILY +
+                        " f " +
+
+                        "ON fm." +
+                        FAMILY_ID +
+                        " = f." +
+                        FAMILY_ID +
+
+                        " WHERE fm." +
+                        USER_ID +
+                        "=?" +
+
+                        " ORDER BY f." +
+                        FAMILY_CREATED_AT +
+                        " DESC";
+
+        Cursor cursor =
+                db.rawQuery(
+                        query,
+                        new String[]{
+                                String.valueOf(userId)
+                        }
+                );
+
+        while (cursor.moveToNext()) {
+
+            familyNames.add(
+                    cursor.getString(0)
+            );
+        }
+
+        cursor.close();
+
+        return familyNames;
+    }
 
 // =====================================================
 // CREATE FAMILY
@@ -5376,6 +5710,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         try {
 
+
+// ---------------------------------------------
+// REMOVE EXPENSE SHARING RELATIONSHIPS
+// ---------------------------------------------
+
+            db.delete(
+                    TABLE_EXPENSE_FAMILY_SHARE,
+                    FAMILY_ID + "=?",
+                    new String[]{
+                            String.valueOf(familyId)
+                    }
+            );
+
+
             // ---------------------------------------------
             // DELETE FAMILY MEMBERS
             // ---------------------------------------------
@@ -5865,6 +6213,695 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return firestoreFamilyId;
+    }
+
+    // =====================================================
+// SHARE EXPENSE WITH FAMILY
+// =====================================================
+
+    public boolean shareExpenseWithFamily(
+            int transactionId,
+            int familyId,
+            int sharedByUserId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        // Make sure the selected family belongs
+        // to / contains this user.
+        if (!isFamilyMember(
+                familyId,
+                sharedByUserId
+        )) {
+
+            return false;
+        }
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(
+                TRANSACTION_ID,
+                transactionId
+        );
+
+        values.put(
+                FAMILY_ID,
+                familyId
+        );
+
+        values.put(
+                SHARED_BY,
+                sharedByUserId
+        );
+
+        values.put(
+                SHARED_AT,
+                System.currentTimeMillis()
+        );
+
+        long result =
+                db.insertWithOnConflict(
+
+                        TABLE_EXPENSE_FAMILY_SHARE,
+
+                        null,
+
+                        values,
+
+                        SQLiteDatabase.CONFLICT_REPLACE
+                );
+
+        return result != -1;
+    }
+
+    // =====================================================
+// GET FAMILY ID FOR EXPENSE
+// =====================================================
+
+    public int getFamilyIdForExpense(
+            int transactionId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT " +
+                                FAMILY_ID +
+
+                                " FROM " +
+                                TABLE_EXPENSE_FAMILY_SHARE +
+
+                                " WHERE " +
+                                TRANSACTION_ID +
+                                "=? LIMIT 1",
+
+                        new String[]{
+                                String.valueOf(transactionId)
+                        }
+                );
+
+        int familyId = -1;
+
+        if (cursor.moveToFirst()) {
+
+            familyId =
+                    cursor.getInt(0);
+        }
+
+        cursor.close();
+
+        return familyId;
+    }
+
+    // =====================================================
+// CHECK IF EXPENSE IS SHARED
+// =====================================================
+
+    public boolean isExpenseSharedWithFamily(
+            int transactionId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT COUNT(*) " +
+
+                                "FROM " +
+                                TABLE_EXPENSE_FAMILY_SHARE +
+
+                                " WHERE " +
+                                TRANSACTION_ID +
+                                "=?",
+
+                        new String[]{
+                                String.valueOf(transactionId)
+                        }
+                );
+
+        boolean shared = false;
+
+        if (cursor.moveToFirst()) {
+
+            shared =
+                    cursor.getInt(0) > 0;
+        }
+
+        cursor.close();
+
+        return shared;
+    }
+
+    // =====================================================
+// REMOVE EXPENSE FROM FAMILY
+// =====================================================
+
+    public boolean removeExpenseFromFamily(
+            int transactionId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        int deletedRows =
+                db.delete(
+
+                        TABLE_EXPENSE_FAMILY_SHARE,
+
+                        TRANSACTION_ID + "=?",
+
+                        new String[]{
+                                String.valueOf(transactionId)
+                        }
+                );
+
+        return deletedRows > 0;
+    }
+
+    // =====================================================
+// GET EXPENSES SHARED WITH SPECIFIC FAMILY
+// =====================================================
+
+    public ArrayList<ExpenseModel> getFamilyExpenses(
+            int familyId
+    ) {
+
+        ArrayList<ExpenseModel> expenseList =
+                new ArrayList<>();
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        String query =
+
+                "SELECT " +
+
+                        "t." + TRANSACTION_ID + ", " +
+
+                        "c." + CATEGORY_NAME + ", " +
+
+                        "p." + METHOD_NAME + ", " +
+
+                        "t." + AMOUNT + ", " +
+
+                        "t." + TRANSACTION_DATE + ", " +
+
+                        "t." + SOURCE +
+
+                        " FROM " +
+                        TABLE_EXPENSE_FAMILY_SHARE +
+                        " efs " +
+
+                        "INNER JOIN " +
+                        TABLE_TRANSACTION +
+                        " t ON efs." +
+                        TRANSACTION_ID +
+                        " = t." +
+                        TRANSACTION_ID + " " +
+
+                        "INNER JOIN " +
+                        TABLE_CATEGORY +
+                        " c ON t." +
+                        CATEGORY_ID +
+                        " = c." +
+                        CATEGORY_ID + " " +
+
+                        "INNER JOIN " +
+                        TABLE_PAYMENT_METHOD +
+                        " p ON t." +
+                        PAYMENT_METHOD_ID +
+                        " = p." +
+                        PAYMENT_METHOD_ID +
+
+                        " WHERE efs." +
+                        FAMILY_ID +
+                        "=?" +
+
+                        " AND t." +
+                        TRANSACTION_TYPE +
+                        "='Expense'" +
+
+                        " ORDER BY t." +
+                        TRANSACTION_DATE +
+                        " DESC";
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        query,
+
+                        new String[]{
+                                String.valueOf(familyId)
+                        }
+                );
+
+        while (cursor.moveToNext()) {
+
+            ExpenseModel expense =
+                    new ExpenseModel();
+
+            expense.setTransactionId(
+                    cursor.getInt(0)
+            );
+
+            expense.setCategoryName(
+                    cursor.getString(1)
+            );
+
+            expense.setPaymentMethod(
+                    cursor.getString(2)
+            );
+
+            expense.setAmount(
+                    cursor.getDouble(3)
+            );
+
+            expense.setTransactionDate(
+                    cursor.getString(4)
+            );
+
+            expense.setNote(
+                    cursor.getString(5)
+            );
+
+            // Temporary compatibility with your model
+            expense.setExpenseMode("Family");
+
+            expenseList.add(expense);
+        }
+
+        cursor.close();
+
+        return expenseList;
+    }
+
+    // =====================================================
+// GET TOTAL EXPENSE FOR SPECIFIC FAMILY
+// =====================================================
+
+    public double getFamilyTotalExpense(
+            int familyId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        String query =
+
+                "SELECT IFNULL(SUM(t." +
+                        AMOUNT +
+                        "),0) " +
+
+                        "FROM " +
+                        TABLE_EXPENSE_FAMILY_SHARE +
+                        " efs " +
+
+                        "INNER JOIN " +
+                        TABLE_TRANSACTION +
+                        " t ON efs." +
+                        TRANSACTION_ID +
+                        " = t." +
+                        TRANSACTION_ID +
+
+                        " WHERE efs." +
+                        FAMILY_ID +
+                        "=?" +
+
+                        " AND t." +
+                        TRANSACTION_TYPE +
+                        "='Expense'";
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        query,
+
+                        new String[]{
+                                String.valueOf(familyId)
+                        }
+                );
+
+        double total = 0;
+
+        if (cursor.moveToFirst()) {
+
+            total =
+                    cursor.getDouble(0);
+        }
+
+        cursor.close();
+
+        return total;
+    }
+
+    // =========================================================
+// GET FAMILY NAME BY ID
+// =========================================================
+
+    public String getFamilyNameById(int familyId) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String familyName = null;
+
+        Cursor cursor = db.rawQuery(
+                "SELECT " + FAMILY_NAME +
+                        " FROM " + TABLE_FAMILY +
+                        " WHERE " + FAMILY_ID + " = ?",
+                new String[]{
+                        String.valueOf(familyId)
+                }
+        );
+
+        if (cursor.moveToFirst()) {
+            familyName = cursor.getString(0);
+        }
+
+        cursor.close();
+
+        return familyName;
+    }
+
+    // =========================================================
+// DELETE EXPENSE
+// =========================================================
+
+    public int deleteExpense(int transactionId) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        int result = 0;
+
+        db.beginTransaction();
+
+        try {
+
+            // Remove family sharing relationship first
+            db.delete(
+                    TABLE_EXPENSE_FAMILY_SHARE,
+                    TRANSACTION_ID + "=?",
+                    new String[]{
+                            String.valueOf(transactionId)
+                    }
+            );
+
+            // Delete the actual expense transaction
+            result = db.delete(
+                    TABLE_TRANSACTION,
+                    TRANSACTION_ID + "=? AND " +
+                            TRANSACTION_TYPE + "=?",
+                    new String[]{
+                            String.valueOf(transactionId),
+                            "Expense"
+                    }
+            );
+
+            db.setTransactionSuccessful();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            db.endTransaction();
+        }
+
+        return result;
+    }
+
+    // =========================================================
+// FILTER EXPENSES BY SHARING STATUS
+// =========================================================
+
+    public ArrayList<ExpenseModel> filterExpensesBySharing(
+            int userId,
+            String category,
+            String paymentMethod,
+            String sharing,
+            String sort
+    ) {
+
+        ArrayList<ExpenseModel> expenseList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        StringBuilder query = new StringBuilder();
+
+        ArrayList<String> args = new ArrayList<>();
+
+
+        // =====================================================
+        // BASE QUERY
+        // =====================================================
+
+        query.append(
+                "SELECT " +
+
+                        "t." + TRANSACTION_ID + ", " +        // 0
+                        "t." + CATEGORY_ID + ", " +           // 1
+                        "t." + PAYMENT_METHOD_ID + ", " +     // 2
+
+                        "c." + CATEGORY_NAME + ", " +         // 3
+                        "p." + METHOD_NAME + ", " +           // 4
+
+                        "t." + AMOUNT + ", " +                // 5
+                        "t." + TRANSACTION_DATE + ", " +      // 6
+                        "t." + SOURCE + ", " +                // 7
+
+                        "t." + EXPENSE_MODE + ", " +          // 8
+
+                        "efs." + FAMILY_ID + ", " +           // 9
+                        "f." + FAMILY_NAME +                  // 10
+
+                        " FROM " + TABLE_TRANSACTION + " t " +
+
+                        " INNER JOIN " + TABLE_CATEGORY + " c " +
+                        " ON t." + CATEGORY_ID +
+                        " = c." + CATEGORY_ID +
+
+                        " INNER JOIN " + TABLE_PAYMENT_METHOD + " p " +
+                        " ON t." + PAYMENT_METHOD_ID +
+                        " = p." + PAYMENT_METHOD_ID +
+
+                        " LEFT JOIN " + TABLE_EXPENSE_FAMILY_SHARE + " efs " +
+                        " ON t." + TRANSACTION_ID +
+                        " = efs." + TRANSACTION_ID +
+
+                        " LEFT JOIN " + TABLE_FAMILY + " f " +
+                        " ON efs." + FAMILY_ID +
+                        " = f." + FAMILY_ID +
+
+                        " WHERE t." + USER_ID + "=? " +
+
+                        " AND t." + TRANSACTION_TYPE +
+                        "='Expense' "
+        );
+
+
+        args.add(
+                String.valueOf(userId)
+        );
+
+
+        // =====================================================
+        // CATEGORY FILTER
+        // =====================================================
+
+        if (category != null &&
+                !category.equalsIgnoreCase("All")) {
+
+            query.append(
+                    " AND c." +
+                            CATEGORY_NAME +
+                            "=? "
+            );
+
+            args.add(category);
+        }
+
+
+        // =====================================================
+        // PAYMENT FILTER
+        // =====================================================
+
+        if (paymentMethod != null &&
+                !paymentMethod.equalsIgnoreCase("All")) {
+
+            query.append(
+                    " AND p." +
+                            METHOD_NAME +
+                            "=? "
+            );
+
+            args.add(paymentMethod);
+        }
+
+
+        // =====================================================
+        // SHARING FILTER
+        // =====================================================
+
+        if ("Shared".equalsIgnoreCase(sharing)) {
+
+            query.append(
+                    " AND efs." +
+                            TRANSACTION_ID +
+                            " IS NOT NULL "
+            );
+
+        } else if ("Not Shared".equalsIgnoreCase(sharing)) {
+
+            query.append(
+                    " AND efs." +
+                            TRANSACTION_ID +
+                            " IS NULL "
+            );
+        }
+
+
+        // =====================================================
+        // SORT
+        // =====================================================
+
+        if ("Oldest".equalsIgnoreCase(sort)) {
+
+            query.append(
+                    " ORDER BY t." +
+                            TRANSACTION_DATE +
+                            " ASC"
+            );
+
+        } else if ("Highest Amount".equalsIgnoreCase(sort)) {
+
+            query.append(
+                    " ORDER BY t." +
+                            AMOUNT +
+                            " DESC"
+            );
+
+        } else if ("Lowest Amount".equalsIgnoreCase(sort)) {
+
+            query.append(
+                    " ORDER BY t." +
+                            AMOUNT +
+                            " ASC"
+            );
+
+        } else {
+
+            // Default: Newest
+
+            query.append(
+                    " ORDER BY t." +
+                            TRANSACTION_DATE +
+                            " DESC"
+            );
+        }
+
+
+        // =====================================================
+        // EXECUTE QUERY
+        // =====================================================
+
+        Cursor cursor = db.rawQuery(
+                query.toString(),
+                args.toArray(new String[0])
+        );
+
+
+        // =====================================================
+        // CREATE MODELS
+        // =====================================================
+
+        while (cursor.moveToNext()) {
+
+            ExpenseModel expense = new ExpenseModel();
+
+
+            expense.setTransactionId(
+                    cursor.getInt(0)
+            );
+
+
+            expense.setCategoryId(
+                    cursor.getInt(1)
+            );
+
+
+            expense.setPaymentMethodId(
+                    cursor.getInt(2)
+            );
+
+
+            expense.setCategoryName(
+                    cursor.getString(3)
+            );
+
+
+            expense.setPaymentMethod(
+                    cursor.getString(4)
+            );
+
+
+            expense.setAmount(
+                    cursor.getDouble(5)
+            );
+
+
+            expense.setTransactionDate(
+                    cursor.getString(6)
+            );
+
+
+            expense.setNote(
+                    cursor.getString(7)
+            );
+
+
+            // Legacy compatibility
+            expense.setExpenseMode(
+                    cursor.getString(8)
+            );
+
+
+            // =================================================
+            // FAMILY SHARING
+            // =================================================
+
+            if (!cursor.isNull(9)) {
+
+                expense.setSharedFamilyId(
+                        cursor.getInt(9)
+                );
+
+
+                expense.setSharedFamilyName(
+                        cursor.getString(10)
+                );
+
+            } else {
+
+                expense.setSharedFamilyId(-1);
+
+                expense.setSharedFamilyName(null);
+            }
+
+
+            expenseList.add(expense);
+        }
+
+
+        cursor.close();
+
+        return expenseList;
     }
 
 }

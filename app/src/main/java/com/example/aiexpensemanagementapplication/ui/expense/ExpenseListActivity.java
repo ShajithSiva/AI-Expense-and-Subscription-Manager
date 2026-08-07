@@ -2,66 +2,48 @@ package com.example.aiexpensemanagementapplication.ui.expense;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.aiexpensemanagementapplication.R;
+import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
-import com.example.aiexpensemanagementapplication.ui.dashboard.PersonalDashboardActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
-import com.example.aiexpensemanagementapplication.ui.profile.EditProfileActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
 import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
-import androidx.recyclerview.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import com.google.android.material.chip.Chip;
-import android.widget.Button;
-import android.widget.Spinner;
-import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-
-
+import com.google.android.material.chip.Chip;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-
-import android.widget.EditText;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.aiexpensemanagementapplication.R;
-
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class ExpenseListActivity extends AppCompatActivity {
 
+    // =========================================================
+    // UI
+    // =========================================================
+
     private RecyclerView rvExpenses;
 
-    private ExpenseAdapter adapter;
-
-    private ArrayList<ExpenseModel> expenseList;
-
-    private DatabaseHelper databaseHelper;
-
-    private FirebaseAuth mAuth;
-
-    private BottomNavigationView bottomNavigation;
-
-    private ImageButton btnFilter;
-
-    private FirebaseUser currentUser;
-
     private TextView tvTotalExpense;
-
     private TextView tvExpenseCount;
 
     private LinearLayout layoutEmpty;
@@ -69,14 +51,45 @@ public class ExpenseListActivity extends AppCompatActivity {
     private ExtendedFloatingActionButton fabAddExpense;
 
     private EditText etSearch;
+
     private Chip chipAll;
     private Chip chipFood;
     private Chip chipTransport;
     private Chip chipShopping;
     private Chip chipBills;
 
+    private ImageButton btnFilter;
+
+    private BottomNavigationView bottomNavigation;
+
+
+    // =========================================================
+    // DATA
+    // =========================================================
+
+    private ExpenseAdapter adapter;
+
+    private ArrayList<ExpenseModel> expenseList;
+
+    private DatabaseHelper databaseHelper;
+
+
+    // =========================================================
+    // FIREBASE
+    // =========================================================
+
+    private FirebaseAuth mAuth;
+
+    private FirebaseUser currentUser;
+
+
+    // =========================================================
+    // ON CREATE
+    // =========================================================
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_expense_list);
@@ -89,148 +102,331 @@ public class ExpenseListActivity extends AppCompatActivity {
 
         listeners();
     }
+
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
     private void initialize() {
 
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper =
+                new DatabaseHelper(this);
 
-        mAuth = FirebaseAuth.getInstance();
 
-        currentUser = mAuth.getCurrentUser();
+        mAuth =
+                FirebaseAuth.getInstance();
 
-        rvExpenses = findViewById(R.id.rvExpenses);
 
-        tvTotalExpense = findViewById(R.id.tvTotalExpense);
+        currentUser =
+                mAuth.getCurrentUser();
 
-        tvExpenseCount = findViewById(R.id.tvExpenseCount);
 
-        layoutEmpty = findViewById(R.id.layoutEmpty);
+        // -----------------------------------------------------
+        // RecyclerView
+        // -----------------------------------------------------
 
-        fabAddExpense = findViewById(R.id.fabAddExpense);
+        rvExpenses =
+                findViewById(R.id.rvExpenses);
 
-        etSearch = findViewById(R.id.etSearch);
-
-        chipAll = findViewById(R.id.chipAll);
-
-        bottomNavigation = findViewById(R.id.bottomNavigation);
-
-        chipFood = findViewById(R.id.chipFood);
-
-        chipTransport = findViewById(R.id.chipTransport);
-
-        chipShopping = findViewById(R.id.chipShopping);
-
-        chipBills = findViewById(R.id.chipBills);
-
-        btnFilter = findViewById(R.id.btnFilter);
-
-        expenseList = new ArrayList<>();
 
         rvExpenses.setLayoutManager(
-                new LinearLayoutManager(this));
+                new LinearLayoutManager(this)
+        );
+
+
+        // -----------------------------------------------------
+        // Summary
+        // -----------------------------------------------------
+
+        tvTotalExpense =
+                findViewById(R.id.tvTotalExpense);
+
+
+        tvExpenseCount =
+                findViewById(R.id.tvExpenseCount);
+
+
+        // -----------------------------------------------------
+        // Empty state
+        // -----------------------------------------------------
+
+        layoutEmpty =
+                findViewById(R.id.layoutEmpty);
+
+
+        // -----------------------------------------------------
+        // Add button
+        // -----------------------------------------------------
+
+        fabAddExpense =
+                findViewById(R.id.fabAddExpense);
+
+
+        // -----------------------------------------------------
+        // Search
+        // -----------------------------------------------------
+
+        etSearch =
+                findViewById(R.id.etSearch);
+
+
+        // -----------------------------------------------------
+        // Chips
+        // -----------------------------------------------------
+
+        chipAll =
+                findViewById(R.id.chipAll);
+
+
+        chipFood =
+                findViewById(R.id.chipFood);
+
+
+        chipTransport =
+                findViewById(R.id.chipTransport);
+
+
+        chipShopping =
+                findViewById(R.id.chipShopping);
+
+
+        chipBills =
+                findViewById(R.id.chipBills);
+
+
+        // -----------------------------------------------------
+        // Filter
+        // -----------------------------------------------------
+
+        btnFilter =
+                findViewById(R.id.btnFilter);
+
+
+        // -----------------------------------------------------
+        // Bottom Navigation
+        // -----------------------------------------------------
+
+        bottomNavigation =
+                findViewById(R.id.bottomNavigation);
+
+
+        // -----------------------------------------------------
+        // Expense list
+        // -----------------------------------------------------
+
+        expenseList =
+                new ArrayList<>();
     }
+
+
+    // =========================================================
+    // LISTENERS
+    // =========================================================
 
     private void listeners() {
 
-        fabAddExpense.setOnClickListener(v -> {
+        // -----------------------------------------------------
+        // ADD EXPENSE
+        // -----------------------------------------------------
 
-            Intent intent =
-                    new Intent(
-                            this,
-                            AddExpenseActivity.class);
+        fabAddExpense.setOnClickListener(
+                v -> {
 
-            startActivity(intent);
+                    Intent intent =
+                            new Intent(
+                                    ExpenseListActivity.this,
+                                    AddExpenseActivity.class
+                            );
 
-        });
-        chipAll.setOnClickListener(v -> loadExpenses());
 
-        chipFood.setOnClickListener(v ->
-                filterCategory("Food"));
+                    startActivity(intent);
+                }
+        );
 
-        chipTransport.setOnClickListener(v ->
-                filterCategory("Transport"));
 
-        chipShopping.setOnClickListener(v ->
-                filterCategory("Shopping"));
+        // -----------------------------------------------------
+        // CATEGORY CHIPS
+        // -----------------------------------------------------
 
-        chipBills.setOnClickListener(v ->
-                filterCategory("Bills"));
+        chipAll.setOnClickListener(
+                v -> loadExpenses()
+        );
 
-        btnFilter.setOnClickListener(v -> showFilterDialog());
 
-        etSearch.addTextChangedListener(new TextWatcher() {
+        chipFood.setOnClickListener(
+                v -> filterCategory("Food")
+        );
 
-            @Override
-            public void beforeTextChanged(CharSequence s,
-                                          int start,
-                                          int count,
-                                          int after) {
 
-            }
+        chipTransport.setOnClickListener(
+                v -> filterCategory("Transport")
+        );
 
-            @Override
-            public void onTextChanged(CharSequence s,
-                                      int start,
-                                      int before,
-                                      int count) {
 
-                searchExpense(s.toString());
+        chipShopping.setOnClickListener(
+                v -> filterCategory("Shopping")
+        );
 
-            }
 
-            @Override
-            public void afterTextChanged(Editable s) {
+        chipBills.setOnClickListener(
+                v -> filterCategory("Bills")
+        );
 
-            }
 
-        });
+        // -----------------------------------------------------
+        // FILTER
+        // -----------------------------------------------------
 
+        btnFilter.setOnClickListener(
+                v -> showFilterDialog()
+        );
+
+
+        // -----------------------------------------------------
+        // SEARCH
+        // -----------------------------------------------------
+
+        etSearch.addTextChangedListener(
+                new TextWatcher() {
+
+                    @Override
+                    public void beforeTextChanged(
+                            CharSequence s,
+                            int start,
+                            int count,
+                            int after
+                    ) {
+
+                    }
+
+
+                    @Override
+                    public void onTextChanged(
+                            CharSequence s,
+                            int start,
+                            int before,
+                            int count
+                    ) {
+
+                        searchExpense(
+                                s.toString()
+                        );
+                    }
+
+
+                    @Override
+                    public void afterTextChanged(
+                            Editable s
+                    ) {
+
+                    }
+                }
+        );
     }
-    private void filterCategory(String category) {
 
-        if (currentUser == null)
+
+    // =========================================================
+    // FILTER CATEGORY
+    // =========================================================
+
+    private void filterCategory(
+            String category
+    ) {
+
+        if (currentUser == null) {
+
             return;
+        }
+
 
         int userId =
                 databaseHelper.getUserIdByFirebaseUid(
-                        currentUser.getUid());
+                        currentUser.getUid()
+                );
 
-        adapter.updateList(
 
+        if (userId == -1) {
+
+            return;
+        }
+
+
+        ArrayList<ExpenseModel> filteredList =
                 databaseHelper.getExpensesByCategory(
                         userId,
-                        category)
-        );
-        tvExpenseCount.setText(adapter.getItemCount() + " Transactions");
+                        category
+                );
 
+
+        adapter.updateList(
+                filteredList
+        );
+
+
+        updateDisplayedListSummary(
+                filteredList
+        );
     }
+
+
+    // =========================================================
+    // FILTER DIALOG
+    // =========================================================
 
     private void showFilterDialog() {
 
         BottomSheetDialog dialog =
                 new BottomSheetDialog(this);
 
-        View view = getLayoutInflater()
-                .inflate(R.layout.dialog_filter_expense, null);
 
-        dialog.setContentView(view);
+        View view =
+                getLayoutInflater().inflate(
+                        R.layout.dialog_filter_expense,
+                        null
+                );
+
+
+        dialog.setContentView(
+                view
+        );
+
 
         Spinner spCategory =
-                view.findViewById(R.id.spCategoryFilter);
+                view.findViewById(
+                        R.id.spCategoryFilter
+                );
+
 
         Spinner spPayment =
-                view.findViewById(R.id.spPaymentFilter);
+                view.findViewById(
+                        R.id.spPaymentFilter
+                );
+
 
         Spinner spMode =
-                view.findViewById(R.id.spModeFilter);
+                view.findViewById(
+                        R.id.spModeFilter
+                );
+
 
         Spinner spSort =
-                view.findViewById(R.id.spSort);
+                view.findViewById(
+                        R.id.spSort
+                );
+
 
         Button btnApply =
-                view.findViewById(R.id.btnApply);
+                view.findViewById(
+                        R.id.btnApply
+                );
+
 
         Button btnReset =
-                view.findViewById(R.id.btnReset);
+                view.findViewById(
+                        R.id.btnReset
+                );
+
 
         loadFilterData(
                 spCategory,
@@ -239,125 +435,233 @@ public class ExpenseListActivity extends AppCompatActivity {
                 spSort
         );
 
-        btnApply.setOnClickListener(v -> {
 
-            applyFilters(
+        // -----------------------------------------------------
+        // APPLY
+        // -----------------------------------------------------
 
-                    spCategory.getSelectedItem().toString(),
+        btnApply.setOnClickListener(
+                v -> {
 
-                    spPayment.getSelectedItem().toString(),
+                    if (spCategory.getSelectedItem() == null ||
+                            spPayment.getSelectedItem() == null ||
+                            spMode.getSelectedItem() == null ||
+                            spSort.getSelectedItem() == null) {
 
-                    spMode.getSelectedItem().toString(),
+                        return;
+                    }
 
-                    spSort.getSelectedItem().toString()
 
-            );
+                    applyFilters(
 
-            dialog.dismiss();
+                            spCategory
+                                    .getSelectedItem()
+                                    .toString(),
 
-        });
+                            spPayment
+                                    .getSelectedItem()
+                                    .toString(),
 
-        btnReset.setOnClickListener(v -> {
+                            spMode
+                                    .getSelectedItem()
+                                    .toString(),
 
-            loadExpenses();
+                            spSort
+                                    .getSelectedItem()
+                                    .toString()
+                    );
 
-            dialog.dismiss();
 
-        });
+                    dialog.dismiss();
+                }
+        );
+
+
+        // -----------------------------------------------------
+        // RESET
+        // -----------------------------------------------------
+
+        btnReset.setOnClickListener(
+                v -> {
+
+                    loadExpenses();
+
+                    dialog.dismiss();
+                }
+        );
+
 
         dialog.show();
-
     }
+
+
+    // =========================================================
+    // LOAD FILTER DATA
+    // =========================================================
+
     private void loadFilterData(
 
             Spinner spCategory,
 
             Spinner spPayment,
 
-            Spinner spMode,
+            Spinner spSharing,
 
             Spinner spSort
 
     ) {
 
+        // =====================================================
+        // CATEGORY
+        // =====================================================
+
         ArrayList<String> categories =
                 databaseHelper.getExpenseCategoryNames();
 
-        categories.add(0, "All");
+
+        /*
+         * Create a copy before inserting "All".
+         * This prevents accidental modification if DatabaseHelper
+         * later returns a shared list.
+         */
+
+        ArrayList<String> categoryOptions =
+                new ArrayList<>(
+                        categories
+                );
+
+
+        categoryOptions.add(
+                0,
+                "All"
+        );
+
 
         ArrayAdapter<String> categoryAdapter =
                 new ArrayAdapter<>(
-
                         this,
-
                         android.R.layout.simple_spinner_dropdown_item,
-
-                        categories
-
+                        categoryOptions
                 );
 
-        spCategory.setAdapter(categoryAdapter);
+
+        spCategory.setAdapter(
+                categoryAdapter
+        );
+
+
+        // =====================================================
+        // PAYMENT METHOD
+        // =====================================================
 
         ArrayList<String> methods =
                 databaseHelper.getPaymentMethodNames();
 
-        methods.add(0, "All");
+
+        ArrayList<String> paymentOptions =
+                new ArrayList<>(
+                        methods
+                );
+
+
+        paymentOptions.add(
+                0,
+                "All"
+        );
+
 
         ArrayAdapter<String> paymentAdapter =
                 new ArrayAdapter<>(
-
                         this,
-
                         android.R.layout.simple_spinner_dropdown_item,
-
-                        methods
-
+                        paymentOptions
                 );
 
-        spPayment.setAdapter(paymentAdapter);
 
-        ArrayList<String> modes = new ArrayList<>();
-
-        modes.add("All");
-        modes.add("Personal");
-        modes.add("Family");
-
-        spMode.setAdapter(
-
-                new ArrayAdapter<>(
-
-                        this,
-
-                        android.R.layout.simple_spinner_dropdown_item,
-
-                        modes
-
-                )
-
+        spPayment.setAdapter(
+                paymentAdapter
         );
 
-        ArrayList<String> sort = new ArrayList<>();
 
-        sort.add("Newest");
-        sort.add("Oldest");
-        sort.add("Highest Amount");
-        sort.add("Lowest Amount");
+        // =====================================================
+        // SHARING FILTER
+        //
+        // OLD:
+        // Personal / Family
+        //
+        // NEW:
+        // All / Not Shared / Shared
+        // =====================================================
+
+        ArrayList<String> sharingOptions =
+                new ArrayList<>();
+
+
+        sharingOptions.add(
+                "All"
+        );
+
+
+        sharingOptions.add(
+                "Not Shared"
+        );
+
+
+        sharingOptions.add(
+                "Shared"
+        );
+
+
+        spSharing.setAdapter(
+                new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        sharingOptions
+                )
+        );
+
+
+        // =====================================================
+        // SORT
+        // =====================================================
+
+        ArrayList<String> sortOptions =
+                new ArrayList<>();
+
+
+        sortOptions.add(
+                "Newest"
+        );
+
+
+        sortOptions.add(
+                "Oldest"
+        );
+
+
+        sortOptions.add(
+                "Highest Amount"
+        );
+
+
+        sortOptions.add(
+                "Lowest Amount"
+        );
+
 
         spSort.setAdapter(
-
                 new ArrayAdapter<>(
-
                         this,
-
                         android.R.layout.simple_spinner_dropdown_item,
-
-                        sort
-
+                        sortOptions
                 )
-
         );
-
     }
+
+
+    // =========================================================
+    // APPLY FILTERS
+    // =========================================================
 
     private void applyFilters(
 
@@ -365,21 +669,51 @@ public class ExpenseListActivity extends AppCompatActivity {
 
             String payment,
 
-            String mode,
+            String sharing,
 
             String sort
 
     ) {
 
-        if(currentUser == null)
+        if (currentUser == null) {
+
             return;
+        }
+
 
         int userId =
                 databaseHelper.getUserIdByFirebaseUid(
-                        currentUser.getUid());
+                        currentUser.getUid()
+                );
+
+
+        if (userId == -1) {
+
+            return;
+        }
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT call the old:
+         *
+         * databaseHelper.filterExpenses(
+         *      userId,
+         *      category,
+         *      payment,
+         *      mode,
+         *      sort
+         * );
+         *
+         * That method still filters ExpenseMode.
+         *
+         * We now use the new sharing-aware method.
+         */
+
 
         ArrayList<ExpenseModel> filteredList =
-                databaseHelper.filterExpenses(
+                databaseHelper.filterExpensesBySharing(
 
                         userId,
 
@@ -387,214 +721,617 @@ public class ExpenseListActivity extends AppCompatActivity {
 
                         payment,
 
-                        mode,
+                        sharing,
 
                         sort
-
                 );
 
-        adapter.updateList(filteredList);
 
-        updateSummary();
+        adapter.updateList(
+                filteredList
+        );
 
+
+        updateDisplayedListSummary(
+                filteredList
+        );
     }
+
+
+    // =========================================================
+    // LOAD ALL USER EXPENSES
+    // =========================================================
 
     private void loadExpenses() {
 
-        if (currentUser == null)
+        if (currentUser == null) {
+
+            showEmptyList();
+
             return;
+        }
+
 
         int userId =
                 databaseHelper.getUserIdByFirebaseUid(
-                        currentUser.getUid());
+                        currentUser.getUid()
+                );
+
+
+        if (userId == -1) {
+
+            showEmptyList();
+
+            return;
+        }
+
+
+        /*
+         * getAllExpenses(userId) is correct here.
+         *
+         * Shared expenses must NOT disappear from the personal
+         * expense list.
+         *
+         * A shared expense is still owned by this user.
+         */
 
         expenseList =
-                databaseHelper.getAllExpenses(userId);
-
-        adapter = new ExpenseAdapter(
-
-                this,
-
-                expenseList,
-
-                new ExpenseAdapter.OnExpenseClickListener() {
+                databaseHelper.getAllExpenses(
+                        userId
+                );
 
 
-                    @Override
-                    public void onExpenseClick(ExpenseModel expense) {
+        // -----------------------------------------------------
+        // CREATE ADAPTER ONLY ONCE
+        // -----------------------------------------------------
 
-                        Intent intent = new Intent(
-                                ExpenseListActivity.this,
-                                ExpenseDetailsActivity.class);
+        if (adapter == null) {
 
-                        intent.putExtra(
-                                "transactionId",
-                                expense.getTransactionId());
+            adapter =
+                    new ExpenseAdapter(
 
-                        startActivity(intent);
+                            this,
 
-                    }
+                            expenseList,
 
-                    @Override
-                    public void onEditClick(ExpenseModel expense) {
+                            new ExpenseAdapter.OnExpenseClickListener() {
 
-                        Toast.makeText(
-                                ExpenseListActivity.this,
-                                "Edit Coming Soon",
-                                Toast.LENGTH_SHORT
-                        ).show();
 
-                    }
+                                // =========================================
+                                // DETAILS
+                                // =========================================
 
-                    @Override
-                    public void onDeleteClick(ExpenseModel expense) {
+                                @Override
+                                public void onExpenseClick(
+                                        ExpenseModel expense
+                                ) {
 
-                        databaseHelper.deleteExpense(
-                                expense.getTransactionId());
+                                    Intent intent =
+                                            new Intent(
+                                                    ExpenseListActivity.this,
+                                                    ExpenseDetailsActivity.class
+                                            );
 
-                        loadExpenses();
 
-                    }
+                                    intent.putExtra(
+                                            "transactionId",
+                                            expense.getTransactionId()
+                                    );
 
-                });
 
-        rvExpenses.setAdapter(adapter);
+                                    startActivity(
+                                            intent
+                                    );
+                                }
 
-        updateSummary();
 
-    }
+                                // =========================================
+                                // EDIT
+                                // =========================================
 
-    private void updateSummary() {
+                                @Override
+                                public void onEditClick(
+                                        ExpenseModel expense
+                                ) {
 
-        if (currentUser == null)
-            return;
+                                    Intent intent =
+                                            new Intent(
+                                                    ExpenseListActivity.this,
+                                                    EditExpenseActivity.class
+                                            );
 
-        int userId =
-                databaseHelper.getUserIdByFirebaseUid(
-                        currentUser.getUid());
 
-        double total =
-                databaseHelper.getTotalExpense(userId);
+                                    intent.putExtra(
+                                            "transactionId",
+                                            expense.getTransactionId()
+                                    );
 
-        int count =
-                databaseHelper.getExpenseCount(userId);
 
-        tvTotalExpense.setText(
-                String.format("Rs. %.2f", total));
+                                    startActivity(
+                                            intent
+                                    );
+                                }
 
-        tvExpenseCount.setText(
-                count + " Transactions");
 
-        if (count == 0) {
+                                // =========================================
+                                // DELETE
+                                // =========================================
 
-            layoutEmpty.setVisibility(View.VISIBLE);
+                                @Override
+                                public void onDeleteClick(
+                                        ExpenseModel expense
+                                ) {
 
-            rvExpenses.setVisibility(View.GONE);
+                                    confirmDeleteExpense(
+                                            expense
+                                    );
+                                }
+                            }
+                    );
+
+
+            rvExpenses.setAdapter(
+                    adapter
+            );
 
         } else {
 
-            layoutEmpty.setVisibility(View.GONE);
-
-            rvExpenses.setVisibility(View.VISIBLE);
-
+            adapter.updateList(
+                    expenseList
+            );
         }
 
+
+        updateSummary();
     }
 
-    private void searchExpense(String keyword) {
 
-        if (currentUser == null)
+    // =========================================================
+    // DELETE CONFIRMATION
+    // =========================================================
+
+    private void confirmDeleteExpense(
+            ExpenseModel expense
+    ) {
+
+        new MaterialAlertDialogBuilder(this)
+
+                .setTitle(
+                        "Delete Expense"
+                )
+
+                .setMessage(
+                        "Are you sure you want to delete this expense?\n\n" +
+                                "If it is shared with a family, it will also " +
+                                "be removed from that family dashboard."
+                )
+
+                .setNegativeButton(
+                        "Cancel",
+                        null
+                )
+
+                .setPositiveButton(
+                        "Delete",
+                        (dialog, which) -> {
+
+                            int result =
+                                    databaseHelper.deleteExpense(
+                                            expense.getTransactionId()
+                                    );
+
+
+                            if (result > 0) {
+
+                                Toast.makeText(
+                                        ExpenseListActivity.this,
+                                        "Expense deleted successfully.",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+
+
+                                loadExpenses();
+
+                            } else {
+
+                                Toast.makeText(
+                                        ExpenseListActivity.this,
+                                        "Failed to delete expense.",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                )
+
+                .show();
+    }
+
+
+    // =========================================================
+    // FULL SUMMARY
+    // =========================================================
+
+    private void updateSummary() {
+
+        if (currentUser == null) {
+
+            showEmptyList();
+
             return;
+        }
+
 
         int userId =
                 databaseHelper.getUserIdByFirebaseUid(
-                        currentUser.getUid());
+                        currentUser.getUid()
+                );
 
-        adapter.updateList(
 
+        if (userId == -1) {
+
+            showEmptyList();
+
+            return;
+        }
+
+
+        double total =
+                databaseHelper.getTotalExpense(
+                        userId
+                );
+
+
+        int count =
+                databaseHelper.getExpenseCount(
+                        userId
+                );
+
+
+        tvTotalExpense.setText(
+                String.format(
+                        Locale.getDefault(),
+                        "Rs. %.2f",
+                        total
+                )
+        );
+
+
+        tvExpenseCount.setText(
+                count + " Transactions"
+        );
+
+
+        if (count == 0) {
+
+            layoutEmpty.setVisibility(
+                    View.VISIBLE
+            );
+
+
+            rvExpenses.setVisibility(
+                    View.GONE
+            );
+
+        } else {
+
+            layoutEmpty.setVisibility(
+                    View.GONE
+            );
+
+
+            rvExpenses.setVisibility(
+                    View.VISIBLE
+            );
+        }
+    }
+
+
+    // =========================================================
+    // FILTERED / SEARCHED LIST SUMMARY
+    // =========================================================
+
+    private void updateDisplayedListSummary(
+            ArrayList<ExpenseModel> list
+    ) {
+
+        if (list == null ||
+                list.isEmpty()) {
+
+            tvTotalExpense.setText(
+                    "Rs. 0.00"
+            );
+
+
+            tvExpenseCount.setText(
+                    "0 Transactions"
+            );
+
+
+            layoutEmpty.setVisibility(
+                    View.VISIBLE
+            );
+
+
+            rvExpenses.setVisibility(
+                    View.GONE
+            );
+
+
+            return;
+        }
+
+
+        double total = 0;
+
+
+        for (ExpenseModel expense : list) {
+
+            total +=
+                    expense.getAmount();
+        }
+
+
+        tvTotalExpense.setText(
+                String.format(
+                        Locale.getDefault(),
+                        "Rs. %.2f",
+                        total
+                )
+        );
+
+
+        tvExpenseCount.setText(
+                list.size()
+                        + " Transactions"
+        );
+
+
+        layoutEmpty.setVisibility(
+                View.GONE
+        );
+
+
+        rvExpenses.setVisibility(
+                View.VISIBLE
+        );
+    }
+
+
+    // =========================================================
+    // SEARCH
+    // =========================================================
+
+    private void searchExpense(
+            String keyword
+    ) {
+
+        if (currentUser == null ||
+                adapter == null) {
+
+            return;
+        }
+
+
+        int userId =
+                databaseHelper.getUserIdByFirebaseUid(
+                        currentUser.getUid()
+                );
+
+
+        if (userId == -1) {
+
+            return;
+        }
+
+
+        ArrayList<ExpenseModel> searchList =
                 databaseHelper.searchExpenses(
                         userId,
                         keyword
-                )
+                );
 
+
+        adapter.updateList(
+                searchList
         );
 
+
+        updateDisplayedListSummary(
+                searchList
+        );
     }
+
+
+    // =========================================================
+    // EMPTY LIST
+    // =========================================================
+
+    private void showEmptyList() {
+
+        tvTotalExpense.setText(
+                "Rs. 0.00"
+        );
+
+
+        tvExpenseCount.setText(
+                "0 Transactions"
+        );
+
+
+        layoutEmpty.setVisibility(
+                View.VISIBLE
+        );
+
+
+        rvExpenses.setVisibility(
+                View.GONE
+        );
+    }
+
+
+    // =========================================================
+    // BOTTOM NAVIGATION
+    // =========================================================
 
     private void setupBottomNavigation() {
 
-        bottomNavigation.setSelectedItemId(R.id.nav_expenses);
+        bottomNavigation.setSelectedItemId(
+                R.id.nav_expenses
+        );
 
-        bottomNavigation.setOnItemSelectedListener(item -> {
 
-            int id = item.getItemId();
+        bottomNavigation.setOnItemSelectedListener(
+                item -> {
 
-            if (id == R.id.nav_expenses) {
+                    int id =
+                            item.getItemId();
 
-                return true;
 
-            } else if (id == R.id.nav_dashboard) {
+                    // -------------------------------------------------
+                    // EXPENSES
+                    // -------------------------------------------------
 
-                Intent intent = new Intent(
-                        ExpenseListActivity.this,
-                        DashboardActivity.class);
+                    if (id == R.id.nav_expenses) {
 
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        return true;
+                    }
 
-                startActivity(intent);
 
-                return true;
+                    // -------------------------------------------------
+                    // DASHBOARD
+                    // -------------------------------------------------
 
-            } else if (id == R.id.nav_profile) {
+                    else if (id == R.id.nav_dashboard) {
 
-                Intent intent = new Intent(
-                        ExpenseListActivity.this,
-                        ProfileActivity.class);
+                        Intent intent =
+                                new Intent(
+                                        ExpenseListActivity.this,
+                                        DashboardActivity.class
+                                );
 
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
-                startActivity(intent);
+                        intent.addFlags(
+                                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                        );
 
-                return true;
 
-            } else if (id == R.id.nav_subscriptions) {
+                        startActivity(
+                                intent
+                        );
 
-                Intent intent = new Intent(
-                        ExpenseListActivity.this,
-                        SubscriptionActivity.class);
 
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        return true;
+                    }
 
-                startActivity(intent);
 
-                return true;
+                    // -------------------------------------------------
+                    // PROFILE
+                    // -------------------------------------------------
 
-            } else if (id == R.id.nav_income) {
+                    else if (id == R.id.nav_profile) {
 
-                Intent intent = new Intent(
-                        ExpenseListActivity.this,
-                        IncomeListActivity.class);
+                        Intent intent =
+                                new Intent(
+                                        ExpenseListActivity.this,
+                                        ProfileActivity.class
+                                );
 
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
-                startActivity(intent);
+                        intent.addFlags(
+                                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                        );
 
-                return true;
 
-            }
+                        startActivity(
+                                intent
+                        );
 
-            return false;
 
-        });
+                        return true;
+                    }
 
+
+                    // -------------------------------------------------
+                    // SUBSCRIPTIONS
+                    // -------------------------------------------------
+
+                    else if (id == R.id.nav_subscriptions) {
+
+                        Intent intent =
+                                new Intent(
+                                        ExpenseListActivity.this,
+                                        SubscriptionActivity.class
+                                );
+
+
+                        intent.addFlags(
+                                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                        );
+
+
+                        startActivity(
+                                intent
+                        );
+
+
+                        return true;
+                    }
+
+
+                    // -------------------------------------------------
+                    // INCOME
+                    // -------------------------------------------------
+
+                    else if (id == R.id.nav_income) {
+
+                        Intent intent =
+                                new Intent(
+                                        ExpenseListActivity.this,
+                                        IncomeListActivity.class
+                                );
+
+
+                        intent.addFlags(
+                                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                        );
+
+
+                        startActivity(
+                                intent
+                        );
+
+
+                        return true;
+                    }
+
+
+                    return false;
+                }
+        );
     }
+
+
+    // =========================================================
+    // ON RESUME
+    // =========================================================
 
     @Override
     protected void onResume() {
 
         super.onResume();
 
-        loadExpenses();
 
+        /*
+         * Refresh after:
+         *
+         * - Add Expense
+         * - Edit Expense
+         * - Expense Details
+         */
+
+        if (databaseHelper != null) {
+
+            loadExpenses();
+        }
     }
 }

@@ -25,6 +25,7 @@
             android:background="@drawable/bg_icon_circle"
             android:padding="10dp" />
 
+
         <!-- Category Name -->
 
         <TextView
@@ -36,7 +37,8 @@
             android:text="Food"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="#111827"/>
+            android:textColor="#111827" />
+
 
         <!-- Amount -->
 
@@ -45,10 +47,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:text="Rs.450.00"
+            android:text="Rs. 450.00"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="#DC2626"/>
+            android:textColor="#DC2626" />
+
 
         <!-- Note -->
 
@@ -60,9 +63,13 @@
             android:layout_toEndOf="@id/imgCategory"
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="50dp"
             android:text="Lunch with friends"
             android:textSize="14sp"
-            android:textColor="#6B7280"/>
+            android:textColor="#6B7280"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
 
         <!-- Payment Method -->
 
@@ -77,32 +84,25 @@
             android:text="Cash"
             android:textStyle="bold"
             android:textColor="#2563EB"
-            android:textSize="13sp"/>
+            android:textSize="13sp" />
 
-        <!-- Divider -->
 
-        <TextView
-            android:id="@+id/tvDivider"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/tvPayment"
-            android:layout_alignBaseline="@id/tvPayment"
-            android:layout_marginStart="8dp"
-            android:text="•"
-            android:textColor="#9CA3AF"/>
-
-        <!-- Expense Mode -->
+        <!-- Family Sharing Status -->
 
         <TextView
-            android:id="@+id/tvMode"
+            android:id="@+id/tvFamilyShare"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/tvDivider"
-            android:layout_alignBaseline="@id/tvPayment"
-            android:layout_marginStart="8dp"
-            android:text="Personal"
-            android:textColor="#6B7280"
-            android:textSize="13sp"/>
+            android:layout_below="@id/tvPayment"
+            android:layout_toEndOf="@id/imgCategory"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Shared with My Family"
+            android:textColor="#16A34A"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
 
         <!-- Date -->
 
@@ -110,13 +110,14 @@
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvPayment"
+            android:layout_below="@id/tvFamilyShare"
             android:layout_toEndOf="@id/imgCategory"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:text="15 Jul 2026"
             android:textColor="#9CA3AF"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
+
 
         <!-- Menu -->
 
@@ -128,7 +129,8 @@
             android:layout_alignParentEnd="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="6dp"
-            android:src="@drawable/ic_more_vert"/>
+            android:src="@drawable/ic_more_vert"
+            android:contentDescription="Expense menu" />
 
     </RelativeLayout>
 

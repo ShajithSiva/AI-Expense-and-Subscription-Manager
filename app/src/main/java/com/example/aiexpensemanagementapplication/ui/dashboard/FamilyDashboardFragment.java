@@ -1,15 +1,23 @@
 package com.example.aiexpensemanagementapplication.ui.dashboard;
 
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
 import com.example.aiexpensemanagementapplication.ui.family.CreateFamilyActivity;
 import com.example.aiexpensemanagementapplication.ui.family.InviteMemberActivity;
 import com.example.aiexpensemanagementapplication.ui.family.JoinFamilyActivity;
@@ -30,6 +39,13 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 public class FamilyDashboardFragment extends Fragment {
 
@@ -56,18 +72,13 @@ public class FamilyDashboardFragment extends Fragment {
     // FAMILY LIST
     // =====================================================
 
-    private final List<Integer> familyIds =
-            new ArrayList<>();
-
-    private final List<String> familyNames =
-            new ArrayList<>();
-
-    private final List<String> familyRoles =
-            new ArrayList<>();
+    private final List<Integer> familyIds = new ArrayList<>();
+    private final List<String> familyNames = new ArrayList<>();
+    private final List<String> familyRoles = new ArrayList<>();
 
 
     // =====================================================
-    // NO FAMILY SCREEN VIEWS
+    // NO FAMILY SCREEN
     // =====================================================
 
     private MaterialCardView cardCreateFamily;
@@ -75,7 +86,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
     // =====================================================
-    // FAMILY DASHBOARD VIEWS
+    // FAMILY DASHBOARD HEADER
     // =====================================================
 
     private View layoutFamilySelector;
@@ -84,8 +95,25 @@ public class FamilyDashboardFragment extends Fragment {
     private TextView tvMemberCount;
 
     private ImageButton btnFamilyOptions;
-
     private MaterialButton btnInviteMember;
+
+
+    // =====================================================
+    // FAMILY EXPENSE UI
+    // =====================================================
+
+    private TextView tvFamilySpending;
+
+    private LinearLayout familyTransactionsContainer;
+
+    private PieChart familyPieChart;
+    private TextView tvNoCategoryData;
+
+    private MaterialButton btnSetFamilyBudget;
+    private TextView tvFamilyBudgetRemaining;
+    private ProgressBar progressFamilyBudget;
+    private TextView tvBudgetAmount;
+    private TextView tvBudgetPercentage;
 
 
     // =====================================================
@@ -102,16 +130,12 @@ public class FamilyDashboardFragment extends Fragment {
     // =====================================================
 
     @Override
-    public void onCreate(
-            @Nullable Bundle savedInstanceState
-    ) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
         databaseHelper =
-                new DatabaseHelper(
-                        requireContext()
-                );
+                new DatabaseHelper(requireContext());
 
         loadCurrentUser();
 
@@ -130,14 +154,12 @@ public class FamilyDashboardFragment extends Fragment {
                         .getInstance()
                         .getCurrentUser();
 
-
         if (firebaseUser == null) {
 
             currentUserId = -1;
 
             return;
         }
-
 
         currentUserId =
                 databaseHelper
@@ -148,35 +170,24 @@ public class FamilyDashboardFragment extends Fragment {
 
 
     // =====================================================
-    // LOAD ALL FAMILIES OF CURRENT USER
+    // LOAD USER FAMILIES
     // =====================================================
 
     private void loadUserFamilies() {
 
-        /*
-         * Remember selected family before refreshing.
-         *
-         * This prevents the dashboard from returning
-         * to the first family every time onResume()
-         * is called.
-         */
-
         int previousSelectedFamilyId =
                 selectedFamilyId;
-
 
         familyIds.clear();
         familyNames.clear();
         familyRoles.clear();
 
-
         selectedFamilyRole = null;
-
         userHasFamily = false;
 
 
         // -------------------------------------------------
-        // CHECK USER
+        // USER CHECK
         // -------------------------------------------------
 
         if (currentUserId == -1) {
@@ -188,7 +199,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         // -------------------------------------------------
-        // GET USER FAMILIES
+        // LOAD FAMILIES
         // -------------------------------------------------
 
         Cursor cursor =
@@ -196,7 +207,6 @@ public class FamilyDashboardFragment extends Fragment {
                         .getFamiliesForUser(
                                 currentUserId
                         );
-
 
         if (cursor == null) {
 
@@ -213,22 +223,16 @@ public class FamilyDashboardFragment extends Fragment {
                             "FamilyID"
                     );
 
-
             int familyNameIndex =
                     cursor.getColumnIndex(
                             "FamilyName"
                     );
-
 
             int familyRoleIndex =
                     cursor.getColumnIndex(
                             "Role"
                     );
 
-
-            // -------------------------------------------------
-            // VALIDATE COLUMNS
-            // -------------------------------------------------
 
             if (familyIdIndex == -1 ||
                     familyNameIndex == -1 ||
@@ -240,10 +244,6 @@ public class FamilyDashboardFragment extends Fragment {
             }
 
 
-            // -------------------------------------------------
-            // READ FAMILIES
-            // -------------------------------------------------
-
             while (cursor.moveToNext()) {
 
                 int familyId =
@@ -251,12 +251,10 @@ public class FamilyDashboardFragment extends Fragment {
                                 familyIdIndex
                         );
 
-
                 String familyName =
                         cursor.getString(
                                 familyNameIndex
                         );
-
 
                 String familyRole =
                         cursor.getString(
@@ -264,19 +262,9 @@ public class FamilyDashboardFragment extends Fragment {
                         );
 
 
-                familyIds.add(
-                        familyId
-                );
-
-
-                familyNames.add(
-                        familyName
-                );
-
-
-                familyRoles.add(
-                        familyRole
-                );
+                familyIds.add(familyId);
+                familyNames.add(familyName);
+                familyRoles.add(familyRole);
             }
 
         } finally {
@@ -286,7 +274,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         // -------------------------------------------------
-        // CHECK FAMILY STATUS
+        // FAMILY STATUS
         // -------------------------------------------------
 
         userHasFamily =
@@ -296,7 +284,6 @@ public class FamilyDashboardFragment extends Fragment {
         if (!userHasFamily) {
 
             selectedFamilyId = -1;
-
             selectedFamilyRole = null;
 
             return;
@@ -304,7 +291,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         // -------------------------------------------------
-        // KEEP PREVIOUS SELECTED FAMILY
+        // KEEP PREVIOUS FAMILY SELECTION
         // -------------------------------------------------
 
         int previousIndex =
@@ -320,7 +307,6 @@ public class FamilyDashboardFragment extends Fragment {
                             previousIndex
                     );
 
-
             selectedFamilyRole =
                     familyRoles.get(
                             previousIndex
@@ -328,15 +314,8 @@ public class FamilyDashboardFragment extends Fragment {
 
         } else {
 
-            /*
-             * No previously selected family.
-             *
-             * Select first available family.
-             */
-
             selectedFamilyId =
                     familyIds.get(0);
-
 
             selectedFamilyRole =
                     familyRoles.get(0);
@@ -392,15 +371,11 @@ public class FamilyDashboardFragment extends Fragment {
 
         if (userHasFamily) {
 
-            setupFamilyDashboard(
-                    view
-            );
+            setupFamilyDashboard(view);
 
         } else {
 
-            setupNoFamilyScreen(
-                    view
-            );
+            setupNoFamilyScreen(view);
         }
     }
 
@@ -409,15 +384,12 @@ public class FamilyDashboardFragment extends Fragment {
     // NO FAMILY SCREEN
     // =====================================================
 
-    private void setupNoFamilyScreen(
-            View view
-    ) {
+    private void setupNoFamilyScreen(View view) {
 
         cardCreateFamily =
                 view.findViewById(
                         R.id.cardCreateFamily
                 );
-
 
         cardJoinFamily =
                 view.findViewById(
@@ -425,33 +397,19 @@ public class FamilyDashboardFragment extends Fragment {
                 );
 
 
-        // -------------------------------------------------
-        // CREATE FAMILY
-        // -------------------------------------------------
-
         if (cardCreateFamily != null) {
 
-            cardCreateFamily
-                    .setOnClickListener(v -> {
-
-                        openCreateFamilyActivity();
-
-                    });
+            cardCreateFamily.setOnClickListener(
+                    v -> openCreateFamilyActivity()
+            );
         }
 
 
-        // -------------------------------------------------
-        // JOIN FAMILY
-        // -------------------------------------------------
-
         if (cardJoinFamily != null) {
 
-            cardJoinFamily
-                    .setOnClickListener(v -> {
-
-                        openJoinFamilyActivity();
-
-                    });
+            cardJoinFamily.setOnClickListener(
+                    v -> openJoinFamilyActivity()
+            );
         }
     }
 
@@ -460,33 +418,31 @@ public class FamilyDashboardFragment extends Fragment {
     // SETUP FAMILY DASHBOARD
     // =====================================================
 
-    private void setupFamilyDashboard(
-            View view
-    ) {
+    private void setupFamilyDashboard(View view) {
+
+        // -------------------------------------------------
+        // HEADER
+        // -------------------------------------------------
 
         layoutFamilySelector =
                 view.findViewById(
                         R.id.layoutFamilySelector
                 );
 
-
         tvFamilyName =
                 view.findViewById(
                         R.id.tvFamilyName
                 );
-
 
         tvMemberCount =
                 view.findViewById(
                         R.id.tvMemberCount
                 );
 
-
         btnFamilyOptions =
                 view.findViewById(
                         R.id.btnFamilyOptions
                 );
-
 
         btnInviteMember =
                 view.findViewById(
@@ -495,32 +451,65 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         // -------------------------------------------------
+        // FAMILY EXPENSE UI
+        // -------------------------------------------------
+
+        tvFamilySpending =
+                view.findViewById(
+                        R.id.tvFamilySpending
+                );
+
+        familyTransactionsContainer =
+                view.findViewById(
+                        R.id.familyTransactionsContainer
+                );
+
+
+
+
+        familyPieChart =
+                view.findViewById(R.id.familyPieChart);
+
+        tvNoCategoryData =
+                view.findViewById(R.id.tvNoCategoryData);
+
+        btnSetFamilyBudget =
+                view.findViewById(R.id.btnSetFamilyBudget);
+
+        tvFamilyBudgetRemaining =
+                view.findViewById(R.id.tvFamilyBudgetRemaining);
+
+        progressFamilyBudget =
+                view.findViewById(R.id.progressFamilyBudget);
+
+        tvBudgetAmount =
+                view.findViewById(R.id.tvBudgetAmount);
+
+        tvBudgetPercentage =
+                view.findViewById(R.id.tvBudgetPercentage);
+
+
+        // -------------------------------------------------
         // FAMILY SELECTOR
         // -------------------------------------------------
 
         if (layoutFamilySelector != null) {
 
-            layoutFamilySelector
-                    .setOnClickListener(v -> {
-
-                        showFamilySelectorMenu();
-
-                    });
+            layoutFamilySelector.setOnClickListener(
+                    v -> showFamilySelectorMenu()
+            );
         }
 
 
         // -------------------------------------------------
-        // FAMILY OPTIONS
+        // OPTIONS
         // -------------------------------------------------
 
         if (btnFamilyOptions != null) {
 
-            btnFamilyOptions
-                    .setOnClickListener(v -> {
-
-                        showFamilyOptionsMenu();
-
-                    });
+            btnFamilyOptions.setOnClickListener(
+                    v -> showFamilyOptionsMenu()
+            );
         }
 
 
@@ -530,17 +519,14 @@ public class FamilyDashboardFragment extends Fragment {
 
         if (btnInviteMember != null) {
 
-            btnInviteMember
-                    .setOnClickListener(v -> {
-
-                        openInviteMemberActivity();
-
-                    });
+            btnInviteMember.setOnClickListener(
+                    v -> openInviteMemberActivity()
+            );
         }
 
 
         // -------------------------------------------------
-        // LOAD SELECTED FAMILY
+        // LOAD DASHBOARD
         // -------------------------------------------------
 
         loadSelectedFamilyDashboard();
@@ -553,13 +539,8 @@ public class FamilyDashboardFragment extends Fragment {
 
     private void loadSelectedFamilyDashboard() {
 
-        if (selectedFamilyId == -1) {
-
-            return;
-        }
-
-
-        if (currentUserId == -1) {
+        if (selectedFamilyId == -1 ||
+                currentUserId == -1) {
 
             return;
         }
@@ -592,7 +573,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         // -------------------------------------------------
-        // CURRENT USER ROLE
+        // USER ROLE
         // -------------------------------------------------
 
         selectedFamilyRole =
@@ -625,39 +606,680 @@ public class FamilyDashboardFragment extends Fragment {
             } else {
 
                 tvMemberCount.setText(
-                        memberCount +
-                                " Members"
+                        memberCount + " Members"
                 );
             }
         }
 
 
         // -------------------------------------------------
-        // APPLY ROLE PERMISSIONS
+        // ROLE UI
         // -------------------------------------------------
 
         updateRoleBasedUI();
 
 
-        /*
-         * NEXT DEVELOPMENT:
-         *
-         * loadFamilyMembers();
-         *
-         * loadSharedExpenses();
-         *
-         * loadSharedIncome();
-         *
-         * loadSharedSubscriptions();
-         *
-         * loadFamilyBudget();
-         *
-         * loadFamilyTransactions();
-         *
-         * loadAIInsights();
-         */
+        // -------------------------------------------------
+        // EXPENSES + GRAPH
+        // -------------------------------------------------
+
+        loadSharedExpenses();
     }
 
+
+    // =====================================================
+    // LOAD SHARED EXPENSES
+    // =====================================================
+
+    private void loadSharedExpenses() {
+
+        if (selectedFamilyId == -1) {
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // TOTAL FAMILY SPENDING
+        // -------------------------------------------------
+
+        double totalExpense =
+                databaseHelper
+                        .getFamilyTotalExpense(
+                                selectedFamilyId
+                        );
+
+
+        if (tvFamilySpending != null) {
+
+            tvFamilySpending.setText(
+
+                    String.format(
+                            Locale.getDefault(),
+                            "Rs %,.2f",
+                            totalExpense
+                    )
+            );
+        }
+
+
+        // -------------------------------------------------
+        // GET FAMILY EXPENSES
+        // -------------------------------------------------
+
+        ArrayList<ExpenseModel> expenses =
+                databaseHelper
+                        .getFamilyExpenses(
+                                selectedFamilyId
+                        );
+
+
+        // -------------------------------------------------
+        // CATEGORY GRAPH
+        // -------------------------------------------------
+
+        loadFamilyCategorySpending(
+                expenses
+        );
+
+
+        // -------------------------------------------------
+        // RECENT TRANSACTIONS
+        // -------------------------------------------------
+
+        loadRecentFamilyTransactions(
+                expenses
+        );
+    }
+
+
+    // =====================================================
+    // LOAD RECENT FAMILY TRANSACTIONS
+    // =====================================================
+
+    private void loadRecentFamilyTransactions(
+            ArrayList<ExpenseModel> expenses
+    ) {
+
+        if (familyTransactionsContainer == null) {
+
+            return;
+        }
+
+
+        familyTransactionsContainer
+                .removeAllViews();
+
+
+        // -------------------------------------------------
+        // EMPTY
+        // -------------------------------------------------
+
+        if (expenses == null ||
+                expenses.isEmpty()) {
+
+            showNoFamilyTransactions();
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // MAXIMUM 5
+        // -------------------------------------------------
+
+        int displayCount =
+                Math.min(
+                        expenses.size(),
+                        5
+                );
+
+
+        for (int i = 0;
+             i < displayCount;
+             i++) {
+
+            ExpenseModel expense =
+                    expenses.get(i);
+
+
+            addFamilyExpenseRow(
+                    expense,
+                    i < displayCount - 1
+            );
+        }
+    }
+
+
+    // =====================================================
+    // NO TRANSACTIONS
+    // =====================================================
+
+    private void showNoFamilyTransactions() {
+
+        if (familyTransactionsContainer == null) {
+
+            return;
+        }
+
+
+        TextView emptyView =
+                new TextView(
+                        requireContext()
+                );
+
+
+        emptyView.setText(
+                "No shared transactions yet"
+        );
+
+        emptyView.setTextSize(12);
+
+        emptyView.setTextColor(
+                Color.parseColor(
+                        "#9CA3AF"
+                )
+        );
+
+        emptyView.setGravity(
+                Gravity.CENTER
+        );
+
+        emptyView.setPadding(
+                0,
+                dpToPx(24),
+                0,
+                dpToPx(24)
+        );
+
+
+        familyTransactionsContainer
+                .addView(
+                        emptyView
+                );
+    }
+
+
+    // =====================================================
+    // ADD FAMILY EXPENSE ROW
+    // =====================================================
+
+    private void addFamilyExpenseRow(
+            ExpenseModel expense,
+            boolean showDivider
+    ) {
+
+        if (expense == null ||
+                familyTransactionsContainer == null) {
+
+            return;
+        }
+
+
+        LinearLayout row =
+                new LinearLayout(
+                        requireContext()
+                );
+
+        row.setOrientation(
+                LinearLayout.HORIZONTAL
+        );
+
+        row.setGravity(
+                Gravity.CENTER_VERTICAL
+        );
+
+        row.setPadding(
+                0,
+                dpToPx(12),
+                0,
+                dpToPx(12)
+        );
+
+
+        // -------------------------------------------------
+        // LEFT INFO
+        // -------------------------------------------------
+
+        LinearLayout informationLayout =
+                new LinearLayout(
+                        requireContext()
+                );
+
+        informationLayout.setOrientation(
+                LinearLayout.VERTICAL
+        );
+
+
+        LinearLayout.LayoutParams informationParams =
+                new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
+                );
+
+
+        // -------------------------------------------------
+        // CATEGORY
+        // -------------------------------------------------
+
+        TextView categoryView =
+                new TextView(
+                        requireContext()
+                );
+
+
+        String categoryName =
+                expense.getCategoryName();
+
+
+        if (categoryName == null ||
+                categoryName.trim().isEmpty()) {
+
+            categoryName = "Expense";
+        }
+
+
+        categoryView.setText(
+                categoryName
+        );
+
+        categoryView.setTextSize(14);
+
+        categoryView.setTextColor(
+                Color.parseColor(
+                        "#111827"
+                )
+        );
+
+        categoryView.setTypeface(
+                Typeface.DEFAULT,
+                Typeface.BOLD
+        );
+
+
+        // -------------------------------------------------
+        // DATE + NOTE
+        // -------------------------------------------------
+
+        TextView detailView =
+                new TextView(
+                        requireContext()
+                );
+
+
+        String date =
+                expense.getTransactionDate();
+
+        if (date == null) {
+            date = "";
+        }
+
+
+        String note =
+                expense.getNote();
+
+
+        String detailText =
+                date;
+
+
+        if (note != null &&
+                !note.trim().isEmpty()) {
+
+            if (!detailText.isEmpty()) {
+
+                detailText += "  •  ";
+            }
+
+            detailText +=
+                    note.trim();
+        }
+
+
+        detailView.setText(
+                detailText
+        );
+
+        detailView.setTextSize(11);
+
+        detailView.setTextColor(
+                Color.parseColor(
+                        "#8A909C"
+                )
+        );
+
+        detailView.setPadding(
+                0,
+                dpToPx(4),
+                0,
+                0
+        );
+
+
+        informationLayout.addView(
+                categoryView
+        );
+
+        informationLayout.addView(
+                detailView
+        );
+
+
+        // -------------------------------------------------
+        // AMOUNT
+        // -------------------------------------------------
+
+        TextView amountView =
+                new TextView(
+                        requireContext()
+                );
+
+
+        amountView.setText(
+
+                String.format(
+                        Locale.getDefault(),
+                        "- Rs %,.2f",
+                        expense.getAmount()
+                )
+        );
+
+        amountView.setTextSize(13);
+
+        amountView.setTextColor(
+                Color.parseColor(
+                        "#DC2626"
+                )
+        );
+
+        amountView.setTypeface(
+                Typeface.DEFAULT,
+                Typeface.BOLD
+        );
+
+
+        // -------------------------------------------------
+        // ADD
+        // -------------------------------------------------
+
+        row.addView(
+                informationLayout,
+                informationParams
+        );
+
+        row.addView(
+                amountView
+        );
+
+
+        familyTransactionsContainer
+                .addView(
+                        row
+                );
+
+
+        // -------------------------------------------------
+        // DIVIDER
+        // -------------------------------------------------
+
+        if (showDivider) {
+
+            View divider =
+                    new View(
+                            requireContext()
+                    );
+
+            divider.setBackgroundColor(
+                    Color.parseColor(
+                            "#E5E7EB"
+                    )
+            );
+
+
+            LinearLayout.LayoutParams dividerParams =
+                    new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            dpToPx(1)
+                    );
+
+
+            familyTransactionsContainer
+                    .addView(
+                            divider,
+                            dividerParams
+                    );
+        }
+    }
+
+
+    // =====================================================
+// LOAD FAMILY CATEGORY PIE CHART
+// =====================================================
+
+    private void loadFamilyCategorySpending(
+            ArrayList<ExpenseModel> expenses
+    ) {
+
+        if (familyPieChart == null) {
+            return;
+        }
+
+        ArrayList<PieEntry> entries =
+                new ArrayList<>();
+
+
+        // -------------------------------------------------
+        // EMPTY CHECK
+        // -------------------------------------------------
+
+        if (expenses == null || expenses.isEmpty()) {
+
+            showNoCategoryData();
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // CALCULATE CATEGORY TOTALS
+        // -------------------------------------------------
+
+        Map<String, Float> categoryTotals =
+                new LinkedHashMap<>();
+
+
+        for (ExpenseModel expense : expenses) {
+
+            if (expense == null) {
+                continue;
+            }
+
+            String category =
+                    expense.getCategoryName();
+
+            if (category == null ||
+                    category.trim().isEmpty()) {
+
+                category = "Other";
+            }
+
+            float amount =
+                    (float) expense.getAmount();
+
+
+            if (categoryTotals.containsKey(category)) {
+
+                Float current =
+                        categoryTotals.get(category);
+
+                if (current == null) {
+                    current = 0f;
+                }
+
+                categoryTotals.put(
+                        category,
+                        current + amount
+                );
+
+            } else {
+
+                categoryTotals.put(
+                        category,
+                        amount
+                );
+            }
+        }
+
+
+        // -------------------------------------------------
+        // CREATE PIE ENTRIES
+        // -------------------------------------------------
+
+        for (Map.Entry<String, Float> entry :
+                categoryTotals.entrySet()) {
+
+            if (entry.getValue() > 0) {
+
+                entries.add(
+                        new PieEntry(
+                                entry.getValue(),
+                                entry.getKey()
+                        )
+                );
+            }
+        }
+
+
+        if (entries.isEmpty()) {
+
+            showNoCategoryData();
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // SHOW CHART
+        // -------------------------------------------------
+
+        if (tvNoCategoryData != null) {
+
+            tvNoCategoryData.setVisibility(
+                    View.GONE
+            );
+        }
+
+        familyPieChart.setVisibility(
+                View.VISIBLE
+        );
+
+
+        // -------------------------------------------------
+        // DATA SET
+        // -------------------------------------------------
+
+        PieDataSet dataSet =
+                new PieDataSet(
+                        entries,
+                        ""
+                );
+
+
+        dataSet.setColors(
+                ColorTemplate.MATERIAL_COLORS
+        );
+
+        dataSet.setSliceSpace(3f);
+
+        dataSet.setSelectionShift(5f);
+
+
+        // -------------------------------------------------
+        // PIE DATA
+        // -------------------------------------------------
+
+        PieData pieData =
+                new PieData(dataSet);
+
+        pieData.setValueTextSize(11f);
+
+        pieData.setValueTextColor(
+                Color.WHITE
+        );
+
+
+        // -------------------------------------------------
+        // CHART CONFIGURATION
+        // -------------------------------------------------
+
+        familyPieChart.setData(
+                pieData
+        );
+
+        familyPieChart
+                .getDescription()
+                .setEnabled(false);
+
+        familyPieChart
+                .getLegend()
+                .setEnabled(false);
+
+        familyPieChart.setDrawHoleEnabled(
+                true
+        );
+
+        familyPieChart.setHoleRadius(
+                68f
+        );
+
+        familyPieChart.setTransparentCircleRadius(
+                72f
+        );
+
+        familyPieChart.setDrawEntryLabels(
+                false
+        );
+
+        familyPieChart.setRotationEnabled(
+                true
+        );
+
+        familyPieChart.setHighlightPerTapEnabled(
+                true
+        );
+
+        familyPieChart.animateY(
+                700
+        );
+
+        familyPieChart.invalidate();
+    }
+
+
+// =====================================================
+// NO CATEGORY DATA
+// =====================================================
+
+    private void showNoCategoryData() {
+
+        if (familyPieChart != null) {
+
+            familyPieChart.clear();
+
+            familyPieChart.setVisibility(
+                    View.GONE
+            );
+        }
+
+
+        if (tvNoCategoryData != null) {
+
+            tvNoCategoryData.setVisibility(
+                    View.VISIBLE
+            );
+        }
+    }
 
     // =====================================================
     // UPDATE ROLE BASED UI
@@ -681,7 +1303,6 @@ public class FamilyDashboardFragment extends Fragment {
         }
 
 
-        // PRIMARY can invite members
         if ("PRIMARY".equalsIgnoreCase(
                 selectedFamilyRole
         )) {
@@ -700,7 +1321,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
     // =====================================================
-    // SHOW FAMILY SELECTOR
+    // FAMILY SELECTOR
     // =====================================================
 
     private void showFamilySelectorMenu() {
@@ -723,21 +1344,18 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         // -------------------------------------------------
-        // ADD EXISTING FAMILIES
+        // EXISTING FAMILIES
         // -------------------------------------------------
 
         for (int i = 0;
              i < familyIds.size();
              i++) {
 
-
             int familyId =
                     familyIds.get(i);
 
-
             String familyName =
                     familyNames.get(i);
-
 
             String role =
                     familyRoles.get(i);
@@ -758,36 +1376,27 @@ public class FamilyDashboardFragment extends Fragment {
                     );
 
 
-            item.setCheckable(
-                    true
-            );
+            item.setCheckable(true);
 
 
             if (familyId ==
                     selectedFamilyId) {
 
-                item.setChecked(
-                        true
-                );
+                item.setChecked(true);
             }
         }
 
 
         // -------------------------------------------------
-        // MENU IDs
+        // EXTRA OPTIONS
         // -------------------------------------------------
 
         final int MENU_CREATE_FAMILY =
                 900001;
 
-
         final int MENU_JOIN_FAMILY =
                 900002;
 
-
-        // -------------------------------------------------
-        // CREATE NEW FAMILY
-        // -------------------------------------------------
 
         menu.add(
                 Menu.NONE,
@@ -796,10 +1405,6 @@ public class FamilyDashboardFragment extends Fragment {
                 "+ Create New Family"
         );
 
-
-        // -------------------------------------------------
-        // JOIN ANOTHER FAMILY
-        // -------------------------------------------------
 
         menu.add(
                 Menu.NONE,
@@ -820,10 +1425,6 @@ public class FamilyDashboardFragment extends Fragment {
                             item.getItemId();
 
 
-                    // -------------------------------------
-                    // CREATE FAMILY
-                    // -------------------------------------
-
                     if (itemId ==
                             MENU_CREATE_FAMILY) {
 
@@ -832,10 +1433,6 @@ public class FamilyDashboardFragment extends Fragment {
                         return true;
                     }
 
-
-                    // -------------------------------------
-                    // JOIN FAMILY
-                    // -------------------------------------
 
                     if (itemId ==
                             MENU_JOIN_FAMILY) {
@@ -846,10 +1443,6 @@ public class FamilyDashboardFragment extends Fragment {
                     }
 
 
-                    // -------------------------------------
-                    // SWITCH FAMILY
-                    // -------------------------------------
-
                     int index =
                             familyIds.indexOf(
                                     itemId
@@ -858,9 +1451,7 @@ public class FamilyDashboardFragment extends Fragment {
 
                     if (index != -1) {
 
-                        selectFamily(
-                                index
-                        );
+                        selectFamily(index);
 
                         return true;
                     }
@@ -879,9 +1470,7 @@ public class FamilyDashboardFragment extends Fragment {
     // SELECT FAMILY
     // =====================================================
 
-    private void selectFamily(
-            int index
-    ) {
+    private void selectFamily(int index) {
 
         if (index < 0 ||
                 index >= familyIds.size()) {
@@ -891,34 +1480,25 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         selectedFamilyId =
-                familyIds.get(
-                        index
-                );
-
+                familyIds.get(index);
 
         selectedFamilyRole =
-                familyRoles.get(
-                        index
-                );
+                familyRoles.get(index);
 
 
+        // Reload everything for selected family
         loadSelectedFamilyDashboard();
     }
 
 
     // =====================================================
-    // FAMILY OPTIONS MENU
+    // FAMILY OPTIONS
     // =====================================================
 
     private void showFamilyOptionsMenu() {
 
-        if (btnFamilyOptions == null) {
-
-            return;
-        }
-
-
-        if (selectedFamilyId == -1) {
+        if (btnFamilyOptions == null ||
+                selectedFamilyId == -1) {
 
             return;
         }
@@ -938,10 +1518,8 @@ public class FamilyDashboardFragment extends Fragment {
         final int MENU_INVITE =
                 100001;
 
-
         final int MENU_LEAVE =
                 100002;
-
 
         final int MENU_DELETE =
                 100003;
@@ -971,10 +1549,6 @@ public class FamilyDashboardFragment extends Fragment {
             );
 
         } else {
-
-            // -------------------------------------------------
-            // MEMBER / VIEWER
-            // -------------------------------------------------
 
             menu.add(
                     Menu.NONE,
@@ -1033,7 +1607,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
     // =====================================================
-    // OPEN CREATE FAMILY
+    // CREATE FAMILY
     // =====================================================
 
     private void openCreateFamilyActivity() {
@@ -1044,15 +1618,12 @@ public class FamilyDashboardFragment extends Fragment {
                         CreateFamilyActivity.class
                 );
 
-
-        startActivity(
-                intent
-        );
+        startActivity(intent);
     }
 
 
     // =====================================================
-    // OPEN JOIN FAMILY
+    // JOIN FAMILY
     // =====================================================
 
     private void openJoinFamilyActivity() {
@@ -1063,15 +1634,12 @@ public class FamilyDashboardFragment extends Fragment {
                         JoinFamilyActivity.class
                 );
 
-
-        startActivity(
-                intent
-        );
+        startActivity(intent);
     }
 
 
     // =====================================================
-    // OPEN INVITE MEMBER
+    // INVITE MEMBER
     // =====================================================
 
     private void openInviteMemberActivity() {
@@ -1095,21 +1663,13 @@ public class FamilyDashboardFragment extends Fragment {
                 );
 
 
-        /*
-         * Send selected FamilyID so
-         * InviteMemberActivity knows which
-         * family the invitation belongs to.
-         */
-
         intent.putExtra(
                 "FAMILY_ID",
                 selectedFamilyId
         );
 
 
-        startActivity(
-                intent
-        );
+        startActivity(intent);
     }
 
 
@@ -1147,9 +1707,9 @@ public class FamilyDashboardFragment extends Fragment {
                 )
 
                 .setMessage(
-                        "Are you sure you want to leave " +
-                                familyName +
-                                "?"
+                        "Are you sure you want to leave "
+                                + familyName
+                                + "?"
                 )
 
                 .setNegativeButton(
@@ -1168,7 +1728,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
     // =====================================================
-    // LEAVE SELECTED FAMILY
+    // LEAVE FAMILY
     // =====================================================
 
     private void leaveSelectedFamily() {
@@ -1247,6 +1807,7 @@ public class FamilyDashboardFragment extends Fragment {
         new AlertDialog.Builder(
                 requireContext()
         )
+
                 .setTitle(
                         "Delete Family"
                 )
@@ -1271,7 +1832,7 @@ public class FamilyDashboardFragment extends Fragment {
 
 
     // =====================================================
-    // DELETE SELECTED FAMILY
+    // DELETE FAMILY
     // =====================================================
 
     private void deleteSelectedFamily() {
@@ -1326,7 +1887,6 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         loadCurrentUser();
-
         loadUserFamilies();
 
 
@@ -1335,6 +1895,24 @@ public class FamilyDashboardFragment extends Fragment {
                 .detach(this)
                 .attach(this)
                 .commit();
+    }
+
+
+    // =====================================================
+    // DP TO PX
+    // =====================================================
+
+    private int dpToPx(int dp) {
+
+        float density =
+                getResources()
+                        .getDisplayMetrics()
+                        .density;
+
+
+        return Math.round(
+                dp * density
+        );
     }
 
 
@@ -1348,13 +1926,8 @@ public class FamilyDashboardFragment extends Fragment {
         super.onResume();
 
 
-        if (databaseHelper == null) {
-
-            return;
-        }
-
-
-        if (!isAdded()) {
+        if (databaseHelper == null ||
+                !isAdded()) {
 
             return;
         }
@@ -1365,7 +1938,6 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         loadCurrentUser();
-
         loadUserFamilies();
 
 
@@ -1373,14 +1945,9 @@ public class FamilyDashboardFragment extends Fragment {
                 familyIds.size();
 
 
-        /*
-         * Reload complete Fragment when:
-         *
-         * 1. User creates first family
-         * 2. User creates another family
-         * 3. User joins another family
-         * 4. User leaves/deletes a family
-         */
+        // -------------------------------------------------
+        // FAMILY LIST CHANGED
+        // -------------------------------------------------
 
         if (oldFamilyCount !=
                 newFamilyCount) {
@@ -1395,11 +1962,9 @@ public class FamilyDashboardFragment extends Fragment {
         }
 
 
-        /*
-         * Family count did not change.
-         *
-         * Refresh currently selected family.
-         */
+        // -------------------------------------------------
+        // REFRESH FAMILY DASHBOARD
+        // -------------------------------------------------
 
         if (userHasFamily &&
                 getView() != null) {
