@@ -152,6 +152,9 @@
             android:name=".ui.family.JoinFamilyActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.family.SetFamilyBudgetActivity"
+            android:exported="false" />
 
         <receiver
             android:name=".notification.ReminderReceiver"

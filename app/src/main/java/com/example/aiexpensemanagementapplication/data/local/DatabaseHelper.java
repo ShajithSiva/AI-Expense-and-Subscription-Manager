@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
 
     //========================================================
     // USER TABLE
@@ -667,7 +667,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 // Add family budget support
 // -------------------------------------------------
 
-        if (oldVersion < 10) {
+        if (oldVersion < 11) {
 
             db.execSQL(
                     "CREATE TABLE IF NOT EXISTS " +
@@ -4907,7 +4907,179 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 return 0;
         }
     }
+    // =====================================================
+// SAVE / UPDATE FAMILY BUDGET
+// =====================================================
 
+    public boolean saveFamilyBudget(
+            int familyId,
+            double amount,
+            String startDate,
+            String endDate
+    ) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        try {
+
+            ContentValues values = new ContentValues();
+
+            values.put(
+                    FAMILY_ID,
+                    familyId
+            );
+
+            values.put(
+                    FAMILY_BUDGET_LIMIT,
+                    amount
+            );
+
+            values.put(
+                    FAMILY_BUDGET_START_DATE,
+                    startDate
+            );
+
+            values.put(
+                    FAMILY_BUDGET_END_DATE,
+                    endDate
+            );
+
+            values.put(
+                    FAMILY_BUDGET_UPDATED_AT,
+                    System.currentTimeMillis()
+            );
+
+
+            // Check whether this family already has a budget
+            Cursor cursor = db.query(
+                    TABLE_FAMILY_BUDGET,
+                    new String[]{
+                            FAMILY_BUDGET_ID
+                    },
+                    FAMILY_ID + "=?",
+                    new String[]{
+                            String.valueOf(familyId)
+                    },
+                    null,
+                    null,
+                    FAMILY_BUDGET_ID + " DESC",
+                    "1"
+            );
+
+
+            boolean exists = cursor.moveToFirst();
+
+            int result;
+
+
+            if (exists) {
+
+                int budgetId =
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow(
+                                        FAMILY_BUDGET_ID
+                                )
+                        );
+
+                result = db.update(
+                        TABLE_FAMILY_BUDGET,
+                        values,
+                        FAMILY_BUDGET_ID + "=?",
+                        new String[]{
+                                String.valueOf(budgetId)
+                        }
+                );
+
+            } else {
+
+                long insertedId =
+                        db.insert(
+                                TABLE_FAMILY_BUDGET,
+                                null,
+                                values
+                        );
+
+                result =
+                        insertedId == -1
+                                ? -1
+                                : 1;
+            }
+
+
+            cursor.close();
+
+            return result > 0;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+
+// =====================================================
+// GET FAMILY BUDGET
+// =====================================================
+
+    public double getFamilyBudgetLimit(
+            int familyId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        Cursor cursor = null;
+
+        try {
+
+            cursor = db.query(
+                    TABLE_FAMILY_BUDGET,
+
+                    new String[]{
+                            FAMILY_BUDGET_LIMIT
+                    },
+
+                    FAMILY_ID + "=?",
+
+                    new String[]{
+                            String.valueOf(familyId)
+                    },
+
+                    null,
+                    null,
+
+                    FAMILY_BUDGET_ID + " DESC",
+
+                    "1"
+            );
+
+
+            if (cursor.moveToFirst()) {
+
+                return cursor.getDouble(
+                        cursor.getColumnIndexOrThrow(
+                                FAMILY_BUDGET_LIMIT
+                        )
+                );
+            }
+
+            return 0.0;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return 0.0;
+
+        } finally {
+
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
     public double getBudgetPercentageByCategory(int userId, String category) {
 
         double budget = getBudgetByCategory(userId, category);

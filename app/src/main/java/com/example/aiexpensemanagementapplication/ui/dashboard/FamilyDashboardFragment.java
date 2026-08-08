@@ -9,6 +9,12 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.content.Intent;
+import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
+
+import com.example.aiexpensemanagementapplication.ui.family.SetFamilyBudgetActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +38,7 @@ import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
 import com.example.aiexpensemanagementapplication.ui.family.CreateFamilyActivity;
 import com.example.aiexpensemanagementapplication.ui.family.InviteMemberActivity;
 import com.example.aiexpensemanagementapplication.ui.family.JoinFamilyActivity;
+import com.example.aiexpensemanagementapplication.ui.family.SetFamilyBudgetActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -448,6 +455,23 @@ public class FamilyDashboardFragment extends Fragment {
                 view.findViewById(
                         R.id.btnInviteMember
                 );
+        btnSetFamilyBudget =
+                view.findViewById(R.id.btnSetFamilyBudget);
+
+        btnSetFamilyBudget.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    requireContext(),
+                    SetFamilyBudgetActivity.class
+            );
+
+            intent.putExtra(
+                    "familyId",
+                    selectedFamilyId
+            );
+
+            startActivity(intent);
+        });
 
 
         // -------------------------------------------------
@@ -690,6 +714,7 @@ public class FamilyDashboardFragment extends Fragment {
         loadRecentFamilyTransactions(
                 expenses
         );
+        loadFamilyBudget();
     }
 
 
@@ -750,7 +775,155 @@ public class FamilyDashboardFragment extends Fragment {
         }
     }
 
+    // =====================================================
+// LOAD SELECTED FAMILY BUDGET
+// =====================================================
 
+    private void loadFamilyBudget() {
+
+        if (selectedFamilyId == -1) {
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // GET BUDGET FOR SELECTED FAMILY
+        // -------------------------------------------------
+
+        double budget =
+                databaseHelper.getFamilyBudgetLimit(
+                        selectedFamilyId
+                );
+
+
+        // -------------------------------------------------
+        // GET SPENDING FOR SELECTED FAMILY
+        // -------------------------------------------------
+
+        double spent =
+                databaseHelper.getFamilyTotalExpense(
+                        selectedFamilyId
+                );
+
+
+        // -------------------------------------------------
+        // NO BUDGET
+        // -------------------------------------------------
+
+        if (budget <= 0) {
+
+            if (tvBudgetAmount != null) {
+
+                tvBudgetAmount.setText(
+                        "Rs. 0.00"
+                );
+            }
+
+
+            if (tvFamilyBudgetRemaining != null) {
+
+                tvFamilyBudgetRemaining.setText(
+                        "Rs. 0.00"
+                );
+            }
+
+
+            if (tvBudgetPercentage != null) {
+
+                tvBudgetPercentage.setText(
+                        "No Budget Set"
+                );
+            }
+
+
+            if (progressFamilyBudget != null) {
+
+                progressFamilyBudget.setProgress(
+                        0
+                );
+            }
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // REMAINING
+        // -------------------------------------------------
+
+        double remaining =
+                budget - spent;
+
+
+        // Don't show negative remaining amount
+        if (remaining < 0) {
+            remaining = 0;
+        }
+
+
+        // -------------------------------------------------
+        // PERCENTAGE
+        // -------------------------------------------------
+
+        int percentage =
+                (int) Math.round(
+                        (spent / budget) * 100
+                );
+
+
+        if (percentage < 0) {
+            percentage = 0;
+        }
+
+
+        if (percentage > 100) {
+            percentage = 100;
+        }
+
+
+        // -------------------------------------------------
+        // UPDATE BUDGET UI
+        // -------------------------------------------------
+
+        if (tvBudgetAmount != null) {
+
+            tvBudgetAmount.setText(
+                    String.format(
+                            Locale.getDefault(),
+                            "Rs. %.2f",
+                            budget
+                    )
+            );
+        }
+
+
+        if (tvFamilyBudgetRemaining != null) {
+
+            tvFamilyBudgetRemaining.setText(
+                    String.format(
+                            Locale.getDefault(),
+                            "Rs. %.2f",
+                            remaining
+                    )
+            );
+        }
+
+
+        if (tvBudgetPercentage != null) {
+
+            tvBudgetPercentage.setText(
+                    percentage + "% Used"
+            );
+        }
+
+
+        if (progressFamilyBudget != null) {
+
+            progressFamilyBudget.setProgress(
+                    percentage
+            );
+        }
+    }
     // =====================================================
     // NO TRANSACTIONS
     // =====================================================
