@@ -4,9 +4,20 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.database.Cursor;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
+
+import com.google.android.material.materialswitch.MaterialSwitch;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.database.Cursor;
+import android.view.View;
+import android.widget.AdapterView;
+
+import com.google.android.material.materialswitch.MaterialSwitch;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +40,21 @@ public class AddIncomeActivity extends AppCompatActivity {
 
     private Spinner spIncomeCategory;
     private Spinner spIncomeSource;
+
+    private MaterialSwitch switchShareFamily;
+
+    private LinearLayout layoutFamilySelection;
+
+    private Spinner spFamily;
+
+    private ArrayList<Integer> familyIds =
+            new ArrayList<>();
+
+    private ArrayList<String> familyNames =
+            new ArrayList<>();
+
+    private int selectedFamilyId = -1;
+
 
     private Button btnSaveIncome;
     private ImageButton btnBack;
@@ -74,6 +100,15 @@ public class AddIncomeActivity extends AppCompatActivity {
 
         btnSaveIncome = findViewById(R.id.btnSaveIncome);
         btnBack = findViewById(R.id.btnBack);
+
+        switchShareFamily =
+                findViewById(R.id.switchShareFamily);
+
+        layoutFamilySelection =
+                findViewById(R.id.layoutFamilySelection);
+
+        spFamily =
+                findViewById(R.id.spFamily);
     }
 
     /**
@@ -89,6 +124,27 @@ public class AddIncomeActivity extends AppCompatActivity {
 
         btnSaveIncome.setOnClickListener(
                 view -> saveIncome()
+        );
+        switchShareFamily.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> {
+
+                    if (isChecked) {
+
+                        layoutFamilySelection.setVisibility(
+                                View.VISIBLE
+                        );
+
+                        loadFamilies();
+
+                    } else {
+
+                        layoutFamilySelection.setVisibility(
+                                View.GONE
+                        );
+
+                        selectedFamilyId = -1;
+                    }
+                }
         );
     }
 
@@ -156,6 +212,107 @@ public class AddIncomeActivity extends AppCompatActivity {
         );
 
         spIncomeCategory.setAdapter(adapter);
+    }
+
+    private void loadFamilies() {
+
+        familyIds.clear();
+        familyNames.clear();
+
+        if (currentUser == null) {
+            return;
+        }
+
+        int userId =
+                databaseHelper.getUserIdByFirebaseUid(
+                        currentUser.getUid()
+                );
+
+        if (userId == -1) {
+            return;
+        }
+
+        Cursor cursor =
+                databaseHelper.getFamiliesForUser(
+                        userId
+                );
+
+        if (cursor != null) {
+
+            try {
+
+                int idIndex =
+                        cursor.getColumnIndex(
+                                DatabaseHelper.FAMILY_ID
+                        );
+
+                int nameIndex =
+                        cursor.getColumnIndex(
+                                DatabaseHelper.FAMILY_NAME
+                        );
+
+                while (cursor.moveToNext()) {
+
+                    if (idIndex != -1 &&
+                            nameIndex != -1) {
+
+                        familyIds.add(
+                                cursor.getInt(idIndex)
+                        );
+
+                        familyNames.add(
+                                cursor.getString(nameIndex)
+                        );
+                    }
+                }
+
+            } finally {
+
+                cursor.close();
+            }
+        }
+
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_spinner_item,
+                        familyNames
+                );
+
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+        );
+
+        spFamily.setAdapter(adapter);
+
+        spFamily.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+
+                    @Override
+                    public void onItemSelected(
+                            AdapterView<?> parent,
+                            View view,
+                            int position,
+                            long id
+                    ) {
+
+                        if (position >= 0 &&
+                                position < familyIds.size()) {
+
+                            selectedFamilyId =
+                                    familyIds.get(position);
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(
+                            AdapterView<?> parent
+                    ) {
+
+                        selectedFamilyId = -1;
+                    }
+                }
+        );
     }
 
     /**
@@ -346,9 +503,24 @@ public class AddIncomeActivity extends AppCompatActivity {
          * Every income added from this page belongs
          * to the currently logged-in personal user.
          */
-        String incomeMode = "Personal";
+        String incomeMode =
+                switchShareFamily.isChecked()
+                        ? "Family"
+                        : "Personal";
 
-        long result =
+        if ("Family".equals(incomeMode) &&
+                selectedFamilyId == -1) {
+
+            Toast.makeText(
+                    this,
+                    "Please select a family.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        long transactionId =
                 databaseHelper.insertTransaction(
                         userId,
                         paymentMethodId,
@@ -360,7 +532,55 @@ public class AddIncomeActivity extends AppCompatActivity {
                         incomeMode
                 );
 
-        if (result != -1) {
+        if (transactionId == -1) {
+
+            Toast.makeText(
+                    this,
+                    "Failed to save income.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        if ("Family".equals(incomeMode)) {
+
+            boolean shared =
+                    databaseHelper.shareIncomeWithFamily(
+                            (int) transactionId,
+                            selectedFamilyId,
+                            userId
+                    );
+
+            if (!shared) {
+
+                Toast.makeText(
+                        this,
+                        "Income saved, but family sharing failed.",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                return;
+            }
+
+            Toast.makeText(
+                    this,
+                    "Family income added successfully.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+        } else {
+
+            Toast.makeText(
+                    this,
+                    "Personal income added successfully.",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+
+        finish();
+
+        if (transactionId != -1) {
 
             Toast.makeText(
                     this,

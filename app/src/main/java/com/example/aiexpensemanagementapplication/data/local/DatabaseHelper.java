@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 13;
 
     //========================================================
     // USER TABLE
@@ -39,6 +39,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String FIREBASE_UID = "FirebaseUid";
     public static final String TABLE_USER = "User";
 
+    // =====================================================
+// INCOME FAMILY SHARE TABLE
+// =====================================================
+
+    public static final String TABLE_INCOME_FAMILY_SHARE =
+            "IncomeFamilyShare";
     public static final String USER_ID = "UserID";
     public static final String USER_NAME = "Name";
     public static final String USER_EMAIL = "Email";
@@ -317,6 +323,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_REPORT_TABLE);
 
+        db.execSQL(CREATE_INCOME_FAMILY_SHARE_TABLE);
+
         insertDefaultCategories(db);
 
         insertDefaultPaymentMethods(db);
@@ -444,6 +452,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "ON DELETE CASCADE" +
 
                     ");";
+    private static final String CREATE_INCOME_FAMILY_SHARE_TABLE =
+            "CREATE TABLE IF NOT EXISTS " +
+                    TABLE_INCOME_FAMILY_SHARE +
+                    " (" +
+                    "IncomeShareID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    TRANSACTION_ID +
+                    " INTEGER NOT NULL UNIQUE," +
+                    FAMILY_ID +
+                    " INTEGER NOT NULL," +
+                    SHARED_BY +
+                    " INTEGER NOT NULL," +
+                    SHARED_AT +
+                    " INTEGER NOT NULL" +
+                    ")";
     private static final String CREATE_BUDGET_TABLE =
             "CREATE TABLE " + TABLE_BUDGET + " (" +
                     BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -695,6 +717,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             TABLE_FAMILY + "(" + FAMILY_ID + ") " +
                             "ON DELETE CASCADE" +
 
+                            ")"
+            );
+        }
+        if (oldVersion < 13) {
+
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                            TABLE_INCOME_FAMILY_SHARE +
+                            " (" +
+                            "IncomeShareID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            TRANSACTION_ID +
+                            " INTEGER NOT NULL UNIQUE," +
+                            FAMILY_ID +
+                            " INTEGER NOT NULL," +
+                            SHARED_BY +
+                            " INTEGER NOT NULL," +
+                            SHARED_AT +
+                            " INTEGER NOT NULL" +
                             ")"
             );
         }
@@ -1485,6 +1525,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return total;
 
+    }
+
+    public double getFamilyTotalIncome(
+            int familyId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        String query =
+                "SELECT IFNULL(SUM(t." +
+                        AMOUNT +
+                        "),0) " +
+
+                        "FROM " +
+                        TABLE_INCOME_FAMILY_SHARE +
+                        " ifs " +
+
+                        "INNER JOIN " +
+                        TABLE_TRANSACTION +
+                        " t ON ifs." +
+                        TRANSACTION_ID +
+                        " = t." +
+                        TRANSACTION_ID +
+
+                        " WHERE ifs." +
+                        FAMILY_ID +
+                        "=? " +
+
+                        "AND t." +
+                        TRANSACTION_TYPE +
+                        "='Income'";
+
+        Cursor cursor =
+                db.rawQuery(
+                        query,
+                        new String[]{
+                                String.valueOf(familyId)
+                        }
+                );
+
+        double total = 0;
+
+        if (cursor.moveToFirst()) {
+            total = cursor.getDouble(0);
+        }
+
+        cursor.close();
+
+        return total;
     }
 
     public int getTransactionCount(int userId) {
@@ -6385,6 +6475,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return firestoreFamilyId;
+    }
+
+    public boolean shareIncomeWithFamily(
+            int transactionId,
+            int familyId,
+            int sharedByUserId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        if (!isFamilyMember(
+                familyId,
+                sharedByUserId
+        )) {
+
+            return false;
+        }
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(
+                TRANSACTION_ID,
+                transactionId
+        );
+
+        values.put(
+                FAMILY_ID,
+                familyId
+        );
+
+        values.put(
+                SHARED_BY,
+                sharedByUserId
+        );
+
+        values.put(
+                SHARED_AT,
+                System.currentTimeMillis()
+        );
+
+        long result =
+                db.insertWithOnConflict(
+                        TABLE_INCOME_FAMILY_SHARE,
+                        null,
+                        values,
+                        SQLiteDatabase.CONFLICT_REPLACE
+                );
+
+        return result != -1;
     }
 
     // =====================================================

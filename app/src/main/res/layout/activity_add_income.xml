@@ -177,6 +177,62 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+            <!-- Family Sharing Card -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#F8FAFC"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="3dp"
+                app:strokeColor="#B8BEC7"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switchShareFamily"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Share with Family"
+                        android:textColor="#111827"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:checked="false" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutFamilySelection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Select Family"
+                            android:textColor="#6B7280"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/spFamily"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="8dp"
+                            android:spinnerMode="dropdown" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Income Date Card -->
 

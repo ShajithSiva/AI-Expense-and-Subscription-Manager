@@ -111,6 +111,8 @@ public class FamilyDashboardFragment extends Fragment {
 
     private TextView tvFamilySpending;
 
+    private TextView tvFamilySharedIncome;
+
     private LinearLayout familyTransactionsContainer;
 
     private PieChart familyPieChart;
@@ -450,6 +452,10 @@ public class FamilyDashboardFragment extends Fragment {
                 view.findViewById(
                         R.id.btnFamilyOptions
                 );
+        tvFamilySharedIncome =
+                view.findViewById(
+                        R.id.tvFamilySharedIncome
+                );
 
         btnInviteMember =
                 view.findViewById(
@@ -672,6 +678,22 @@ public class FamilyDashboardFragment extends Fragment {
                         .getFamilyTotalExpense(
                                 selectedFamilyId
                         );
+
+        double totalIncome =
+                databaseHelper.getFamilyTotalIncome(
+                        selectedFamilyId
+                );
+
+        if (tvFamilySharedIncome != null) {
+
+            tvFamilySharedIncome.setText(
+                    String.format(
+                            Locale.getDefault(),
+                            "Rs %,.2f",
+                            totalIncome
+                    )
+            );
+        }
 
 
         if (tvFamilySpending != null) {

@@ -238,15 +238,12 @@
                             android:textSize="11sp" />
 
                         <TextView
-                            android:id="@+id/tvSharedIncome"
+                            android:id="@+id/tvFamilySharedIncome"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
                             android:text="Rs 0.00"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            tools:text="Rs 150,000.00" />
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 
