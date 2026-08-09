@@ -4,6 +4,15 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.database.Cursor;
+import android.view.View;
+import android.widget.Spinner;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
+
+import com.google.android.material.materialswitch.MaterialSwitch;
+
+import java.util.ArrayList;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +43,18 @@ public class AddSubscriptionActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
 
     private int userId;
+
+    private MaterialSwitch switchShareFamily;
+    private LinearLayout layoutFamilySelection;
+    private Spinner spFamily;
+
+    private ArrayList<Integer> familyIds =
+            new ArrayList<>();
+
+    private ArrayList<String> familyNames =
+            new ArrayList<>();
+
+    private int selectedFamilyId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +91,15 @@ public class AddSubscriptionActivity extends AppCompatActivity {
         btnSave=findViewById(R.id.btnSave);
 
         btnCancel=findViewById(R.id.btnCancel);
+
+        switchShareFamily =
+                findViewById(R.id.switchShareFamily);
+
+        layoutFamilySelection =
+                findViewById(R.id.layoutFamilySelection);
+
+        spFamily =
+                findViewById(R.id.spFamily);
 
     }
 
@@ -158,12 +188,172 @@ public class AddSubscriptionActivity extends AppCompatActivity {
 
     private void setupListeners(){
 
-        btnSave.setOnClickListener(v->saveSubscription());
+        btnSave.setOnClickListener(
+                v -> saveSubscription()
+        );
 
-        btnCancel.setOnClickListener(v->finish());
+        btnCancel.setOnClickListener(
+                v -> finish()
+        );
 
+
+        // =================================================
+        // FAMILY SHARING SWITCH
+        // =================================================
+
+        switchShareFamily.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> {
+
+                    if (isChecked) {
+
+                        layoutFamilySelection.setVisibility(
+                                View.VISIBLE
+                        );
+
+                        loadFamilies();
+
+                    } else {
+
+                        layoutFamilySelection.setVisibility(
+                                View.GONE
+                        );
+
+                        selectedFamilyId = -1;
+                    }
+                }
+        );
     }
 
+    private void loadFamilies() {
+
+        familyIds.clear();
+        familyNames.clear();
+
+
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+
+        if (firebaseUser == null) {
+            return;
+        }
+
+
+        String firebaseUid =
+                firebaseUser.getUid();
+
+
+        int userId =
+                databaseHelper
+                        .getUserIdByFirebaseUid(
+                                firebaseUid
+                        );
+
+
+        if (userId == -1) {
+            return;
+        }
+
+
+        Cursor cursor =
+                databaseHelper.getFamiliesForUser(
+                        userId
+                );
+
+
+        if (cursor != null) {
+
+            try {
+
+                int idIndex =
+                        cursor.getColumnIndex(
+                                DatabaseHelper.FAMILY_ID
+                        );
+
+                int nameIndex =
+                        cursor.getColumnIndex(
+                                DatabaseHelper.FAMILY_NAME
+                        );
+
+
+                while (cursor.moveToNext()) {
+
+                    if (idIndex != -1 &&
+                            nameIndex != -1) {
+
+                        familyIds.add(
+                                cursor.getInt(
+                                        idIndex
+                                )
+                        );
+
+                        familyNames.add(
+                                cursor.getString(
+                                        nameIndex
+                                )
+                        );
+                    }
+                }
+
+            } finally {
+
+                cursor.close();
+            }
+        }
+
+
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(
+                        this,
+                        android.R.layout
+                                .simple_spinner_item,
+                        familyNames
+                );
+
+
+        adapter.setDropDownViewResource(
+                android.R.layout
+                        .simple_spinner_dropdown_item
+        );
+
+
+        spFamily.setAdapter(adapter);
+
+
+        spFamily.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+
+                    @Override
+                    public void onItemSelected(
+                            AdapterView<?> parent,
+                            View view,
+                            int position,
+                            long id
+                    ) {
+
+                        if (position >= 0 &&
+                                position < familyIds.size()) {
+
+                            selectedFamilyId =
+                                    familyIds.get(
+                                            position
+                                    );
+                        }
+                    }
+
+
+                    @Override
+                    public void onNothingSelected(
+                            AdapterView<?> parent
+                    ) {
+
+                        selectedFamilyId = -1;
+                    }
+                }
+        );
+    }
     private boolean validateInputs(){
 
         if(etServiceName.getText().toString().trim().isEmpty()){
@@ -202,46 +392,207 @@ public class AddSubscriptionActivity extends AppCompatActivity {
 
     }
 
-    private void saveSubscription(){
+    private void saveSubscription() {
 
-        if(!validateInputs())
+        // ---------------------------------------------
+        // GET INPUT VALUES
+        // ---------------------------------------------
+
+        String serviceName =
+                etServiceName
+                        .getText()
+                        .toString()
+                        .trim();
+
+        String amountText =
+                etAmount
+                        .getText()
+                        .toString()
+                        .trim();
+
+        String billingCycle =
+                actBillingCycle
+                        .getText()
+                        .toString()
+                        .trim();
+
+        String nextBillingDate =
+                etNextBillingDate
+                        .getText()
+                        .toString()
+                        .trim();
+
+
+        // ---------------------------------------------
+        // VALIDATION
+        // ---------------------------------------------
+
+        if (serviceName.isEmpty()) {
+
+            etServiceName.setError(
+                    "Enter service name"
+            );
+
+            etServiceName.requestFocus();
+
             return;
-
-        long result=databaseHelper.insertSubscription(
-
-                userId,
-
-                etServiceName.getText().toString().trim(),
-
-                Double.parseDouble(
-                        etAmount.getText().toString()),
-
-                actBillingCycle.getText().toString(),
-
-                etNextBillingDate.getText().toString()
-
-        );
-
-        if(result!=-1){
-
-            Toast.makeText(
-                    this,
-                    "Subscription Added Successfully",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-            finish();
-
-        }else{
-
-            Toast.makeText(
-                    this,
-                    "Failed to Save",
-                    Toast.LENGTH_SHORT
-            ).show();
-
         }
 
+
+        if (amountText.isEmpty()) {
+
+            etAmount.setError(
+                    "Enter amount"
+            );
+
+            etAmount.requestFocus();
+
+            return;
+        }
+
+
+        if (billingCycle.isEmpty()) {
+
+            actBillingCycle.setError(
+                    "Select billing cycle"
+            );
+
+            actBillingCycle.requestFocus();
+
+            return;
+        }
+
+
+        if (nextBillingDate.isEmpty()) {
+
+            etNextBillingDate.setError(
+                    "Select billing date"
+            );
+
+            return;
+        }
+
+
+        double amount;
+
+        try {
+
+            amount =
+                    Double.parseDouble(
+                            amountText
+                    );
+
+        } catch (NumberFormatException e) {
+
+            etAmount.setError(
+                    "Enter a valid amount"
+            );
+
+            etAmount.requestFocus();
+
+            return;
+        }
+
+
+        if (amount <= 0) {
+
+            etAmount.setError(
+                    "Amount must be greater than zero"
+            );
+
+            etAmount.requestFocus();
+
+            return;
+        }
+
+
+        // ---------------------------------------------
+        // SAVE SUBSCRIPTION
+        // ---------------------------------------------
+
+        long subscriptionId =
+                databaseHelper.insertSubscription(
+
+                        userId,
+
+                        serviceName,
+
+                        amount,
+
+                        billingCycle,
+
+                        nextBillingDate
+                );
+
+
+        if (subscriptionId == -1) {
+
+            Toast.makeText(
+                    this,
+                    "Failed to save subscription",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+
+        // ---------------------------------------------
+        // FAMILY SHARING
+        // ---------------------------------------------
+
+        if (switchShareFamily.isChecked()) {
+
+            if (selectedFamilyId == -1) {
+
+                Toast.makeText(
+                        this,
+                        "Please select a family",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+
+            boolean shared =
+                    databaseHelper
+                            .shareSubscriptionWithFamily(
+
+                                    (int) subscriptionId,
+
+                                    selectedFamilyId,
+
+                                    userId
+                            );
+
+
+            if (!shared) {
+
+                Toast.makeText(
+                        this,
+                        "Subscription saved, but family sharing failed",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                return;
+            }
+        }
+
+
+        // ---------------------------------------------
+        // SUCCESS
+        // ---------------------------------------------
+
+        Toast.makeText(
+                this,
+                switchShareFamily.isChecked()
+                        ? "Family subscription added successfully"
+                        : "Personal subscription added successfully",
+                Toast.LENGTH_SHORT
+        ).show();
+
+        finish();
     }
 
 

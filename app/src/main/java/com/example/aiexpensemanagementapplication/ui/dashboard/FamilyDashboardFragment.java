@@ -110,6 +110,7 @@ public class FamilyDashboardFragment extends Fragment {
     // =====================================================
 
     private TextView tvFamilySpending;
+    private TextView tvSharedSubscriptionTotal;
 
     private TextView tvFamilySharedIncome;
 
@@ -456,6 +457,10 @@ public class FamilyDashboardFragment extends Fragment {
                 view.findViewById(
                         R.id.tvFamilySharedIncome
                 );
+        tvSharedSubscriptionTotal =
+                view.findViewById(
+                        R.id.tvSharedSubscriptionTotal
+                );
 
         btnInviteMember =
                 view.findViewById(
@@ -661,10 +666,13 @@ public class FamilyDashboardFragment extends Fragment {
     // LOAD SHARED EXPENSES
     // =====================================================
 
+    // =====================================================
+// LOAD SHARED EXPENSES
+// =====================================================
+
     private void loadSharedExpenses() {
 
         if (selectedFamilyId == -1) {
-
             return;
         }
 
@@ -679,6 +687,28 @@ public class FamilyDashboardFragment extends Fragment {
                                 selectedFamilyId
                         );
 
+
+        // -------------------------------------------------
+        // TOTAL FAMILY SUBSCRIPTIONS
+        // -------------------------------------------------
+
+        double totalSubscription =
+                databaseHelper
+                        .getFamilyTotalSubscription(
+                                selectedFamilyId
+                        );
+
+
+        if (tvSharedSubscriptionTotal != null) {
+
+            tvSharedSubscriptionTotal.setText(
+                    String.format(
+                            Locale.getDefault(),
+                            "Rs %,.2f",
+                            totalSubscription
+                    )
+            );
+        }
         double totalIncome =
                 databaseHelper.getFamilyTotalIncome(
                         selectedFamilyId
@@ -696,10 +726,13 @@ public class FamilyDashboardFragment extends Fragment {
         }
 
 
+        // -------------------------------------------------
+        // UPDATE FAMILY SPENDING
+        // -------------------------------------------------
+
         if (tvFamilySpending != null) {
 
             tvFamilySpending.setText(
-
                     String.format(
                             Locale.getDefault(),
                             "Rs %,.2f",
@@ -736,6 +769,8 @@ public class FamilyDashboardFragment extends Fragment {
         loadRecentFamilyTransactions(
                 expenses
         );
+
+
         loadFamilyBudget();
     }
 
