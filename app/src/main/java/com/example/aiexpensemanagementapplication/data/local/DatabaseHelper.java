@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 13;
 
     //========================================================
     // USER TABLE
@@ -166,17 +166,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String SERVICE_NAME = "ServiceName";
     public static final String BILLING_CYCLE = "BillingCycle";
     public static final String NEXT_BILLING_DATE = "NextBillingDate";
-
-    // =====================================================
-// SUBSCRIPTION FAMILY SHARE
-// =====================================================
-
-    public static final String TABLE_SUBSCRIPTION_FAMILY_SHARE =
-            "SubscriptionFamilyShare";
-
-    public static final String SUBSCRIPTION_SHARE_ID =
-            "SubscriptionShareID";
-
 
     //========================================================
     // USAGE DATA
@@ -328,10 +317,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_SUBSCRIPTION_TABLE);
 
-        db.execSQL(
-                CREATE_SUBSCRIPTION_FAMILY_SHARE_TABLE
-        );
-
         db.execSQL(CREATE_USAGE_DATA_TABLE);
 
         db.execSQL(CREATE_ALERT_TABLE);
@@ -347,28 +332,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_NOTIFICATION_PREFERENCES_TABLE);
 
         db.execSQL(CREATE_FINANCIAL_PREFERENCES_TABLE);
-        db.execSQL(
-                "CREATE TABLE " +
-                        TABLE_SUBSCRIPTION_FAMILY_SHARE +
-                        " (" +
-
-                        SUBSCRIPTION_SHARE_ID +
-                        " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-
-                        SUBSCRIPTION_ID +
-                        " INTEGER NOT NULL, " +
-
-                        FAMILY_ID +
-                        " INTEGER NOT NULL, " +
-
-                        SHARED_BY +
-                        " INTEGER NOT NULL, " +
-
-                        SHARED_AT +
-                        " INTEGER NOT NULL" +
-
-                        ")"
-        );
 
         db.execSQL(CREATE_BUDGET_SETTINGS_TABLE);
 
@@ -557,50 +520,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     NEXT_BILLING_DATE + " TEXT," +
                     "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
                     TABLE_USER + "(" + USER_ID + ")" +
-                    ");";
-    private static final String CREATE_SUBSCRIPTION_FAMILY_SHARE_TABLE =
-            "CREATE TABLE " +
-                    TABLE_SUBSCRIPTION_FAMILY_SHARE + " (" +
-
-                    SUBSCRIPTION_SHARE_ID +
-                    " INTEGER PRIMARY KEY AUTOINCREMENT," +
-
-                    SUBSCRIPTION_ID +
-                    " INTEGER NOT NULL UNIQUE," +
-
-                    FAMILY_ID +
-                    " INTEGER NOT NULL," +
-
-                    SHARED_BY +
-                    " INTEGER NOT NULL," +
-
-                    SHARED_AT +
-                    " INTEGER NOT NULL," +
-
-                    "FOREIGN KEY(" +
-                    SUBSCRIPTION_ID +
-                    ") REFERENCES " +
-                    TABLE_SUBSCRIPTION +
-                    "(" +
-                    SUBSCRIPTION_ID +
-                    ") ON DELETE CASCADE," +
-
-                    "FOREIGN KEY(" +
-                    FAMILY_ID +
-                    ") REFERENCES " +
-                    TABLE_FAMILY +
-                    "(" +
-                    FAMILY_ID +
-                    ") ON DELETE CASCADE," +
-
-                    "FOREIGN KEY(" +
-                    SHARED_BY +
-                    ") REFERENCES " +
-                    TABLE_USER +
-                    "(" +
-                    USER_ID +
-                    ") ON DELETE CASCADE" +
-
                     ");";
 
     private static final String CREATE_BUDGET_SETTINGS_TABLE =
@@ -802,79 +721,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             );
         }
         if (oldVersion < 13) {
-
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS " +
-                            TABLE_INCOME_FAMILY_SHARE +
-                            " (" +
-                            "IncomeShareID INTEGER PRIMARY KEY AUTOINCREMENT," +
-                            TRANSACTION_ID +
-                            " INTEGER NOT NULL UNIQUE," +
-                            FAMILY_ID +
-                            " INTEGER NOT NULL," +
-                            SHARED_BY +
-                            " INTEGER NOT NULL," +
-                            SHARED_AT +
-                            " INTEGER NOT NULL" +
-                            ")"
-            );
-        }
-
-        // -------------------------------------------------
-// VERSION 13 -> VERSION 14
-// Add subscription-family sharing support
-// -------------------------------------------------
-
-        if (oldVersion < 14) {
-
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS " +
-                            TABLE_SUBSCRIPTION_FAMILY_SHARE +
-                            " (" +
-
-                            SUBSCRIPTION_SHARE_ID +
-                            " INTEGER PRIMARY KEY AUTOINCREMENT," +
-
-                            SUBSCRIPTION_ID +
-                            " INTEGER NOT NULL UNIQUE," +
-
-                            FAMILY_ID +
-                            " INTEGER NOT NULL," +
-
-                            SHARED_BY +
-                            " INTEGER NOT NULL," +
-
-                            SHARED_AT +
-                            " INTEGER NOT NULL," +
-
-                            "FOREIGN KEY(" +
-                            SUBSCRIPTION_ID +
-                            ") REFERENCES " +
-                            TABLE_SUBSCRIPTION +
-                            "(" +
-                            SUBSCRIPTION_ID +
-                            ") ON DELETE CASCADE," +
-
-                            "FOREIGN KEY(" +
-                            FAMILY_ID +
-                            ") REFERENCES " +
-                            TABLE_FAMILY +
-                            "(" +
-                            FAMILY_ID +
-                            ") ON DELETE CASCADE," +
-
-                            "FOREIGN KEY(" +
-                            SHARED_BY +
-                            ") REFERENCES " +
-                            TABLE_USER +
-                            "(" +
-                            USER_ID +
-                            ") ON DELETE CASCADE" +
-
-                            ")"
-            );
-        }
-        if (oldVersion < 15) {
 
             db.execSQL(
                     "CREATE TABLE IF NOT EXISTS " +
@@ -6231,196 +6077,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         return exists;
-    }
-
-    // =====================================================
-// SHARE SUBSCRIPTION WITH FAMILY
-// =====================================================
-
-    public boolean shareSubscriptionWithFamily(
-            int subscriptionId,
-            int familyId,
-            int sharedByUserId
-    ) {
-
-        SQLiteDatabase db =
-                getWritableDatabase();
-
-
-        // -------------------------------------------------
-        // CHECK FAMILY MEMBERSHIP
-        // -------------------------------------------------
-
-        if (!isFamilyMember(
-                familyId,
-                sharedByUserId
-        )) {
-
-            return false;
-        }
-
-
-        // -------------------------------------------------
-        // SAVE FAMILY SHARE
-        // -------------------------------------------------
-
-        ContentValues values =
-                new ContentValues();
-
-
-        values.put(
-                SUBSCRIPTION_ID,
-                subscriptionId
-        );
-
-        values.put(
-                FAMILY_ID,
-                familyId
-        );
-
-        values.put(
-                SHARED_BY,
-                sharedByUserId
-        );
-
-        values.put(
-                SHARED_AT,
-                System.currentTimeMillis()
-        );
-
-
-        long result =
-                db.insertWithOnConflict(
-                        TABLE_SUBSCRIPTION_FAMILY_SHARE,
-                        null,
-                        values,
-                        SQLiteDatabase.CONFLICT_REPLACE
-                );
-
-
-        return result != -1;
-    }
-
-
-
-    public int getFamilyIdForSubscription(
-            int subscriptionId
-    ) {
-
-        SQLiteDatabase db =
-                getReadableDatabase();
-
-        Cursor cursor =
-                db.rawQuery(
-                        "SELECT " +
-                                FAMILY_ID +
-                                " FROM " +
-                                TABLE_SUBSCRIPTION_FAMILY_SHARE +
-                                " WHERE " +
-                                SUBSCRIPTION_ID +
-                                "=? LIMIT 1",
-
-                        new String[]{
-                                String.valueOf(
-                                        subscriptionId
-                                )
-                        }
-                );
-
-        int familyId = -1;
-
-        if (cursor.moveToFirst()) {
-
-            familyId =
-                    cursor.getInt(0);
-        }
-
-        cursor.close();
-
-        return familyId;
-    }
-
-    public boolean removeSubscriptionFromFamily(
-            int subscriptionId
-    ) {
-
-        SQLiteDatabase db =
-                getWritableDatabase();
-
-        int deletedRows =
-                db.delete(
-                        TABLE_SUBSCRIPTION_FAMILY_SHARE,
-
-                        SUBSCRIPTION_ID + "=?",
-
-                        new String[]{
-                                String.valueOf(
-                                        subscriptionId
-                                )
-                        }
-                );
-
-        return deletedRows > 0;
-    }
-
-    // =====================================================
-// GET TOTAL SUBSCRIPTION FOR FAMILY
-// =====================================================
-
-    public double getFamilyTotalSubscription(
-            int familyId
-    ) {
-
-        SQLiteDatabase db =
-                getReadableDatabase();
-
-
-        String query =
-                "SELECT IFNULL(SUM(s." +
-                        AMOUNT +
-                        "),0) " +
-
-                        "FROM " +
-                        TABLE_SUBSCRIPTION_FAMILY_SHARE +
-                        " sf " +
-
-                        "INNER JOIN " +
-                        TABLE_SUBSCRIPTION +
-                        " s ON sf." +
-                        SUBSCRIPTION_ID +
-                        " = s." +
-                        SUBSCRIPTION_ID +
-
-                        " WHERE sf." +
-                        FAMILY_ID +
-                        "=?";
-
-
-        Cursor cursor =
-                db.rawQuery(
-                        query,
-                        new String[]{
-                                String.valueOf(
-                                        familyId
-                                )
-                        }
-                );
-
-
-        double total = 0;
-
-
-        if (cursor.moveToFirst()) {
-
-            total =
-                    cursor.getDouble(0);
-        }
-
-
-        cursor.close();
-
-
-        return total;
     }
 
     // =====================================================
