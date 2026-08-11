@@ -16,6 +16,17 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import android.view.View;
+import android.widget.Spinner;
+
+import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
+
+import java.util.ArrayList;
+
+import android.widget.LinearLayout;
+
+import com.google.android.material.materialswitch.MaterialSwitch;
+
 import java.util.Calendar;
 
 public class AddSubscriptionActivity extends AppCompatActivity {
@@ -35,6 +46,20 @@ public class AddSubscriptionActivity extends AppCompatActivity {
 
     private int userId;
 
+    private MaterialSwitch switchShareFamily;
+    private LinearLayout layoutFamilySelection;
+    private Spinner spFamily;
+
+    private FamilyFirestoreService familyFirestoreService;
+
+    private int selectedFamilyId = -1;
+
+    private ArrayList<Integer> familyIds =
+            new ArrayList<>();
+    private ArrayList<String> familyNames =
+            new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +69,14 @@ public class AddSubscriptionActivity extends AppCompatActivity {
 
         setupToolbar();
 
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper =
+                new DatabaseHelper(this);
+
+        familyFirestoreService =
+                new FamilyFirestoreService();
+
+
+        loadUserFamilies();
 
         initializeUser();
 
@@ -53,6 +85,10 @@ public class AddSubscriptionActivity extends AppCompatActivity {
         setupDatePicker();
 
         setupListeners();
+
+        setupFamilySharing();
+
+
     }
 
     private void initializeViews(){
@@ -71,6 +107,186 @@ public class AddSubscriptionActivity extends AppCompatActivity {
 
         btnCancel=findViewById(R.id.btnCancel);
 
+        switchShareFamily =
+                findViewById(R.id.switchShareFamily);
+
+        layoutFamilySelection =
+                findViewById(R.id.layoutFamilySelection);
+
+        spFamily =
+                findViewById(R.id.spFamily);
+
+    }
+
+
+    private void setupFamilySharing() {
+
+        switchShareFamily.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> {
+
+                    if (isChecked) {
+
+                        if (familyIds.isEmpty()) {
+
+                            switchShareFamily.setChecked(false);
+
+                            Toast.makeText(
+                                    this,
+                                    "You are not a member of any family group.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            return;
+                        }
+
+                        layoutFamilySelection.setVisibility(
+                                View.VISIBLE
+                        );
+
+                    } else {
+
+                        layoutFamilySelection.setVisibility(
+                                View.GONE
+                        );
+
+                        selectedFamilyId = -1;
+                    }
+                }
+        );
+    }
+
+    // =====================================================
+    // LOAD USER FAMILIES
+    // =====================================================
+
+    private void loadUserFamilies() {
+
+        FirebaseUser currentUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (currentUser == null) {
+
+            switchShareFamily.setEnabled(false);
+
+            return;
+        }
+
+        int localUserId =
+                databaseHelper.getUserIdByFirebaseUid(
+                        currentUser.getUid()
+                );
+
+        if (localUserId == -1) {
+
+            switchShareFamily.setEnabled(false);
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // GET FAMILY IDs
+        // -------------------------------------------------
+
+        familyIds =
+                databaseHelper.getFamilyIdsForUser(
+                        localUserId
+                );
+
+        // -------------------------------------------------
+        // GET FAMILY NAMES
+        // -------------------------------------------------
+
+        familyNames =
+                databaseHelper.getFamilyNamesForUser(
+                        localUserId
+                );
+
+        // -------------------------------------------------
+        // SAFETY CHECK
+        // -------------------------------------------------
+
+        if (familyIds == null ||
+                familyNames == null ||
+                familyIds.size() != familyNames.size()) {
+
+            familyIds.clear();
+            familyNames.clear();
+
+            switchShareFamily.setEnabled(false);
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // NO FAMILY
+        // -------------------------------------------------
+
+        if (familyIds.isEmpty()) {
+
+            switchShareFamily.setChecked(false);
+
+            switchShareFamily.setEnabled(false);
+
+            layoutFamilySelection.setVisibility(
+                    View.GONE
+            );
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // FAMILY AVAILABLE
+        // -------------------------------------------------
+
+        switchShareFamily.setEnabled(true);
+
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_spinner_item,
+                        familyNames
+                );
+
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+        );
+
+        spFamily.setAdapter(adapter);
+
+        // -------------------------------------------------
+        // FAMILY SELECTION
+        // -------------------------------------------------
+
+        spFamily.setOnItemSelectedListener(
+                new android.widget.AdapterView.OnItemSelectedListener() {
+
+                    @Override
+                    public void onItemSelected(
+                            android.widget.AdapterView<?> parent,
+                            View view,
+                            int position,
+                            long id
+                    ) {
+
+                        if (position >= 0 &&
+                                position < familyIds.size()) {
+
+                            selectedFamilyId =
+                                    familyIds.get(position);
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(
+                            android.widget.AdapterView<?> parent
+                    ) {
+
+                        selectedFamilyId = -1;
+                    }
+                }
+        );
     }
 
     private void setupToolbar(){
@@ -202,46 +418,246 @@ public class AddSubscriptionActivity extends AppCompatActivity {
 
     }
 
-    private void saveSubscription(){
+    // =====================================================
+// SAVE SUBSCRIPTION
+// =====================================================
 
-        if(!validateInputs())
+    private void saveSubscription() {
+
+        if (!validateInputs()) {
             return;
+        }
 
-        long result=databaseHelper.insertSubscription(
+        // -------------------------------------------------
+        // GET CURRENT FIREBASE USER
+        // -------------------------------------------------
 
-                userId,
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
 
-                etServiceName.getText().toString().trim(),
-
-                Double.parseDouble(
-                        etAmount.getText().toString()),
-
-                actBillingCycle.getText().toString(),
-
-                etNextBillingDate.getText().toString()
-
-        );
-
-        if(result!=-1){
+        if (firebaseUser == null) {
 
             Toast.makeText(
                     this,
-                    "Subscription Added Successfully",
+                    "User session not found. Please login again.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // GET INPUT VALUES
+        // -------------------------------------------------
+
+        String serviceName =
+                etServiceName
+                        .getText()
+                        .toString()
+                        .trim();
+
+        double amount;
+
+        try {
+
+            amount =
+                    Double.parseDouble(
+                            etAmount
+                                    .getText()
+                                    .toString()
+                                    .trim()
+                    );
+
+        } catch (NumberFormatException e) {
+
+            etAmount.setError(
+                    "Enter a valid amount"
+            );
+
+            return;
+        }
+
+        if (amount <= 0) {
+
+            etAmount.setError(
+                    "Amount must be greater than 0"
+            );
+
+            return;
+        }
+
+        String billingCycle =
+                actBillingCycle
+                        .getText()
+                        .toString()
+                        .trim();
+
+        String nextBillingDate =
+                etNextBillingDate
+                        .getText()
+                        .toString()
+                        .trim();
+
+        // -------------------------------------------------
+        // FAMILY VALIDATION
+        // -------------------------------------------------
+
+        if (switchShareFamily.isChecked() &&
+                selectedFamilyId == -1) {
+
+            Toast.makeText(
+                    this,
+                    "Please select a family.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // SAVE TO SQLITE
+        // -------------------------------------------------
+
+        long result =
+                databaseHelper.insertSubscription(
+
+                        userId,
+
+                        serviceName,
+
+                        amount,
+
+                        billingCycle,
+
+                        nextBillingDate
+                );
+
+        if (result == -1) {
+
+            Toast.makeText(
+                    this,
+                    "Failed to save subscription.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // PERSONAL SUBSCRIPTION
+        // -------------------------------------------------
+
+        if (!switchShareFamily.isChecked()) {
+
+            Toast.makeText(
+                    this,
+                    "Subscription added successfully.",
                     Toast.LENGTH_SHORT
             ).show();
 
             finish();
 
-        }else{
+            return;
+        }
+
+        // -------------------------------------------------
+        // GET FIRESTORE FAMILY ID
+        // -------------------------------------------------
+
+        String firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(
+                        selectedFamilyId
+                );
+
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
 
             Toast.makeText(
                     this,
-                    "Failed to Save",
-                    Toast.LENGTH_SHORT
+                    "Subscription saved, but family Firestore ID was not found.",
+                    Toast.LENGTH_LONG
             ).show();
 
+            return;
         }
 
+        // -------------------------------------------------
+        // GET OWNER NAME
+        // -------------------------------------------------
+
+        String ownerName =
+                firebaseUser.getDisplayName();
+
+        if (ownerName == null ||
+                ownerName.trim().isEmpty()) {
+
+            ownerName = "Family Member";
+        }
+
+        // -------------------------------------------------
+        // DISABLE BUTTON
+        // -------------------------------------------------
+
+        btnSave.setEnabled(false);
+        btnSave.setText("Saving...");
+
+        // -------------------------------------------------
+        // SAVE FAMILY SUBSCRIPTION TO FIRESTORE
+        // -------------------------------------------------
+
+        familyFirestoreService.addFamilySubscription(
+
+                firestoreFamilyId,
+
+                String.valueOf(result),
+
+                firebaseUser.getUid(),
+
+                ownerName,
+
+                serviceName,
+
+                amount,
+
+                billingCycle,
+
+                nextBillingDate,
+
+                new FamilyFirestoreService.FamilySubscriptionCallback() {
+
+                    @Override
+                    public void onSuccess() {
+
+                        Toast.makeText(
+                                AddSubscriptionActivity.this,
+                                "Family subscription added successfully.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        btnSave.setEnabled(true);
+                        btnSave.setText(
+                                "Save Subscription"
+                        );
+
+                        Toast.makeText(
+                                AddSubscriptionActivity.this,
+                                "Subscription saved locally, but family sync failed: "
+                                        + message,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
+        );
     }
 
 

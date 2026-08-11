@@ -16,6 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
+
 public class SetFamilyBudgetActivity extends AppCompatActivity {
 
     private MaterialToolbar toolbar;
@@ -35,6 +37,8 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
     private Calendar startCalendar;
     private Calendar endCalendar;
 
+    private FamilyFirestoreService familyFirestoreService;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,9 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
 
         databaseHelper =
                 new DatabaseHelper(this);
+
+        familyFirestoreService =
+                new FamilyFirestoreService();
 
 
         // -------------------------------------------------
@@ -307,9 +314,9 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
     }
 
 
-    // =====================================================
-    // SAVE / UPDATE FAMILY BUDGET
-    // =====================================================
+// =====================================================
+// SAVE / UPDATE FAMILY BUDGET
+// =====================================================
 
     private void saveBudget() {
 
@@ -318,7 +325,6 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
                         .getText()
                         .toString()
                         .trim();
-
 
         if (amountText.isEmpty()) {
 
@@ -331,9 +337,7 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
             return;
         }
 
-
         double amount;
-
 
         try {
 
@@ -353,7 +357,6 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
             return;
         }
 
-
         if (amount <= 0) {
 
             etFamilyBudget.setError(
@@ -365,24 +368,17 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
             return;
         }
 
-
         String startDate =
                 etStartDate
                         .getText()
                         .toString()
                         .trim();
 
-
         String endDate =
                 etEndDate
                         .getText()
                         .toString()
                         .trim();
-
-
-        // -------------------------------------------------
-        // CHECK DATE
-        // -------------------------------------------------
 
         if (startDate.isEmpty()) {
 
@@ -393,7 +389,6 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
             return;
         }
 
-
         if (endDate.isEmpty()) {
 
             etEndDate.setError(
@@ -403,12 +398,42 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
             return;
         }
 
+        // -------------------------------------------------
+        // GET FIRESTORE FAMILY ID
+        // -------------------------------------------------
+
+        String firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(
+                        familyId
+                );
+
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
+
+            Toast.makeText(
+                    this,
+                    "Family Firestore ID not found.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            return;
+        }
 
         // -------------------------------------------------
-        // SAVE USING FAMILY ID
+        // DISABLE BUTTON
         // -------------------------------------------------
 
-        boolean success =
+        btnSaveFamilyBudget.setEnabled(false);
+
+        btnSaveFamilyBudget.setText(
+                "Saving..."
+        );
+
+        // -------------------------------------------------
+        // SAVE TO SQLITE
+        // -------------------------------------------------
+
+        boolean localSuccess =
                 databaseHelper.saveFamilyBudget(
 
                         familyId,
@@ -420,25 +445,73 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
                         endDate
                 );
 
+        if (!localSuccess) {
 
-        if (success) {
+            btnSaveFamilyBudget.setEnabled(true);
 
-            Toast.makeText(
-                    this,
-                    "Family budget saved successfully.",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-            finish();
-
-        } else {
+            btnSaveFamilyBudget.setText(
+                    "Save Family Budget"
+            );
 
             Toast.makeText(
                     this,
-                    "Failed to save family budget.",
-                    Toast.LENGTH_SHORT
+                    "Failed to save family budget locally.",
+                    Toast.LENGTH_LONG
             ).show();
+
+            return;
         }
+
+        // -------------------------------------------------
+        // SAVE TO FIRESTORE
+        // -------------------------------------------------
+
+        familyFirestoreService.saveFamilyBudget(
+
+                firestoreFamilyId,
+
+                amount,
+
+                startDate,
+
+                endDate,
+
+                new FamilyFirestoreService.FamilyBudgetCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            FamilyFirestoreService.FamilyBudgetData budget
+                    ) {
+
+                        Toast.makeText(
+                                SetFamilyBudgetActivity.this,
+                                "Family budget saved successfully.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        btnSaveFamilyBudget.setEnabled(true);
+
+                        btnSaveFamilyBudget.setText(
+                                "Save Family Budget"
+                        );
+
+                        Toast.makeText(
+                                SetFamilyBudgetActivity.this,
+                                "Budget saved locally, but Firestore sync failed: "
+                                        + message,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
+        );
     }
 
 

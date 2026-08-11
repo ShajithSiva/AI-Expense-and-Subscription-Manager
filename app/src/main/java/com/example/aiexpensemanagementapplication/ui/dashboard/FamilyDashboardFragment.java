@@ -1,20 +1,11 @@
 package com.example.aiexpensemanagementapplication.ui.dashboard;
 
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.content.Intent;
-import android.widget.Toast;
-
-import com.google.android.material.button.MaterialButton;
-
-import com.example.aiexpensemanagementapplication.ui.family.SetFamilyBudgetActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +25,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseModel;
 import com.example.aiexpensemanagementapplication.ui.family.CreateFamilyActivity;
 import com.example.aiexpensemanagementapplication.ui.family.InviteMemberActivity;
@@ -44,15 +36,17 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class FamilyDashboardFragment extends Fragment {
 
@@ -61,6 +55,8 @@ public class FamilyDashboardFragment extends Fragment {
     // =====================================================
 
     private DatabaseHelper databaseHelper;
+
+    private FamilyFirestoreService familyFirestoreService;
 
 
     // =====================================================
@@ -100,6 +96,9 @@ public class FamilyDashboardFragment extends Fragment {
 
     private TextView tvFamilyName;
     private TextView tvMemberCount;
+
+    private LinearLayout familyMembersContainer;
+    private TextView tvNoMembers;
 
     private ImageButton btnFamilyOptions;
     private MaterialButton btnInviteMember;
@@ -147,6 +146,9 @@ public class FamilyDashboardFragment extends Fragment {
 
         databaseHelper =
                 new DatabaseHelper(requireContext());
+
+        familyFirestoreService =
+                new FamilyFirestoreService();
 
         loadCurrentUser();
 
@@ -450,6 +452,16 @@ public class FamilyDashboardFragment extends Fragment {
                         R.id.tvMemberCount
                 );
 
+        familyMembersContainer =
+                view.findViewById(
+                        R.id.familyMembersContainer
+                );
+
+        tvNoMembers =
+                view.findViewById(
+                        R.id.tvNoMembers
+                );
+
         btnFamilyOptions =
                 view.findViewById(
                         R.id.btnFamilyOptions
@@ -483,6 +495,30 @@ public class FamilyDashboardFragment extends Fragment {
 
 
         // -------------------------------------------------
+        // FAMILY SUBSCRIPTIONS
+        // -------------------------------------------------
+
+        tvSharedSubscriptionTotal =
+                view.findViewById(
+                        R.id.tvSharedSubscriptionTotal
+                );
+
+        sharedSubscriptionsContainer =
+                view.findViewById(
+                        R.id.sharedSubscriptionsContainer
+                );
+
+        tvNoSharedSubscriptions =
+                view.findViewById(
+                        R.id.tvNoSharedSubscriptions
+                );
+
+
+
+
+
+
+        // -------------------------------------------------
         // FAMILY EXPENSE UI
         // -------------------------------------------------
 
@@ -510,8 +546,6 @@ public class FamilyDashboardFragment extends Fragment {
         tvNoCategoryData =
                 view.findViewById(R.id.tvNoCategoryData);
 
-        btnSetFamilyBudget =
-                view.findViewById(R.id.btnSetFamilyBudget);
 
         tvFamilyBudgetRemaining =
                 view.findViewById(R.id.tvFamilyBudgetRemaining);
@@ -621,33 +655,12 @@ public class FamilyDashboardFragment extends Fragment {
                         );
 
 
+
         // -------------------------------------------------
-        // MEMBER COUNT
+        // LOAD FIRESTORE FAMILY MEMBERS
         // -------------------------------------------------
 
-        int memberCount =
-                databaseHelper
-                        .getFamilyMemberCount(
-                                selectedFamilyId
-                        );
-
-
-        if (tvMemberCount != null) {
-
-            if (memberCount == 1) {
-
-                tvMemberCount.setText(
-                        "1 Member"
-                );
-
-            } else {
-
-                tvMemberCount.setText(
-                        memberCount + " Members"
-                );
-            }
-        }
-
+        loadFamilyMembers();
 
         // -------------------------------------------------
         // ROLE UI
@@ -661,12 +674,19 @@ public class FamilyDashboardFragment extends Fragment {
         // -------------------------------------------------
 
         loadSharedExpenses();
+
+        // -------------------------------------------------
+        // SUBSCRIPTIONS
+        // -------------------------------------------------
+
+        loadSharedSubscriptions();
     }
 
 
+
     // =====================================================
-// LOAD SHARED EXPENSES
-// =====================================================
+    // LOAD SHARED FAMILY EXPENSES + INCOME FROM FIRESTORE
+    // =====================================================
 
     private void loadSharedExpenses() {
 
@@ -674,108 +694,825 @@ public class FamilyDashboardFragment extends Fragment {
             return;
         }
 
-
-        // -------------------------------------------------
-        // TOTAL FAMILY SPENDING
-        // -------------------------------------------------
-
-        double totalExpense =
-                databaseHelper.getFamilyTotalExpense(
+        String firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(
                         selectedFamilyId
                 );
 
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
 
-        // -------------------------------------------------
-        // TOTAL FAMILY INCOME
-        // -------------------------------------------------
+            Toast.makeText(
+                    requireContext(),
+                    "Family Firestore ID not found.",
+                    Toast.LENGTH_SHORT
+            ).show();
 
-        double totalIncome =
-                databaseHelper.getFamilyTotalIncome(
-                        selectedFamilyId
-                );
+            return;
+        }
+
+        familyFirestoreService.getFamilyExpenses(
+                firestoreFamilyId,
+                new FamilyFirestoreService.FamilyExpensesCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            ArrayList<FamilyFirestoreService.FamilyExpenseData>
+                                    familyExpenses
+                    ) {
+
+                        if (!isAdded() || getView() == null) {
+                            return;
+                        }
+
+                        // -----------------------------------------
+                        // TOTAL FAMILY EXPENSE
+                        // -----------------------------------------
+
+                        double totalExpense = 0.0;
+
+                        if (familyExpenses != null) {
+
+                            for (
+                                    FamilyFirestoreService.FamilyExpenseData expense
+                                    : familyExpenses
+                            ) {
+
+                                if (expense != null) {
+
+                                    totalExpense +=
+                                            expense.getAmount();
+                                }
+                            }
+                        }
 
 
-        // -------------------------------------------------
-        // UPDATE INCOME
-        // -------------------------------------------------
 
-        if (tvFamilySharedIncome != null) {
+// IMPORTANT:
+// Java inner callbacks can only access final/effectively-final variables.
+                        final double finalTotalExpense = totalExpense;
 
-            tvFamilySharedIncome.setText(
-                    String.format(
-                            Locale.getDefault(),
-                            "Rs %,.2f",
-                            totalIncome
-                    )
-            );
+                        // -----------------------------------------
+                        // UPDATE TOTAL SPENDING
+                        // -----------------------------------------
+
+                        if (tvFamilySpending != null) {
+
+                            tvFamilySpending.setText(
+                                    String.format(
+                                            Locale.getDefault(),
+                                            "Rs %,.2f",
+                                            totalExpense
+                                    )
+                            );
+                        }
+
+                        // -----------------------------------------
+                        // CONVERT EXPENSE DATA
+                        // -----------------------------------------
+
+                        ArrayList<ExpenseModel> expenses =
+                                convertFamilyExpensesToModels(
+                                        familyExpenses
+                                );
+
+                        // -----------------------------------------
+                        // CATEGORY GRAPH
+                        // -----------------------------------------
+
+                        loadFamilyCategorySpending(
+                                expenses
+                        );
+
+                        // -----------------------------------------
+                        // RECENT TRANSACTIONS
+                        // -----------------------------------------
+
+                        loadRecentFamilyTransactions(
+                                expenses
+                        );
+
+                        // -----------------------------------------
+                        // FAMILY BUDGET
+                        // -----------------------------------------
+
+                        loadFamilyBudget();
+
+                        // -----------------------------------------
+                        // LOAD FAMILY INCOME
+                        // -----------------------------------------
+
+                        familyFirestoreService.getFamilyIncome(
+                                firestoreFamilyId,
+                                new FamilyFirestoreService.FamilyIncomeListCallback() {
+
+                                    @Override
+                                    public void onSuccess(
+                                            ArrayList<FamilyFirestoreService.FamilyIncomeData>
+                                                    familyIncomes
+                                    ) {
+
+                                        if (!isAdded() ||
+                                                getView() == null) {
+                                            return;
+                                        }
+
+                                        // -----------------------------
+                                        // TOTAL FAMILY INCOME
+                                        // -----------------------------
+
+                                        double totalIncome = 0.0;
+
+                                        if (familyIncomes != null) {
+
+                                            for (
+                                                    FamilyFirestoreService.FamilyIncomeData income
+                                                    : familyIncomes
+                                            ) {
+
+                                                if (income != null) {
+
+                                                    totalIncome +=
+                                                            income.getAmount();
+                                                }
+                                            }
+                                        }
+
+                                        // -----------------------------
+                                        // UPDATE SHARED INCOME
+                                        // -----------------------------
+
+                                        if (tvFamilySharedIncome != null) {
+
+                                            tvFamilySharedIncome.setText(
+                                                    String.format(
+                                                            Locale.getDefault(),
+                                                            "Rs %,.2f",
+                                                            totalIncome
+                                                    )
+                                            );
+                                        }
+
+                                        // -----------------------------
+                                        // AI INSIGHT
+                                        // -----------------------------
+
+                                        loadFamilyAIInsight(
+                                                totalIncome,
+                                                finalTotalExpense,
+                                                expenses
+                                        );
+                                    }
+
+                                    @Override
+                                    public void onFailure(
+                                            String message
+                                    ) {
+
+                                        if (!isAdded()) {
+                                            return;
+                                        }
+
+                                        if (tvFamilySharedIncome != null) {
+
+                                            tvFamilySharedIncome.setText(
+                                                    "Rs 0.00"
+                                            );
+                                        }
+
+                                        Toast.makeText(
+                                                requireContext(),
+                                                "Failed to load family income: "
+                                                        + message,
+                                                Toast.LENGTH_LONG
+                                        ).show();
+                                    }
+                                }
+                        );
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to load family expenses: "
+                                        + message,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
+        );
+    }
+
+
+    // =====================================================
+// LOAD SHARED FAMILY SUBSCRIPTIONS
+// =====================================================
+
+    private void loadSharedSubscriptions() {
+
+        if (selectedFamilyId == -1) {
+            return;
         }
 
 
         // -------------------------------------------------
-        // UPDATE EXPENSE
+        // GET FIRESTORE FAMILY ID
         // -------------------------------------------------
 
-        if (tvFamilySpending != null) {
-
-            tvFamilySpending.setText(
-                    String.format(
-                            Locale.getDefault(),
-                            "Rs %,.2f",
-                            totalExpense
-                    )
-            );
-        }
-
-
-        // -------------------------------------------------
-        // GET FAMILY EXPENSES
-        // -------------------------------------------------
-
-        ArrayList<ExpenseModel> expenses =
-                databaseHelper.getFamilyExpenses(
+        String firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(
                         selectedFamilyId
                 );
 
 
-        // -------------------------------------------------
-        // CATEGORY GRAPH
-        // -------------------------------------------------
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
 
-        loadFamilyCategorySpending(
-                expenses
-        );
+            if (tvSharedSubscriptionTotal != null) {
 
+                tvSharedSubscriptionTotal.setText(
+                        "Rs 0.00"
+                );
+            }
 
-        // -------------------------------------------------
-        // RECENT TRANSACTIONS
-        // -------------------------------------------------
+            showNoSharedSubscriptions();
 
-        loadRecentFamilyTransactions(
-                expenses
-        );
+            return;
+        }
 
 
         // -------------------------------------------------
-        // FAMILY BUDGET
+        // GET SUBSCRIPTIONS FROM FIRESTORE
         // -------------------------------------------------
 
-        loadFamilyBudget();
+        familyFirestoreService.getFamilySubscriptions(
+
+                firestoreFamilyId,
+
+                new FamilyFirestoreService
+                        .FamilySubscriptionsCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            ArrayList<FamilyFirestoreService.FamilySubscriptionData>
+                                    subscriptions
+                    ) {
+
+                        if (!isAdded() ||
+                                getView() == null) {
+
+                            return;
+                        }
 
 
-        // -------------------------------------------------
-        // AI FAMILY INSIGHT
-        // -------------------------------------------------
+                        // -----------------------------------------
+                        // TOTAL SUBSCRIPTION AMOUNT
+                        // -----------------------------------------
 
-        loadFamilyAIInsight(
-                totalIncome,
-                totalExpense,
-                expenses
+                        double total = 0.0;
+
+
+                        if (subscriptions != null) {
+
+                            for (
+                                    FamilyFirestoreService.FamilySubscriptionData subscription
+                                    : subscriptions
+                            ) {
+
+                                if (subscription != null) {
+
+                                    total +=
+                                            subscription.getAmount();
+                                }
+                            }
+                        }
+
+
+                        // -----------------------------------------
+                        // UPDATE TOTAL
+                        // -----------------------------------------
+
+                        if (tvSharedSubscriptionTotal != null) {
+
+                            tvSharedSubscriptionTotal.setText(
+
+                                    String.format(
+                                            Locale.getDefault(),
+                                            "Rs %,.2f",
+                                            total
+                                    )
+                            );
+                        }
+
+
+                        // -----------------------------------------
+                        // DISPLAY SUBSCRIPTIONS
+                        // -----------------------------------------
+
+                        displaySharedSubscriptions(
+                                subscriptions
+                        );
+                    }
+
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+
+                        if (tvSharedSubscriptionTotal != null) {
+
+                            tvSharedSubscriptionTotal.setText(
+                                    "Rs 0.00"
+                            );
+                        }
+
+
+                        showNoSharedSubscriptions();
+
+
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to load family subscriptions: "
+                                        + message,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
         );
     }
 
     // =====================================================
-// AI FAMILY INSIGHT
+// DISPLAY SHARED SUBSCRIPTIONS
 // =====================================================
+
+    private void displaySharedSubscriptions(
+            ArrayList<FamilyFirestoreService.FamilySubscriptionData>
+                    subscriptions
+    ) {
+
+        if (sharedSubscriptionsContainer == null) {
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // CLEAR OLD DATA
+        // -------------------------------------------------
+
+        sharedSubscriptionsContainer.removeAllViews();
+
+
+        // -------------------------------------------------
+        // EMPTY
+        // -------------------------------------------------
+
+        if (subscriptions == null ||
+                subscriptions.isEmpty()) {
+
+            showNoSharedSubscriptions();
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // HIDE EMPTY MESSAGE
+        // -------------------------------------------------
+
+        if (tvNoSharedSubscriptions != null) {
+
+            tvNoSharedSubscriptions.setVisibility(
+                    View.GONE
+            );
+        }
+
+
+        // -------------------------------------------------
+        // DISPLAY MAX 5
+        // -------------------------------------------------
+
+        int displayCount =
+                Math.min(
+                        subscriptions.size(),
+                        5
+                );
+
+
+        for (int i = 0;
+             i < displayCount;
+             i++) {
+
+            FamilyFirestoreService
+                    .FamilySubscriptionData subscription =
+                    subscriptions.get(i);
+
+
+            if (subscription == null) {
+                continue;
+            }
+
+
+            addSubscriptionRow(
+                    subscription,
+                    i < displayCount - 1
+            );
+        }
+    }
+
+    // =====================================================
+// ADD SUBSCRIPTION ROW
+// =====================================================
+
+    private void addSubscriptionRow(
+            FamilyFirestoreService.FamilySubscriptionData subscription,
+            boolean showDivider
+    ) {
+
+        if (subscription == null ||
+                sharedSubscriptionsContainer == null) {
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // MAIN ROW
+        // -------------------------------------------------
+
+        LinearLayout row =
+                new LinearLayout(
+                        requireContext()
+                );
+
+        row.setOrientation(
+                LinearLayout.HORIZONTAL
+        );
+
+        row.setGravity(
+                Gravity.CENTER_VERTICAL
+        );
+
+        row.setPadding(
+                0,
+                dpToPx(12),
+                0,
+                dpToPx(12)
+        );
+
+
+        // -------------------------------------------------
+        // LEFT SIDE
+        // -------------------------------------------------
+
+        LinearLayout informationLayout =
+                new LinearLayout(
+                        requireContext()
+                );
+
+        informationLayout.setOrientation(
+                LinearLayout.VERTICAL
+        );
+
+
+        LinearLayout.LayoutParams informationParams =
+                new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
+                );
+
+
+        // -------------------------------------------------
+        // SERVICE NAME
+        // -------------------------------------------------
+
+        TextView serviceView =
+                new TextView(
+                        requireContext()
+                );
+
+
+        String serviceName =
+                subscription.getServiceName();
+
+
+        if (serviceName == null ||
+                serviceName.trim().isEmpty()) {
+
+            serviceName = "Subscription";
+        }
+
+
+        serviceView.setText(
+                serviceName
+        );
+
+        serviceView.setTextSize(14);
+
+        serviceView.setTextColor(
+                Color.parseColor(
+                        "#111827"
+                )
+        );
+
+        serviceView.setTypeface(
+                Typeface.DEFAULT,
+                Typeface.BOLD
+        );
+
+
+        // -------------------------------------------------
+        // BILLING DETAILS
+        // -------------------------------------------------
+
+        TextView detailView =
+                new TextView(
+                        requireContext()
+                );
+
+
+        String billingCycle =
+                subscription.getBillingCycle();
+
+
+        if (billingCycle == null ||
+                billingCycle.trim().isEmpty()) {
+
+            billingCycle = "Subscription";
+        }
+
+
+        String nextBillingDate =
+                subscription.getNextBillingDate();
+
+
+        if (nextBillingDate == null) {
+
+            nextBillingDate = "";
+        }
+
+
+        String detailText =
+                billingCycle;
+
+
+        if (!nextBillingDate.trim().isEmpty()) {
+
+            detailText +=
+                    "  •  Next: "
+                            + nextBillingDate;
+        }
+
+
+        detailView.setText(
+                detailText
+        );
+
+        detailView.setTextSize(11);
+
+        detailView.setTextColor(
+                Color.parseColor(
+                        "#8A909C"
+                )
+        );
+
+        detailView.setPadding(
+                0,
+                dpToPx(4),
+                0,
+                0
+        );
+
+
+        informationLayout.addView(
+                serviceView
+        );
+
+        informationLayout.addView(
+                detailView
+        );
+
+
+        // -------------------------------------------------
+        // AMOUNT
+        // -------------------------------------------------
+
+        TextView amountView =
+                new TextView(
+                        requireContext()
+                );
+
+
+        amountView.setText(
+
+                String.format(
+                        Locale.getDefault(),
+                        "Rs %,.2f",
+                        subscription.getAmount()
+                )
+        );
+
+        amountView.setTextSize(13);
+
+        amountView.setTextColor(
+                Color.parseColor(
+                        "#16A34A"
+                )
+        );
+
+        amountView.setTypeface(
+                Typeface.DEFAULT,
+                Typeface.BOLD
+        );
+
+
+        // -------------------------------------------------
+        // ADD ROW
+        // -------------------------------------------------
+
+        row.addView(
+                informationLayout,
+                informationParams
+        );
+
+        row.addView(
+                amountView
+        );
+
+
+        sharedSubscriptionsContainer
+                .addView(
+                        row
+                );
+
+
+        // -------------------------------------------------
+        // DIVIDER
+        // -------------------------------------------------
+
+        if (showDivider) {
+
+            View divider =
+                    new View(
+                            requireContext()
+                    );
+
+
+            divider.setBackgroundColor(
+                    Color.parseColor(
+                            "#E5E7EB"
+                    )
+            );
+
+
+            LinearLayout.LayoutParams dividerParams =
+                    new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            dpToPx(1)
+                    );
+
+
+            sharedSubscriptionsContainer
+                    .addView(
+                            divider,
+                            dividerParams
+                    );
+        }
+    }
+
+    // =====================================================
+// NO SHARED SUBSCRIPTIONS
+// =====================================================
+
+    private void showNoSharedSubscriptions() {
+
+        if (sharedSubscriptionsContainer == null) {
+            return;
+        }
+
+
+        sharedSubscriptionsContainer.removeAllViews();
+
+
+        if (tvNoSharedSubscriptions != null) {
+
+            tvNoSharedSubscriptions.setText(
+                    "No shared subscriptions yet"
+            );
+
+            tvNoSharedSubscriptions.setVisibility(
+                    View.VISIBLE
+            );
+
+
+            sharedSubscriptionsContainer.addView(
+                    tvNoSharedSubscriptions
+            );
+        }
+    }
+
+
+
+    // =====================================================
+    // CONVERT FIRESTORE FAMILY EXPENSES
+    // TO EXISTING EXPENSE MODELS
+    // =====================================================
+
+    private ArrayList<ExpenseModel>
+    convertFamilyExpensesToModels(
+            ArrayList<FamilyFirestoreService.FamilyExpenseData>
+                    familyExpenses
+    ) {
+
+        ArrayList<ExpenseModel> expenses =
+                new ArrayList<>();
+
+        if (familyExpenses == null) {
+            return expenses;
+        }
+
+        for (
+                FamilyFirestoreService.FamilyExpenseData familyExpense
+                : familyExpenses
+        ) {
+
+            if (familyExpense == null) {
+                continue;
+            }
+
+            ExpenseModel model =
+                    new ExpenseModel(
+
+                            parseTransactionId(
+                                    familyExpense.getTransactionId()
+                            ),
+
+                            familyExpense.getCategoryId(),
+
+                            familyExpense.getPaymentMethodId(),
+
+                            familyExpense.getCategory(),
+
+                            familyExpense.getPaymentMethod(),
+
+                            familyExpense.getAmount(),
+
+                            familyExpense.getDate(),
+
+                            familyExpense.getNote(),
+
+                            "Family"
+                    );
+
+            expenses.add(model);
+        }
+
+        return expenses;
+    }
+
+    // =====================================================
+// PARSE TRANSACTION ID
+// =====================================================
+
+    private int parseTransactionId(
+            String transactionId
+    ) {
+
+        if (transactionId == null) {
+            return -1;
+        }
+
+        try {
+
+            return Integer.parseInt(
+                    transactionId
+            );
+
+        } catch (NumberFormatException e) {
+
+            return -1;
+        }
+    }
+
+
+
+    // =====================================================
+    // AI FAMILY INSIGHT
+    // =====================================================
 
     private void loadFamilyAIInsight(
             double totalIncome,
@@ -1089,7 +1826,7 @@ public class FamilyDashboardFragment extends Fragment {
         }
     }
 
-    // =====================================================
+// =====================================================
 // LOAD SELECTED FAMILY BUDGET
 // =====================================================
 
@@ -1099,144 +1836,235 @@ public class FamilyDashboardFragment extends Fragment {
             return;
         }
 
-
         // -------------------------------------------------
-        // GET BUDGET FOR SELECTED FAMILY
+        // GET FIRESTORE FAMILY ID
         // -------------------------------------------------
 
-        double budget =
-                databaseHelper.getFamilyBudgetLimit(
+        String firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(
                         selectedFamilyId
                 );
 
-
-        // -------------------------------------------------
-        // GET SPENDING FOR SELECTED FAMILY
-        // -------------------------------------------------
-
-        double spent =
-                databaseHelper.getFamilyTotalExpense(
-                        selectedFamilyId
-                );
-
-
-        // -------------------------------------------------
-        // NO BUDGET
-        // -------------------------------------------------
-
-        if (budget <= 0) {
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
 
             if (tvBudgetAmount != null) {
-
-                tvBudgetAmount.setText(
-                        "Rs. 0.00"
-                );
+                tvBudgetAmount.setText("Rs. 0.00");
             }
-
 
             if (tvFamilyBudgetRemaining != null) {
-
-                tvFamilyBudgetRemaining.setText(
-                        "Rs. 0.00"
-                );
+                tvFamilyBudgetRemaining.setText("Rs. 0.00");
             }
-
 
             if (tvBudgetPercentage != null) {
-
-                tvBudgetPercentage.setText(
-                        "No Budget Set"
-                );
+                tvBudgetPercentage.setText("No Budget Set");
             }
 
-
             if (progressFamilyBudget != null) {
-
-                progressFamilyBudget.setProgress(
-                        0
-                );
+                progressFamilyBudget.setProgress(0);
             }
 
             return;
         }
 
-
         // -------------------------------------------------
-        // REMAINING
-        // -------------------------------------------------
-
-        double remaining =
-                budget - spent;
-
-
-        // Don't show negative remaining amount
-        if (remaining < 0) {
-            remaining = 0;
-        }
-
-
-        // -------------------------------------------------
-        // PERCENTAGE
+        // GET BUDGET FROM FIRESTORE
         // -------------------------------------------------
 
-        int percentage =
-                (int) Math.round(
-                        (spent / budget) * 100
-                );
+        familyFirestoreService.getFamilyBudget(
+                firestoreFamilyId,
+                new FamilyFirestoreService.FamilyBudgetCallback() {
 
+                    @Override
+                    public void onSuccess(
+                            FamilyFirestoreService.FamilyBudgetData budgetData
+                    ) {
 
-        if (percentage < 0) {
-            percentage = 0;
-        }
+                        if (!isAdded() || getView() == null) {
+                            return;
+                        }
 
+                        // -----------------------------------------
+                        // NO BUDGET
+                        // -----------------------------------------
 
-        if (percentage > 100) {
-            percentage = 100;
-        }
+                        if (budgetData == null ||
+                                budgetData.getLimitAmount() <= 0) {
 
+                            if (tvBudgetAmount != null) {
+                                tvBudgetAmount.setText(
+                                        "Rs. 0.00"
+                                );
+                            }
 
-        // -------------------------------------------------
-        // UPDATE BUDGET UI
-        // -------------------------------------------------
+                            if (tvFamilyBudgetRemaining != null) {
+                                tvFamilyBudgetRemaining.setText(
+                                        "Rs. 0.00"
+                                );
+                            }
 
-        if (tvBudgetAmount != null) {
+                            if (tvBudgetPercentage != null) {
+                                tvBudgetPercentage.setText(
+                                        "No Budget Set"
+                                );
+                            }
 
-            tvBudgetAmount.setText(
-                    String.format(
-                            Locale.getDefault(),
-                            "Rs. %.2f",
-                            budget
-                    )
-            );
-        }
+                            if (progressFamilyBudget != null) {
+                                progressFamilyBudget.setProgress(0);
+                            }
 
+                            return;
+                        }
 
-        if (tvFamilyBudgetRemaining != null) {
+                        double budget =
+                                budgetData.getLimitAmount();
 
-            tvFamilyBudgetRemaining.setText(
-                    String.format(
-                            Locale.getDefault(),
-                            "Rs. %.2f",
-                            remaining
-                    )
-            );
-        }
+                        // -----------------------------------------
+                        // GET FIRESTORE FAMILY EXPENSES
+                        // -----------------------------------------
 
+                        familyFirestoreService.getFamilyExpenses(
+                                firestoreFamilyId,
+                                new FamilyFirestoreService.FamilyExpensesCallback() {
 
-        if (tvBudgetPercentage != null) {
+                                    @Override
+                                    public void onSuccess(
+                                            ArrayList<FamilyFirestoreService.FamilyExpenseData>
+                                                    familyExpenses
+                                    ) {
 
-            tvBudgetPercentage.setText(
-                    percentage + "% Used"
-            );
-        }
+                                        if (!isAdded() ||
+                                                getView() == null) {
+                                            return;
+                                        }
 
+                                        // ---------------------------------
+                                        // CALCULATE TOTAL SPENT
+                                        // ---------------------------------
 
-        if (progressFamilyBudget != null) {
+                                        double spent = 0.0;
 
-            progressFamilyBudget.setProgress(
-                    percentage
-            );
-        }
+                                        if (familyExpenses != null) {
+
+                                            for (
+                                                    FamilyFirestoreService.FamilyExpenseData expense
+                                                    : familyExpenses
+                                            ) {
+
+                                                if (expense != null) {
+
+                                                    spent +=
+                                                            expense.getAmount();
+                                                }
+                                            }
+                                        }
+
+                                        // ---------------------------------
+                                        // REMAINING
+                                        // ---------------------------------
+
+                                        double remaining =
+                                                budget - spent;
+
+                                        if (remaining < 0) {
+                                            remaining = 0;
+                                        }
+
+                                        // ---------------------------------
+                                        // PERCENTAGE
+                                        // ---------------------------------
+
+                                        int percentage =
+                                                (int) Math.round(
+                                                        (spent / budget) * 100
+                                                );
+
+                                        if (percentage < 0) {
+                                            percentage = 0;
+                                        }
+
+                                        if (percentage > 100) {
+                                            percentage = 100;
+                                        }
+
+                                        // ---------------------------------
+                                        // UPDATE UI
+                                        // ---------------------------------
+
+                                        if (tvBudgetAmount != null) {
+
+                                            tvBudgetAmount.setText(
+                                                    String.format(
+                                                            Locale.getDefault(),
+                                                            "Rs. %.2f",
+                                                            budget
+                                                    )
+                                            );
+                                        }
+
+                                        if (tvFamilyBudgetRemaining != null) {
+
+                                            tvFamilyBudgetRemaining.setText(
+                                                    String.format(
+                                                            Locale.getDefault(),
+                                                            "Rs. %.2f",
+                                                            remaining
+                                                    )
+                                            );
+                                        }
+
+                                        if (tvBudgetPercentage != null) {
+
+                                            tvBudgetPercentage.setText(
+                                                    percentage + "% Used"
+                                            );
+                                        }
+
+                                        if (progressFamilyBudget != null) {
+
+                                            progressFamilyBudget.setProgress(
+                                                    percentage
+                                            );
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(
+                                            String message
+                                    ) {
+
+                                        if (!isAdded()) {
+                                            return;
+                                        }
+
+                                        Toast.makeText(
+                                                requireContext(),
+                                                "Failed to load family spending.",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+                                }
+                        );
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to load family budget: "
+                                        + message,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
+        );
     }
     // =====================================================
     // NO TRANSACTIONS
@@ -1978,6 +2806,202 @@ public class FamilyDashboardFragment extends Fragment {
     }
 
 
+
+    // =====================================================
+    // LOAD FAMILY MEMBERS FROM FIRESTORE
+    // =====================================================
+
+    private void loadFamilyMembers() {
+
+        if (selectedFamilyId == -1 ||
+                familyFirestoreService == null) {
+
+            return;
+        }
+
+        String firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(
+                        selectedFamilyId
+                );
+
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
+
+            return;
+        }
+
+        familyFirestoreService.getFamilyMembers(
+                firestoreFamilyId,
+                new FamilyFirestoreService.FamilyMembersCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            List<FamilyFirestoreService.FamilyMemberData> members
+                    ) {
+
+                        if (!isAdded() || getView() == null) {
+                            return;
+                        }
+
+                        displayFamilyMembers(members);
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        Toast.makeText(
+                                requireContext(),
+                                "Unable to load family members: "
+                                        + message,
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
+        );
+    }
+
+
+    // =====================================================
+// DISPLAY FAMILY MEMBERS
+// =====================================================
+
+    private void displayFamilyMembers(
+            List<FamilyFirestoreService.FamilyMemberData> members
+    ) {
+
+        if (familyMembersContainer == null) {
+            return;
+        }
+
+        familyMembersContainer.removeAllViews();
+
+        if (members == null || members.isEmpty()) {
+
+            showNoFamilyMembers();
+
+            return;
+        }
+
+        if (tvMemberCount != null) {
+
+            tvMemberCount.setText(
+                    members.size() == 1
+                            ? "1 Member"
+                            : members.size() + " Members"
+            );
+        }
+
+        if (tvNoMembers != null) {
+            tvNoMembers.setVisibility(View.GONE);
+        }
+
+        for (int i = 0; i < members.size(); i++) {
+
+            FamilyFirestoreService.FamilyMemberData member =
+                    members.get(i);
+
+            TextView memberView =
+                    new TextView(requireContext());
+
+            String role = member.getRole();
+
+            if (role == null || role.trim().isEmpty()) {
+                role = "MEMBER";
+            }
+
+            memberView.setText(
+                    getInitials(member.getName())
+                            + "   "
+                            + member.getName()
+                            + "    "
+                            + role.toUpperCase()
+            );
+
+            memberView.setTextSize(14);
+            memberView.setTextColor(
+                    Color.parseColor("#111827")
+            );
+
+            memberView.setPadding(
+                    0,
+                    dpToPx(12),
+                    0,
+                    dpToPx(12)
+            );
+
+            familyMembersContainer.addView(
+                    memberView
+            );
+        }
+    }
+
+
+// =====================================================
+// GET MEMBER INITIALS
+// =====================================================
+
+    private String getInitials(String name) {
+
+        if (name == null || name.trim().isEmpty()) {
+            return "FM";
+        }
+
+        String[] parts =
+                name.trim().split("\\s+");
+
+        if (parts.length == 1) {
+
+            return parts[0]
+                    .substring(
+                            0,
+                            Math.min(2, parts[0].length())
+                    )
+                    .toUpperCase();
+        }
+
+        return (
+                parts[0].substring(0, 1)
+                        + parts[parts.length - 1]
+                        .substring(0, 1)
+        ).toUpperCase();
+    }
+
+
+    // =====================================================
+    // NO FAMILY MEMBERS
+    // =====================================================
+
+    private void showNoFamilyMembers() {
+
+        if (familyMembersContainer == null) {
+            return;
+        }
+
+        familyMembersContainer.removeAllViews();
+
+        if (tvNoMembers != null) {
+
+            tvNoMembers.setText(
+                    "No family members found"
+            );
+
+            tvNoMembers.setVisibility(
+                    View.VISIBLE
+            );
+
+            familyMembersContainer.addView(
+                    tvNoMembers
+            );
+        }
+
+        if (tvMemberCount != null) {
+            tvMemberCount.setText("0 Members");
+        }
+    }
     // =====================================================
     // FAMILY OPTIONS
     // =====================================================
@@ -2459,6 +3483,17 @@ public class FamilyDashboardFragment extends Fragment {
             loadSelectedFamilyDashboard();
         }
     }
+
+
+    // =====================================================
+    // FAMILY SUBSCRIPTION UI
+    // =====================================================
+
+    private TextView tvSharedSubscriptionTotal;
+
+    private LinearLayout sharedSubscriptionsContainer;
+
+    private TextView tvNoSharedSubscriptions;
 
 
     // =====================================================

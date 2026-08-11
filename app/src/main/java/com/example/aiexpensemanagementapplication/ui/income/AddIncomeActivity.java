@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
+
 public class AddIncomeActivity extends AppCompatActivity {
 
     private EditText etIncomeAmount;
@@ -66,6 +68,8 @@ public class AddIncomeActivity extends AppCompatActivity {
 
     private Calendar calendar;
 
+    private FamilyFirestoreService familyFirestoreService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +89,8 @@ public class AddIncomeActivity extends AppCompatActivity {
     private void initializeViews() {
 
         databaseHelper = new DatabaseHelper(this);
+        familyFirestoreService =
+                new FamilyFirestoreService();
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -545,6 +551,10 @@ public class AddIncomeActivity extends AppCompatActivity {
 
         if ("Family".equals(incomeMode)) {
 
+            // -------------------------------------------------
+            // SAVE FAMILY SHARE LOCALLY
+            // -------------------------------------------------
+
             boolean shared =
                     databaseHelper.shareIncomeWithFamily(
                             (int) transactionId,
@@ -556,18 +566,105 @@ public class AddIncomeActivity extends AppCompatActivity {
 
                 Toast.makeText(
                         this,
-                        "Income saved, but family sharing failed.",
+                        "Income saved, but local family sharing failed.",
                         Toast.LENGTH_LONG
                 ).show();
 
                 return;
             }
 
-            Toast.makeText(
-                    this,
-                    "Family income added successfully.",
-                    Toast.LENGTH_SHORT
-            ).show();
+            // -------------------------------------------------
+            // GET FIRESTORE FAMILY ID
+            // -------------------------------------------------
+
+            String firestoreFamilyId =
+                    databaseHelper.getFirestoreFamilyId(
+                            selectedFamilyId
+                    );
+
+            if (firestoreFamilyId == null ||
+                    firestoreFamilyId.trim().isEmpty()) {
+
+                Toast.makeText(
+                        this,
+                        "Income saved, but family Firestore ID was not found.",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                return;
+            }
+
+            // -------------------------------------------------
+            // GET OWNER NAME
+            // -------------------------------------------------
+
+            String ownerName =
+                    currentUser.getDisplayName();
+
+            if (ownerName == null ||
+                    ownerName.trim().isEmpty()) {
+
+                ownerName = "Family Member";
+            }
+
+            // -------------------------------------------------
+            // SAVE FAMILY INCOME TO FIRESTORE
+            // -------------------------------------------------
+
+            familyFirestoreService.addFamilyIncome(
+
+                    firestoreFamilyId,
+
+                    String.valueOf(transactionId),
+
+                    currentUser.getUid(),
+
+                    ownerName,
+
+                    amount,
+
+                    categoryName,
+
+                    categoryId,
+
+                    sourceName,
+
+                    paymentMethodId,
+
+                    date,
+
+                    note,
+
+                    new FamilyFirestoreService.FamilyIncomeCallback() {
+
+                        @Override
+                        public void onSuccess() {
+
+                            Toast.makeText(
+                                    AddIncomeActivity.this,
+                                    "Family income added successfully.",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(
+                                String message
+                        ) {
+
+                            Toast.makeText(
+                                    AddIncomeActivity.this,
+                                    "Income saved, but family sync failed: "
+                                            + message,
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            finish();
+                        }
+                    }
+            );
 
         } else {
 
@@ -576,27 +673,11 @@ public class AddIncomeActivity extends AppCompatActivity {
                     "Personal income added successfully.",
                     Toast.LENGTH_SHORT
             ).show();
-        }
-
-        finish();
-
-        if (transactionId != -1) {
-
-            Toast.makeText(
-                    this,
-                    "Income added successfully.",
-                    Toast.LENGTH_SHORT
-            ).show();
 
             finish();
-
-        } else {
-
-            Toast.makeText(
-                    this,
-                    "Failed to save income.",
-                    Toast.LENGTH_SHORT
-            ).show();
         }
+
+
+
     }
 }

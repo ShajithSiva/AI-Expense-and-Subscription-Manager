@@ -26,6 +26,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
+
 public class AddExpenseActivity extends AppCompatActivity {
 
     // =========================================================
@@ -53,7 +55,7 @@ public class AddExpenseActivity extends AppCompatActivity {
     // =========================================================
 
     private DatabaseHelper databaseHelper;
-
+    private FamilyFirestoreService familyFirestoreService;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
 
@@ -106,6 +108,9 @@ public class AddExpenseActivity extends AppCompatActivity {
 
         databaseHelper =
                 new DatabaseHelper(this);
+
+        familyFirestoreService =
+                new FamilyFirestoreService();
 
         mAuth =
                 FirebaseAuth.getInstance();
@@ -755,40 +760,131 @@ public class AddExpenseActivity extends AppCompatActivity {
 
 
         // =====================================================
-        // FAMILY SHARING
-        // =====================================================
+// FAMILY SHARING
+// =====================================================
 
         if (shareWithFamily) {
 
-            boolean shared =
-                    databaseHelper.shareExpenseWithFamily(
+            // -------------------------------------------------
+            // SAVE LOCAL FAMILY SHARE
+            // -------------------------------------------------
 
-                            (int) transactionId,
+            databaseHelper.shareExpenseWithFamily(
+                    (int) transactionId,
+                    selectedFamilyId,
+                    userId
+            );
 
-                            selectedFamilyId,
 
-                            userId
+            // -------------------------------------------------
+            // GET FIRESTORE FAMILY ID
+            // -------------------------------------------------
+
+            String firestoreFamilyId =
+                    databaseHelper.getFirestoreFamilyId(
+                            selectedFamilyId
                     );
 
 
-            if (!shared) {
-
-                /*
-                 * Expense itself was successfully saved.
-                 *
-                 * Only family sharing failed.
-                 *
-                 * Therefore DO NOT tell the user that the entire
-                 * expense failed.
-                 */
+            if (firestoreFamilyId == null ||
+                    firestoreFamilyId.trim().isEmpty()) {
 
                 Toast.makeText(
                         this,
-                        "Expense saved, but it could not be shared with the family.",
+                        "Expense saved, but family Firestore ID was not found.",
                         Toast.LENGTH_LONG
                 ).show();
 
+                return;
             }
+
+
+            // -------------------------------------------------
+            // OWNER NAME
+            // -------------------------------------------------
+
+            String ownerName =
+                    currentUser.getDisplayName();
+
+            if (ownerName == null ||
+                    ownerName.trim().isEmpty()) {
+
+                ownerName = "Family Member";
+            }
+
+
+            // -------------------------------------------------
+            // SAVE TO FIRESTORE
+            // -------------------------------------------------
+
+            familyFirestoreService.addFamilyExpense(
+
+                    firestoreFamilyId,
+
+                    String.valueOf(transactionId),
+
+                    currentUser.getUid(),
+
+                    ownerName,
+
+                    amount,
+
+                    categoryName,
+
+                    categoryId,
+
+                    paymentMethodName,
+
+                    paymentMethodId,
+
+                    date,
+
+                    note,
+
+                    new FamilyFirestoreService.FamilyTransactionCallback() {
+
+                        @Override
+                        public void onSuccess() {
+
+                            Toast.makeText(
+                                    AddExpenseActivity.this,
+                                    "Expense shared with family successfully.",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(
+                                String message
+                        ) {
+
+                            Toast.makeText(
+                                    AddExpenseActivity.this,
+                                    "Expense saved, but family sync failed: "
+                                            + message,
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            finish();
+                        }
+                    }
+            );
+
+        } else {
+
+            // -------------------------------------------------
+            // PERSONAL EXPENSE ONLY
+            // -------------------------------------------------
+
+            Toast.makeText(
+                    this,
+                    "Expense added successfully.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            finish();
         }
 
 
