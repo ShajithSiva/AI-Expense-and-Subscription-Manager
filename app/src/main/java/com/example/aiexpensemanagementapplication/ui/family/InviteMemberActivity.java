@@ -1,22 +1,25 @@
 package com.example.aiexpensemanagementapplication.ui.family;
 
-import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Patterns;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
-import android.widget.TextView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
-import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class InviteMemberActivity extends AppCompatActivity {
 
@@ -26,9 +29,9 @@ public class InviteMemberActivity extends AppCompatActivity {
 
     private ImageButton btnBack;
 
-    private TextView tvFamilyName;
-
     private TextInputEditText etMemberEmail;
+
+    private RadioGroup roleRadioGroup;
 
     private RadioButton radioMember;
     private RadioButton radioViewer;
@@ -36,20 +39,26 @@ public class InviteMemberActivity extends AppCompatActivity {
     private MaterialButton btnSendInvitation;
 
     // =====================================================
-    // DATABASE / FIRESTORE
+    // DATABASE
     // =====================================================
 
     private DatabaseHelper databaseHelper;
-    private FamilyFirestoreService familyFirestoreService;
+
+    // Local SQLite family ID
+    private int familyId = -1;
+
+    // Firestore family ID
+    private String firestoreFamilyId = "";
+
+    private String familyName = "Family";
 
     // =====================================================
-    // FAMILY
+    // FIREBASE
     // =====================================================
 
-    private int localFamilyId = -1;
-
-    private String firestoreFamilyId = null;
-    private String familyName = null;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore firestore;
+    private FirebaseUser currentUser;
 
     // =====================================================
     // ACTIVITY
@@ -61,15 +70,72 @@ public class InviteMemberActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_invite_member);
 
-        databaseHelper =
-                new DatabaseHelper(this);
+        // Firebase
+        mAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
+        currentUser = mAuth.getCurrentUser();
 
-        familyFirestoreService =
-                new FamilyFirestoreService();
+        // Local database
+        databaseHelper = new DatabaseHelper(this);
+
+        // -------------------------------------------------
+        // Get LOCAL family ID
+        // -------------------------------------------------
+
+        familyId = getIntent().getIntExtra(
+                "FAMILY_ID",
+                -1
+        );
+
+        if (familyId == -1) {
+
+            Toast.makeText(
+                    this,
+                    "Family not found.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            finish();
+            return;
+        }
+
+        // -------------------------------------------------
+        // Get family name
+        // -------------------------------------------------
+
+        String localFamilyName =
+                databaseHelper.getFamilyName(familyId);
+
+        if (localFamilyName != null &&
+                !localFamilyName.trim().isEmpty()) {
+
+            familyName = localFamilyName.trim();
+        }
+
+        // -------------------------------------------------
+        // Get Firestore Family ID
+        // -------------------------------------------------
+
+        firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(familyId);
+
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
+
+            Toast.makeText(
+                    this,
+                    "Firestore family ID not found.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            finish();
+            return;
+        }
+
+        firestoreFamilyId =
+                firestoreFamilyId.trim();
 
         initializeViews();
-
-        loadSelectedFamily();
 
         setupListeners();
     }
@@ -83,11 +149,11 @@ public class InviteMemberActivity extends AppCompatActivity {
         btnBack =
                 findViewById(R.id.btnBack);
 
-        tvFamilyName =
-                findViewById(R.id.tvFamilyName);
-
         etMemberEmail =
                 findViewById(R.id.etMemberEmail);
+
+        roleRadioGroup =
+                findViewById(R.id.roleRadioGroup);
 
         radioMember =
                 findViewById(R.id.radioMember);
@@ -100,103 +166,70 @@ public class InviteMemberActivity extends AppCompatActivity {
     }
 
     // =====================================================
-    // LOAD SELECTED FAMILY
-    // =====================================================
-
-    private void loadSelectedFamily() {
-
-        localFamilyId =
-                getIntent().getIntExtra(
-                        "FAMILY_ID",
-                        -1
-                );
-
-        if (localFamilyId == -1) {
-
-            Toast.makeText(
-                    this,
-                    "Selected family was not found.",
-                    Toast.LENGTH_LONG
-            ).show();
-
-            finish();
-
-            return;
-        }
-
-        familyName =
-                databaseHelper.getFamilyName(
-                        localFamilyId
-                );
-
-        firestoreFamilyId =
-                databaseHelper.getFirestoreFamilyId(
-                        localFamilyId
-                );
-
-        if (familyName == null ||
-                familyName.trim().isEmpty()) {
-
-            familyName = "Family";
-        }
-
-        if (tvFamilyName != null) {
-
-            tvFamilyName.setText(
-                    "Invite someone to " +
-                            familyName
-            );
-        }
-
-        if (firestoreFamilyId == null ||
-                firestoreFamilyId.trim().isEmpty()) {
-
-            Toast.makeText(
-                    this,
-                    "This family is not connected to Firestore.",
-                    Toast.LENGTH_LONG
-            ).show();
-
-            btnSendInvitation.setEnabled(false);
-        }
-    }
-
-    // =====================================================
     // LISTENERS
     // =====================================================
 
     private void setupListeners() {
 
+        // Back
         btnBack.setOnClickListener(v ->
                 finish()
         );
 
+        // Send invitation
         btnSendInvitation.setOnClickListener(v ->
-                validateInvitation()
+                sendInvitation()
         );
     }
 
     // =====================================================
-    // VALIDATE INVITATION
+    // SEND INVITATION
     // =====================================================
 
-    private void validateInvitation() {
+    private void sendInvitation() {
+
+        // -------------------------------------------------
+        // Check login
+        // -------------------------------------------------
+
+        currentUser =
+                mAuth.getCurrentUser();
+
+        if (currentUser == null) {
+
+            Toast.makeText(
+                    this,
+                    "Please login again.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // Get email
+        // -------------------------------------------------
 
         String email = "";
 
         if (etMemberEmail.getText() != null) {
 
-            email = etMemberEmail
-                    .getText()
-                    .toString()
-                    .trim()
-                    .toLowerCase();
+            email =
+                    etMemberEmail
+                            .getText()
+                            .toString()
+                            .trim()
+                            .toLowerCase();
         }
 
-        if (email.isEmpty()) {
+        // -------------------------------------------------
+        // Validate email
+        // -------------------------------------------------
+
+        if (TextUtils.isEmpty(email)) {
 
             etMemberEmail.setError(
-                    "Please enter member email"
+                    "Enter member email"
             );
 
             etMemberEmail.requestFocus();
@@ -209,7 +242,7 @@ public class InviteMemberActivity extends AppCompatActivity {
                 .matches()) {
 
             etMemberEmail.setError(
-                    "Please enter a valid email address"
+                    "Enter a valid email address"
             );
 
             etMemberEmail.requestFocus();
@@ -217,243 +250,253 @@ public class InviteMemberActivity extends AppCompatActivity {
             return;
         }
 
-        if (firestoreFamilyId == null ||
-                firestoreFamilyId
+        // -------------------------------------------------
+        // Prevent inviting yourself
+        // -------------------------------------------------
+
+        String currentUserEmail =
+                currentUser.getEmail();
+
+        if (currentUserEmail != null &&
+                currentUserEmail
                         .trim()
-                        .isEmpty()) {
+                        .equalsIgnoreCase(email)) {
 
             Toast.makeText(
                     this,
-                    "Family connection was not found.",
-                    Toast.LENGTH_LONG
+                    "You cannot invite yourself.",
+                    Toast.LENGTH_SHORT
             ).show();
 
             return;
         }
 
-        String selectedRole;
+        // -------------------------------------------------
+        // Get selected role
+        // -------------------------------------------------
 
-        if (radioViewer.isChecked()) {
+        String role;
 
-            selectedRole = "VIEWER";
+        if (radioViewer != null &&
+                radioViewer.isChecked()) {
+
+            role = "viewer";
 
         } else {
 
-            selectedRole = "MEMBER";
+            role = "member";
         }
 
-        sendInvitation(
-                email,
-                selectedRole
-        );
-    }
+        // -------------------------------------------------
+        // Inviter UID
+        // -------------------------------------------------
 
-    // =====================================================
-    // SEND INVITATION
-    // =====================================================
+        String inviterUid =
+                currentUser.getUid();
 
-    private void sendInvitation(
-            String memberEmail,
-            String selectedRole
-    ) {
+        // -------------------------------------------------
+        // IMPORTANT
+        //
+        // Create final variables for lambda
+        // -------------------------------------------------
 
-        FirebaseUser firebaseUser =
-                FirebaseAuth
-                        .getInstance()
-                        .getCurrentUser();
+        final String finalEmail = email;
+        final String finalRole = role;
+        final String finalInviterUid = inviterUid;
+        final String finalFirestoreFamilyId =
+                firestoreFamilyId;
 
-        if (firebaseUser == null) {
-
-            Toast.makeText(
-                    this,
-                    "User session not found. Please login again.",
-                    Toast.LENGTH_LONG
-            ).show();
-
-            return;
-        }
-
-        String firebaseUid =
-                firebaseUser.getUid();
-
-        int localUserId =
-                databaseHelper
-                        .getUserIdByFirebaseUid(
-                                firebaseUid
-                        );
-
-        if (localUserId == -1) {
-
-            Toast.makeText(
-                    this,
-                    "Current user was not found locally.",
-                    Toast.LENGTH_LONG
-            ).show();
-
-            return;
-        }
-
-        String inviterName =
-                getLocalUserName(
-                        localUserId
-                );
+        // -------------------------------------------------
+        // Disable button
+        // -------------------------------------------------
 
         btnSendInvitation.setEnabled(false);
-        btnSendInvitation.setText("Sending...");
+        btnSendInvitation.setText("Checking...");
 
-        familyFirestoreService
-                .sendFamilyInvitation(
-                        firestoreFamilyId,
-                        familyName,
-                        memberEmail,
-                        firebaseUid,
-                        inviterName,
-                        selectedRole,
-                        new FamilyFirestoreService
-                                .SendInvitationCallback() {
+        // =================================================
+        // CHECK DUPLICATE INVITATION
+        // =================================================
 
-                            @Override
-                            public void onSuccess(
-                                    String invitationId,
-                                    String invitationCode
-                            ) {
+        firestore
+                .collection("familyInvitations")
 
-                                resetSendButton();
+                .whereEqualTo(
+                        "familyId",
+                        finalFirestoreFamilyId
+                )
 
-                                Toast.makeText(
-                                        InviteMemberActivity.this,
-                                        "Invitation sent successfully!",
-                                        Toast.LENGTH_LONG
-                                ).show();
+                .whereEqualTo(
+                        "invitedEmail",
+                        finalEmail
+                )
 
-                                etMemberEmail.setText("");
+                .whereEqualTo(
+                        "status",
+                        "pending"
+                )
 
-                                radioMember.setChecked(true);
-                                radioViewer.setChecked(false);
-                            }
+                .get()
 
-                            @Override
-                            public void onUserNotFound() {
+                .addOnSuccessListener(
+                        querySnapshot -> {
 
-                                resetSendButton();
+                            if (!querySnapshot.isEmpty()) {
 
-                                Toast.makeText(
-                                        InviteMemberActivity.this,
-                                        "No registered user found with this email.",
-                                        Toast.LENGTH_LONG
-                                ).show();
-                            }
+                                btnSendInvitation
+                                        .setEnabled(true);
 
-                            @Override
-                            public void onAlreadyMember() {
-
-                                resetSendButton();
+                                btnSendInvitation
+                                        .setText(
+                                                "Send Invitation"
+                                        );
 
                                 Toast.makeText(
                                         InviteMemberActivity.this,
-                                        "This user is already a member of the family.",
+                                        "A pending invitation already exists for this email.",
                                         Toast.LENGTH_LONG
                                 ).show();
+
+                                return;
                             }
 
-                            @Override
-                            public void onInvitationAlreadyPending() {
+                            // -------------------------------------------------
+                            // No duplicate found
+                            // -------------------------------------------------
 
-                                resetSendButton();
+                            createInvitation(
+                                    finalEmail,
+                                    finalRole,
+                                    finalInviterUid,
+                                    finalFirestoreFamilyId
+                            );
+                        }
+                )
 
-                                Toast.makeText(
-                                        InviteMemberActivity.this,
-                                        "An invitation is already pending for this user.",
-                                        Toast.LENGTH_LONG
-                                ).show();
-                            }
+                .addOnFailureListener(
+                        e -> {
 
-                            @Override
-                            public void onCannotInviteYourself() {
+                            btnSendInvitation
+                                    .setEnabled(true);
 
-                                resetSendButton();
+                            btnSendInvitation
+                                    .setText(
+                                            "Send Invitation"
+                                    );
 
-                                Toast.makeText(
-                                        InviteMemberActivity.this,
-                                        "You cannot invite your own account.",
-                                        Toast.LENGTH_LONG
-                                ).show();
-                            }
-
-                            @Override
-                            public void onFailure(
-                                    String message
-                            ) {
-
-                                resetSendButton();
-
-                                Toast.makeText(
-                                        InviteMemberActivity.this,
-                                        message,
-                                        Toast.LENGTH_LONG
-                                ).show();
-                            }
+                            Toast.makeText(
+                                    InviteMemberActivity.this,
+                                    "Unable to check invitation: "
+                                            + e.getMessage(),
+                                    Toast.LENGTH_LONG
+                            ).show();
                         }
                 );
     }
 
     // =====================================================
-    // GET LOCAL USER NAME
+    // CREATE INVITATION
     // =====================================================
 
-    private String getLocalUserName(
-            int userId
+    private void createInvitation(
+            String email,
+            String role,
+            String inviterUid,
+            String firestoreFamilyId
     ) {
 
-        Cursor cursor =
-                databaseHelper.getUserById(
-                        userId
-                );
+        Map<String, Object> invitation =
+                new HashMap<>();
 
-        String userName = "";
+        // -------------------------------------------------
+        // IMPORTANT
+        //
+        // Store Firestore Family ID as STRING
+        // -------------------------------------------------
 
-        if (cursor != null) {
-
-            try {
-
-                if (cursor.moveToFirst()) {
-
-                    int nameIndex =
-                            cursor.getColumnIndex(
-                                    DatabaseHelper.USER_NAME
-                            );
-
-                    if (nameIndex != -1) {
-
-                        userName =
-                                cursor.getString(
-                                        nameIndex
-                                );
-                    }
-                }
-
-            } finally {
-
-                cursor.close();
-            }
-        }
-
-        return userName == null
-                ? ""
-                : userName;
-    }
-
-    // =====================================================
-    // RESET BUTTON
-    // =====================================================
-
-    private void resetSendButton() {
-
-        btnSendInvitation.setEnabled(true);
-
-        btnSendInvitation.setText(
-                "Send Invitation"
+        invitation.put(
+                "familyId",
+                firestoreFamilyId
         );
+
+        invitation.put(
+                "familyName",
+                familyName
+        );
+
+        invitation.put(
+                "invitedEmail",
+                email
+        );
+
+        invitation.put(
+                "invitedBy",
+                inviterUid
+        );
+
+        invitation.put(
+                "role",
+                role
+        );
+
+        invitation.put(
+                "status",
+                "pending"
+        );
+
+        // Store createdAt as LONG
+        // because FamilyInvitation uses long createdAt
+        invitation.put(
+                "createdAt",
+                System.currentTimeMillis()
+        );
+
+        // -------------------------------------------------
+        // Button state
+        // -------------------------------------------------
+
+        btnSendInvitation.setEnabled(false);
+        btnSendInvitation.setText("Sending...");
+
+        // =================================================
+        // SAVE TO FIRESTORE
+        // =================================================
+
+        firestore
+                .collection("familyInvitations")
+                .add(invitation)
+
+                .addOnSuccessListener(
+                        documentReference -> {
+
+                            Toast.makeText(
+                                    InviteMemberActivity.this,
+                                    "Invitation sent successfully.",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            finish();
+                        }
+                )
+
+                .addOnFailureListener(
+                        e -> {
+
+                            btnSendInvitation
+                                    .setEnabled(true);
+
+                            btnSendInvitation
+                                    .setText(
+                                            "Send Invitation"
+                                    );
+
+                            Toast.makeText(
+                                    InviteMemberActivity.this,
+                                    "Failed to send invitation: "
+                                            + e.getMessage(),
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
+                );
     }
 
     // =====================================================
@@ -462,9 +505,11 @@ public class InviteMemberActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
 
         if (databaseHelper != null) {
+
             databaseHelper.close();
         }
     }

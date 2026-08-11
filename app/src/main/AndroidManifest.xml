@@ -159,6 +159,9 @@
         <receiver
             android:name=".notification.ReminderReceiver"
             android:exported="false" />
+        <activity
+            android:name=".ui.family.FamilyInvitationsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

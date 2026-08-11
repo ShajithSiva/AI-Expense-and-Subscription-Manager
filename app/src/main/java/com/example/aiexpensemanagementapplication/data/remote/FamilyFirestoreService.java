@@ -1,45 +1,23 @@
 package com.example.aiexpensemanagementapplication.data.remote;
 
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.WriteBatch;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
 public class FamilyFirestoreService {
 
-    // =====================================================
-    // COLLECTION NAMES
-    // =====================================================
+    private final FirebaseFirestore firestore;
 
-    private static final String COLLECTION_FAMILIES =
+    private static final String FAMILY_COLLECTION =
             "families";
 
-    private static final String COLLECTION_MEMBERS =
-            "members";
-
-    private static final String COLLECTION_USERS =
-            "users";
-
-    private static final String COLLECTION_USER_FAMILIES =
-            "families";
-
-    private static final String COLLECTION_INVITATIONS =
+    private static final String INVITATION_COLLECTION =
             "familyInvitations";
 
-    // =====================================================
-    // FIRESTORE
-    // =====================================================
-
-    private final FirebaseFirestore firestore;
 
     // =====================================================
     // CONSTRUCTOR
@@ -51,229 +29,6 @@ public class FamilyFirestoreService {
                 FirebaseFirestore.getInstance();
     }
 
-    // =====================================================
-    // CREATE FAMILY CALLBACK
-    // =====================================================
-
-    public interface CreateFamilyCallback {
-
-        void onSuccess(
-                String firestoreFamilyId,
-                String unusedInviteCode
-        );
-
-        void onFailure(String message);
-    }
-
-    // =====================================================
-    // SEND INVITATION CALLBACK
-    // =====================================================
-
-    public interface SendInvitationCallback {
-
-        void onSuccess(
-                String invitationId,
-                String invitationCode
-        );
-
-        void onUserNotFound();
-
-        void onAlreadyMember();
-
-        void onInvitationAlreadyPending();
-
-        void onCannotInviteYourself();
-
-        void onFailure(String message);
-    }
-
-    // =====================================================
-    // LOAD INVITATIONS CALLBACK
-    // =====================================================
-
-    public interface PendingInvitationsCallback {
-
-        void onSuccess(
-                List<FamilyInvitation> invitations
-        );
-
-        void onFailure(String message);
-    }
-
-    // =====================================================
-    // ACCEPT INVITATION CALLBACK
-    // =====================================================
-
-    public interface AcceptInvitationCallback {
-
-        void onSuccess(
-                String firestoreFamilyId,
-                String familyName,
-                String role
-        );
-
-        void onAlreadyAccepted();
-
-        void onFailure(String message);
-    }
-
-    // =====================================================
-    // DECLINE INVITATION CALLBACK
-    // =====================================================
-
-    public interface DeclineInvitationCallback {
-
-        void onSuccess();
-
-        void onFailure(String message);
-    }
-
-    // =====================================================
-    // FAMILY INVITATION MODEL
-    // =====================================================
-
-    public static class FamilyInvitation {
-
-        private String invitationId;
-        private String invitationCode;
-
-        private String familyId;
-        private String familyName;
-
-        private String invitedEmail;
-        private String invitedUserUid;
-        private String invitedUserName;
-
-        private String invitedByUid;
-        private String invitedByName;
-
-        private String role;
-        private String status;
-
-        public FamilyInvitation() {
-        }
-
-        public String getInvitationId() {
-            return invitationId;
-        }
-
-        public void setInvitationId(
-                String invitationId
-        ) {
-            this.invitationId =
-                    invitationId;
-        }
-
-        public String getInvitationCode() {
-            return invitationCode;
-        }
-
-        public void setInvitationCode(
-                String invitationCode
-        ) {
-            this.invitationCode =
-                    invitationCode;
-        }
-
-        public String getFamilyId() {
-            return familyId;
-        }
-
-        public void setFamilyId(
-                String familyId
-        ) {
-            this.familyId =
-                    familyId;
-        }
-
-        public String getFamilyName() {
-            return familyName;
-        }
-
-        public void setFamilyName(
-                String familyName
-        ) {
-            this.familyName =
-                    familyName;
-        }
-
-        public String getInvitedEmail() {
-            return invitedEmail;
-        }
-
-        public void setInvitedEmail(
-                String invitedEmail
-        ) {
-            this.invitedEmail =
-                    invitedEmail;
-        }
-
-        public String getInvitedUserUid() {
-            return invitedUserUid;
-        }
-
-        public void setInvitedUserUid(
-                String invitedUserUid
-        ) {
-            this.invitedUserUid =
-                    invitedUserUid;
-        }
-
-        public String getInvitedUserName() {
-            return invitedUserName;
-        }
-
-        public void setInvitedUserName(
-                String invitedUserName
-        ) {
-            this.invitedUserName =
-                    invitedUserName;
-        }
-
-        public String getInvitedByUid() {
-            return invitedByUid;
-        }
-
-        public void setInvitedByUid(
-                String invitedByUid
-        ) {
-            this.invitedByUid =
-                    invitedByUid;
-        }
-
-        public String getInvitedByName() {
-            return invitedByName;
-        }
-
-        public void setInvitedByName(
-                String invitedByName
-        ) {
-            this.invitedByName =
-                    invitedByName;
-        }
-
-        public String getRole() {
-            return role;
-        }
-
-        public void setRole(
-                String role
-        ) {
-            this.role =
-                    role;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(
-                String status
-        ) {
-            this.status =
-                    status;
-        }
-    }
 
     // =====================================================
     // CREATE FAMILY
@@ -281,7 +36,7 @@ public class FamilyFirestoreService {
 
     public void createFamily(
             String familyName,
-            String firebaseUid,
+            String creatorUid,
             String creatorName,
             CreateFamilyCallback callback
     ) {
@@ -296,73 +51,64 @@ public class FamilyFirestoreService {
             return;
         }
 
-        if (firebaseUid == null ||
-                firebaseUid.trim().isEmpty()) {
+        if (creatorUid == null ||
+                creatorUid.trim().isEmpty()) {
 
             callback.onFailure(
-                    "User account was not found."
+                    "User ID is missing."
             );
 
             return;
         }
 
-        String cleanedFamilyName =
-                familyName.trim();
+        if (creatorName == null) {
+            creatorName = "";
+        }
 
-        String safeCreatorName =
-                creatorName == null
-                        ? ""
-                        : creatorName.trim();
+        final String finalCreatorName =
+                creatorName.trim();
 
-        DocumentReference familyReference =
+        DocumentReference familyRef =
                 firestore
-                        .collection(
-                                COLLECTION_FAMILIES
-                        )
+                        .collection(FAMILY_COLLECTION)
                         .document();
 
-        String firestoreFamilyId =
-                familyReference.getId();
+        String familyId =
+                familyRef.getId();
 
-        DocumentReference memberReference =
-                familyReference
-                        .collection(
-                                COLLECTION_MEMBERS
-                        )
-                        .document(firebaseUid);
+        String inviteCode =
+                generateInviteCode();
 
-        DocumentReference userFamilyReference =
-                firestore
-                        .collection(
-                                COLLECTION_USERS
-                        )
-                        .document(firebaseUid)
-                        .collection(
-                                COLLECTION_USER_FAMILIES
-                        )
-                        .document(firestoreFamilyId);
+        // -------------------------------------------------
+        // FAMILY DATA
+        // -------------------------------------------------
 
         Map<String, Object> familyData =
                 new HashMap<>();
 
         familyData.put(
                 "familyId",
-                firestoreFamilyId
+                familyId
         );
 
         familyData.put(
                 "familyName",
-                cleanedFamilyName
+                familyName.trim()
         );
 
         familyData.put(
-                "createdByUid",
-                firebaseUid
+                "ownerUid",
+                creatorUid
         );
 
         familyData.put(
-                "createdByName",
-                safeCreatorName
+                "ownerName",
+                finalCreatorName
+        );
+
+        familyData.put(
+                "inviteCode",
+                inviteCode
         );
 
         familyData.put(
@@ -370,113 +116,88 @@ public class FamilyFirestoreService {
                 FieldValue.serverTimestamp()
         );
 
-        Map<String, Object> memberData =
+        // -------------------------------------------------
+        // CREATOR MEMBER
+        // -------------------------------------------------
+
+        Map<String, Object> creatorMember =
                 new HashMap<>();
 
-        memberData.put(
-                "userUid",
-                firebaseUid
+        creatorMember.put(
+                "uid",
+                creatorUid
         );
 
-        memberData.put(
-                "userName",
-                safeCreatorName
+        creatorMember.put(
+                "name",
+                finalCreatorName
         );
 
-        memberData.put(
+        creatorMember.put(
                 "role",
-                "PRIMARY"
+                "OWNER"
         );
 
-        memberData.put(
+        creatorMember.put(
                 "joinedAt",
                 FieldValue.serverTimestamp()
         );
 
-        Map<String, Object> userFamilyData =
+        Map<String, Object> members =
                 new HashMap<>();
 
-        userFamilyData.put(
-                "familyId",
-                firestoreFamilyId
+        members.put(
+                creatorUid,
+                creatorMember
         );
 
-        userFamilyData.put(
-                "familyName",
-                cleanedFamilyName
+        familyData.put(
+                "members",
+                members
         );
 
-        userFamilyData.put(
-                "role",
-                "PRIMARY"
-        );
+        // -------------------------------------------------
+        // SAVE FAMILY
+        // -------------------------------------------------
 
-        userFamilyData.put(
-                "joinedAt",
-                FieldValue.serverTimestamp()
-        );
-
-        WriteBatch batch =
-                firestore.batch();
-
-        batch.set(
-                familyReference,
-                familyData
-        );
-
-        batch.set(
-                memberReference,
-                memberData
-        );
-
-        batch.set(
-                userFamilyReference,
-                userFamilyData
-        );
-
-        batch.commit()
+        familyRef
+                .set(familyData)
                 .addOnSuccessListener(unused -> {
 
-                    /*
-                     * Second parameter is kept only because
-                     * CreateFamilyActivity currently expects it.
-                     *
-                     * Family creation no longer displays or uses
-                     * a manual family invite code.
-                     */
-
                     callback.onSuccess(
-                            firestoreFamilyId,
-                            ""
+                            familyId,
+                            inviteCode
                     );
                 })
-                .addOnFailureListener(exception -> {
+                .addOnFailureListener(e -> {
 
                     callback.onFailure(
-                            getErrorMessage(exception)
+                            e.getMessage() != null
+                                    ? e.getMessage()
+                                    : "Failed to create family."
                     );
                 });
     }
 
+
     // =====================================================
-    // SEND EMAIL INVITATION
+    // SEND FAMILY INVITATION
     // =====================================================
 
-    public void sendFamilyInvitation(
-            String firestoreFamilyId,
+    public void sendInvitation(
+            String familyId,
             String familyName,
             String invitedEmail,
-            String invitedByUid,
-            String invitedByName,
+            String invitedBy,
             String role,
-            SendInvitationCallback callback
+            InvitationCallback callback
     ) {
 
-        if (firestoreFamilyId == null ||
-                firestoreFamilyId.trim().isEmpty()) {
+        if (familyId == null ||
+                familyId.trim().isEmpty()) {
 
             callback.onFailure(
-                    "Family was not found."
+                    "Family ID is missing."
             );
 
             return;
@@ -486,876 +207,531 @@ public class FamilyFirestoreService {
                 invitedEmail.trim().isEmpty()) {
 
             callback.onFailure(
-                    "Member email is required."
+                    "Email address is required."
             );
 
             return;
         }
 
-        if (invitedByUid == null ||
-                invitedByUid.trim().isEmpty()) {
+        if (role == null ||
+                role.trim().isEmpty()) {
 
-            callback.onFailure(
-                    "Current user account was not found."
-            );
-
-            return;
+            role = "member";
         }
 
-        String cleanedEmail =
+        final String finalEmail =
                 invitedEmail
                         .trim()
-                        .toLowerCase(Locale.ROOT);
+                        .toLowerCase();
 
-        String safeFamilyName =
-                familyName == null ||
-                        familyName.trim().isEmpty()
-                        ? "Family"
-                        : familyName.trim();
-
-        String safeInviterName =
-                invitedByName == null
-                        ? ""
-                        : invitedByName.trim();
-
-        String safeRole =
-                "VIEWER".equalsIgnoreCase(role)
-                        ? "VIEWER"
-                        : "MEMBER";
-
-        // -------------------------------------------------
-        // FIND REGISTERED USER USING EMAIL
-        // -------------------------------------------------
+        final String finalRole =
+                role
+                        .trim()
+                        .toLowerCase();
 
         firestore
-                .collection(COLLECTION_USERS)
+                .collection(INVITATION_COLLECTION)
                 .whereEqualTo(
-                        "email",
-                        cleanedEmail
+                        "familyId",
+                        familyId
                 )
-                .limit(1)
+                .whereEqualTo(
+                        "invitedEmail",
+                        finalEmail
+                )
+                .whereEqualTo(
+                        "status",
+                        "pending"
+                )
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
 
-                    if (querySnapshot.isEmpty()) {
+                    if (!querySnapshot.isEmpty()) {
 
-                        callback.onUserNotFound();
-
-                        return;
-                    }
-
-                    DocumentSnapshot userDocument =
-                            querySnapshot
-                                    .getDocuments()
-                                    .get(0);
-
-                    String invitedUserUid =
-                            userDocument.getString(
-                                    "uid"
-                            );
-
-                    if (invitedUserUid == null ||
-                            invitedUserUid.trim().isEmpty()) {
-
-                        invitedUserUid =
-                                userDocument.getId();
-                    }
-
-                    String invitedUserName =
-                            userDocument.getString(
-                                    "fullName"
-                            );
-
-                    if (invitedUserUid.equals(
-                            invitedByUid
-                    )) {
-
-                        callback.onCannotInviteYourself();
+                        callback.onFailure(
+                                "A pending invitation already exists for this email."
+                        );
 
                         return;
                     }
 
-                    checkExistingMembership(
-                            firestoreFamilyId,
-                            safeFamilyName,
-                            cleanedEmail,
-                            invitedUserUid,
-                            invitedUserName,
-                            invitedByUid,
-                            safeInviterName,
-                            safeRole,
-                            callback
-                    );
-                })
-                .addOnFailureListener(exception -> {
-
-                    callback.onFailure(
-                            getErrorMessage(exception)
-                    );
-                });
-    }
-
-    // =====================================================
-    // CHECK EXISTING MEMBERSHIP
-    // =====================================================
-
-    private void checkExistingMembership(
-            String firestoreFamilyId,
-            String familyName,
-            String invitedEmail,
-            String invitedUserUid,
-            String invitedUserName,
-            String invitedByUid,
-            String invitedByName,
-            String role,
-            SendInvitationCallback callback
-    ) {
-
-        firestore
-                .collection(COLLECTION_FAMILIES)
-                .document(firestoreFamilyId)
-                .collection(COLLECTION_MEMBERS)
-                .document(invitedUserUid)
-                .get()
-                .addOnSuccessListener(memberDocument -> {
-
-                    if (memberDocument.exists()) {
-
-                        callback.onAlreadyMember();
-
-                        return;
-                    }
-
-                    checkPendingInvitation(
-                            firestoreFamilyId,
+                    createInvitation(
+                            familyId,
                             familyName,
-                            invitedEmail,
-                            invitedUserUid,
-                            invitedUserName,
-                            invitedByUid,
-                            invitedByName,
-                            role,
+                            finalEmail,
+                            invitedBy,
+                            finalRole,
                             callback
                     );
                 })
-                .addOnFailureListener(exception -> {
+                .addOnFailureListener(e -> {
 
                     callback.onFailure(
-                            getErrorMessage(exception)
+                            e.getMessage() != null
+                                    ? e.getMessage()
+                                    : "Unable to check existing invitations."
                     );
                 });
     }
 
+
     // =====================================================
-    // CHECK DUPLICATE PENDING INVITATION
+    // CREATE INVITATION
     // =====================================================
 
-    private void checkPendingInvitation(
-            String firestoreFamilyId,
+    private void createInvitation(
+            String familyId,
             String familyName,
             String invitedEmail,
-            String invitedUserUid,
-            String invitedUserName,
-            String invitedByUid,
-            String invitedByName,
+            String invitedBy,
             String role,
-            SendInvitationCallback callback
+            InvitationCallback callback
     ) {
 
-        String invitationDocumentId =
-                createInvitationDocumentId(
-                        firestoreFamilyId,
-                        invitedUserUid
-                );
-
-        DocumentReference invitationReference =
+        DocumentReference invitationRef =
                 firestore
                         .collection(
-                                COLLECTION_INVITATIONS
+                                INVITATION_COLLECTION
                         )
-                        .document(invitationDocumentId);
+                        .document();
 
-        invitationReference
-                .get()
-                .addOnSuccessListener(invitationDocument -> {
-
-                    if (invitationDocument.exists()) {
-
-                        String currentStatus =
-                                invitationDocument.getString(
-                                        "status"
-                                );
-
-                        if ("PENDING".equalsIgnoreCase(
-                                currentStatus
-                        )) {
-
-                            callback.onInvitationAlreadyPending();
-
-                            return;
-                        }
-                    }
-
-                    createPendingInvitation(
-                            invitationReference,
-                            invitationDocumentId,
-                            firestoreFamilyId,
-                            familyName,
-                            invitedEmail,
-                            invitedUserUid,
-                            invitedUserName,
-                            invitedByUid,
-                            invitedByName,
-                            role,
-                            callback
-                    );
-                })
-                .addOnFailureListener(exception -> {
-
-                    callback.onFailure(
-                            getErrorMessage(exception)
-                    );
-                });
-    }
-
-    // =====================================================
-    // CREATE PENDING INVITATION
-    // =====================================================
-
-    private void createPendingInvitation(
-            DocumentReference invitationReference,
-            String invitationId,
-            String firestoreFamilyId,
-            String familyName,
-            String invitedEmail,
-            String invitedUserUid,
-            String invitedUserName,
-            String invitedByUid,
-            String invitedByName,
-            String role,
-            SendInvitationCallback callback
-    ) {
-
-        String invitationCode =
-                generateInvitationCode();
-
-        Map<String, Object> invitationData =
+        Map<String, Object> invitation =
                 new HashMap<>();
 
-        invitationData.put(
-                "invitationId",
-                invitationId
-        );
-
-        invitationData.put(
-                "invitationCode",
-                invitationCode
-        );
-
-        invitationData.put(
+        invitation.put(
                 "familyId",
-                firestoreFamilyId
+                familyId
         );
 
-        invitationData.put(
+        invitation.put(
                 "familyName",
                 familyName
         );
 
-        invitationData.put(
+        invitation.put(
                 "invitedEmail",
                 invitedEmail
         );
 
-        invitationData.put(
-                "invitedUserUid",
-                invitedUserUid
+        invitation.put(
+                "invitedBy",
+                invitedBy
         );
 
-        invitationData.put(
-                "invitedUserName",
-                invitedUserName == null
-                        ? ""
-                        : invitedUserName
-        );
-
-        invitationData.put(
-                "invitedByUid",
-                invitedByUid
-        );
-
-        invitationData.put(
-                "invitedByName",
-                invitedByName
-        );
-
-        invitationData.put(
+        invitation.put(
                 "role",
                 role
         );
 
-        invitationData.put(
+        invitation.put(
                 "status",
-                "PENDING"
+                "pending"
         );
 
-        invitationData.put(
+        invitation.put(
                 "createdAt",
-                FieldValue.serverTimestamp()
+                System.currentTimeMillis()
         );
 
-        invitationData.put(
-                "updatedAt",
-                FieldValue.serverTimestamp()
-        );
-
-        invitationReference
-                .set(invitationData)
+        invitationRef
+                .set(invitation)
                 .addOnSuccessListener(unused -> {
 
                     callback.onSuccess(
-                            invitationId,
-                            invitationCode
+                            invitationRef.getId()
                     );
                 })
-                .addOnFailureListener(exception -> {
+                .addOnFailureListener(e -> {
 
                     callback.onFailure(
-                            getErrorMessage(exception)
+                            e.getMessage() != null
+                                    ? e.getMessage()
+                                    : "Failed to send invitation."
                     );
                 });
     }
 
-    // =====================================================
-    // GET PENDING INVITATIONS
-    // =====================================================
-
-    public void getPendingInvitations(
-            String firebaseUid,
-            PendingInvitationsCallback callback
-    ) {
-
-        if (firebaseUid == null ||
-                firebaseUid.trim().isEmpty()) {
-
-            callback.onFailure(
-                    "User account was not found."
-            );
-
-            return;
-        }
-
-        firestore
-                .collection(
-                        COLLECTION_INVITATIONS
-                )
-                .whereEqualTo(
-                        "invitedUserUid",
-                        firebaseUid
-                )
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-
-                    List<FamilyInvitation> invitations =
-                            new ArrayList<>();
-
-                    for (QueryDocumentSnapshot document
-                            : querySnapshot) {
-
-                        String status =
-                                document.getString(
-                                        "status"
-                                );
-
-                        if (!"PENDING".equalsIgnoreCase(
-                                status
-                        )) {
-
-                            continue;
-                        }
-
-                        FamilyInvitation invitation =
-                                new FamilyInvitation();
-
-                        invitation.setInvitationId(
-                                document.getId()
-                        );
-
-                        invitation.setInvitationCode(
-                                document.getString(
-                                        "invitationCode"
-                                )
-                        );
-
-                        invitation.setFamilyId(
-                                document.getString(
-                                        "familyId"
-                                )
-                        );
-
-                        invitation.setFamilyName(
-                                document.getString(
-                                        "familyName"
-                                )
-                        );
-
-                        invitation.setInvitedEmail(
-                                document.getString(
-                                        "invitedEmail"
-                                )
-                        );
-
-                        invitation.setInvitedUserUid(
-                                document.getString(
-                                        "invitedUserUid"
-                                )
-                        );
-
-                        invitation.setInvitedUserName(
-                                document.getString(
-                                        "invitedUserName"
-                                )
-                        );
-
-                        invitation.setInvitedByUid(
-                                document.getString(
-                                        "invitedByUid"
-                                )
-                        );
-
-                        invitation.setInvitedByName(
-                                document.getString(
-                                        "invitedByName"
-                                )
-                        );
-
-                        invitation.setRole(
-                                document.getString(
-                                        "role"
-                                )
-                        );
-
-                        invitation.setStatus(
-                                status
-                        );
-
-                        invitations.add(invitation);
-                    }
-
-                    callback.onSuccess(
-                            invitations
-                    );
-                })
-                .addOnFailureListener(exception -> {
-
-                    callback.onFailure(
-                            getErrorMessage(exception)
-                    );
-                });
-    }
 
     // =====================================================
     // ACCEPT INVITATION
     // =====================================================
 
     public void acceptInvitation(
-            FamilyInvitation invitation,
-            String firebaseUid,
-            String userName,
-            AcceptInvitationCallback callback
-    ) {
-
-        if (invitation == null) {
-
-            callback.onFailure(
-                    "Invitation was not found."
-            );
-
-            return;
-        }
-
-        if (firebaseUid == null ||
-                firebaseUid.trim().isEmpty()) {
-
-            callback.onFailure(
-                    "User account was not found."
-            );
-
-            return;
-        }
-
-        if (!firebaseUid.equals(
-                invitation.getInvitedUserUid()
-        )) {
-
-            callback.onFailure(
-                    "This invitation does not belong to your account."
-            );
-
-            return;
-        }
-
-        String invitationId =
-                invitation.getInvitationId();
-
-        String firestoreFamilyId =
-                invitation.getFamilyId();
-
-        String familyName =
-                invitation.getFamilyName();
-
-        String role =
-                "VIEWER".equalsIgnoreCase(
-                        invitation.getRole()
-                )
-                        ? "VIEWER"
-                        : "MEMBER";
-
-        DocumentReference invitationReference =
-                firestore
-                        .collection(
-                                COLLECTION_INVITATIONS
-                        )
-                        .document(invitationId);
-
-        invitationReference
-                .get()
-                .addOnSuccessListener(document -> {
-
-                    if (!document.exists()) {
-
-                        callback.onFailure(
-                                "Invitation no longer exists."
-                        );
-
-                        return;
-                    }
-
-                    String status =
-                            document.getString(
-                                    "status"
-                            );
-
-                    if (!"PENDING".equalsIgnoreCase(
-                            status
-                    )) {
-
-                        callback.onAlreadyAccepted();
-
-                        return;
-                    }
-
-                    addAcceptedMember(
-                            invitationReference,
-                            firestoreFamilyId,
-                            familyName,
-                            firebaseUid,
-                            userName,
-                            role,
-                            callback
-                    );
-                })
-                .addOnFailureListener(exception -> {
-
-                    callback.onFailure(
-                            getErrorMessage(exception)
-                    );
-                });
-    }
-
-    // =====================================================
-    // ADD ACCEPTED MEMBER
-    // =====================================================
-
-    private void addAcceptedMember(
-            DocumentReference invitationReference,
-            String firestoreFamilyId,
-            String familyName,
-            String firebaseUid,
-            String userName,
-            String role,
-            AcceptInvitationCallback callback
-    ) {
-
-        DocumentReference familyReference =
-                firestore
-                        .collection(
-                                COLLECTION_FAMILIES
-                        )
-                        .document(firestoreFamilyId);
-
-        DocumentReference memberReference =
-                familyReference
-                        .collection(
-                                COLLECTION_MEMBERS
-                        )
-                        .document(firebaseUid);
-
-        DocumentReference userFamilyReference =
-                firestore
-                        .collection(
-                                COLLECTION_USERS
-                        )
-                        .document(firebaseUid)
-                        .collection(
-                                COLLECTION_USER_FAMILIES
-                        )
-                        .document(firestoreFamilyId);
-
-        String safeFamilyName =
-                familyName == null ||
-                        familyName.trim().isEmpty()
-                        ? "Family"
-                        : familyName;
-
-        String safeUserName =
-                userName == null
-                        ? ""
-                        : userName;
-
-        Map<String, Object> memberData =
-                new HashMap<>();
-
-        memberData.put(
-                "userUid",
-                firebaseUid
-        );
-
-        memberData.put(
-                "userName",
-                safeUserName
-        );
-
-        memberData.put(
-                "role",
-                role
-        );
-
-        memberData.put(
-                "joinedAt",
-                FieldValue.serverTimestamp()
-        );
-
-        Map<String, Object> userFamilyData =
-                new HashMap<>();
-
-        userFamilyData.put(
-                "familyId",
-                firestoreFamilyId
-        );
-
-        userFamilyData.put(
-                "familyName",
-                safeFamilyName
-        );
-
-        userFamilyData.put(
-                "role",
-                role
-        );
-
-        userFamilyData.put(
-                "joinedAt",
-                FieldValue.serverTimestamp()
-        );
-
-        Map<String, Object> invitationUpdate =
-                new HashMap<>();
-
-        invitationUpdate.put(
-                "status",
-                "ACCEPTED"
-        );
-
-        invitationUpdate.put(
-                "updatedAt",
-                FieldValue.serverTimestamp()
-        );
-
-        WriteBatch batch =
-                firestore.batch();
-
-        batch.set(
-                memberReference,
-                memberData
-        );
-
-        batch.set(
-                userFamilyReference,
-                userFamilyData
-        );
-
-        batch.update(
-                invitationReference,
-                invitationUpdate
-        );
-
-        batch.commit()
-                .addOnSuccessListener(unused -> {
-
-                    callback.onSuccess(
-                            firestoreFamilyId,
-                            safeFamilyName,
-                            role
-                    );
-                })
-                .addOnFailureListener(exception -> {
-
-                    callback.onFailure(
-                            getErrorMessage(exception)
-                    );
-                });
-    }
-
-    // =====================================================
-    // DECLINE INVITATION
-    // =====================================================
-
-    public void declineInvitation(
             String invitationId,
-            String firebaseUid,
-            DeclineInvitationCallback callback
+            String userUid,
+            String userName,
+            AcceptInvitationCallback callback
     ) {
 
         if (invitationId == null ||
                 invitationId.trim().isEmpty()) {
 
             callback.onFailure(
-                    "Invitation was not found."
+                    "Invitation ID is missing."
             );
 
             return;
         }
 
-        if (firebaseUid == null ||
-                firebaseUid.trim().isEmpty()) {
+        if (userUid == null ||
+                userUid.trim().isEmpty()) {
 
             callback.onFailure(
-                    "User account was not found."
+                    "User ID is missing."
             );
 
             return;
         }
 
-        DocumentReference invitationReference =
+        DocumentReference invitationRef =
                 firestore
                         .collection(
-                                COLLECTION_INVITATIONS
+                                INVITATION_COLLECTION
                         )
                         .document(invitationId);
 
-        invitationReference
+        invitationRef
                 .get()
-                .addOnSuccessListener(document -> {
+                .addOnSuccessListener(
+                        invitationSnapshot -> {
 
-                    if (!document.exists()) {
-
-                        callback.onFailure(
-                                "Invitation no longer exists."
-                        );
-
-                        return;
-                    }
-
-                    String invitedUserUid =
-                            document.getString(
-                                    "invitedUserUid"
-                            );
-
-                    if (!firebaseUid.equals(
-                            invitedUserUid
-                    )) {
-
-                        callback.onFailure(
-                                "This invitation does not belong to your account."
-                        );
-
-                        return;
-                    }
-
-                    Map<String, Object> update =
-                            new HashMap<>();
-
-                    update.put(
-                            "status",
-                            "DECLINED"
-                    );
-
-                    update.put(
-                            "updatedAt",
-                            FieldValue.serverTimestamp()
-                    );
-
-                    invitationReference
-                            .update(update)
-                            .addOnSuccessListener(unused -> {
-
-                                callback.onSuccess();
-                            })
-                            .addOnFailureListener(exception -> {
+                            if (!invitationSnapshot.exists()) {
 
                                 callback.onFailure(
-                                        getErrorMessage(
-                                                exception
-                                        )
+                                        "Invitation not found."
                                 );
-                            });
-                })
-                .addOnFailureListener(exception -> {
+
+                                return;
+                            }
+
+                            String status =
+                                    invitationSnapshot.getString(
+                                            "status"
+                                    );
+
+                            if (status == null ||
+                                    !status.equalsIgnoreCase(
+                                            "pending"
+                                    )) {
+
+                                callback.onFailure(
+                                        "This invitation is no longer pending."
+                                );
+
+                                return;
+                            }
+
+                            Object familyIdValue =
+                                    invitationSnapshot.get("familyId");
+
+                            String familyId;
+
+                            if (familyIdValue instanceof Number) {
+
+                                familyId =
+                                        String.valueOf(
+                                                ((Number) familyIdValue).longValue()
+                                        );
+
+                            } else {
+
+                                familyId =
+                                        String.valueOf(familyIdValue);
+                            }
+
+                            String familyName =
+                                    invitationSnapshot.getString(
+                                            "familyName"
+                                    );
+
+                            String role =
+                                    invitationSnapshot.getString(
+                                            "role"
+                                    );
+
+                            if (familyId == null ||
+                                    familyId.trim().isEmpty()) {
+
+                                callback.onFailure(
+                                        "Family ID is missing."
+                                );
+
+                                return;
+                            }
+
+                            if (familyName == null ||
+                                    familyName.trim().isEmpty()) {
+
+                                familyName = "Family";
+                            }
+
+                            if (role == null ||
+                                    role.trim().isEmpty()) {
+
+                                role = "member";
+                            }
+
+                            addMemberToFamily(
+                                    familyId,
+                                    familyName,
+                                    userUid,
+                                    userName,
+                                    role,
+                                    invitationId,
+                                    callback
+                            );
+                        }
+                )
+                .addOnFailureListener(e -> {
 
                     callback.onFailure(
-                            getErrorMessage(exception)
+                            e.getMessage() != null
+                                    ? e.getMessage()
+                                    : "Unable to read invitation."
                     );
                 });
     }
 
+
     // =====================================================
-    // CREATE INVITATION DOCUMENT ID
+    // ADD MEMBER TO FAMILY
     // =====================================================
 
-    private String createInvitationDocumentId(
+    private void addMemberToFamily(
             String familyId,
-            String invitedUserUid
+            String familyName,
+            String userUid,
+            String userName,
+            String role,
+            String invitationId,
+            AcceptInvitationCallback callback
     ) {
 
-        return familyId +
-                "_" +
-                invitedUserUid;
+        DocumentReference familyRef =
+                firestore
+                        .collection(FAMILY_COLLECTION)
+                        .document(familyId);
+
+        Map<String, Object> member =
+                new HashMap<>();
+
+        member.put(
+                "uid",
+                userUid
+        );
+
+        member.put(
+                "name",
+                userName == null
+                        ? ""
+                        : userName
+        );
+
+        member.put(
+                "role",
+                role.toUpperCase()
+        );
+
+        member.put(
+                "joinedAt",
+                FieldValue.serverTimestamp()
+        );
+
+        Map<String, Object> update =
+                new HashMap<>();
+
+        update.put(
+                "members." + userUid,
+                member
+        );
+
+        final String finalFamilyName =
+                familyName;
+
+        final String finalRole =
+                role;
+
+        familyRef
+                .update(update)
+                .addOnSuccessListener(unused -> {
+
+                    Map<String, Object> invitationUpdate =
+                            new HashMap<>();
+
+                    invitationUpdate.put(
+                            "status",
+                            "accepted"
+                    );
+
+                    invitationUpdate.put(
+                            "acceptedBy",
+                            userUid
+                    );
+
+                    invitationUpdate.put(
+                            "acceptedAt",
+                            System.currentTimeMillis()
+                    );
+
+                    firestore
+                            .collection(
+                                    INVITATION_COLLECTION
+                            )
+                            .document(invitationId)
+                            .update(invitationUpdate)
+                            .addOnSuccessListener(
+                                    unused2 -> {
+
+                                        callback.onSuccess(
+                                                familyId,
+                                                finalFamilyName,
+                                                finalRole
+                                        );
+                                    }
+                            )
+                            .addOnFailureListener(e ->
+                                    callback.onFailure(
+                                            e.getMessage() != null
+                                                    ? e.getMessage()
+                                                    : "Member added but invitation update failed."
+                                    )
+                            );
+                })
+                .addOnFailureListener(e -> {
+
+                    callback.onFailure(
+                            e.getMessage() != null
+                                    ? e.getMessage()
+                                    : "Failed to add member to family."
+                    );
+                });
     }
 
+
     // =====================================================
-    // GENERATE INVITATION CODE
+    // REJECT INVITATION
     // =====================================================
 
-    private String generateInvitationCode() {
+    public void rejectInvitation(
+            String invitationId,
+            String userUid,
+            RejectInvitationCallback callback
+    ) {
 
-        String randomPart =
+        if (invitationId == null ||
+                invitationId.trim().isEmpty()) {
+
+            callback.onFailure(
+                    "Invitation ID is missing."
+            );
+
+            return;
+        }
+
+        Map<String, Object> update =
+                new HashMap<>();
+
+        update.put(
+                "status",
+                "rejected"
+        );
+
+        update.put(
+                "rejectedBy",
+                userUid
+        );
+
+        update.put(
+                "rejectedAt",
+                System.currentTimeMillis()
+        );
+
+        firestore
+                .collection(INVITATION_COLLECTION)
+                .document(invitationId)
+                .update(update)
+                .addOnSuccessListener(
+                        unused ->
+                                callback.onSuccess()
+                )
+                .addOnFailureListener(e ->
+                        callback.onFailure(
+                                e.getMessage() != null
+                                        ? e.getMessage()
+                                        : "Failed to reject invitation."
+                        )
+                );
+    }
+
+
+    // =====================================================
+    // GENERATE INVITE CODE
+    // =====================================================
+
+    private String generateInviteCode() {
+
+        String random =
                 UUID.randomUUID()
                         .toString()
                         .replace("-", "")
-                        .substring(0, 8)
-                        .toUpperCase(Locale.ROOT);
+                        .substring(0, 5)
+                        .toUpperCase();
 
-        return "INV-" + randomPart;
+        return "FAM-" + random;
     }
 
+
     // =====================================================
-    // ERROR MESSAGE
+    // CALLBACKS
     // =====================================================
 
-    private String getErrorMessage(
-            Exception exception
-    ) {
+    public interface CreateFamilyCallback {
 
-        if (exception == null ||
-                exception.getMessage() == null ||
-                exception.getMessage()
-                        .trim()
-                        .isEmpty()) {
+        void onSuccess(
+                String firestoreFamilyId,
+                String inviteCode
+        );
 
-            return "Something went wrong. Please try again.";
-        }
+        void onFailure(
+                String message
+        );
+    }
 
-        return exception.getMessage();
+
+    public interface InvitationCallback {
+
+        void onSuccess(
+                String invitationId
+        );
+
+        void onFailure(
+                String message
+        );
+    }
+
+
+    public interface AcceptInvitationCallback {
+
+        void onSuccess(
+                String familyId,
+                String familyName,
+                String role
+        );
+
+        void onAlreadyAccepted();
+
+        void onFailure(
+                String message
+        );
+    }
+
+
+    public interface RejectInvitationCallback {
+
+        void onSuccess();
+
+        void onFailure(
+                String message
+        );
     }
 }
