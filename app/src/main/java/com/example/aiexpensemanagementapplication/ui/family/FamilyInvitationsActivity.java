@@ -1,5 +1,6 @@
 package com.example.aiexpensemanagementapplication.ui.family;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,10 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
-
 import com.example.aiexpensemanagementapplication.R;
+import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
 import com.example.aiexpensemanagementapplication.model.FamilyInvitation;
+import com.example.aiexpensemanagementapplication.ui.dashboard.FamilyDashboardActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,8 +33,7 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
     // TAG
     // =====================================================
 
-    private static final String TAG =
-            "FAMILY_INVITATION";
+    private static final String TAG = "FAMILY_INVITATION";
 
     // =====================================================
     // UI
@@ -52,11 +53,17 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
-    private FamilyFirestoreService familyFirestoreService;
-
     private FirebaseFirestore firestore;
 
     private FirebaseUser currentUser;
+
+    private FamilyFirestoreService familyFirestoreService;
+
+    // =====================================================
+    // LOCAL DATABASE
+    // =====================================================
+
+    private DatabaseHelper databaseHelper;
 
     // =====================================================
     // DATA
@@ -82,8 +89,7 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
 
         initializeFirebase();
 
-        familyFirestoreService =
-                new FamilyFirestoreService();
+        initializeServices();
 
         initializeViews();
 
@@ -95,7 +101,7 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
     }
 
     // =====================================================
-    // FIREBASE
+    // INITIALIZE FIREBASE
     // =====================================================
 
     private void initializeFirebase() {
@@ -111,7 +117,20 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
     }
 
     // =====================================================
-    // VIEWS
+    // INITIALIZE SERVICES
+    // =====================================================
+
+    private void initializeServices() {
+
+        familyFirestoreService =
+                new FamilyFirestoreService();
+
+        databaseHelper =
+                new DatabaseHelper(this);
+    }
+
+    // =====================================================
+    // INITIALIZE VIEWS
     // =====================================================
 
     private void initializeViews() {
@@ -197,10 +216,6 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
 
     private void loadInvitations() {
 
-        // -------------------------------------------------
-        // CHECK LOGIN
-        // -------------------------------------------------
-
         if (currentUser == null) {
 
             showLoading(false);
@@ -215,10 +230,6 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
 
             return;
         }
-
-        // -------------------------------------------------
-        // GET EMAIL
-        // -------------------------------------------------
 
         String userEmail =
                 currentUser.getEmail();
@@ -249,19 +260,15 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                 "Current user email = " + email
         );
 
-        // -------------------------------------------------
-        // START LOADING
-        // -------------------------------------------------
-
         showLoading(true);
 
-        // -------------------------------------------------
-        // IMPORTANT
-        //
-        // Query ONLY by invitedEmail.
-        //
-        // We check status manually below.
-        // -------------------------------------------------
+        /*
+         * Query only by email.
+         *
+         * Status is checked manually because this avoids
+         * problems caused by Firestore composite indexes
+         * and also lets us safely handle old invitation data.
+         */
 
         firestore
                 .collection("familyInvitations")
@@ -270,10 +277,6 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                         email
                 )
                 .get()
-
-                // =================================================
-                // SUCCESS
-                // =================================================
 
                 .addOnSuccessListener(
                         querySnapshot -> {
@@ -286,31 +289,12 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                                             + querySnapshot.size()
                             );
 
-                            // -----------------------------------------
-                            // LOOP DOCUMENTS
-                            // -----------------------------------------
-
                             for (
                                     QueryDocumentSnapshot document
                                     : querySnapshot
                             ) {
 
                                 try {
-
-                                    Log.d(
-                                            TAG,
-                                            "--------------------------------"
-                                    );
-
-                                    Log.d(
-                                            TAG,
-                                            "Document ID = "
-                                                    + document.getId()
-                                    );
-
-                                    // ---------------------------------
-                                    // READ RAW STATUS
-                                    // ---------------------------------
 
                                     String status =
                                             document.getString(
@@ -319,14 +303,17 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
 
                                     Log.d(
                                             TAG,
-                                            "Firestore status = "
+                                            "Document ID = "
+                                                    + document.getId()
+                                    );
+
+                                    Log.d(
+                                            TAG,
+                                            "Status = "
                                                     + status
                                     );
 
-                                    // ---------------------------------
-                                    // ONLY PENDING
-                                    // ---------------------------------
-
+                                    // Only pending invitations
                                     if (status == null ||
                                             !status
                                                     .trim()
@@ -334,18 +321,8 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                                                             "pending"
                                                     )) {
 
-                                        Log.d(
-                                                TAG,
-                                                "Skipping document because "
-                                                        + "status is not pending."
-                                        );
-
                                         continue;
                                     }
-
-                                    // ---------------------------------
-                                    // CONVERT TO MODEL
-                                    // ---------------------------------
 
                                     FamilyInvitation invitation =
                                             document.toObject(
@@ -353,29 +330,16 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                                             );
 
                                     if (invitation == null) {
-
                                         continue;
                                     }
-
-                                    // ---------------------------------
-                                    // SET DOCUMENT ID
-                                    // ---------------------------------
 
                                     invitation.setInvitationId(
                                             document.getId()
                                     );
 
-                                    // ---------------------------------
-                                    // ADD TO LIST
-                                    // ---------------------------------
-
                                     invitationList.add(
                                             invitation
                                     );
-
-                                    // ---------------------------------
-                                    // DEBUG
-                                    // ---------------------------------
 
                                     Log.d(
                                             TAG,
@@ -391,26 +355,8 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
 
                                     Log.d(
                                             TAG,
-                                            "Invited Email = "
-                                                    + invitation.getInvitedEmail()
-                                    );
-
-                                    Log.d(
-                                            TAG,
-                                            "Invited By = "
-                                                    + invitation.getInvitedBy()
-                                    );
-
-                                    Log.d(
-                                            TAG,
                                             "Role = "
                                                     + invitation.getRole()
-                                    );
-
-                                    Log.d(
-                                            TAG,
-                                            "Status = "
-                                                    + invitation.getStatus()
                                     );
 
                                 } catch (Exception e) {
@@ -423,27 +369,11 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                                 }
                             }
 
-                            // -----------------------------------------
-                            // UPDATE RECYCLER VIEW
-                            // -----------------------------------------
-
                             adapter.notifyDataSetChanged();
-
-                            // -----------------------------------------
-                            // STOP LOADING
-                            // -----------------------------------------
 
                             showLoading(false);
 
-                            // -----------------------------------------
-                            // EMPTY STATE
-                            // -----------------------------------------
-
                             updateEmptyState();
-
-                            // -----------------------------------------
-                            // RESULT
-                            // -----------------------------------------
 
                             Log.d(
                                     TAG,
@@ -452,7 +382,7 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                             );
 
                             Toast.makeText(
-                                    this,
+                                    FamilyInvitationsActivity.this,
                                     "Found "
                                             + invitationList.size()
                                             + " invitation(s)",
@@ -460,10 +390,6 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                             ).show();
                         }
                 )
-
-                // =================================================
-                // FAILURE
-                // =================================================
 
                 .addOnFailureListener(
                         e -> {
@@ -477,7 +403,7 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                             );
 
                             Toast.makeText(
-                                    this,
+                                    FamilyInvitationsActivity.this,
                                     "Failed to load invitations:\n"
                                             + e.getMessage(),
                                     Toast.LENGTH_LONG
@@ -487,49 +413,16 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
     }
 
     // =====================================================
-    // EMPTY STATE
-    // =====================================================
-
-    private void updateEmptyState() {
-
-        if (invitationList.isEmpty()) {
-
-            showEmptyState();
-
-        } else {
-
-            recyclerInvitations.setVisibility(
-                    View.VISIBLE
-            );
-
-            tvEmptyInvitations.setVisibility(
-                    View.GONE
-            );
-        }
-    }
-
-    // =====================================================
-    // SHOW EMPTY STATE
-    // =====================================================
-
-    private void showEmptyState() {
-
-        recyclerInvitations.setVisibility(
-                View.GONE
-        );
-
-        tvEmptyInvitations.setVisibility(
-                View.VISIBLE
-        );
-    }
-
-    // =====================================================
-    // ACCEPT
+    // ACCEPT INVITATION
     // =====================================================
 
     private void acceptInvitation(
             FamilyInvitation invitation
     ) {
+
+        // -------------------------------------------------
+        // CHECK LOGIN
+        // -------------------------------------------------
 
         if (currentUser == null) {
 
@@ -542,40 +435,157 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
             return;
         }
 
-        String uid =
+        // -------------------------------------------------
+        // INVITATION ID
+        // -------------------------------------------------
+
+        String invitationId =
+                invitation.getInvitationId();
+
+        if (invitationId == null ||
+                invitationId.trim().isEmpty()) {
+
+            Toast.makeText(
+                    this,
+                    "Invalid invitation.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // FIREBASE UID
+        // -------------------------------------------------
+
+        String firebaseUid =
                 currentUser.getUid();
 
-        String userName =
-                currentUser.getDisplayName();
+        // -------------------------------------------------
+        // LOCAL USER ID
+        // -------------------------------------------------
 
-        if (userName == null) {
-            userName = "";
+        int localUserId =
+                databaseHelper.getUserIdByFirebaseUid(
+                        firebaseUid
+                );
+
+        if (localUserId == -1) {
+
+            Toast.makeText(
+                    this,
+                    "User account not found in local database.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            return;
         }
+
+        // -------------------------------------------------
+        // USER NAME
+        // -------------------------------------------------
+
+        String userName =
+                getLocalUserName(
+                        localUserId
+                );
+
+        // -------------------------------------------------
+        // LOADING
+        // -------------------------------------------------
 
         showLoading(true);
 
+        // -------------------------------------------------
+        // ACCEPT FIRESTORE INVITATION
+        // -------------------------------------------------
+
         familyFirestoreService.acceptInvitation(
-                invitation.getInvitationId(),
-                uid,
+                invitationId,
+                firebaseUid,
                 userName,
-                new FamilyFirestoreService.AcceptInvitationCallback() {
+
+                new FamilyFirestoreService
+                        .AcceptInvitationCallback() {
 
                     @Override
                     public void onSuccess(
-                            String familyId,
+                            String firestoreFamilyId,
                             String familyName,
                             String role
                     ) {
 
-                        showLoading(false);
+                        Log.d(
+                                TAG,
+                                "Firestore family ID = "
+                                        + firestoreFamilyId
+                        );
 
-                        Toast.makeText(
-                                FamilyInvitationsActivity.this,
-                                "You joined "
+                        Log.d(
+                                TAG,
+                                "Family name = "
                                         + familyName
-                                        + " successfully!",
-                                Toast.LENGTH_LONG
-                        ).show();
+                        );
+
+                        Log.d(
+                                TAG,
+                                "Role = "
+                                        + role
+                        );
+
+                        // ---------------------------------------------
+                        // NORMALIZE ROLE
+                        // ---------------------------------------------
+
+                        String finalRole =
+                                role == null ||
+                                        role.trim().isEmpty()
+                                        ? "MEMBER"
+                                        : role
+                                        .trim()
+                                        .toUpperCase(
+                                                Locale.ROOT
+                                        );
+
+                        // ---------------------------------------------
+                        // SAVE FAMILY TO LOCAL SQLITE
+                        // ---------------------------------------------
+
+                        long localFamilyId =
+                                databaseHelper
+                                        .createJoinedFamilyWithFirestoreId(
+                                                familyName,
+                                                firestoreFamilyId,
+                                                localUserId,
+                                                finalRole
+                                        );
+
+                        Log.d(
+                                TAG,
+                                "Local SQLite family ID = "
+                                        + localFamilyId
+                        );
+
+                        // ---------------------------------------------
+                        // CHECK LOCAL SAVE
+                        // ---------------------------------------------
+
+                        if (localFamilyId == -1) {
+
+                            showLoading(false);
+
+                            Toast.makeText(
+                                    FamilyInvitationsActivity.this,
+                                    "Invitation accepted online, but family could not be saved locally.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            return;
+                        }
+
+                        // ---------------------------------------------
+                        // REMOVE INVITATION FROM LIST
+                        // ---------------------------------------------
 
                         invitationList.remove(
                                 invitation
@@ -584,7 +594,52 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
                         adapter.notifyDataSetChanged();
 
                         updateEmptyState();
+
+                        showLoading(false);
+
+                        // ---------------------------------------------
+                        // SUCCESS MESSAGE
+                        // ---------------------------------------------
+
+                        Toast.makeText(
+                                FamilyInvitationsActivity.this,
+                                "You joined "
+                                        + familyName
+                                        + " successfully!",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        // ---------------------------------------------
+                        // OPEN FAMILY DASHBOARD
+                        //
+                        // IMPORTANT:
+                        // Send LOCAL SQLite ID, NOT Firestore ID.
+                        // ---------------------------------------------
+
+                        Intent intent =
+                                new Intent(
+                                        FamilyInvitationsActivity.this,
+                                        FamilyDashboardActivity.class
+                                );
+
+                        intent.putExtra(
+                                "FAMILY_ID",
+                                (int) localFamilyId
+                        );
+
+                        intent.putExtra(
+                                "FAMILY_NAME",
+                                familyName
+                        );
+
+                        startActivity(intent);
+
+                        finish();
                     }
+
+                    // ---------------------------------------------
+                    // ALREADY ACCEPTED
+                    // ---------------------------------------------
 
                     @Override
                     public void onAlreadyAccepted() {
@@ -593,12 +648,16 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
 
                         Toast.makeText(
                                 FamilyInvitationsActivity.this,
-                                "This invitation has already been accepted.",
+                                "This invitation has already been processed.",
                                 Toast.LENGTH_LONG
                         ).show();
 
                         loadInvitations();
                     }
+
+                    // ---------------------------------------------
+                    // FAILURE
+                    // ---------------------------------------------
 
                     @Override
                     public void onFailure(
@@ -618,7 +677,7 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
     }
 
     // =====================================================
-    // REJECT
+    // REJECT INVITATION
     // =====================================================
 
     private void rejectInvitation(
@@ -636,12 +695,29 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
             return;
         }
 
+        String invitationId =
+                invitation.getInvitationId();
+
+        if (invitationId == null ||
+                invitationId.trim().isEmpty()) {
+
+            Toast.makeText(
+                    this,
+                    "Invalid invitation.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
         showLoading(true);
 
         familyFirestoreService.rejectInvitation(
-                invitation.getInvitationId(),
+                invitationId,
                 currentUser.getUid(),
-                new FamilyFirestoreService.RejectInvitationCallback() {
+
+                new FamilyFirestoreService
+                        .RejectInvitationCallback() {
 
                     @Override
                     public void onSuccess() {
@@ -681,6 +757,92 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
     }
 
     // =====================================================
+    // GET LOCAL USER NAME
+    // =====================================================
+
+    private String getLocalUserName(
+            int userId
+    ) {
+
+        android.database.Cursor cursor =
+                databaseHelper.getUserById(
+                        userId
+                );
+
+        String userName = "";
+
+        if (cursor != null) {
+
+            try {
+
+                if (cursor.moveToFirst()) {
+
+                    int nameIndex =
+                            cursor.getColumnIndex(
+                                    DatabaseHelper.USER_NAME
+                            );
+
+                    if (nameIndex != -1) {
+
+                        userName =
+                                cursor.getString(
+                                        nameIndex
+                                );
+                    }
+                }
+
+            } finally {
+
+                cursor.close();
+            }
+        }
+
+        return userName == null
+                ? ""
+                : userName;
+    }
+
+    // =====================================================
+    // EMPTY STATE
+    // =====================================================
+
+    private void updateEmptyState() {
+
+        boolean empty =
+                invitationList.isEmpty();
+
+        if (empty) {
+
+            showEmptyState();
+
+        } else {
+
+            recyclerInvitations.setVisibility(
+                    View.VISIBLE
+            );
+
+            tvEmptyInvitations.setVisibility(
+                    View.GONE
+            );
+        }
+    }
+
+    // =====================================================
+    // SHOW EMPTY STATE
+    // =====================================================
+
+    private void showEmptyState() {
+
+        recyclerInvitations.setVisibility(
+                View.GONE
+        );
+
+        tvEmptyInvitations.setVisibility(
+                View.VISIBLE
+        );
+    }
+
+    // =====================================================
     // LOADING
     // =====================================================
 
@@ -706,6 +868,21 @@ public class FamilyInvitationsActivity extends AppCompatActivity {
             tvEmptyInvitations.setVisibility(
                     View.GONE
             );
+        }
+    }
+
+    // =====================================================
+    // CLEANUP
+    // =====================================================
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+        if (databaseHelper != null) {
+
+            databaseHelper.close();
         }
     }
 }

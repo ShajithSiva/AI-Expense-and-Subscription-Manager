@@ -421,23 +421,21 @@ public class FamilyFirestoreService {
                                 return;
                             }
 
-                            Object familyIdValue =
-                                    invitationSnapshot.get("familyId");
+                            String familyId =
+                                    invitationSnapshot.getString("familyId");
 
-                            String familyId;
+                            if (familyId == null ||
+                                    familyId.trim().isEmpty() ||
+                                    familyId.equalsIgnoreCase("null")) {
 
-                            if (familyIdValue instanceof Number) {
+                                callback.onFailure(
+                                        "This invitation does not contain a valid Firestore family ID."
+                                );
 
-                                familyId =
-                                        String.valueOf(
-                                                ((Number) familyIdValue).longValue()
-                                        );
-
-                            } else {
-
-                                familyId =
-                                        String.valueOf(familyIdValue);
+                                return;
                             }
+
+                            familyId = familyId.trim();
 
                             String familyName =
                                     invitationSnapshot.getString(
