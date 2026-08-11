@@ -19,7 +19,7 @@
 
     <item
         android:id="@+id/nav_income"
-        android:icon="@drawable/subscribtion"
+        android:icon="@drawable/income1"
         android:title="Income" />
 
     <item

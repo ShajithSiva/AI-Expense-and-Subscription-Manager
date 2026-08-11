@@ -83,7 +83,7 @@
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="••••••••"
+                android:hint="Password"
                 android:inputType="textPassword"
                 android:padding="16dp"/>
         </com.google.android.material.textfield.TextInputLayout>

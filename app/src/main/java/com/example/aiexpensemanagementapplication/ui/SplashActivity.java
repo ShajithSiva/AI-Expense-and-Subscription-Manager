@@ -18,7 +18,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class SplashActivity extends BaseActivity {
+public class
+SplashActivity extends BaseActivity {
 
     private static final int SPLASH_DELAY = 2000;
 
