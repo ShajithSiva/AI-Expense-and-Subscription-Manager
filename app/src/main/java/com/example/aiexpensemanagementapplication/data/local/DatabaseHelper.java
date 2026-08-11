@@ -3056,32 +3056,150 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return total;
     }
+    // =====================================================
+// AI FINANCIAL INSIGHT
+// =====================================================
+
     public String generateAIInsight(int userId) {
 
-        double income = getTotalIncome(userId);
+        try {
 
-        double expense = getTotalExpense(userId);
+            double income =
+                    getTotalIncome(userId);
 
-        if(income==0){
+            double expense =
+                    getTotalExpense(userId);
 
-            return "Add your first income to start receiving AI insights.";
+            double savings =
+                    income - expense;
 
+            // -------------------------------------------------
+            // NO INCOME
+            // -------------------------------------------------
+
+            if (income <= 0) {
+
+                if (expense > 0) {
+
+                    return "⚠ Your expenses are recorded, but no income has been added yet. "
+                            + "Add your income to get more accurate financial insights.";
+
+                }
+
+                return "💡 Start recording your income and expenses "
+                        + "to receive personalized financial insights.";
+            }
+
+
+            // -------------------------------------------------
+            // EXPENSE > INCOME
+            // -------------------------------------------------
+
+            if (expense > income) {
+
+                double overspending =
+                        expense - income;
+
+                return "⚠ Your expenses are higher than your income by Rs "
+                        + String.format(
+                        java.util.Locale.getDefault(),
+                        "%.2f",
+                        overspending
+                )
+                        + ". Consider reducing non-essential spending "
+                        + "and reviewing your highest expense categories.";
+            }
+
+
+            // -------------------------------------------------
+            // EXPENSE RATIO
+            // -------------------------------------------------
+
+            double expensePercentage =
+                    (expense / income) * 100;
+
+
+            // -------------------------------------------------
+            // HIGH SPENDING
+            // -------------------------------------------------
+
+            if (expensePercentage >= 80) {
+
+                return "⚠ You have used "
+                        + String.format(
+                        java.util.Locale.getDefault(),
+                        "%.1f",
+                        expensePercentage
+                )
+                        + "% of your income. "
+                        + "Try to reduce unnecessary spending "
+                        + "to protect your remaining savings.";
+            }
+
+
+            // -------------------------------------------------
+            // MODERATELY HIGH SPENDING
+            // -------------------------------------------------
+
+            if (expensePercentage >= 60) {
+
+                return "💡 You have used "
+                        + String.format(
+                        java.util.Locale.getDefault(),
+                        "%.1f",
+                        expensePercentage
+                )
+                        + "% of your income. "
+                        + "Your finances are manageable, but keeping "
+                        + "discretionary spending under control could "
+                        + "improve your savings.";
+            }
+
+
+            // -------------------------------------------------
+            // GOOD SAVINGS
+            // -------------------------------------------------
+
+            if (expensePercentage <= 40) {
+
+                return "🎯 Excellent financial performance! "
+                        + "You are spending only "
+                        + String.format(
+                        java.util.Locale.getDefault(),
+                        "%.1f",
+                        expensePercentage
+                )
+                        + "% of your income and saving approximately Rs "
+                        + String.format(
+                        java.util.Locale.getDefault(),
+                        "%.2f",
+                        savings
+                )
+                        + ". Keep maintaining this healthy spending pattern.";
+            }
+
+
+            // -------------------------------------------------
+            // NORMAL
+            // -------------------------------------------------
+
+            return "✓ Your spending is currently under control. "
+                    + "You have approximately Rs "
+                    + String.format(
+                    java.util.Locale.getDefault(),
+                    "%.2f",
+                    savings
+            )
+                    + " remaining after expenses. "
+                    + "Continue monitoring your spending to maintain healthy savings.";
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return "💡 Unable to generate your financial insight right now. "
+                    + "Please continue recording your income and expenses.";
         }
-
-        if(expense>income){
-
-            return "Warning! Your expenses are higher than your income.";
-
-        }
-
-        if(expense>income*0.80){
-
-            return "You have spent more than 80% of your income this month.";
-
-        }
-
-        return "Great! Your spending is under control.";
-
     }
 
     // =====================================================

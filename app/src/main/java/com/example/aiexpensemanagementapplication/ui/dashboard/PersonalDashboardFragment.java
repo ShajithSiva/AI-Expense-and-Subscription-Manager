@@ -708,38 +708,116 @@ public class PersonalDashboardFragment extends Fragment {
             return;
         }
 
+        String email = currentUser.getEmail();
 
-        int userId =
-                databaseHelper.getUserIdByEmail(
-                        currentUser.getEmail()
-                );
+        if (email == null || email.trim().isEmpty()) {
 
+            tvAIInsight.setText(
+                    "Unable to identify your account."
+            );
 
-        if (userId == -1) {
+            tvRecommendation.setText(
+                    "Please login again."
+            );
+
             return;
         }
 
-
-        String insight =
-                databaseHelper.generateAIInsight(
-                        userId
+        int userId =
+                databaseHelper.getUserIdByEmail(
+                        email.trim()
                 );
 
+        if (userId == -1) {
+
+            tvAIInsight.setText(
+                    "Your financial profile could not be found."
+            );
+
+            tvRecommendation.setText(
+                    "Please make sure your account is properly registered."
+            );
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // GENERATE INSIGHT
+        // -------------------------------------------------
+
+        String insight =
+                databaseHelper.generateAIInsight(userId);
 
         if (insight == null ||
                 insight.trim().isEmpty()) {
 
             tvAIInsight.setText(
-                    "No insights available yet. "
-                            + "Continue recording your expenses "
-                            + "to receive personalized financial insights."
+                    "No financial insight is available yet."
+            );
+
+        } else {
+
+            tvAIInsight.setText(insight);
+        }
+
+
+        // -------------------------------------------------
+        // GENERATE RECOMMENDATION
+        // -------------------------------------------------
+
+        double income =
+                databaseHelper.getTotalIncome(userId);
+
+        double expense =
+                databaseHelper.getTotalExpense(userId);
+
+        double remaining =
+                income - expense;
+
+
+        if (income <= 0) {
+
+            tvRecommendation.setText(
+                    "Add your income to receive personalized "
+                            + "budget and saving recommendations."
             );
 
             return;
         }
 
 
-        tvAIInsight.setText(insight);
+        double percentage =
+                (expense / income) * 100;
+
+
+        if (expense > income) {
+
+            tvRecommendation.setText(
+                    "Recommendation: Reduce non-essential expenses "
+                            + "and review your highest spending categories."
+            );
+
+        } else if (percentage >= 80) {
+
+            tvRecommendation.setText(
+                    "Recommendation: Your spending is high. "
+                            + "Try to reduce discretionary expenses this month."
+            );
+
+        } else if (percentage >= 60) {
+
+            tvRecommendation.setText(
+                    "Recommendation: Keep monitoring your spending "
+                            + "and try to increase your monthly savings."
+            );
+
+        } else {
+
+            tvRecommendation.setText(
+                    "Recommendation: Your spending is healthy. "
+                            + "Consider saving or investing part of your remaining income."
+            );
+        }
     }
 
 

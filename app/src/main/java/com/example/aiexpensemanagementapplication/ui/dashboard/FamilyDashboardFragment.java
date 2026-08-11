@@ -124,6 +124,7 @@ public class FamilyDashboardFragment extends Fragment {
     private TextView tvBudgetAmount;
     private TextView tvBudgetPercentage;
 
+    private TextView tvAIInsight;
 
     // =====================================================
     // CONSTRUCTOR
@@ -131,6 +132,7 @@ public class FamilyDashboardFragment extends Fragment {
 
     public FamilyDashboardFragment() {
         // Required empty constructor
+
     }
 
 
@@ -489,6 +491,11 @@ public class FamilyDashboardFragment extends Fragment {
                         R.id.tvFamilySpending
                 );
 
+        tvAIInsight =
+                view.findViewById(
+                        R.id.tvAIInsight
+                );
+
         familyTransactionsContainer =
                 view.findViewById(
                         R.id.familyTransactionsContainer
@@ -658,13 +665,12 @@ public class FamilyDashboardFragment extends Fragment {
 
 
     // =====================================================
-    // LOAD SHARED EXPENSES
-    // =====================================================
+// LOAD SHARED EXPENSES
+// =====================================================
 
     private void loadSharedExpenses() {
 
         if (selectedFamilyId == -1) {
-
             return;
         }
 
@@ -674,15 +680,24 @@ public class FamilyDashboardFragment extends Fragment {
         // -------------------------------------------------
 
         double totalExpense =
-                databaseHelper
-                        .getFamilyTotalExpense(
-                                selectedFamilyId
-                        );
+                databaseHelper.getFamilyTotalExpense(
+                        selectedFamilyId
+                );
+
+
+        // -------------------------------------------------
+        // TOTAL FAMILY INCOME
+        // -------------------------------------------------
 
         double totalIncome =
                 databaseHelper.getFamilyTotalIncome(
                         selectedFamilyId
                 );
+
+
+        // -------------------------------------------------
+        // UPDATE INCOME
+        // -------------------------------------------------
 
         if (tvFamilySharedIncome != null) {
 
@@ -696,10 +711,13 @@ public class FamilyDashboardFragment extends Fragment {
         }
 
 
+        // -------------------------------------------------
+        // UPDATE EXPENSE
+        // -------------------------------------------------
+
         if (tvFamilySpending != null) {
 
             tvFamilySpending.setText(
-
                     String.format(
                             Locale.getDefault(),
                             "Rs %,.2f",
@@ -714,10 +732,9 @@ public class FamilyDashboardFragment extends Fragment {
         // -------------------------------------------------
 
         ArrayList<ExpenseModel> expenses =
-                databaseHelper
-                        .getFamilyExpenses(
-                                selectedFamilyId
-                        );
+                databaseHelper.getFamilyExpenses(
+                        selectedFamilyId
+                );
 
 
         // -------------------------------------------------
@@ -736,7 +753,282 @@ public class FamilyDashboardFragment extends Fragment {
         loadRecentFamilyTransactions(
                 expenses
         );
+
+
+        // -------------------------------------------------
+        // FAMILY BUDGET
+        // -------------------------------------------------
+
         loadFamilyBudget();
+
+
+        // -------------------------------------------------
+        // AI FAMILY INSIGHT
+        // -------------------------------------------------
+
+        loadFamilyAIInsight(
+                totalIncome,
+                totalExpense,
+                expenses
+        );
+    }
+
+    // =====================================================
+// AI FAMILY INSIGHT
+// =====================================================
+
+    private void loadFamilyAIInsight(
+            double totalIncome,
+            double totalExpense,
+            ArrayList<ExpenseModel> expenses
+    ) {
+
+        if (tvAIInsight == null) {
+            return;
+        }
+
+        // -------------------------------------------------
+        // NO FAMILY DATA
+        // -------------------------------------------------
+
+        if (totalIncome <= 0 && totalExpense <= 0) {
+
+            tvAIInsight.setText(
+                    "💡 Start recording family income and expenses "
+                            + "to receive personalized AI financial insights."
+            );
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // EXPENSES WITHOUT INCOME
+        // -------------------------------------------------
+
+        if (totalIncome <= 0 && totalExpense > 0) {
+
+            tvAIInsight.setText(
+                    "⚠ Family expenses have been recorded, but "
+                            + "no family income has been added yet. "
+                            + "Add income to get more accurate financial insights."
+            );
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // CALCULATE SAVINGS
+        // -------------------------------------------------
+
+        double savings =
+                totalIncome - totalExpense;
+
+
+        // -------------------------------------------------
+        // EXPENSE PERCENTAGE
+        // -------------------------------------------------
+
+        double expensePercentage =
+                (totalExpense / totalIncome) * 100;
+
+
+        // -------------------------------------------------
+        // FIND HIGHEST SPENDING CATEGORY
+        // -------------------------------------------------
+
+        Map<String, Double> categoryTotals =
+                new LinkedHashMap<>();
+
+
+        if (expenses != null) {
+
+            for (ExpenseModel expense : expenses) {
+
+                if (expense == null) {
+                    continue;
+                }
+
+                String category =
+                        expense.getCategoryName();
+
+
+                if (category == null ||
+                        category.trim().isEmpty()) {
+
+                    category = "Other";
+                }
+
+
+                double amount =
+                        expense.getAmount();
+
+
+                Double current =
+                        categoryTotals.get(category);
+
+
+                if (current == null) {
+                    current = 0.0;
+                }
+
+
+                categoryTotals.put(
+                        category,
+                        current + amount
+                );
+            }
+        }
+
+
+        String highestCategory =
+                "general spending";
+
+        double highestCategoryAmount =
+                0;
+
+
+        for (Map.Entry<String, Double> entry :
+                categoryTotals.entrySet()) {
+
+            if (entry.getValue() >
+                    highestCategoryAmount) {
+
+                highestCategoryAmount =
+                        entry.getValue();
+
+                highestCategory =
+                        entry.getKey();
+            }
+        }
+
+
+        // =================================================
+        // INSIGHT LOGIC
+        // =================================================
+
+        String insight;
+
+
+        // -------------------------------------------------
+        // CASE 1: EXPENSES > INCOME
+        // -------------------------------------------------
+
+        if (totalExpense > totalIncome) {
+
+            double overspending =
+                    totalExpense - totalIncome;
+
+
+            insight =
+                    "⚠ Your family is currently spending more "
+                            + "than its recorded income by Rs "
+                            + formatAmount(overspending)
+                            + ". "
+                            + "The highest spending category is "
+                            + highestCategory
+                            + ". "
+                            + "Consider reducing non-essential "
+                            + "expenses and reviewing this category.";
+
+
+        }
+
+        // -------------------------------------------------
+        // CASE 2: VERY HIGH SPENDING
+        // -------------------------------------------------
+
+        else if (expensePercentage >= 80) {
+
+            insight =
+                    "⚠ Your family has used "
+                            + formatAmount(expensePercentage)
+                            + "% of its recorded income. "
+                            + highestCategory
+                            + " is currently the highest spending "
+                            + "category. "
+                            + "Try to reduce unnecessary spending "
+                            + "to protect your remaining savings.";
+
+
+        }
+
+        // -------------------------------------------------
+        // CASE 3: MODERATE-HIGH SPENDING
+        // -------------------------------------------------
+
+        else if (expensePercentage >= 60) {
+
+            insight =
+                    "💡 Your family has used "
+                            + formatAmount(expensePercentage)
+                            + "% of its recorded income. "
+                            + highestCategory
+                            + " is the largest expense category. "
+                            + "Your family finances are manageable, "
+                            + "but controlling discretionary spending "
+                            + "could improve savings.";
+
+
+        }
+
+        // -------------------------------------------------
+        // CASE 4: HEALTHY SPENDING
+        // -------------------------------------------------
+
+        else if (expensePercentage <= 40) {
+
+            insight =
+                    "🎯 Your family is maintaining a healthy "
+                            + "spending pattern. Only "
+                            + formatAmount(expensePercentage)
+                            + "% of recorded income has been spent. "
+                            + "Approximately Rs "
+                            + formatAmount(savings)
+                            + " remains after expenses. "
+                            + "Keep maintaining this positive habit.";
+
+
+        }
+
+        // -------------------------------------------------
+        // CASE 5: NORMAL
+        // -------------------------------------------------
+
+        else {
+
+            insight =
+                    "✓ Your family spending is currently "
+                            + "under control. Approximately Rs "
+                            + formatAmount(savings)
+                            + " remains after recorded expenses. "
+                            + "Continue monitoring "
+                            + highestCategory
+                            + " and maintain consistent savings.";
+        }
+
+
+        // -------------------------------------------------
+        // DISPLAY
+        // -------------------------------------------------
+
+        tvAIInsight.setText(
+                insight
+        );
+    }
+
+    // =====================================================
+// FORMAT AMOUNT
+// =====================================================
+
+    private String formatAmount(double amount) {
+
+        return String.format(
+                Locale.getDefault(),
+                "%,.2f",
+                amount
+        );
     }
 
 
