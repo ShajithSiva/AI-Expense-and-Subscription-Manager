@@ -239,6 +239,69 @@
 
             </LinearLayout>
 
+            <!-- Gmail Subscription Detection -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardGmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="18dp">
+
+                    <ImageView
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:src="@drawable/ic_email"
+                        android:contentDescription="Gmail" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Connect Gmail"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222" />
+
+                        <TextView
+                            android:id="@+id/tvGmailStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Detect subscriptions automatically from your emails"
+                            android:textSize="13sp"
+                            android:textColor="#666666" />
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnConnectGmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Connect"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- AI Insight Card -->
 
             <com.google.android.material.card.MaterialCardView

@@ -1873,25 +1873,105 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public long insertSubscription(int userId,
-                                   String serviceName,
-                                   double amount,
-                                   String billingCycle,
-                                   String nextBillingDate) {
+    public long insertSubscription(
+            int userId,
+            String serviceName,
+            double amount,
+            String billingCycle,
+            String nextBillingDate
+    ) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        if (userId <= 0) {
 
-        ContentValues values = new ContentValues();
+            System.out.println(
+                    "ERROR: Cannot insert subscription. "
+                            + "Invalid UserID = "
+                            + userId
+            );
 
-        values.put(USER_ID, userId);
-        values.put(SERVICE_NAME, serviceName);
-        values.put(AMOUNT, amount);
-        values.put(BILLING_CYCLE, billingCycle);
-        values.put(NEXT_BILLING_DATE, nextBillingDate);
+            return -1;
+        }
 
-        return db.insert(TABLE_SUBSCRIPTION, null, values);
+
+        SQLiteDatabase db =
+                this.getWritableDatabase();
+
+
+        Cursor cursor = db.rawQuery(
+
+                "SELECT " + USER_ID +
+                        " FROM " + TABLE_USER +
+                        " WHERE " + USER_ID + "=?",
+
+                new String[]{
+                        String.valueOf(userId)
+                }
+        );
+
+
+        boolean userExists =
+                cursor.moveToFirst();
+
+        cursor.close();
+
+
+        if (!userExists) {
+
+            System.out.println(
+                    "ERROR: UserID "
+                            + userId
+                            + " does not exist in User table."
+            );
+
+            return -1;
+        }
+
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(
+                USER_ID,
+                userId
+        );
+
+        values.put(
+                SERVICE_NAME,
+                serviceName
+        );
+
+        values.put(
+                AMOUNT,
+                amount
+        );
+
+        values.put(
+                BILLING_CYCLE,
+                billingCycle
+        );
+
+        values.put(
+                NEXT_BILLING_DATE,
+                nextBillingDate
+        );
+
+
+        long result =
+                db.insert(
+                        TABLE_SUBSCRIPTION,
+                        null,
+                        values
+                );
+
+
+        System.out.println(
+                "SUBSCRIPTION INSERT RESULT: "
+                        + result
+        );
+
+
+        return result;
     }
-
     public Cursor getSubscriptions(int userId) {
 
         SQLiteDatabase db = this.getReadableDatabase();
