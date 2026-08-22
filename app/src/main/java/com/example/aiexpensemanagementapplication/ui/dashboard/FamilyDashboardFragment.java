@@ -125,6 +125,12 @@ public class FamilyDashboardFragment extends Fragment {
 
     private TextView tvAIInsight;
 
+    private TextView tvViewSubscriptions;
+    private TextView tvViewTransactions;
+
+    private boolean showAllSubscriptions = false;
+    private boolean showAllTransactions = false;
+
     // =====================================================
     // CONSTRUCTOR
     // =====================================================
@@ -537,7 +543,52 @@ public class FamilyDashboardFragment extends Fragment {
                         R.id.familyTransactionsContainer
                 );
 
+        tvViewSubscriptions =
+                view.findViewById(R.id.tvViewSubscriptions);
 
+        tvViewTransactions =
+                view.findViewById(R.id.tvViewTransactions);
+
+        // -------------------------------------------------
+// VIEW ALL SUBSCRIPTIONS
+// -------------------------------------------------
+
+        if (tvViewSubscriptions != null) {
+
+            tvViewSubscriptions.setOnClickListener(v -> {
+
+                showAllSubscriptions = !showAllSubscriptions;
+
+                tvViewSubscriptions.setText(
+                        showAllSubscriptions
+                                ? "Show Less"
+                                : "View All"
+                );
+
+                loadSharedSubscriptions();
+            });
+        }
+
+
+// -------------------------------------------------
+// VIEW ALL TRANSACTIONS
+// -------------------------------------------------
+
+        if (tvViewTransactions != null) {
+
+            tvViewTransactions.setOnClickListener(v -> {
+
+                showAllTransactions = !showAllTransactions;
+
+                tvViewTransactions.setText(
+                        showAllTransactions
+                                ? "Show Less"
+                                : "View All"
+                );
+
+                loadFamilyTransactionsOnly();
+            });
+        }
 
 
         familyPieChart =
@@ -1106,9 +1157,9 @@ public class FamilyDashboardFragment extends Fragment {
         // -------------------------------------------------
 
         int displayCount =
-                Math.min(
-                        subscriptions.size(),
-                        5
+                showAllSubscriptions
+                        ? subscriptions.size()
+                        : Math.min(subscriptions.size(), 1
                 );
 
 
@@ -1805,9 +1856,9 @@ public class FamilyDashboardFragment extends Fragment {
         // -------------------------------------------------
 
         int displayCount =
-                Math.min(
-                        expenses.size(),
-                        5
+                showAllTransactions
+                        ? expenses.size()
+                        : Math.min(expenses.size(), 1
                 );
 
 
@@ -2367,7 +2418,21 @@ public class FamilyDashboardFragment extends Fragment {
         }
     }
 
+    private void loadFamilyTransactionsOnly() {
 
+        if (selectedFamilyId == -1) {
+            return;
+        }
+
+        ArrayList<ExpenseModel> expenses =
+                databaseHelper.getFamilyExpenses(
+                        selectedFamilyId
+                );
+
+        loadRecentFamilyTransactions(
+                expenses
+        );
+    }
     // =====================================================
 // LOAD FAMILY CATEGORY PIE CHART
 // =====================================================
