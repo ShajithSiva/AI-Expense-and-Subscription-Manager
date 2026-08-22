@@ -17,6 +17,8 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SetFamilyBudgetActivity extends AppCompatActivity {
 
@@ -80,6 +82,19 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
             return;
         }
 
+
+        // -------------------------------------------------
+        // SECURITY CHECK
+        // Only Family Head / PRIMARY can manage family budget.
+        // -------------------------------------------------
+
+        if (!isCurrentUserPrimary()) {
+
+            showPrimaryOnlyAlert();
+
+            finish();
+            return;
+        }
 
         initializeViews();
 
@@ -320,6 +335,17 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
 
     private void saveBudget() {
 
+        // -------------------------------------------------
+        // SECURITY CHECK
+        // Re-check permission before saving.
+        // -------------------------------------------------
+
+        if (!isCurrentUserPrimary()) {
+
+            showPrimaryOnlyAlert();
+            return;
+        }
+
         String amountText =
                 etFamilyBudget
                         .getText()
@@ -512,6 +538,61 @@ public class SetFamilyBudgetActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+
+    // =====================================================
+    // CHECK WHETHER CURRENT USER IS FAMILY HEAD / PRIMARY
+    // =====================================================
+
+    private boolean isCurrentUserPrimary() {
+
+        FirebaseUser user =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (user == null) {
+            return false;
+        }
+
+        int userId =
+                databaseHelper
+                        .getUserIdByFirebaseUid(
+                                user.getUid()
+                        );
+
+        if (userId == -1) {
+            return false;
+        }
+
+        String role =
+                databaseHelper
+                        .getFamilyRole(
+                                userId,
+                                familyId
+                        );
+
+        return role != null &&
+                "PRIMARY".equalsIgnoreCase(
+                        role.trim()
+                );
+    }
+
+
+    // =====================================================
+    // PRIMARY-ONLY ALERT
+    // =====================================================
+
+    private void showPrimaryOnlyAlert() {
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Permission Denied")
+                .setMessage(
+                        "Only the Family Head can manage the family budget."
+                )
+                .setPositiveButton("OK", null)
+                .show();
     }
 
 

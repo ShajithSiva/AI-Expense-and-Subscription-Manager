@@ -12,14 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class InviteMemberActivity extends AppCompatActivity {
 
@@ -57,8 +55,8 @@ public class InviteMemberActivity extends AppCompatActivity {
     // =====================================================
 
     private FirebaseAuth mAuth;
-    private FirebaseFirestore firestore;
     private FirebaseUser currentUser;
+    private FamilyFirestoreService familyFirestoreService;
 
     // =====================================================
     // ACTIVITY
@@ -72,8 +70,8 @@ public class InviteMemberActivity extends AppCompatActivity {
 
         // Firebase
         mAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
         currentUser = mAuth.getCurrentUser();
+        familyFirestoreService = new FamilyFirestoreService();
 
         // Local database
         databaseHelper = new DatabaseHelper(this);
@@ -135,6 +133,20 @@ public class InviteMemberActivity extends AppCompatActivity {
         firestoreFamilyId =
                 firestoreFamilyId.trim();
 
+        // -------------------------------------------------
+        // SECURITY CHECK
+        // Only the Family Head / PRIMARY user can invite.
+        // Do this before showing an operational invite screen.
+        // -------------------------------------------------
+
+        if (!isCurrentUserPrimary()) {
+
+            showPrimaryOnlyAlert();
+
+            finish();
+            return;
+        }
+
         initializeViews();
 
         setupListeners();
@@ -187,6 +199,17 @@ public class InviteMemberActivity extends AppCompatActivity {
     // =====================================================
 
     private void sendInvitation() {
+
+        // -------------------------------------------------
+        // SECURITY CHECK
+        // Re-check permission before sending.
+        // -------------------------------------------------
+
+        if (!isCurrentUserPrimary()) {
+
+            showPrimaryOnlyAlert();
+            return;
+        }
 
         // -------------------------------------------------
         // Check login
@@ -295,9 +318,7 @@ public class InviteMemberActivity extends AppCompatActivity {
                 currentUser.getUid();
 
         // -------------------------------------------------
-        // IMPORTANT
-        //
-        // Create final variables for lambda
+        // FINAL VALUES
         // -------------------------------------------------
 
         final String finalEmail = email;
@@ -307,197 +328,124 @@ public class InviteMemberActivity extends AppCompatActivity {
                 firestoreFamilyId;
 
         // -------------------------------------------------
-        // Disable button
-        // -------------------------------------------------
-
-        btnSendInvitation.setEnabled(false);
-        btnSendInvitation.setText("Checking...");
-
-        // =================================================
-        // CHECK DUPLICATE INVITATION
-        // =================================================
-
-        firestore
-                .collection("familyInvitations")
-
-                .whereEqualTo(
-                        "familyId",
-                        finalFirestoreFamilyId
-                )
-
-                .whereEqualTo(
-                        "invitedEmail",
-                        finalEmail
-                )
-
-                .whereEqualTo(
-                        "status",
-                        "pending"
-                )
-
-                .get()
-
-                .addOnSuccessListener(
-                        querySnapshot -> {
-
-                            if (!querySnapshot.isEmpty()) {
-
-                                btnSendInvitation
-                                        .setEnabled(true);
-
-                                btnSendInvitation
-                                        .setText(
-                                                "Send Invitation"
-                                        );
-
-                                Toast.makeText(
-                                        InviteMemberActivity.this,
-                                        "A pending invitation already exists for this email.",
-                                        Toast.LENGTH_LONG
-                                ).show();
-
-                                return;
-                            }
-
-                            // -------------------------------------------------
-                            // No duplicate found
-                            // -------------------------------------------------
-
-                            createInvitation(
-                                    finalEmail,
-                                    finalRole,
-                                    finalInviterUid,
-                                    finalFirestoreFamilyId
-                            );
-                        }
-                )
-
-                .addOnFailureListener(
-                        e -> {
-
-                            btnSendInvitation
-                                    .setEnabled(true);
-
-                            btnSendInvitation
-                                    .setText(
-                                            "Send Invitation"
-                                    );
-
-                            Toast.makeText(
-                                    InviteMemberActivity.this,
-                                    "Unable to check invitation: "
-                                            + e.getMessage(),
-                                    Toast.LENGTH_LONG
-                            ).show();
-                        }
-                );
-    }
-
-    // =====================================================
-    // CREATE INVITATION
-    // =====================================================
-
-    private void createInvitation(
-            String email,
-            String role,
-            String inviterUid,
-            String firestoreFamilyId
-    ) {
-
-        Map<String, Object> invitation =
-                new HashMap<>();
-
-        // -------------------------------------------------
-        // IMPORTANT
-        //
-        // Store Firestore Family ID as STRING
-        // -------------------------------------------------
-
-        invitation.put(
-                "familyId",
-                firestoreFamilyId
-        );
-
-        invitation.put(
-                "familyName",
-                familyName
-        );
-
-        invitation.put(
-                "invitedEmail",
-                email
-        );
-
-        invitation.put(
-                "invitedBy",
-                inviterUid
-        );
-
-        invitation.put(
-                "role",
-                role
-        );
-
-        invitation.put(
-                "status",
-                "pending"
-        );
-
-        // Store createdAt as LONG
-        // because FamilyInvitation uses long createdAt
-        invitation.put(
-                "createdAt",
-                System.currentTimeMillis()
-        );
-
-        // -------------------------------------------------
-        // Button state
+        // DISABLE BUTTON WHILE REQUEST IS RUNNING
         // -------------------------------------------------
 
         btnSendInvitation.setEnabled(false);
         btnSendInvitation.setText("Sending...");
 
         // =================================================
-        // SAVE TO FIRESTORE
+        // SEND THROUGH SECURED FIRESTORE SERVICE
+        // The service checks:
+        // 1. Family exists
+        // 2. inviterUid == ownerUid
+        // 3. No duplicate pending invitation
         // =================================================
 
-        firestore
-                .collection("familyInvitations")
-                .add(invitation)
+        familyFirestoreService.sendInvitation(
+                finalFirestoreFamilyId,
+                familyName,
+                finalEmail,
+                finalInviterUid,
+                finalRole,
+                new FamilyFirestoreService.InvitationCallback() {
 
-                .addOnSuccessListener(
-                        documentReference -> {
+                    @Override
+                    public void onSuccess(
+                            String invitationId
+                    ) {
 
-                            Toast.makeText(
-                                    InviteMemberActivity.this,
-                                    "Invitation sent successfully.",
-                                    Toast.LENGTH_SHORT
-                            ).show();
+                        btnSendInvitation.setEnabled(true);
+                        btnSendInvitation.setText(
+                                "Send Invitation"
+                        );
 
-                            finish();
-                        }
-                )
+                        Toast.makeText(
+                                InviteMemberActivity.this,
+                                "Invitation sent successfully.",
+                                Toast.LENGTH_SHORT
+                        ).show();
 
-                .addOnFailureListener(
-                        e -> {
+                        finish();
+                    }
 
-                            btnSendInvitation
-                                    .setEnabled(true);
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
 
-                            btnSendInvitation
-                                    .setText(
-                                            "Send Invitation"
-                                    );
+                        btnSendInvitation.setEnabled(true);
+                        btnSendInvitation.setText(
+                                "Send Invitation"
+                        );
 
-                            Toast.makeText(
-                                    InviteMemberActivity.this,
-                                    "Failed to send invitation: "
-                                            + e.getMessage(),
-                                    Toast.LENGTH_LONG
-                            ).show();
-                        }
+                        Toast.makeText(
+                                InviteMemberActivity.this,
+                                message == null ||
+                                        message.trim().isEmpty()
+                                        ? "Failed to send invitation."
+                                        : message,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
+        );
+    }
+
+    // =====================================================
+    // CHECK WHETHER CURRENT USER IS FAMILY HEAD / PRIMARY
+    // =====================================================
+
+    private boolean isCurrentUserPrimary() {
+
+        FirebaseUser user =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (user == null) {
+            return false;
+        }
+
+        int userId =
+                databaseHelper
+                        .getUserIdByFirebaseUid(
+                                user.getUid()
+                        );
+
+        if (userId == -1) {
+            return false;
+        }
+
+        String role =
+                databaseHelper
+                        .getFamilyRole(
+                                userId,
+                                familyId
+                        );
+
+        return role != null &&
+                "PRIMARY".equalsIgnoreCase(
+                        role.trim()
                 );
     }
+
+
+    // =====================================================
+    // PRIMARY-ONLY ALERT
+    // =====================================================
+
+    private void showPrimaryOnlyAlert() {
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Permission Denied")
+                .setMessage(
+                        "Only the Family Head can invite family members."
+                )
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
 
     // =====================================================
     // CLEANUP

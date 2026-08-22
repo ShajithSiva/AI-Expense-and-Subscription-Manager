@@ -484,20 +484,32 @@ public class FamilyDashboardFragment extends Fragment {
         btnSetFamilyBudget =
                 view.findViewById(R.id.btnSetFamilyBudget);
 
-        btnSetFamilyBudget.setOnClickListener(v -> {
+        if (btnSetFamilyBudget != null) {
 
-            Intent intent = new Intent(
-                    requireContext(),
-                    SetFamilyBudgetActivity.class
-            );
+            btnSetFamilyBudget.setOnClickListener(v -> {
 
-            intent.putExtra(
-                    "familyId",
-                    selectedFamilyId
-            );
+                if (!isPrimaryUser()) {
 
-            startActivity(intent);
-        });
+                    showPrimaryOnlyAlert(
+                            "Only the Family Head can manage the family budget."
+                    );
+
+                    return;
+                }
+
+                Intent intent = new Intent(
+                        requireContext(),
+                        SetFamilyBudgetActivity.class
+                );
+
+                intent.putExtra(
+                        "familyId",
+                        selectedFamilyId
+                );
+
+                startActivity(intent);
+            });
+        }
 
 
         // -------------------------------------------------
@@ -2667,35 +2679,20 @@ public class FamilyDashboardFragment extends Fragment {
 
     private void updateRoleBasedUI() {
 
-        if (btnInviteMember == null) {
+        // Only the Family Head / PRIMARY user can invite members.
+        if (btnInviteMember != null) {
 
-            return;
+            btnInviteMember.setVisibility(
+                    isPrimaryUser()
+                            ? View.VISIBLE
+                            : View.GONE
+            );
         }
 
-
-        if (selectedFamilyRole == null) {
-
-            btnInviteMember.setVisibility(
-                    View.GONE
-            );
-
-            return;
-        }
-
-
-        if ("PRIMARY".equalsIgnoreCase(
-                selectedFamilyRole
-        )) {
-
-            btnInviteMember.setVisibility(
-                    View.VISIBLE
-            );
-
-        } else {
-
-            btnInviteMember.setVisibility(
-                    View.GONE
-            );
+        // Keep the budget button visible for everyone.
+        // Non-primary users receive a permission alert when they press it.
+        if (btnSetFamilyBudget != null) {
+            btnSetFamilyBudget.setVisibility(View.VISIBLE);
         }
     }
 
@@ -2934,6 +2931,7 @@ public class FamilyDashboardFragment extends Fragment {
 // DISPLAY FAMILY MEMBERS
 // =====================================================
 
+
     private void displayFamilyMembers(
             List<FamilyFirestoreService.FamilyMemberData> members
     ) {
@@ -2947,7 +2945,6 @@ public class FamilyDashboardFragment extends Fragment {
         if (members == null || members.isEmpty()) {
 
             showNoFamilyMembers();
-
             return;
         }
 
@@ -2964,44 +2961,736 @@ public class FamilyDashboardFragment extends Fragment {
             tvNoMembers.setVisibility(View.GONE);
         }
 
+        FirebaseUser currentFirebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        String currentFirebaseUid =
+                currentFirebaseUser == null
+                        ? ""
+                        : currentFirebaseUser.getUid();
+
+
         for (int i = 0; i < members.size(); i++) {
 
             FamilyFirestoreService.FamilyMemberData member =
                     members.get(i);
 
-            TextView memberView =
-                    new TextView(requireContext());
+            if (member == null) {
+                continue;
+            }
 
-            String role = member.getRole();
+            String memberName =
+                    member.getName();
 
-            if (role == null || role.trim().isEmpty()) {
+            if (memberName == null ||
+                    memberName.trim().isEmpty()) {
+
+                memberName = "Family Member";
+            }
+
+            String role =
+                    member.getRole();
+
+            if (role == null ||
+                    role.trim().isEmpty()) {
+
                 role = "MEMBER";
             }
 
-            memberView.setText(
-                    getInitials(member.getName())
-                            + "   "
-                            + member.getName()
-                            + "    "
-                            + role.toUpperCase()
+
+            // =============================================
+            // MAIN MEMBER ROW
+            // =============================================
+
+            LinearLayout memberRow =
+                    new LinearLayout(requireContext());
+
+            memberRow.setOrientation(
+                    LinearLayout.HORIZONTAL
             );
 
-            memberView.setTextSize(14);
-            memberView.setTextColor(
+            memberRow.setGravity(
+                    Gravity.CENTER_VERTICAL
+            );
+
+            memberRow.setPadding(
+                    0,
+                    dpToPx(10),
+                    0,
+                    dpToPx(10)
+            );
+
+
+            // =============================================
+            // MEMBER INFORMATION
+            // =============================================
+
+            LinearLayout memberInfo =
+                    new LinearLayout(requireContext());
+
+            memberInfo.setOrientation(
+                    LinearLayout.VERTICAL
+            );
+
+            LinearLayout.LayoutParams memberInfoParams =
+                    new LinearLayout.LayoutParams(
+                            0,
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            1f
+                    );
+
+
+            // =============================================
+            // MEMBER NAME
+            // =============================================
+
+            TextView nameView =
+                    new TextView(requireContext());
+
+            nameView.setText(
+                    getInitials(memberName)
+                            + "   "
+                            + memberName
+            );
+
+            nameView.setTextSize(14);
+
+            nameView.setTextColor(
                     Color.parseColor("#111827")
             );
 
-            memberView.setPadding(
-                    0,
-                    dpToPx(12),
-                    0,
-                    dpToPx(12)
+            nameView.setTypeface(
+                    Typeface.DEFAULT,
+                    Typeface.BOLD
             );
 
-            familyMembersContainer.addView(
-                    memberView
+
+            // =============================================
+            // MEMBER ROLE
+            // =============================================
+
+            TextView roleView =
+                    new TextView(requireContext());
+
+            String displayRole =
+                    "PRIMARY".equalsIgnoreCase(role)
+                            ? "Family Head"
+                            : "Family Member";
+
+            roleView.setText(displayRole);
+
+            roleView.setTextSize(11);
+
+            roleView.setTextColor(
+                    Color.parseColor("#6B7280")
             );
+
+            roleView.setPadding(
+                    0,
+                    dpToPx(3),
+                    0,
+                    0
+            );
+
+
+            memberInfo.addView(nameView);
+            memberInfo.addView(roleView);
+
+            memberRow.addView(
+                    memberInfo,
+                    memberInfoParams
+            );
+
+
+            // =============================================
+            // MANAGE MEMBER / TRANSFER FAMILY HEAD
+            // =============================================
+
+            boolean isCurrentUser =
+                    member.getUid() != null
+                            && member.getUid()
+                            .equals(currentFirebaseUid);
+
+            boolean isFamilyHead =
+                    "PRIMARY".equalsIgnoreCase(role);
+
+            /*
+             * Only the current Family Head sees the Manage button.
+             * It is shown only for another member, never for the
+             * current Family Head row.
+             */
+            if (isPrimaryUser() &&
+                    !isCurrentUser &&
+                    !isFamilyHead) {
+
+                MaterialButton manageButton =
+                        new MaterialButton(
+                                requireContext(),
+                                null,
+                                com.google.android.material.R.attr.materialButtonOutlinedStyle
+                        );
+
+                manageButton.setText("Manage");
+                manageButton.setTextSize(11);
+                manageButton.setAllCaps(false);
+                manageButton.setMinWidth(0);
+                manageButton.setMinimumWidth(0);
+                manageButton.setPadding(
+                        dpToPx(10),
+                        0,
+                        dpToPx(10),
+                        0
+                );
+
+                String finalManageMemberName =
+                        memberName;
+
+                manageButton.setOnClickListener(v ->
+                        showMemberManagementMenu(
+                                manageButton,
+                                member.getUid(),
+                                finalManageMemberName
+                        )
+                );
+
+                memberRow.addView(manageButton);
+            }
+
+
+            // =============================================
+            // REMOVE BUTTON
+            // =============================================
+
+            /*
+             * Do not show Remove for the current user.
+             * Do not show Remove for the Family Head.
+             *
+             * Everyone else gets the button.
+             * Permission is checked again when pressed.
+             */
+
+            if (!isCurrentUser && !isFamilyHead) {
+
+                MaterialButton removeButton =
+                        new MaterialButton(
+                                requireContext(),
+                                null,
+                                com.google.android.material.R.attr.materialButtonOutlinedStyle
+                        );
+
+                removeButton.setText("Remove");
+                removeButton.setTextSize(11);
+                removeButton.setAllCaps(false);
+
+                removeButton.setMinWidth(0);
+                removeButton.setMinimumWidth(0);
+
+                removeButton.setPadding(
+                        dpToPx(12),
+                        0,
+                        dpToPx(12),
+                        0
+                );
+
+                String finalMemberName =
+                        memberName;
+
+                removeButton.setOnClickListener(v -> {
+
+                    if (!isPrimaryUser()) {
+
+                        showPrimaryOnlyAlert(
+                                "Only the Family Head can remove family members."
+                        );
+
+                        return;
+                    }
+
+                    confirmRemoveFamilyMember(
+                            member.getUid(),
+                            finalMemberName
+                    );
+                });
+
+                memberRow.addView(removeButton);
+            }
+
+
+            familyMembersContainer.addView(
+                    memberRow
+            );
+
+
+            if (i < members.size() - 1) {
+
+                View divider =
+                        new View(requireContext());
+
+                divider.setBackgroundColor(
+                        Color.parseColor("#E5E7EB")
+                );
+
+                LinearLayout.LayoutParams dividerParams =
+                        new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                dpToPx(1)
+                        );
+
+                familyMembersContainer.addView(
+                        divider,
+                        dividerParams
+                );
+            }
         }
+    }
+
+    // =====================================================
+    // MEMBER MANAGEMENT MENU
+    // =====================================================
+
+    private void showMemberManagementMenu(
+            View anchor,
+            String memberUid,
+            String memberName
+    ) {
+
+        if (!isPrimaryUser()) {
+            showPrimaryOnlyAlert(
+                    "Only the Family Head can manage family members."
+            );
+            return;
+        }
+
+        PopupMenu popupMenu =
+                new PopupMenu(
+                        requireContext(),
+                        anchor
+                );
+
+        final int MENU_MAKE_HEAD = 200001;
+        final int MENU_REMOVE = 200002;
+
+        popupMenu.getMenu().add(
+                Menu.NONE,
+                MENU_MAKE_HEAD,
+                Menu.NONE,
+                "Make Family Head"
+        );
+
+        popupMenu.getMenu().add(
+                Menu.NONE,
+                MENU_REMOVE,
+                Menu.NONE,
+                "Remove Member"
+        );
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+
+            if (item.getItemId() == MENU_MAKE_HEAD) {
+
+                confirmTransferFamilyHead(
+                        memberUid,
+                        memberName
+                );
+
+                return true;
+            }
+
+            if (item.getItemId() == MENU_REMOVE) {
+
+                confirmRemoveFamilyMember(
+                        memberUid,
+                        memberName
+                );
+
+                return true;
+            }
+
+            return false;
+        });
+
+        popupMenu.show();
+    }
+
+
+    // =====================================================
+    // CONFIRM FAMILY HEAD TRANSFER
+    // =====================================================
+
+    private void confirmTransferFamilyHead(
+            String newPrimaryUid,
+            String newPrimaryName
+    ) {
+
+        if (!isPrimaryUser()) {
+            showPrimaryOnlyAlert(
+                    "Only the Family Head can transfer the Family Head role."
+            );
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Change Family Head")
+                .setMessage(
+                        "Make " + newPrimaryName
+                                + " the new Family Head?\n\n"
+                                + "You will become a normal family member. "
+                                + "The new Family Head will control invitations, "
+                                + "member removal, family budget and family deletion."
+                )
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton(
+                        "Make Family Head",
+                        (dialog, which) ->
+                                transferFamilyHead(
+                                        newPrimaryUid,
+                                        newPrimaryName
+                                )
+                )
+                .show();
+    }
+
+
+    // =====================================================
+    // TRANSFER FAMILY HEAD
+    // FIRESTORE FIRST, THEN LOCAL SQLITE
+    // =====================================================
+
+    private void transferFamilyHead(
+            String newPrimaryUid,
+            String newPrimaryName
+    ) {
+
+        if (!isAdded() ||
+                selectedFamilyId == -1 ||
+                currentUserId == -1) {
+            return;
+        }
+
+        if (!isPrimaryUser()) {
+            showPrimaryOnlyAlert(
+                    "Only the Family Head can transfer the Family Head role."
+            );
+            return;
+        }
+
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (firebaseUser == null) {
+            Toast.makeText(
+                    requireContext(),
+                    "User session not found. Please login again.",
+                    Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+
+        if (newPrimaryUid == null ||
+                newPrimaryUid.trim().isEmpty()) {
+            Toast.makeText(
+                    requireContext(),
+                    "Selected member ID is missing.",
+                    Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+
+        int newPrimaryUserId =
+                databaseHelper
+                        .getUserIdByFirebaseUid(
+                                newPrimaryUid
+                        );
+
+        if (newPrimaryUserId == -1) {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Unable to Change Family Head")
+                    .setMessage(
+                            "The selected member is not available in the local user database yet. "
+                                    + "Please make sure the member has accepted the invitation and "
+                                    + "their account is synchronized on this device."
+                    )
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
+        String firestoreFamilyId =
+                databaseHelper
+                        .getFirestoreFamilyId(
+                                selectedFamilyId
+                        );
+
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
+            Toast.makeText(
+                    requireContext(),
+                    "Family Firestore ID not found.",
+                    Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+
+        familyFirestoreService.transferFamilyHead(
+                firestoreFamilyId,
+                firebaseUser.getUid(),
+                newPrimaryUid,
+                newPrimaryName,
+                new FamilyFirestoreService.MemberManagementCallback() {
+
+                    @Override
+                    public void onSuccess() {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        boolean localSuccess =
+                                databaseHelper
+                                        .transferFamilyHead(
+                                                selectedFamilyId,
+                                                currentUserId,
+                                                newPrimaryUserId
+                                        );
+
+                        if (!localSuccess) {
+
+                            new AlertDialog.Builder(
+                                    requireContext()
+                            )
+                                    .setTitle(
+                                            "Family Head Changed Online"
+                                    )
+                                    .setMessage(
+                                            "The Family Head was changed in Firestore, "
+                                                    + "but the local database could not be updated. "
+                                                    + "Please reload or sign in again to synchronize the family."
+                                    )
+                                    .setPositiveButton(
+                                            "OK",
+                                            (dialog, which) ->
+                                                    reloadFragment()
+                                    )
+                                    .show();
+
+                            return;
+                        }
+
+                        Toast.makeText(
+                                requireContext(),
+                                newPrimaryName
+                                        + " is now the Family Head.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        reloadFragment();
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        new AlertDialog.Builder(
+                                requireContext()
+                        )
+                                .setTitle(
+                                        "Unable to Change Family Head"
+                                )
+                                .setMessage(
+                                        message == null
+                                                ? "Failed to change the Family Head."
+                                                : message
+                                )
+                                .setPositiveButton(
+                                        "OK",
+                                        null
+                                )
+                                .show();
+                    }
+                }
+        );
+    }
+
+
+    // =====================================================
+    // CONFIRM REMOVE FAMILY MEMBER
+    // =====================================================
+
+    private void confirmRemoveFamilyMember(
+            String memberUid,
+            String memberName
+    ) {
+
+        if (!isAdded()) {
+            return;
+        }
+
+        if (!isPrimaryUser()) {
+
+            showPrimaryOnlyAlert(
+                    "Only the Family Head can remove family members."
+            );
+
+            return;
+        }
+
+        if (memberUid == null ||
+                memberUid.trim().isEmpty()) {
+
+            Toast.makeText(
+                    requireContext(),
+                    "Member ID is missing.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        new AlertDialog.Builder(
+                requireContext()
+        )
+                .setTitle(
+                        "Remove Family Member"
+                )
+                .setMessage(
+                        "Are you sure you want to remove "
+                                + memberName
+                                + " from this family?"
+                )
+                .setNegativeButton(
+                        "Cancel",
+                        null
+                )
+                .setPositiveButton(
+                        "Remove",
+                        (dialog, which) ->
+                                removeFamilyMember(
+                                        memberUid,
+                                        memberName
+                                )
+                )
+                .show();
+    }
+
+
+    // =====================================================
+    // REMOVE FAMILY MEMBER
+    // =====================================================
+
+    private void removeFamilyMember(
+            String memberUid,
+            String memberName
+    ) {
+
+        if (!isAdded() ||
+                selectedFamilyId == -1) {
+
+            return;
+        }
+
+        if (!isPrimaryUser()) {
+
+            showPrimaryOnlyAlert(
+                    "Only the Family Head can remove family members."
+            );
+
+            return;
+        }
+
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (firebaseUser == null) {
+
+            Toast.makeText(
+                    requireContext(),
+                    "User session not found. Please login again.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        String firestoreFamilyId =
+                databaseHelper
+                        .getFirestoreFamilyId(
+                                selectedFamilyId
+                        );
+
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
+
+            Toast.makeText(
+                    requireContext(),
+                    "Family Firestore ID not found.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        familyFirestoreService.removeFamilyMember(
+                firestoreFamilyId,
+                firebaseUser.getUid(),
+                memberUid,
+                new FamilyFirestoreService.MemberManagementCallback() {
+
+                    @Override
+                    public void onSuccess() {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        Toast.makeText(
+                                requireContext(),
+                                memberName
+                                        + " removed from the family.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        loadFamilyMembers();
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        new AlertDialog.Builder(
+                                requireContext()
+                        )
+                                .setTitle(
+                                        "Unable to Remove Member"
+                                )
+                                .setMessage(
+                                        message == null
+                                                ? "Failed to remove family member."
+                                                : message
+                                )
+                                .setPositiveButton(
+                                        "OK",
+                                        null
+                                )
+                                .show();
+                    }
+                }
+        );
     }
 
 
@@ -3079,17 +3768,14 @@ public class FamilyDashboardFragment extends Fragment {
             return;
         }
 
-
         PopupMenu popupMenu =
                 new PopupMenu(
                         requireContext(),
                         btnFamilyOptions
                 );
 
-
         Menu menu =
                 popupMenu.getMenu();
-
 
         final int MENU_INVITE =
                 100001;
@@ -3100,28 +3786,17 @@ public class FamilyDashboardFragment extends Fragment {
         final int MENU_DELETE =
                 100003;
 
-
         // -------------------------------------------------
-        // PRIMARY USER
+        // INVITE - PRIMARY ONLY
         // -------------------------------------------------
 
-        if ("PRIMARY".equalsIgnoreCase(
-                selectedFamilyRole
-        )) {
+        if (isPrimaryUser()) {
 
             menu.add(
                     Menu.NONE,
                     MENU_INVITE,
                     Menu.NONE,
                     "Invite Member"
-            );
-
-
-            menu.add(
-                    Menu.NONE,
-                    MENU_DELETE,
-                    Menu.NONE,
-                    "Delete Family"
             );
 
         } else {
@@ -3134,10 +3809,17 @@ public class FamilyDashboardFragment extends Fragment {
             );
         }
 
+        // -------------------------------------------------
+        // DELETE FAMILY - VISIBLE TO EVERYONE
+        // Only PRIMARY can actually delete.
+        // -------------------------------------------------
 
-        // -------------------------------------------------
-        // MENU CLICK
-        // -------------------------------------------------
+        menu.add(
+                Menu.NONE,
+                MENU_DELETE,
+                Menu.NONE,
+                "Delete Family"
+        );
 
         popupMenu.setOnMenuItemClickListener(
                 item -> {
@@ -3145,42 +3827,39 @@ public class FamilyDashboardFragment extends Fragment {
                     int itemId =
                             item.getItemId();
 
-
-                    if (itemId ==
-                            MENU_INVITE) {
+                    if (itemId == MENU_INVITE) {
 
                         openInviteMemberActivity();
-
                         return true;
                     }
 
-
-                    if (itemId ==
-                            MENU_LEAVE) {
+                    if (itemId == MENU_LEAVE) {
 
                         confirmLeaveFamily();
-
                         return true;
                     }
 
+                    if (itemId == MENU_DELETE) {
 
-                    if (itemId ==
-                            MENU_DELETE) {
+                        if (!isPrimaryUser()) {
+
+                            showPrimaryOnlyAlert(
+                                    "Only the Family Head can delete this family."
+                            );
+
+                            return true;
+                        }
 
                         confirmDeleteFamily();
-
                         return true;
                     }
-
 
                     return false;
                 }
         );
 
-
         popupMenu.show();
     }
-
 
     // =====================================================
     // CREATE FAMILY
@@ -3231,6 +3910,14 @@ public class FamilyDashboardFragment extends Fragment {
             return;
         }
 
+        if (!isPrimaryUser()) {
+
+            showPrimaryOnlyAlert(
+                    "Only the Family Head can invite family members."
+            );
+
+            return;
+        }
 
         Intent intent =
                 new Intent(
@@ -3238,16 +3925,13 @@ public class FamilyDashboardFragment extends Fragment {
                         InviteMemberActivity.class
                 );
 
-
         intent.putExtra(
                 "FAMILY_ID",
                 selectedFamilyId
         );
 
-
         startActivity(intent);
     }
-
 
     // =====================================================
     // CONFIRM LEAVE FAMILY
@@ -3305,44 +3989,171 @@ public class FamilyDashboardFragment extends Fragment {
 
     // =====================================================
     // LEAVE FAMILY
+    // FIRESTORE FIRST, THEN LOCAL SQLITE
+    // NORMAL MEMBERS ONLY
     // =====================================================
 
     private void leaveSelectedFamily() {
 
-        if (selectedFamilyId == -1 ||
+        if (!isAdded() ||
+                selectedFamilyId == -1 ||
                 currentUserId == -1) {
 
             return;
         }
 
+        // -------------------------------------------------
+        // FAMILY HEAD MUST NOT LEAVE DIRECTLY
+        // -------------------------------------------------
 
-        boolean success =
+        if (isPrimaryUser()) {
+
+            showPrimaryOnlyAlert(
+                    "The Family Head cannot leave the family. "
+                            + "Transfer the Family Head role to another member "
+                            + "or delete the family first."
+            );
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // CURRENT FIREBASE USER
+        // -------------------------------------------------
+
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (firebaseUser == null) {
+
+            Toast.makeText(
+                    requireContext(),
+                    "User session not found. Please login again.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        // -------------------------------------------------
+        // FIRESTORE FAMILY ID
+        // -------------------------------------------------
+
+        String firestoreFamilyId =
                 databaseHelper
-                        .leaveFamily(
-                                selectedFamilyId,
-                                currentUserId
+                        .getFirestoreFamilyId(
+                                selectedFamilyId
                         );
 
-
-        if (success) {
-
-            Toast.makeText(
-                    requireContext(),
-                    "You left the family",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-
-            reloadFragment();
-
-        } else {
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
 
             Toast.makeText(
                     requireContext(),
-                    "Unable to leave this family",
+                    "Family Firestore ID not found.",
                     Toast.LENGTH_SHORT
             ).show();
+
+            return;
         }
+
+        final int familyIdToLeave =
+                selectedFamilyId;
+
+        // -------------------------------------------------
+        // REMOVE FROM FIRESTORE FIRST
+        // -------------------------------------------------
+
+        familyFirestoreService.leaveFamily(
+                firestoreFamilyId,
+                firebaseUser.getUid(),
+                new FamilyFirestoreService.MemberManagementCallback() {
+
+                    @Override
+                    public void onSuccess() {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        // -----------------------------------------
+                        // THEN REMOVE LOCAL SQLITE MEMBERSHIP
+                        // -----------------------------------------
+
+                        boolean localSuccess =
+                                databaseHelper
+                                        .leaveFamily(
+                                                familyIdToLeave,
+                                                currentUserId
+                                        );
+
+                        if (!localSuccess) {
+
+                            new AlertDialog.Builder(
+                                    requireContext()
+                            )
+                                    .setTitle(
+                                            "Family Left Online"
+                                    )
+                                    .setMessage(
+                                            "You were removed from the family in Firestore, "
+                                                    + "but the local database could not be updated. "
+                                                    + "Please reopen the app or sign in again to synchronize."
+                                    )
+                                    .setPositiveButton(
+                                            "OK",
+                                            (dialog, which) ->
+                                                    reloadFragment()
+                                    )
+                                    .show();
+
+                            return;
+                        }
+
+                        Toast.makeText(
+                                requireContext(),
+                                "You left the family successfully.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        // Reset selection before rebuilding the screen.
+                        selectedFamilyId = -1;
+                        selectedFamilyRole = null;
+
+                        reloadFragment();
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        new AlertDialog.Builder(
+                                requireContext()
+                        )
+                                .setTitle(
+                                        "Unable to Leave Family"
+                                )
+                                .setMessage(
+                                        message == null ||
+                                                message.trim().isEmpty()
+                                                ? "Unable to leave this family."
+                                                : message
+                                )
+                                .setPositiveButton(
+                                        "OK",
+                                        null
+                                )
+                                .show();
+                    }
+                }
+        );
     }
 
 
@@ -3358,6 +4169,14 @@ public class FamilyDashboardFragment extends Fragment {
             return;
         }
 
+        if (!isPrimaryUser()) {
+
+            showPrimaryOnlyAlert(
+                    "Only the Family Head can delete this family."
+            );
+
+            return;
+        }
 
         String familyName =
                 databaseHelper
@@ -3365,50 +4184,44 @@ public class FamilyDashboardFragment extends Fragment {
                                 selectedFamilyId
                         );
 
-
-        if (familyName == null) {
+        if (familyName == null ||
+                familyName.trim().isEmpty()) {
 
             familyName = "this family";
         }
-
 
         String message =
                 "Delete \"" +
                         familyName +
                         "\"?\n\n" +
-                        "All memberships for this family " +
-                        "will be removed.";
-
+                        "All family memberships and the family group will be removed. " +
+                        "This action cannot be undone.";
 
         new AlertDialog.Builder(
                 requireContext()
         )
-
                 .setTitle(
                         "Delete Family"
                 )
-
                 .setMessage(
                         message
                 )
-
                 .setNegativeButton(
                         "Cancel",
                         null
                 )
-
                 .setPositiveButton(
                         "Delete",
                         (dialog, which) ->
                                 deleteSelectedFamily()
                 )
-
                 .show();
     }
 
 
     // =====================================================
-    // DELETE FAMILY
+    // DELETE FAMILY FROM FIRESTORE + SQLITE
+    // PRIMARY ONLY
     // =====================================================
 
     private void deleteSelectedFamily() {
@@ -3419,36 +4232,161 @@ public class FamilyDashboardFragment extends Fragment {
             return;
         }
 
+        if (!isPrimaryUser()) {
 
-        boolean success =
+            showPrimaryOnlyAlert(
+                    "Only the Family Head can delete this family."
+            );
+
+            return;
+        }
+
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (firebaseUser == null) {
+
+            Toast.makeText(
+                    requireContext(),
+                    "User session not found. Please login again.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        String firestoreFamilyId =
                 databaseHelper
-                        .deleteFamily(
-                                selectedFamilyId,
-                                currentUserId
+                        .getFirestoreFamilyId(
+                                selectedFamilyId
                         );
 
-
-        if (success) {
-
-            Toast.makeText(
-                    requireContext(),
-                    "Family deleted",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-
-            reloadFragment();
-
-        } else {
+        if (firestoreFamilyId == null ||
+                firestoreFamilyId.trim().isEmpty()) {
 
             Toast.makeText(
                     requireContext(),
-                    "Only the primary user can delete this family",
+                    "Family Firestore ID not found.",
                     Toast.LENGTH_SHORT
             ).show();
+
+            return;
         }
+
+        familyFirestoreService.deleteFamily(
+                firestoreFamilyId,
+                firebaseUser.getUid(),
+                new FamilyFirestoreService.MemberManagementCallback() {
+
+                    @Override
+                    public void onSuccess() {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        boolean localSuccess =
+                                databaseHelper
+                                        .deleteFamily(
+                                                selectedFamilyId,
+                                                currentUserId
+                                        );
+
+                        if (!localSuccess) {
+
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Family deleted online, but local cleanup failed.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            reloadFragment();
+                            return;
+                        }
+
+                        Toast.makeText(
+                                requireContext(),
+                                "Family deleted successfully.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        reloadFragment();
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        new AlertDialog.Builder(
+                                requireContext()
+                        )
+                                .setTitle(
+                                        "Unable to Delete Family"
+                                )
+                                .setMessage(
+                                        message == null
+                                                ? "Unable to delete this family."
+                                                : message
+                                )
+                                .setPositiveButton(
+                                        "OK",
+                                        null
+                                )
+                                .show();
+                    }
+                }
+        );
     }
 
+
+    // =====================================================
+    // PRIMARY / FAMILY HEAD CHECK
+    // =====================================================
+
+    private boolean isPrimaryUser() {
+
+        if (selectedFamilyRole == null ||
+                selectedFamilyRole.trim().isEmpty()) {
+
+            return false;
+        }
+
+        return "PRIMARY".equalsIgnoreCase(
+                selectedFamilyRole.trim()
+        );
+    }
+
+
+    // =====================================================
+    // PRIMARY-ONLY PERMISSION ALERT
+    // =====================================================
+
+    private void showPrimaryOnlyAlert(String message) {
+
+        if (!isAdded()) {
+            return;
+        }
+
+        new AlertDialog.Builder(
+                requireContext()
+        )
+                .setTitle(
+                        "Permission Denied"
+                )
+                .setMessage(
+                        message
+                )
+                .setPositiveButton(
+                        "OK",
+                        null
+                )
+                .show();
+    }
 
     // =====================================================
     // RELOAD FRAGMENT
