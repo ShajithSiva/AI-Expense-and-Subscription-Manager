@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -3016,6 +3017,113 @@ public class FamilyFirestoreService {
         );
     }
 
+    public interface FamilyMembershipCallback {
+
+        void onActive();
+
+        void onRemoved();
+
+        void onFailure(String message);
+    }
+
+    public ListenerRegistration listenToFamilyMembership(
+            String familyId,
+            String userUid,
+            FamilyMembershipCallback callback
+    ) {
+
+        if (familyId == null ||
+                familyId.trim().isEmpty()) {
+
+            callback.onFailure(
+                    "Family ID is missing."
+            );
+
+            return null;
+        }
+
+        if (userUid == null ||
+                userUid.trim().isEmpty()) {
+
+            callback.onFailure(
+                    "User ID is missing."
+            );
+
+            return null;
+        }
+
+        return firestore
+                .collection(FAMILY_COLLECTION)
+                .document(familyId)
+                .addSnapshotListener(
+                        (snapshot, error) -> {
+
+                            // -----------------------------------------
+                            // FIRESTORE ERROR
+                            // -----------------------------------------
+
+                            if (error != null) {
+
+                                callback.onFailure(
+                                        error.getMessage() != null
+                                                ? error.getMessage()
+                                                : "Membership check failed."
+                                );
+
+                                return;
+                            }
+
+                            // -----------------------------------------
+                            // FAMILY DOCUMENT DELETED
+                            // -----------------------------------------
+
+                            if (snapshot == null ||
+                                    !snapshot.exists()) {
+
+                                callback.onRemoved();
+
+                                return;
+                            }
+
+                            // -----------------------------------------
+                            // GET MEMBERS MAP
+                            // -----------------------------------------
+
+                            Object membersObject =
+                                    snapshot.get("members");
+
+                            if (!(membersObject instanceof Map)) {
+
+                                callback.onRemoved();
+
+                                return;
+                            }
+
+                            Map<?, ?> members =
+                                    (Map<?, ?>) membersObject;
+
+                            // -----------------------------------------
+                            // CHECK CURRENT USER
+                            // -----------------------------------------
+
+                            Object currentMember =
+                                    members.get(userUid);
+
+                            if (currentMember == null) {
+
+                                callback.onRemoved();
+
+                                return;
+                            }
+
+                            // -----------------------------------------
+                            // USER STILL ACTIVE
+                            // -----------------------------------------
+
+                            callback.onActive();
+                        }
+                );
+    }
 
     // =====================================================
     // MEMBER MANAGEMENT CALLBACK

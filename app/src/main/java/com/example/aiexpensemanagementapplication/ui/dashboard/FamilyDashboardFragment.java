@@ -35,6 +35,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -57,6 +58,9 @@ public class FamilyDashboardFragment extends Fragment {
     private DatabaseHelper databaseHelper;
 
     private FamilyFirestoreService familyFirestoreService;
+
+    private ListenerRegistration familyMembershipListener;
+    private boolean familyAccessRevoked = false;
 
 
     // =====================================================
@@ -679,6 +683,15 @@ public class FamilyDashboardFragment extends Fragment {
             return;
         }
 
+        if (familyAccessRevoked) {
+            return;
+        }
+
+        // Start monitoring family membership
+        startFamilyMembershipListener();
+
+        // FAMILY NAME
+
 
         // -------------------------------------------------
         // FAMILY NAME
@@ -753,7 +766,7 @@ public class FamilyDashboardFragment extends Fragment {
 
     private void loadSharedExpenses() {
 
-        if (selectedFamilyId == -1) {
+        if (!canAccessFamilyDashboard()) {
             return;
         }
 
@@ -784,10 +797,12 @@ public class FamilyDashboardFragment extends Fragment {
                                     familyExpenses
                     ) {
 
-                        if (!isAdded() || getView() == null) {
+                        if (!isAdded()
+                                || getView() == null
+                                || familyAccessRevoked) {
+
                             return;
                         }
-
                         // -----------------------------------------
                         // TOTAL FAMILY EXPENSE
                         // -----------------------------------------
@@ -875,8 +890,10 @@ public class FamilyDashboardFragment extends Fragment {
                                                     familyIncomes
                                     ) {
 
-                                        if (!isAdded() ||
-                                                getView() == null) {
+                                        if (!isAdded()
+                                                || getView() == null
+                                                || familyAccessRevoked) {
+
                                             return;
                                         }
 
@@ -981,7 +998,7 @@ public class FamilyDashboardFragment extends Fragment {
 
     private void loadSharedSubscriptions() {
 
-        if (selectedFamilyId == -1) {
+        if (!canAccessFamilyDashboard()) {
             return;
         }
 
@@ -1027,10 +1044,11 @@ public class FamilyDashboardFragment extends Fragment {
                     public void onSuccess(
                             ArrayList<FamilyFirestoreService.FamilySubscriptionData>
                                     subscriptions
-                    ) {
+                    ){
 
-                        if (!isAdded() ||
-                                getView() == null) {
+                        if (!isAdded()
+                                || getView() == null
+                                || familyAccessRevoked) {
 
                             return;
                         }
@@ -1895,7 +1913,7 @@ public class FamilyDashboardFragment extends Fragment {
 
     private void loadFamilyBudget() {
 
-        if (selectedFamilyId == -1) {
+        if (!canAccessFamilyDashboard()) {
             return;
         }
 
@@ -1943,7 +1961,10 @@ public class FamilyDashboardFragment extends Fragment {
                             FamilyFirestoreService.FamilyBudgetData budgetData
                     ) {
 
-                        if (!isAdded() || getView() == null) {
+                        if (!isAdded()
+                                || getView() == null
+                                || familyAccessRevoked) {
+
                             return;
                         }
 
@@ -1996,8 +2017,10 @@ public class FamilyDashboardFragment extends Fragment {
                                                     familyExpenses
                                     ) {
 
-                                        if (!isAdded() ||
-                                                getView() == null) {
+                                        if (!isAdded()
+                                                || getView() == null
+                                                || familyAccessRevoked) {
+
                                             return;
                                         }
 
@@ -2432,7 +2455,7 @@ public class FamilyDashboardFragment extends Fragment {
 
     private void loadFamilyTransactionsOnly() {
 
-        if (selectedFamilyId == -1) {
+        if (!canAccessFamilyDashboard()) {
             return;
         }
 
@@ -2703,7 +2726,8 @@ public class FamilyDashboardFragment extends Fragment {
 
     private void showFamilySelectorMenu() {
 
-        if (layoutFamilySelector == null) {
+        if (layoutFamilySelector == null ||
+                !canAccessFamilyDashboard()) {
 
             return;
         }
@@ -2875,8 +2899,8 @@ public class FamilyDashboardFragment extends Fragment {
 
     private void loadFamilyMembers() {
 
-        if (selectedFamilyId == -1 ||
-                familyFirestoreService == null) {
+        if (!canAccessFamilyDashboard()
+                || familyFirestoreService == null) {
 
             return;
         }
@@ -2901,7 +2925,10 @@ public class FamilyDashboardFragment extends Fragment {
                             List<FamilyFirestoreService.FamilyMemberData> members
                     ) {
 
-                        if (!isAdded() || getView() == null) {
+                        if (!isAdded()
+                                || getView() == null
+                                || familyAccessRevoked) {
+
                             return;
                         }
 
@@ -3763,7 +3790,7 @@ public class FamilyDashboardFragment extends Fragment {
     private void showFamilyOptionsMenu() {
 
         if (btnFamilyOptions == null ||
-                selectedFamilyId == -1) {
+                !canAccessFamilyDashboard()) {
 
             return;
         }
@@ -4343,6 +4370,13 @@ public class FamilyDashboardFragment extends Fragment {
         );
     }
 
+    private boolean canAccessFamilyDashboard() {
+
+        return !familyAccessRevoked
+                && selectedFamilyId != -1
+                && currentUserId != -1;
+    }
+
 
     // =====================================================
     // PRIMARY / FAMILY HEAD CHECK
@@ -4439,6 +4473,9 @@ public class FamilyDashboardFragment extends Fragment {
 
         super.onResume();
 
+        if (familyAccessRevoked) {
+            return;
+        }
 
         if (databaseHelper == null ||
                 !isAdded()) {
@@ -4499,6 +4536,184 @@ public class FamilyDashboardFragment extends Fragment {
     private TextView tvNoSharedSubscriptions;
 
 
+    private void startFamilyMembershipListener() {
+
+        if (!isAdded()
+                || selectedFamilyId == -1
+                || currentUserId == -1) {
+
+            return;
+        }
+
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (firebaseUser == null) {
+            return;
+        }
+
+        String firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(
+                        selectedFamilyId
+                );
+
+        if (firestoreFamilyId == null
+                || firestoreFamilyId.trim().isEmpty()) {
+
+            return;
+        }
+
+        // Remove old listener first
+        stopFamilyMembershipListener();
+
+        familyMembershipListener =
+                familyFirestoreService.listenToFamilyMembership(
+                        firestoreFamilyId,
+                        firebaseUser.getUid(),
+                        new FamilyFirestoreService.FamilyMembershipCallback() {
+
+                            @Override
+                            public void onActive() {
+
+                                if (!isAdded()) {
+                                    return;
+                                }
+
+                                // User is still a family member.
+                            }
+
+                            @Override
+                            public void onRemoved() {
+
+                                if (!isAdded()) {
+                                    return;
+                                }
+
+                                handleFamilyAccessRevoked();
+                            }
+
+                            @Override
+                            public void onFailure(
+                                    String message
+                            ) {
+
+                                // Do not freeze the dashboard
+                                // because of temporary network errors.
+                            }
+                        }
+                );
+    }
+
+    private void stopFamilyMembershipListener() {
+
+        if (familyMembershipListener != null) {
+
+            familyMembershipListener.remove();
+
+            familyMembershipListener = null;
+        }
+    }
+
+    private void handleFamilyAccessRevoked() {
+
+        if (familyAccessRevoked) {
+            return;
+        }
+
+        familyAccessRevoked = true;
+
+        // Stop receiving membership updates
+        stopFamilyMembershipListener();
+
+        // Remove local SQLite membership
+        if (selectedFamilyId != -1 &&
+                currentUserId != -1) {
+
+            databaseHelper.leaveFamily(
+                    selectedFamilyId,
+                    currentUserId
+            );
+        }
+
+        // Freeze the dashboard
+        disableFamilyDashboard();
+
+        Toast.makeText(
+                requireContext(),
+                "You have been removed from this family.",
+                Toast.LENGTH_LONG
+        ).show();
+    }
+
+    private void disableFamilyDashboard() {
+
+        if (getView() == null) {
+            return;
+        }
+
+        View root =
+                getView();
+
+        root.setAlpha(0.55f);
+
+        root.setEnabled(false);
+
+        root.setClickable(true);
+
+        if (btnInviteMember != null) {
+            btnInviteMember.setEnabled(false);
+        }
+
+        if (btnFamilyOptions != null) {
+            btnFamilyOptions.setEnabled(false);
+        }
+
+        if (layoutFamilySelector != null) {
+            layoutFamilySelector.setEnabled(false);
+        }
+
+        if (btnSetFamilyBudget != null) {
+            btnSetFamilyBudget.setEnabled(false);
+        }
+
+        if (tvViewSubscriptions != null) {
+            tvViewSubscriptions.setEnabled(false);
+        }
+
+        if (tvViewTransactions != null) {
+            tvViewTransactions.setEnabled(false);
+        }
+
+        showFamilyRemovedMessage();
+    }
+
+    private void showFamilyRemovedMessage() {
+
+        if (!isAdded()) {
+            return;
+        }
+
+        new AlertDialog.Builder(
+                requireContext()
+        )
+                .setTitle(
+                        "Family Access Removed"
+                )
+                .setMessage(
+                        "You have been removed from this family.\n\n"
+                                + "This family dashboard is no longer active "
+                                + "and will not receive any further updates."
+                )
+                .setPositiveButton(
+                        "OK",
+                        null
+                )
+                .setCancelable(false)
+                .show();
+    }
+
     // =====================================================
     // CLEANUP
     // =====================================================
@@ -4506,8 +4721,9 @@ public class FamilyDashboardFragment extends Fragment {
     @Override
     public void onDestroy() {
 
-        super.onDestroy();
+        stopFamilyMembershipListener();
 
+        super.onDestroy();
 
         if (databaseHelper != null) {
 
