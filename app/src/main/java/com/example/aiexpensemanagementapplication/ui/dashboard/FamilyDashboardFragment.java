@@ -48,6 +48,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class FamilyDashboardFragment extends Fragment {
 
@@ -163,8 +164,10 @@ public class FamilyDashboardFragment extends Fragment {
         loadCurrentUser();
 
         loadUserFamilies();
-    }
 
+        // Synchronize the role from Firestore
+        syncCurrentUserFamilyRole();
+    }
 
     // =====================================================
     // LOAD CURRENT USER
@@ -343,6 +346,111 @@ public class FamilyDashboardFragment extends Fragment {
             selectedFamilyRole =
                     familyRoles.get(0);
         }
+    }
+
+    private void syncCurrentUserFamilyRole() {
+
+        if (!isAdded()
+                || selectedFamilyId == -1
+                || currentUserId == -1) {
+
+            return;
+        }
+
+        FirebaseUser firebaseUser =
+                FirebaseAuth
+                        .getInstance()
+                        .getCurrentUser();
+
+        if (firebaseUser == null) {
+            return;
+        }
+
+        String firestoreFamilyId =
+                databaseHelper.getFirestoreFamilyId(
+                        selectedFamilyId
+                );
+
+        if (firestoreFamilyId == null
+                || firestoreFamilyId.trim().isEmpty()) {
+
+            return;
+        }
+
+        FirebaseFirestore
+                .getInstance()
+                .collection("families")
+                .document(firestoreFamilyId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+
+                    if (!snapshot.exists()) {
+                        return;
+                    }
+
+                    String currentUid =
+                            firebaseUser.getUid();
+
+                    String ownerUid =
+                            snapshot.getString("ownerUid");
+
+                    String role = "MEMBER";
+
+                    // The owner is always PRIMARY
+                    if (currentUid.equals(ownerUid)) {
+
+                        role = "PRIMARY";
+
+                    } else {
+
+                        // Get role from members map
+                        Object membersObject =
+                                snapshot.get("members");
+
+                        if (membersObject instanceof Map) {
+
+                            Map<?, ?> members =
+                                    (Map<?, ?>) membersObject;
+
+                            Object memberObject =
+                                    members.get(currentUid);
+
+                            if (memberObject instanceof Map) {
+
+                                Map<?, ?> memberData =
+                                        (Map<?, ?>) memberObject;
+
+                                Object firestoreRole =
+                                        memberData.get("role");
+
+                                if (firestoreRole != null) {
+
+                                    role =
+                                            String.valueOf(
+                                                    firestoreRole
+                                            );
+                                }
+                            }
+                        }
+                    }
+
+                    // Update SQLite
+                    databaseHelper.updateFamilyMemberRole(
+                            selectedFamilyId,
+                            currentUserId,
+                            role
+                    );
+
+                    // IMPORTANT:
+                    // Update the current in-memory role too
+                    selectedFamilyRole = role;
+
+                    // Reload family list so UI permissions update
+                    loadUserFamilies();
+                })
+                .addOnFailureListener(e -> {
+                    // Keep local role if Firestore sync fails
+                });
     }
 
 
@@ -758,6 +866,50 @@ public class FamilyDashboardFragment extends Fragment {
         loadSharedSubscriptions();
     }
 
+    private void showTransferFamilyHeadDialog(
+            int familyId,
+            int currentHeadUserId,
+            int selectedMemberUserId,
+            String selectedMemberName
+    ) {
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Transfer Family Head")
+                .setMessage(
+                        "Are you sure you want to make " +
+                                selectedMemberName +
+                                " the Family Head?\n\n" +
+                                "You will become a regular family member."
+                )
+                .setNegativeButton("Cancel", null)
+
+                .setPositiveButton("Transfer", (dialog, which) -> {
+
+                    boolean success = databaseHelper.transferFamilyHead(
+                            familyId,
+                            currentHeadUserId,
+                            selectedMemberUserId
+                    );
+
+                    if (success) {
+
+                        Toast.makeText(
+                                requireContext(),
+                                "Family Head transferred successfully",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                    } else {
+
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to transfer Family Head",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                })
+                .show();
+    }
 
 
     // =====================================================
@@ -3390,16 +3542,12 @@ public class FamilyDashboardFragment extends Fragment {
             String newPrimaryName
     ) {
 
-        if (!isAdded() ||
-                selectedFamilyId == -1 ||
-                currentUserId == -1) {
-            return;
-        }
-
         if (!isPrimaryUser()) {
+
             showPrimaryOnlyAlert(
                     "Only the Family Head can transfer the Family Head role."
             );
+
             return;
         }
 
@@ -3409,139 +3557,97 @@ public class FamilyDashboardFragment extends Fragment {
                         .getCurrentUser();
 
         if (firebaseUser == null) {
+
             Toast.makeText(
                     requireContext(),
-                    "User session not found. Please login again.",
+                    "User not logged in.",
                     Toast.LENGTH_SHORT
             ).show();
+
             return;
         }
 
-        if (newPrimaryUid == null ||
-                newPrimaryUid.trim().isEmpty()) {
-            Toast.makeText(
-                    requireContext(),
-                    "Selected member ID is missing.",
-                    Toast.LENGTH_SHORT
-            ).show();
-            return;
-        }
+        // Current Family Head Firebase UID
+        String currentPrimaryUid =
+                firebaseUser.getUid();
 
-        int newPrimaryUserId =
-                databaseHelper
-                        .getUserIdByFirebaseUid(
-                                newPrimaryUid
-                        );
-
-        if (newPrimaryUserId == -1) {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Unable to Change Family Head")
-                    .setMessage(
-                            "The selected member is not available in the local user database yet. "
-                                    + "Please make sure the member has accepted the invitation and "
-                                    + "their account is synchronized on this device."
-                    )
-                    .setPositiveButton("OK", null)
-                    .show();
-            return;
-        }
-
+        // Get the correct Firestore Family ID
         String firestoreFamilyId =
-                databaseHelper
-                        .getFirestoreFamilyId(
-                                selectedFamilyId
-                        );
+                databaseHelper.getFirestoreFamilyId(
+                        selectedFamilyId
+                );
 
         if (firestoreFamilyId == null ||
                 firestoreFamilyId.trim().isEmpty()) {
+
             Toast.makeText(
                     requireContext(),
-                    "Family Firestore ID not found.",
+                    "No family found.",
                     Toast.LENGTH_SHORT
             ).show();
+
             return;
         }
 
         familyFirestoreService.transferFamilyHead(
                 firestoreFamilyId,
-                firebaseUser.getUid(),
+                currentPrimaryUid,
                 newPrimaryUid,
                 newPrimaryName,
+
                 new FamilyFirestoreService.MemberManagementCallback() {
 
                     @Override
                     public void onSuccess() {
 
-                        if (!isAdded()) {
-                            return;
-                        }
-
-                        boolean localSuccess =
+                        // Get selected member's LOCAL SQLite User ID
+                        int newPrimaryLocalUserId =
                                 databaseHelper
-                                        .transferFamilyHead(
-                                                selectedFamilyId,
-                                                currentUserId,
-                                                newPrimaryUserId
+                                        .getUserIdByFirebaseUid(
+                                                newPrimaryUid
                                         );
 
-                        if (!localSuccess) {
+                        // Old Family Head -> MEMBER
+                        databaseHelper.updateFamilyMemberRole(
+                                selectedFamilyId,
+                                currentUserId,
+                                "MEMBER"
+                        );
 
-                            new AlertDialog.Builder(
-                                    requireContext()
-                            )
-                                    .setTitle(
-                                            "Family Head Changed Online"
-                                    )
-                                    .setMessage(
-                                            "The Family Head was changed in Firestore, "
-                                                    + "but the local database could not be updated. "
-                                                    + "Please reload or sign in again to synchronize the family."
-                                    )
-                                    .setPositiveButton(
-                                            "OK",
-                                            (dialog, which) ->
-                                                    reloadFragment()
-                                    )
-                                    .show();
+                        // New Family Head -> PRIMARY
+                        if (newPrimaryLocalUserId != -1) {
 
-                            return;
+                            databaseHelper.updateFamilyMemberRole(
+                                    selectedFamilyId,
+                                    newPrimaryLocalUserId,
+                                    "PRIMARY"
+                            );
                         }
 
                         Toast.makeText(
                                 requireContext(),
-                                newPrimaryName
-                                        + " is now the Family Head.",
-                                Toast.LENGTH_SHORT
+                                "Family Head transferred successfully.",
+                                Toast.LENGTH_LONG
                         ).show();
 
+                        // Refresh local family information
+                        loadUserFamilies();
+
+                        // Refresh the screen
                         reloadFragment();
+
+                        // Reload family information
+                        loadUserFamilies();
                     }
 
                     @Override
-                    public void onFailure(
-                            String message
-                    ) {
+                    public void onFailure(String message) {
 
-                        if (!isAdded()) {
-                            return;
-                        }
-
-                        new AlertDialog.Builder(
-                                requireContext()
-                        )
-                                .setTitle(
-                                        "Unable to Change Family Head"
-                                )
-                                .setMessage(
-                                        message == null
-                                                ? "Failed to change the Family Head."
-                                                : message
-                                )
-                                .setPositiveButton(
-                                        "OK",
-                                        null
-                                )
-                                .show();
+                        Toast.makeText(
+                                requireContext(),
+                                message,
+                                Toast.LENGTH_LONG
+                        ).show();
                     }
                 }
         );
@@ -4490,6 +4596,8 @@ public class FamilyDashboardFragment extends Fragment {
 
         loadCurrentUser();
         loadUserFamilies();
+
+        syncCurrentUserFamilyRole();
 
 
         int newFamilyCount =

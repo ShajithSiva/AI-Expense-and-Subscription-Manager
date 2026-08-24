@@ -6092,122 +6092,60 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean transferFamilyHead(
             int familyId,
-            int currentPrimaryUserId,
-            int newPrimaryUserId
+            int currentHeadUserId,
+            int newHeadUserId
     ) {
 
-        if (familyId <= 0 ||
-                currentPrimaryUserId <= 0 ||
-                newPrimaryUserId <= 0 ||
-                currentPrimaryUserId == newPrimaryUserId) {
-
-            return false;
-        }
-
-        SQLiteDatabase db =
-                getWritableDatabase();
-
-        // Current user must really be PRIMARY.
-        String currentRole =
-                getFamilyRole(
-                        currentPrimaryUserId,
-                        familyId
-                );
-
-        if (currentRole == null ||
-                !"PRIMARY".equalsIgnoreCase(
-                        currentRole.trim()
-                )) {
-
-            return false;
-        }
-
-        // New head must already belong to this family.
-        if (!isFamilyMember(
-                familyId,
-                newPrimaryUserId
-        )) {
-
-            return false;
-        }
-
-        String newUserRole =
-                getFamilyRole(
-                        newPrimaryUserId,
-                        familyId
-                );
-
-        if (newUserRole == null) {
-            return false;
-        }
-
-        boolean success = false;
+        SQLiteDatabase db = this.getWritableDatabase();
 
         db.beginTransaction();
 
         try {
 
-            // Demote the old Family Head.
-            ContentValues oldHeadValues =
-                    new ContentValues();
+            // 1. தற்போதைய Family Head → MEMBER
+            ContentValues oldHeadValues = new ContentValues();
+            oldHeadValues.put(FAMILY_ROLE, "MEMBER");
 
-            oldHeadValues.put(
-                    FAMILY_ROLE,
-                    "MEMBER"
+            int oldHeadUpdated = db.update(
+                    TABLE_FAMILY_MEMBER,
+                    oldHeadValues,
+                    FAMILY_ID + "=? AND " + USER_ID + "=?",
+                    new String[]{
+                            String.valueOf(familyId),
+                            String.valueOf(currentHeadUserId)
+                    }
             );
 
-            int oldHeadUpdated =
-                    db.update(
-                            TABLE_FAMILY_MEMBER,
-                            oldHeadValues,
-                            FAMILY_ID + "=? AND " +
-                                    USER_ID + "=? AND " +
-                                    FAMILY_ROLE + "=?",
-                            new String[]{
-                                    String.valueOf(familyId),
-                                    String.valueOf(currentPrimaryUserId),
-                                    "PRIMARY"
-                            }
-                    );
 
-            if (oldHeadUpdated != 1) {
-                return false;
-            }
+            // 2. தேர்வு செய்யப்பட்ட Member → PRIMARY
+            ContentValues newHeadValues = new ContentValues();
+            newHeadValues.put(FAMILY_ROLE, "PRIMARY");
 
-            // Promote the selected family member.
-            ContentValues newHeadValues =
-                    new ContentValues();
-
-            newHeadValues.put(
-                    FAMILY_ROLE,
-                    "PRIMARY"
+            int newHeadUpdated = db.update(
+                    TABLE_FAMILY_MEMBER,
+                    newHeadValues,
+                    FAMILY_ID + "=? AND " + USER_ID + "=?",
+                    new String[]{
+                            String.valueOf(familyId),
+                            String.valueOf(newHeadUserId)
+                    }
             );
 
-            int newHeadUpdated =
-                    db.update(
-                            TABLE_FAMILY_MEMBER,
-                            newHeadValues,
-                            FAMILY_ID + "=? AND " +
-                                    USER_ID + "=?",
-                            new String[]{
-                                    String.valueOf(familyId),
-                                    String.valueOf(newPrimaryUserId)
-                            }
-                    );
 
-            if (newHeadUpdated != 1) {
-                return false;
+            if (oldHeadUpdated > 0 && newHeadUpdated > 0) {
+
+                db.setTransactionSuccessful();
+                return true;
+
             }
 
-            db.setTransactionSuccessful();
-            success = true;
+            return false;
 
         } finally {
 
             db.endTransaction();
+            db.close();
         }
-
-        return success;
     }
 
 
@@ -7540,4 +7478,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return expenseList;
     }
 
+    public boolean updateFamilyMemberRole(
+            int familyId,
+            int userId,
+            String newRole
+    ) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FAMILY_ROLE, newRole);
+
+        int result = db.update(
+                TABLE_FAMILY_MEMBER,
+                values,
+                FAMILY_ID + "=? AND " + USER_ID + "=?",
+                new String[]{
+                        String.valueOf(familyId),
+                        String.valueOf(userId)
+                }
+        );
+
+        return result > 0;
+    }
 }
