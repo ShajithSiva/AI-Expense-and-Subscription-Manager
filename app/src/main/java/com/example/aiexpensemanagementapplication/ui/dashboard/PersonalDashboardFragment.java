@@ -104,6 +104,8 @@ public class PersonalDashboardFragment extends Fragment {
 
     private TextView tvAIInsight;
 
+    private MaterialButton btnAIFinancialAdvisor;
+
     private TextView tvRecommendation;
 
     private MaterialButton btnViewInsights;
@@ -239,6 +241,9 @@ public class PersonalDashboardFragment extends Fragment {
 
         btnViewInsights =
                 view.findViewById(R.id.btnViewInsights);
+
+        btnAIFinancialAdvisor =
+                view.findViewById(R.id.btnAIFinancialAdvisor);
     }
 
 
@@ -286,6 +291,22 @@ public class PersonalDashboardFragment extends Fragment {
         // -----------------------------------------------------
         // Detailed AI Insights
         // -----------------------------------------------------
+
+        if (btnAIFinancialAdvisor != null) {
+
+            btnAIFinancialAdvisor.setOnClickListener(v -> {
+
+                Intent intent =
+                        new Intent(
+                                requireContext(),
+                                com.example.aiexpensemanagementapplication
+                                        .ui.ai
+                                        .AIFinancialAdvisorActivity.class
+                        );
+
+                startActivity(intent);
+            });
+        }
 
         if (btnViewInsights != null) {
 

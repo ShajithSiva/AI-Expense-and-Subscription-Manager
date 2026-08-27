@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AIExpenseManagementApplication">
         <activity
+            android:name=".ui.ai.AIFinancialAdvisorActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.notification.NotificationActivity"
             android:exported="false" />
         <activity
@@ -23,7 +26,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.ai.AIInsightsActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".ui.profile.NotificationPreferancesActivity"
             android:exported="false" /> <!-- Splash Screen -->
@@ -36,12 +39,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity> <!-- Authentication -->
-
         <activity
             android:name=".ui.family.CreateFamilyActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.auth.LoginActivity"
             android:windowSoftInputMode="adjustResize" />
@@ -61,14 +62,11 @@
             android:name=".ui.auth.CreatePasswordActivity"
             android:windowSoftInputMode="adjustResize" /> <!-- Dashboard -->
         <!-- Dashboard -->
-
         <!-- New Main Dashboard -->
         <activity
             android:name=".ui.dashboard.DashboardActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- Old Personal Dashboard - keep temporarily -->
+            android:windowSoftInputMode="adjustResize" /> <!-- Old Personal Dashboard - keep temporarily -->
         <activity
             android:name=".ui.dashboard.PersonalDashboardActivity"
             android:exported="false"
@@ -147,7 +145,6 @@
             android:name=".ui.family.InviteMemberActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.family.JoinFamilyActivity"
             android:exported="false"

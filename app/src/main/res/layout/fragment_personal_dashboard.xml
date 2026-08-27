@@ -606,7 +606,6 @@
 
                 </LinearLayout>
 
-
                 <!-- DETAILS BUTTON -->
 
                 <com.google.android.material.button.MaterialButton
@@ -621,6 +620,18 @@
                     app:backgroundTint="#2563EB"
                     app:cornerRadius="12dp" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAIFinancialAdvisor"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="12dp"
+                    android:text="🤖  Ask AI Financial Advisor"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#22C55E"
+                    app:cornerRadius="16dp" />
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
