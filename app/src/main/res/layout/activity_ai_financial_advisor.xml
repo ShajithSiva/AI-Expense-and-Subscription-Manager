@@ -171,6 +171,19 @@
 
         tools:listitem="@layout/item_advisor_message" />
 
+    <ProgressBar
+        android:id="@+id/progressAI"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
+        android:indeterminateTint="#22C55E"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/inputContainer" />
+
+
 
     <!-- ===================================================== -->
     <!-- INPUT AREA                                            -->
