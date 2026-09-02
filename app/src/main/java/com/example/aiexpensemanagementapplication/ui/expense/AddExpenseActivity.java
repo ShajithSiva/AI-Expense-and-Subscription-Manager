@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.example.aiexpensemanagementapplication.data.remote.FamilyFirestoreService;
+import com.example.aiexpensemanagementapplication.ui.ai.AIInsightCacheManager;
 
 public class AddExpenseActivity extends AppCompatActivity {
 
@@ -757,6 +758,15 @@ public class AddExpenseActivity extends AppCompatActivity {
 
             return;
         }
+
+        // =====================================================
+        // INVALIDATE AI INSIGHT CACHE
+        // =====================================================
+
+        AIInsightCacheManager.invalidate(
+                this,
+                userId
+        );
 
 
         // =====================================================

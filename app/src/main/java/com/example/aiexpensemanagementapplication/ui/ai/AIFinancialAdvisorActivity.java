@@ -2,6 +2,7 @@ package com.example.aiexpensemanagementapplication.ui.ai;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -19,9 +20,26 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class AIFinancialAdvisorActivity
         extends AppCompatActivity {
+
+    // =====================================================
+    // TAGS
+    // =====================================================
+
+    private static final String TAG =
+            "AI_FINANCIAL_ADVISOR";
+
+    private static final String INSIGHT_TAG =
+            "FINANCIAL_INSIGHTS";
+
+    private static final String AI_INSIGHT_TAG =
+            "AI_INSIGHT_RESULT";
+
 
     // =====================================================
     // UI
@@ -45,12 +63,17 @@ public class AIFinancialAdvisorActivity
 
 
     // =====================================================
-    // DATA
+    // CHAT DATA
     // =====================================================
 
     private ArrayList<AdvisorMessage> messages;
 
     private AdvisorMessageAdapter adapter;
+
+
+    // =====================================================
+    // FINANCIAL ADVISOR
+    // =====================================================
 
     private FinancialAdvisorEngine advisorEngine;
 
@@ -58,13 +81,24 @@ public class AIFinancialAdvisorActivity
 
     private FinancialAnalysis financialAnalysis;
 
-    private int currentUserId = -1;
-
-    private boolean isAIThinking = false;
+    private AdvisorQuestionRouter questionRouter;
 
 
     // =====================================================
-    // DATABASE / AUTH
+    // PROACTIVE INSIGHTS
+    // =====================================================
+
+    private ProactiveInsightEngine insightEngine;
+
+    private List<FinancialInsight> proactiveInsights =
+            new ArrayList<>();
+
+    private List<AIInsightResult> aiInsightResults =
+            new ArrayList<>();
+
+
+    // =====================================================
+    // DATABASE / FIREBASE
     // =====================================================
 
     private DatabaseHelper databaseHelper;
@@ -72,6 +106,17 @@ public class AIFinancialAdvisorActivity
     private FirebaseAuth firebaseAuth;
 
     private FirebaseUser currentUser;
+
+    private int currentUserId = -1;
+
+
+    // =====================================================
+    // STATE
+    // =====================================================
+
+    private boolean isAIThinking = false;
+
+    private boolean initialInsightsGenerated = false;
 
 
     // =====================================================
@@ -89,18 +134,39 @@ public class AIFinancialAdvisorActivity
                 R.layout.activity_ai_financial_advisor
         );
 
+
+        // -------------------------------------------------
+        // INITIALIZE EVERYTHING
+        // -------------------------------------------------
+
         initialize();
+
+
+        // -------------------------------------------------
+        // SETUP RECYCLER VIEW
+        // -------------------------------------------------
 
         setupRecyclerView();
 
+
+        // -------------------------------------------------
+        // SETUP BUTTONS / INPUT
+        // -------------------------------------------------
+
         setupListeners();
+
+
+        // -------------------------------------------------
+        // WELCOME
+        // -------------------------------------------------
 
         showWelcomeMessage();
 
-        /*
-         * Load the user's financial information
-         * immediately when the Activity opens.
-         */
+
+        // -------------------------------------------------
+        // LOAD FINANCIAL DATA
+        // -------------------------------------------------
+
         loadFinancialAnalysis();
     }
 
@@ -120,7 +186,7 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // FIREBASE AUTH
+        // FIREBASE
         // -------------------------------------------------
 
         firebaseAuth =
@@ -131,7 +197,7 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // FINANCIAL ADVISOR ENGINE
+        // FINANCIAL ENGINE
         // -------------------------------------------------
 
         advisorEngine =
@@ -141,7 +207,15 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // REAL AI API SERVICE
+        // PROACTIVE INSIGHT ENGINE
+        // -------------------------------------------------
+
+        insightEngine =
+                new ProactiveInsightEngine();
+
+
+        // -------------------------------------------------
+        // API SERVICE
         // -------------------------------------------------
 
         apiService =
@@ -149,7 +223,15 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // VIEWS
+        // QUESTION ROUTER
+        // -------------------------------------------------
+
+        questionRouter =
+                new AdvisorQuestionRouter();
+
+
+        // -------------------------------------------------
+        // UI
         // -------------------------------------------------
 
         btnBack =
@@ -194,7 +276,7 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // INITIAL LOADING STATE
+        // INITIAL STATE
         // -------------------------------------------------
 
         if (progressAI != null) {
@@ -215,21 +297,26 @@ public class AIFinancialAdvisorActivity
         messages =
                 new ArrayList<>();
 
+
         adapter =
                 new AdvisorMessageAdapter(
                         messages
                 );
 
+
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(this);
+
 
         layoutManager.setStackFromEnd(
                 false
         );
 
+
         rvMessages.setLayoutManager(
                 layoutManager
         );
+
 
         rvMessages.setAdapter(
                 adapter
@@ -262,7 +349,7 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // QUICK QUESTION - SAVE
+        // QUICK QUESTION
         // -------------------------------------------------
 
         btnHowSave.setOnClickListener(
@@ -272,20 +359,12 @@ public class AIFinancialAdvisorActivity
         );
 
 
-        // -------------------------------------------------
-        // QUICK QUESTION - SPENDING
-        // -------------------------------------------------
-
         btnSpending.setOnClickListener(
                 v -> sendQuickQuestion(
                         "Can you analyze my spending?"
                 )
         );
 
-
-        // -------------------------------------------------
-        // QUICK QUESTION - BUDGET
-        // -------------------------------------------------
 
         btnBudget.setOnClickListener(
                 v -> sendQuickQuestion(
@@ -301,9 +380,11 @@ public class AIFinancialAdvisorActivity
         etMessage.setOnEditorActionListener(
                 (v, actionId, event) -> {
 
-                    if (event != null &&
-                            event.getKeyCode()
-                                    == KeyEvent.KEYCODE_ENTER) {
+                    if (
+                            event != null &&
+                                    event.getKeyCode()
+                                            == KeyEvent.KEYCODE_ENTER
+                    ) {
 
                         sendMessage();
 
@@ -325,11 +406,15 @@ public class AIFinancialAdvisorActivity
         String name =
                 "there";
 
-        if (currentUser != null &&
-                currentUser.getDisplayName() != null &&
-                !currentUser.getDisplayName()
-                        .trim()
-                        .isEmpty()) {
+
+        if (
+                currentUser != null &&
+                        currentUser.getDisplayName() != null &&
+                        !currentUser
+                                .getDisplayName()
+                                .trim()
+                                .isEmpty()
+        ) {
 
             name =
                     currentUser
@@ -337,14 +422,16 @@ public class AIFinancialAdvisorActivity
                             .trim();
         }
 
+
         String welcome =
                 "Hi " + name + "! 👋\n\n"
                         + "I'm your AI Financial Advisor. "
                         + "I can help you understand your "
                         + "spending, budget, savings and "
                         + "financial habits.\n\n"
-                        + "Ask me a question or choose one "
-                        + "of the suggestions above.";
+                        + "Ask me a question or choose "
+                        + "one of the suggestions above.";
+
 
         addAIMessage(
                 welcome
@@ -358,18 +445,10 @@ public class AIFinancialAdvisorActivity
 
     private void sendMessage() {
 
-        // -------------------------------------------------
-        // PREVENT DUPLICATE REQUESTS
-        // -------------------------------------------------
-
         if (isAIThinking) {
             return;
         }
 
-
-        // -------------------------------------------------
-        // GET MESSAGE
-        // -------------------------------------------------
 
         String message =
                 etMessage
@@ -378,34 +457,18 @@ public class AIFinancialAdvisorActivity
                         .trim();
 
 
-        // -------------------------------------------------
-        // EMPTY MESSAGE
-        // -------------------------------------------------
-
         if (TextUtils.isEmpty(message)) {
             return;
         }
 
-
-        // -------------------------------------------------
-        // ADD USER MESSAGE
-        // -------------------------------------------------
 
         addUserMessage(
                 message
         );
 
 
-        // -------------------------------------------------
-        // CLEAR INPUT
-        // -------------------------------------------------
-
         etMessage.setText("");
 
-
-        // -------------------------------------------------
-        // GENERATE RESPONSE
-        // -------------------------------------------------
 
         generateAdvisorResponse(
                 message
@@ -421,27 +484,15 @@ public class AIFinancialAdvisorActivity
             String question
     ) {
 
-        // -------------------------------------------------
-        // PREVENT DUPLICATE REQUESTS
-        // -------------------------------------------------
-
         if (isAIThinking) {
             return;
         }
 
 
-        // -------------------------------------------------
-        // ADD USER MESSAGE
-        // -------------------------------------------------
-
         addUserMessage(
                 question
         );
 
-
-        // -------------------------------------------------
-        // GENERATE RESPONSE
-        // -------------------------------------------------
 
         generateAdvisorResponse(
                 question
@@ -450,8 +501,184 @@ public class AIFinancialAdvisorActivity
 
 
     // =====================================================
-// LOCAL FINANCIAL QUESTION HANDLER
-// =====================================================
+    // GENERATE ADVISOR RESPONSE
+    // =====================================================
+
+    private void generateAdvisorResponse(
+            String question
+    ) {
+
+        if (isAIThinking) {
+            return;
+        }
+
+
+        if (
+                question == null ||
+                        question.trim().isEmpty()
+        ) {
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // MAKE SURE FINANCIAL DATA EXISTS
+        // -------------------------------------------------
+
+        if (financialAnalysis == null) {
+
+            boolean loaded =
+                    loadFinancialAnalysis();
+
+
+            if (!loaded) {
+
+                addAIMessage(
+                        "I couldn't analyze your financial "
+                                + "data yet. Please make sure "
+                                + "your account is synchronized "
+                                + "and try again."
+                );
+
+                return;
+            }
+        }
+
+
+        // -------------------------------------------------
+        // QUESTION ROUTING
+        // -------------------------------------------------
+
+        AdvisorQuestionRouter.Route route =
+                questionRouter.route(
+                        question
+                );
+
+
+        Log.d(
+                "ADVISOR_ROUTER",
+                "Question = "
+                        + question
+                        + " | Route = "
+                        + route
+        );
+
+
+        // -------------------------------------------------
+        // LOCAL QUESTION
+        // -------------------------------------------------
+
+        if (
+                route ==
+                        AdvisorQuestionRouter.Route.LOCAL
+        ) {
+
+            boolean handled =
+                    handleLocalFinancialQuestion(
+                            question
+                    );
+
+
+            if (handled) {
+
+                return;
+            }
+        }
+
+
+        // -------------------------------------------------
+        // AI QUESTION
+        // -------------------------------------------------
+
+        showAIThinking(
+                true
+        );
+
+
+        apiService.askAdvisor(
+                financialAnalysis,
+                question,
+                getRecentMessages(),
+
+                new FinancialAdvisorApiService.AdvisorCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            String response
+                    ) {
+
+                        runOnUiThread(() -> {
+
+                            showAIThinking(
+                                    false
+                            );
+
+
+                            if (
+                                    response == null ||
+                                            response.trim().isEmpty()
+                            ) {
+
+                                addAIMessage(
+                                        "The AI returned an "
+                                                + "empty response. "
+                                                + "Please try again."
+                                );
+
+                                return;
+                            }
+
+
+                            addAIMessage(
+                                    response.trim()
+                            );
+                        });
+                    }
+
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        runOnUiThread(() -> {
+
+                            showAIThinking(
+                                    false
+                            );
+
+
+                            String error =
+                                    message;
+
+
+                            if (
+                                    error == null ||
+                                            error.trim().isEmpty()
+                            ) {
+
+                                error =
+                                        "Unknown error occurred.";
+                            }
+
+
+                            addAIMessage(
+                                    "Sorry, I couldn't generate "
+                                            + "your financial advice."
+                                            + "\n\n"
+                                            + error
+                            );
+                        });
+                    }
+                }
+        );
+    }
+
+
+    // =====================================================
+    // LOCAL FINANCIAL QUESTION HANDLER
+    // =====================================================
 
     private boolean handleLocalFinancialQuestion(
             String question
@@ -461,20 +688,26 @@ public class AIFinancialAdvisorActivity
             return false;
         }
 
-        if (question == null ||
-                question.trim().isEmpty()) {
+
+        if (
+                question == null ||
+                        question.trim().isEmpty()
+        ) {
 
             return false;
         }
 
+
         String q =
                 question
                         .trim()
-                        .toLowerCase();
+                        .toLowerCase(
+                                Locale.ROOT
+                        );
 
 
         // =================================================
-        // 1. AM I WITHIN MY BUDGET?
+        // BUDGET STATUS
         // =================================================
 
         if (
@@ -485,49 +718,53 @@ public class AIFinancialAdvisorActivity
         ) {
 
             double budget =
-                    financialAnalysis.getBudget();
+                    financialAnalysis
+                            .getBudget();
+
 
             double expense =
-                    financialAnalysis.getCurrentMonthExpense();
+                    financialAnalysis
+                            .getCurrentMonthExpense();
+
 
             double remaining =
-                    financialAnalysis.getRemainingBudget();
+                    financialAnalysis
+                            .getRemainingBudget();
 
-
-            // -------------------------------------------------
-            // NO ACTIVE BUDGET
-            // -------------------------------------------------
 
             if (budget <= 0) {
 
                 addAIMessage(
                         "I couldn't find an active monthly "
-                                + "budget for your financial profile. "
-                                + "Create a monthly budget and I'll "
-                                + "help you monitor it."
+                                + "budget for your financial "
+                                + "profile. Create a monthly "
+                                + "budget and I'll help you "
+                                + "monitor it."
                 );
 
                 return true;
             }
 
 
-            // -------------------------------------------------
-            // WITHIN BUDGET
-            // -------------------------------------------------
+            double usedPercentage =
+                    (expense / budget)
+                            * 100.0;
+
 
             if (expense <= budget) {
 
-                double usedPercentage =
-                        (expense / budget) * 100.0;
-
                 addAIMessage(
                         String.format(
-                                java.util.Locale.US,
-                                "Yes, you're within your monthly "
-                                        + "budget. You've spent Rs %.2f "
-                                        + "of Rs %.2f, which is %.1f%% "
-                                        + "of your budget. You have "
-                                        + "Rs %.2f remaining.",
+                                Locale.US,
+
+                                "Yes, you're within your "
+                                        + "monthly budget. You've "
+                                        + "spent Rs %.2f of "
+                                        + "Rs %.2f, which is "
+                                        + "%.1f%% of your budget. "
+                                        + "You have Rs %.2f "
+                                        + "remaining.",
+
                                 expense,
                                 budget,
                                 usedPercentage,
@@ -535,29 +772,29 @@ public class AIFinancialAdvisorActivity
                         )
                 );
 
-            }
-
-            // -------------------------------------------------
-            // OVER BUDGET
-            // -------------------------------------------------
-
-            else {
+            } else {
 
                 double exceeded =
                         expense - budget;
 
+
                 double exceededPercentage =
-                        ((expense - budget)
-                                / budget) * 100.0;
+                        (
+                                exceeded / budget
+                        ) * 100.0;
+
 
                 addAIMessage(
                         String.format(
-                                java.util.Locale.US,
+                                Locale.US,
+
                                 "You're currently over your "
-                                        + "monthly budget. You've spent "
-                                        + "Rs %.2f against a budget of "
-                                        + "Rs %.2f, exceeding it by "
-                                        + "Rs %.2f (%.1f%%).",
+                                        + "monthly budget. You've "
+                                        + "spent Rs %.2f against "
+                                        + "a budget of Rs %.2f, "
+                                        + "exceeding it by Rs %.2f "
+                                        + "(%.1f%%).",
+
                                 expense,
                                 budget,
                                 exceeded,
@@ -572,7 +809,7 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
-        // 2. HOW MUCH BUDGET IS LEFT?
+        // REMAINING BUDGET
         // =================================================
 
         if (
@@ -584,10 +821,13 @@ public class AIFinancialAdvisorActivity
         ) {
 
             double budget =
-                    financialAnalysis.getBudget();
+                    financialAnalysis
+                            .getBudget();
+
 
             double remaining =
-                    financialAnalysis.getRemainingBudget();
+                    financialAnalysis
+                            .getRemainingBudget();
 
 
             if (budget <= 0) {
@@ -605,10 +845,12 @@ public class AIFinancialAdvisorActivity
 
                 addAIMessage(
                         String.format(
-                                java.util.Locale.US,
+                                Locale.US,
+
                                 "You have Rs %.2f remaining "
-                                        + "from your monthly budget "
-                                        + "of Rs %.2f.",
+                                        + "from your monthly "
+                                        + "budget of Rs %.2f.",
+
                                 remaining,
                                 budget
                         )
@@ -618,9 +860,11 @@ public class AIFinancialAdvisorActivity
 
                 addAIMessage(
                         String.format(
-                                java.util.Locale.US,
+                                Locale.US,
+
                                 "You've exceeded your monthly "
                                         + "budget by Rs %.2f.",
+
                                 Math.abs(remaining)
                         )
                 );
@@ -632,7 +876,7 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
-        // 3. HOW MUCH DID I SPEND?
+        // CURRENT MONTH EXPENSE
         // =================================================
 
         if (
@@ -649,8 +893,10 @@ public class AIFinancialAdvisorActivity
 
             addAIMessage(
                     String.format(
-                            java.util.Locale.US,
+                            Locale.US,
+
                             "You've spent Rs %.2f this month.",
+
                             expense
                     )
             );
@@ -661,7 +907,7 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
-        // 4. HOW MUCH DID I SAVE?
+        // SAVINGS
         // =================================================
 
         if (
@@ -671,18 +917,22 @@ public class AIFinancialAdvisorActivity
         ) {
 
             double savings =
-                    financialAnalysis.getSavings();
+                    financialAnalysis
+                            .getSavings();
 
 
             double savingsRate =
-                    financialAnalysis.getSavingsRate();
+                    financialAnalysis
+                            .getSavingsRate();
 
 
             addAIMessage(
                     String.format(
-                            java.util.Locale.US,
-                            "You've saved Rs %.2f, with a "
-                                    + "savings rate of %.1f%%.",
+                            Locale.US,
+
+                            "You've saved Rs %.2f, with "
+                                    + "a savings rate of %.1f%%.",
+
                             savings,
                             savingsRate
                     )
@@ -694,7 +944,7 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
-        // 5. HIGHEST SPENDING CATEGORY
+        // HIGHEST SPENDING
         // =================================================
 
         if (
@@ -726,9 +976,11 @@ public class AIFinancialAdvisorActivity
 
             addAIMessage(
                     String.format(
-                            java.util.Locale.US,
+                            Locale.US,
+
                             "Your highest spending category "
                                     + "is %s, with Rs %.2f spent.",
+
                             category,
                             amount
                     )
@@ -740,7 +992,7 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
-        // 6. FINANCIAL HEALTH SCORE
+        // FINANCIAL HEALTH
         // =================================================
 
         if (
@@ -749,16 +1001,18 @@ public class AIFinancialAdvisorActivity
                         q.contains("health score")
         ) {
 
-            double score =
+            int score =
                     financialAnalysis
                             .getFinancialHealthScore();
 
 
             addAIMessage(
                     String.format(
-                            java.util.Locale.US,
+                            Locale.US,
+
                             "Your current financial health "
-                                    + "score is %.0f out of 100.",
+                                    + "score is %d out of 100.",
+
                             score
                     )
             );
@@ -769,7 +1023,7 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
-        // 7. EXPENSE CHANGE
+        // EXPENSE CHANGE
         // =================================================
 
         if (
@@ -790,10 +1044,12 @@ public class AIFinancialAdvisorActivity
 
                 addAIMessage(
                         String.format(
-                                java.util.Locale.US,
+                                Locale.US,
+
                                 "Your expenses increased by "
                                         + "%.1f%% compared with "
                                         + "the previous month.",
+
                                 change
                         )
                 );
@@ -802,10 +1058,12 @@ public class AIFinancialAdvisorActivity
 
                 addAIMessage(
                         String.format(
-                                java.util.Locale.US,
+                                Locale.US,
+
                                 "Your expenses decreased by "
                                         + "%.1f%% compared with "
                                         + "the previous month.",
+
                                 Math.abs(change)
                         )
                 );
@@ -824,212 +1082,304 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
-        // NOT A LOCAL QUESTION
+        // CATEGORY QUESTION
         // =================================================
+
+        String requestedCategory =
+                findRequestedCategory(
+                        q
+                );
+
+
+        if (requestedCategory != null) {
+
+            Double amount =
+                    getCategoryAmount(
+                            requestedCategory
+                    );
+
+
+            if (amount != null) {
+
+                addAIMessage(
+                        String.format(
+                                Locale.US,
+
+                                "You've spent Rs %.2f on %s.",
+
+                                amount,
+                                requestedCategory
+                        )
+                );
+
+
+                return true;
+            }
+        }
+
 
         return false;
     }
 
-    // =====================================================
-    // GENERATE ADVISOR RESPONSE
-    // =====================================================
 
     // =====================================================
-// GENERATE ADVISOR RESPONSE
-// =====================================================
+    // FIND REQUESTED CATEGORY
+    // =====================================================
 
-    private void generateAdvisorResponse(
+    private String findRequestedCategory(
             String question
     ) {
 
-        // -------------------------------------------------
-        // PREVENT DUPLICATE REQUESTS
-        // -------------------------------------------------
-
-        if (isAIThinking) {
-            return;
+        if (question == null) {
+            return null;
         }
 
 
-        // -------------------------------------------------
-        // CHECK FINANCIAL ANALYSIS
-        // -------------------------------------------------
+        String q =
+                question
+                        .trim()
+                        .toLowerCase(
+                                Locale.ROOT
+                        );
 
-        if (financialAnalysis == null) {
 
-            boolean loaded =
-                    loadFinancialAnalysis();
+        if (q.contains("food")) {
 
-            if (!loaded) {
-
-                addAIMessage(
-                        "I couldn't analyze your financial "
-                                + "data yet. Please make sure "
-                                + "your account is synchronized "
-                                + "and try again."
-                );
-
-                return;
-            }
+            return findActualCategory(
+                    "food"
+            );
         }
 
 
-        // -------------------------------------------------
-        // TRY LOCAL FINANCIAL ANSWER FIRST
-        // -------------------------------------------------
+        if (
+                q.contains("transport") ||
+                        q.contains("transportation")
+        ) {
 
-        boolean handledLocally =
-                handleLocalFinancialQuestion(
-                        question
-                );
-
-
-        // -------------------------------------------------
-        // LOCAL ANSWER FOUND
-        // -------------------------------------------------
-
-        if (handledLocally) {
-
-            return;
+            return findActualCategory(
+                    "transport"
+            );
         }
 
 
-        // -------------------------------------------------
-        // QUESTION NEEDS AI
-        // -------------------------------------------------
+        if (q.contains("shopping")) {
 
-        showAIThinking(
-                true
-        );
-
-
-        // -------------------------------------------------
-        // SEND TO OLLAMA BACKEND
-        // -------------------------------------------------
-
-        apiService.askAdvisor(
-                financialAnalysis,
-                question,
-                getRecentMessages(),
-                new FinancialAdvisorApiService.AdvisorCallback() {
-
-                    @Override
-                    public void onSuccess(
-                            String response
-                    ) {
-
-                        runOnUiThread(() -> {
-
-                            // -----------------------------
-                            // STOP THINKING
-                            // -----------------------------
-
-                            showAIThinking(
-                                    false
-                            );
+            return findActualCategory(
+                    "shopping"
+            );
+        }
 
 
-                            // -----------------------------
-                            // CHECK RESPONSE
-                            // -----------------------------
+        if (
+                q.contains("bills") ||
+                        q.contains("bill")
+        ) {
 
-                            if (
-                                    response == null ||
-                                            response.trim().isEmpty()
-                            ) {
-
-                                addAIMessage(
-                                        "The AI returned an "
-                                                + "empty response. "
-                                                + "Please try again."
-                                );
-
-                                return;
-                            }
+            return findActualCategory(
+                    "bill"
+            );
+        }
 
 
-                            // -----------------------------
-                            // ADD AI RESPONSE
-                            // -----------------------------
+        if (q.contains("health")) {
 
-                            addAIMessage(
-                                    response.trim()
-                            );
-                        });
-                    }
+            return findActualCategory(
+                    "health"
+            );
+        }
 
 
-                    @Override
-                    public void onFailure(
-                            String message
-                    ) {
+        if (q.contains("education")) {
 
-                        runOnUiThread(() -> {
-
-                            // -----------------------------
-                            // STOP THINKING
-                            // -----------------------------
-
-                            showAIThinking(
-                                    false
-                            );
+            return findActualCategory(
+                    "education"
+            );
+        }
 
 
-                            // -----------------------------
-                            // ERROR
-                            // -----------------------------
+        if (q.contains("entertainment")) {
 
-                            String errorMessage =
-                                    message;
-
-
-                            if (
-                                    errorMessage == null ||
-                                            errorMessage.trim().isEmpty()
-                            ) {
-
-                                errorMessage =
-                                        "Unknown error occurred.";
-                            }
+            return findActualCategory(
+                    "entertainment"
+            );
+        }
 
 
-                            addAIMessage(
-                                    "Sorry, I couldn't generate "
-                                            + "your financial advice."
-                                            + "\n\n"
-                                            + errorMessage
-                            );
-                        });
-                    }
-                }
-        );
+        if (
+                q.contains("others") ||
+                        q.contains("other")
+        ) {
+
+            return findActualCategory(
+                    "other"
+            );
+        }
+
+
+        return null;
     }
 
 
-        private ArrayList<AdvisorMessage> getRecentMessages() {
+    // =====================================================
+    // FIND ACTUAL CATEGORY
+    // =====================================================
 
-            ArrayList<AdvisorMessage> recent =
-                    new ArrayList<>();
+    private String findActualCategory(
+            String requestedCategory
+    ) {
 
-            int start =
-                    Math.max(
-                            0,
-                            messages.size() - 10
-                    );
+        if (
+                financialAnalysis == null ||
+                        financialAnalysis
+                                .getCategoryTotals() == null
+        ) {
 
-            for (
-                    int i = start;
-                    i < messages.size();
-                    i++
-            ) {
+            return null;
+        }
 
-                recent.add(
-                        messages.get(i)
-                );
+
+        for (
+                String category
+                : financialAnalysis
+                .getCategoryTotals()
+                .keySet()
+        ) {
+
+            if (category == null) {
+                continue;
             }
 
-            return recent;
+
+            String normalized =
+                    category
+                            .trim()
+                            .toLowerCase(
+                                    Locale.ROOT
+                            );
+
+
+            if (
+                    normalized.equals(
+                            requestedCategory
+                    )
+            ) {
+
+                return category;
+            }
+
+
+            if (
+                    requestedCategory.equals(
+                            "transport"
+                    ) &&
+                            normalized.equals(
+                                    "transportation"
+                            )
+            ) {
+
+                return category;
+            }
+
+
+            if (
+                    requestedCategory.equals(
+                            "bill"
+                    ) &&
+                            normalized.equals(
+                                    "bills"
+                            )
+            ) {
+
+                return category;
+            }
+
+
+            if (
+                    requestedCategory.equals(
+                            "other"
+                    ) &&
+                            normalized.equals(
+                                    "others"
+                            )
+            ) {
+
+                return category;
+            }
         }
+
+
+        return null;
+    }
+
+
+    // =====================================================
+    // CATEGORY AMOUNT
+    // =====================================================
+
+    private Double getCategoryAmount(
+            String category
+    ) {
+
+        if (
+                financialAnalysis == null ||
+                        category == null ||
+                        financialAnalysis
+                                .getCategoryTotals() == null
+        ) {
+
+            return null;
+        }
+
+
+        Double amount =
+                financialAnalysis
+                        .getCategoryTotals()
+                        .get(category);
+
+
+        if (amount == null) {
+
+            return 0.0;
+        }
+
+
+        return amount;
+    }
+
+
+    // =====================================================
+    // RECENT CHAT MESSAGES
+    // =====================================================
+
+    private ArrayList<AdvisorMessage>
+    getRecentMessages() {
+
+        ArrayList<AdvisorMessage> recent =
+                new ArrayList<>();
+
+
+        int start =
+                Math.max(
+                        0,
+                        messages.size() - 10
+                );
+
+
+        for (
+                int i = start;
+                i < messages.size();
+                i++
+        ) {
+
+            recent.add(
+                    messages.get(i)
+            );
+        }
+
+
+        return recent;
+    }
+
 
     // =====================================================
     // LOAD FINANCIAL ANALYSIS
@@ -1038,10 +1388,36 @@ public class AIFinancialAdvisorActivity
     private boolean loadFinancialAnalysis() {
 
         // -------------------------------------------------
-        // CHECK AUTHENTICATION
+        // CHECK FIREBASE USER
         // -------------------------------------------------
 
         if (currentUser == null) {
+
+            Log.e(
+                    TAG,
+                    "Firebase user is null."
+            );
+
+            return false;
+        }
+
+
+        // -------------------------------------------------
+        // CHECK EMAIL
+        // -------------------------------------------------
+
+        if (
+                currentUser.getEmail() == null ||
+                        currentUser
+                                .getEmail()
+                                .trim()
+                                .isEmpty()
+        ) {
+
+            Log.e(
+                    TAG,
+                    "Firebase user email unavailable."
+            );
 
             return false;
         }
@@ -1049,19 +1425,6 @@ public class AIFinancialAdvisorActivity
 
         // -------------------------------------------------
         // GET EMAIL
-        // -------------------------------------------------
-
-        if (currentUser.getEmail() == null ||
-                currentUser.getEmail()
-                        .trim()
-                        .isEmpty()) {
-
-            return false;
-        }
-
-
-        // -------------------------------------------------
-        // NORMALIZE EMAIL
         // -------------------------------------------------
 
         String email =
@@ -1080,19 +1443,38 @@ public class AIFinancialAdvisorActivity
                 );
 
 
+        Log.d(
+                TAG,
+                "Firebase email = "
+                        + email
+        );
+
+
+        Log.d(
+                TAG,
+                "Local user ID = "
+                        + currentUserId
+        );
+
+
         // -------------------------------------------------
-        // USER NOT FOUND
+        // LOCAL USER NOT FOUND
         // -------------------------------------------------
 
         if (currentUserId == -1) {
+
+            Log.e(
+                    TAG,
+                    "Local user profile not found."
+            );
 
             return false;
         }
 
 
-        // -------------------------------------------------
-        // ANALYZE FINANCIAL DATA
-        // -------------------------------------------------
+        // =================================================
+        // ANALYZE USER
+        // =================================================
 
         try {
 
@@ -1101,22 +1483,449 @@ public class AIFinancialAdvisorActivity
                             currentUserId
                     );
 
+
+            if (financialAnalysis == null) {
+
+                Log.e(
+                        TAG,
+                        "FinancialAnalysis is null."
+                );
+
+                return false;
+            }
+
+
+            // =================================================
+            // GENERATE PROACTIVE INSIGHTS
+            // =================================================
+
+            proactiveInsights =
+                    insightEngine.analyze(
+                            financialAnalysis
+                    );
+
+
+            if (proactiveInsights == null) {
+
+                proactiveInsights =
+                        new ArrayList<>();
+            }
+
+
+            // =================================================
+            // LOG FINANCIAL DATA
+            // =================================================
+
+            logFinancialAnalysis();
+
+
+            // =================================================
+            // LOG DETECTED INSIGHTS
+            // =================================================
+
+            logProactiveInsights();
+
+
+            // =================================================
+            // GENERATE AI EXPLANATIONS
+            // ONLY ON INITIAL LOAD
+            // =================================================
+
+            if (
+                    !initialInsightsGenerated &&
+                            !proactiveInsights.isEmpty()
+            ) {
+
+                initialInsightsGenerated =
+                        true;
+
+
+                generateAIProactiveInsights();
+            }
+
+
+            return true;
+
         } catch (Exception e) {
 
-            e.printStackTrace();
+            Log.e(
+                    TAG,
+                    "Error analyzing financial data.",
+                    e
+            );
+
 
             financialAnalysis =
                     null;
 
+
+            proactiveInsights =
+                    new ArrayList<>();
+
+
             return false;
+        }
+    }
+
+
+    // =====================================================
+    // LOG FINANCIAL ANALYSIS
+    // =====================================================
+
+    private void logFinancialAnalysis() {
+
+        Log.d(
+                TAG,
+                "======================================"
+        );
+
+
+        Log.d(
+                TAG,
+                "FINANCIAL ANALYSIS"
+        );
+
+
+        Log.d(
+                TAG,
+                "======================================"
+        );
+
+
+        Log.d(
+                TAG,
+                "Income = Rs "
+                        + financialAnalysis
+                        .getTotalIncome()
+        );
+
+
+        Log.d(
+                TAG,
+                "Expense = Rs "
+                        + financialAnalysis
+                        .getTotalExpense()
+        );
+
+
+        Log.d(
+                TAG,
+                "Savings = Rs "
+                        + financialAnalysis
+                        .getSavings()
+        );
+
+
+        Log.d(
+                TAG,
+                "Savings Rate = "
+                        + financialAnalysis
+                        .getSavingsRate()
+                        + "%"
+        );
+
+
+        Log.d(
+                TAG,
+                "Budget = Rs "
+                        + financialAnalysis
+                        .getBudget()
+        );
+
+
+        Log.d(
+                TAG,
+                "Budget Used = "
+                        + financialAnalysis
+                        .getBudgetUsed()
+                        + "%"
+        );
+
+
+        Log.d(
+                TAG,
+                "Remaining Budget = Rs "
+                        + financialAnalysis
+                        .getRemainingBudget()
+        );
+
+
+        Log.d(
+                TAG,
+                "Current Month Expense = Rs "
+                        + financialAnalysis
+                        .getCurrentMonthExpense()
+        );
+
+
+        Log.d(
+                TAG,
+                "Previous Month Expense = Rs "
+                        + financialAnalysis
+                        .getPreviousMonthExpense()
+        );
+
+
+        Log.d(
+                TAG,
+                "Expense Change = "
+                        + financialAnalysis
+                        .getExpenseChangePercentage()
+                        + "%"
+        );
+
+
+        Log.d(
+                TAG,
+                "Highest Category = "
+                        + financialAnalysis
+                        .getHighestCategory()
+        );
+
+
+        Log.d(
+                TAG,
+                "Highest Category Amount = Rs "
+                        + financialAnalysis
+                        .getHighestCategoryAmount()
+        );
+
+
+        Log.d(
+                TAG,
+                "Financial Health Score = "
+                        + financialAnalysis
+                        .getFinancialHealthScore()
+                        + "/100"
+        );
+
+
+        // -------------------------------------------------
+        // CATEGORY TOTALS
+        // -------------------------------------------------
+
+        Map<String, Double> categoryTotals =
+                financialAnalysis
+                        .getCategoryTotals();
+
+
+        Log.d(
+                TAG,
+                "Category Totals = "
+                        + categoryTotals
+        );
+
+
+        Log.d(
+                TAG,
+                "======================================"
+        );
+    }
+
+
+    // =====================================================
+    // LOG PROACTIVE INSIGHTS
+    // =====================================================
+
+    private void logProactiveInsights() {
+
+        Log.d(
+                INSIGHT_TAG,
+                "======================================"
+        );
+
+
+        Log.d(
+                INSIGHT_TAG,
+                "PROACTIVE INSIGHTS"
+        );
+
+
+        Log.d(
+                INSIGHT_TAG,
+                "Count = "
+                        + proactiveInsights.size()
+        );
+
+
+        if (proactiveInsights.isEmpty()) {
+
+            Log.d(
+                    INSIGHT_TAG,
+                    "No proactive insights detected."
+            );
+
+            return;
         }
 
 
-        // -------------------------------------------------
-        // VERIFY RESULT
-        // -------------------------------------------------
+        for (
+                FinancialInsight insight
+                : proactiveInsights
+        ) {
 
-        return financialAnalysis != null;
+            if (insight == null) {
+                continue;
+            }
+
+
+            Log.d(
+                    INSIGHT_TAG,
+
+                    "Type = "
+                            + insight.getType()
+            );
+
+
+            Log.d(
+                    INSIGHT_TAG,
+
+                    "Title = "
+                            + insight.getTitle()
+            );
+
+
+            Log.d(
+                    INSIGHT_TAG,
+
+                    "Message = "
+                            + insight.getMessage()
+            );
+
+
+            Log.d(
+                    INSIGHT_TAG,
+                    "----------------------------------"
+            );
+        }
+    }
+
+
+    // =====================================================
+    // GENERATE AI PROACTIVE INSIGHTS
+    // =====================================================
+
+    private void generateAIProactiveInsights() {
+
+        if (financialAnalysis == null) {
+
+            Log.d(
+                    AI_INSIGHT_TAG,
+                    "Financial analysis unavailable."
+            );
+
+            return;
+        }
+
+
+        if (
+                proactiveInsights == null ||
+                        proactiveInsights.isEmpty()
+        ) {
+
+            Log.d(
+                    AI_INSIGHT_TAG,
+                    "No proactive insights to explain."
+            );
+
+            return;
+        }
+
+
+        Log.d(
+                AI_INSIGHT_TAG,
+
+                "Sending "
+                        + proactiveInsights.size()
+                        + " detected insights to AI."
+        );
+
+
+        apiService.generateProactiveInsights(
+
+                financialAnalysis,
+
+                proactiveInsights,
+
+                new FinancialAdvisorApiService.InsightCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            List<AIInsightResult> results
+                    ) {
+
+                        runOnUiThread(() -> {
+
+                            if (results == null) {
+
+                                aiInsightResults =
+                                        new ArrayList<>();
+
+                            } else {
+
+                                aiInsightResults =
+                                        results;
+                            }
+
+
+                            Log.d(
+                                    AI_INSIGHT_TAG,
+
+                                    "AI insight results = "
+                                            + aiInsightResults.size()
+                            );
+
+
+                            for (
+                                    AIInsightResult result
+                                    : aiInsightResults
+                            ) {
+
+                                if (result == null) {
+                                    continue;
+                                }
+
+
+                                Log.d(
+                                        AI_INSIGHT_TAG,
+
+                                        "TITLE = "
+                                                + result.getTitle()
+                                );
+
+
+                                Log.d(
+                                        AI_INSIGHT_TAG,
+
+                                        "MESSAGE = "
+                                                + result.getMessage()
+                                );
+
+
+                                Log.d(
+                                        AI_INSIGHT_TAG,
+                                        "----------------------------------"
+                                );
+                            }
+                        });
+                    }
+
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        Log.e(
+                                AI_INSIGHT_TAG,
+
+                                "AI proactive insight "
+                                        + "generation failed: "
+                                        + message
+                        );
+                    }
+                }
+        );
     }
 
 
@@ -1128,12 +1937,22 @@ public class AIFinancialAdvisorActivity
             String message
     ) {
 
+        if (
+                adapter == null ||
+                        message == null
+        ) {
+
+            return;
+        }
+
+
         adapter.addMessage(
                 new AdvisorMessage(
                         message,
                         AdvisorMessage.TYPE_USER
                 )
         );
+
 
         scrollToBottom();
     }
@@ -1147,12 +1966,22 @@ public class AIFinancialAdvisorActivity
             String message
     ) {
 
+        if (
+                adapter == null ||
+                        message == null
+        ) {
+
+            return;
+        }
+
+
         adapter.addMessage(
                 new AdvisorMessage(
                         message,
                         AdvisorMessage.TYPE_AI
                 )
         );
+
 
         scrollToBottom();
     }
@@ -1164,21 +1993,25 @@ public class AIFinancialAdvisorActivity
 
     private void scrollToBottom() {
 
-        if (rvMessages == null ||
-                adapter == null) {
+        if (
+                rvMessages == null ||
+                        adapter == null
+        ) {
 
             return;
         }
 
+
         rvMessages.post(() -> {
 
-            int lastPosition =
+            int position =
                     adapter.getItemCount() - 1;
 
-            if (lastPosition >= 0) {
+
+            if (position >= 0) {
 
                 rvMessages.smoothScrollToPosition(
-                        lastPosition
+                        position
                 );
             }
         });
@@ -1186,7 +2019,7 @@ public class AIFinancialAdvisorActivity
 
 
     // =====================================================
-    // AI THINKING STATE
+    // AI THINKING
     // =====================================================
 
     private void showAIThinking(
@@ -1198,7 +2031,7 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // PROGRESS BAR
+        // PROGRESS
         // -------------------------------------------------
 
         if (progressAI != null) {
@@ -1212,7 +2045,7 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // SEND BUTTON
+        // SEND
         // -------------------------------------------------
 
         if (btnSend != null) {
@@ -1220,6 +2053,7 @@ public class AIFinancialAdvisorActivity
             btnSend.setEnabled(
                     !show
             );
+
 
             btnSend.setAlpha(
                     show
@@ -1230,7 +2064,7 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // TEXT INPUT
+        // INPUT
         // -------------------------------------------------
 
         if (etMessage != null) {
@@ -1242,7 +2076,7 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // QUICK QUESTIONS
+        // QUICK BUTTONS
         // -------------------------------------------------
 
         if (btnHowSave != null) {
@@ -1252,12 +2086,14 @@ public class AIFinancialAdvisorActivity
             );
         }
 
+
         if (btnSpending != null) {
 
             btnSpending.setEnabled(
                     !show
             );
         }
+
 
         if (btnBudget != null) {
 
@@ -1269,20 +2105,47 @@ public class AIFinancialAdvisorActivity
 
 
     // =====================================================
-    // ACTIVITY DESTROY
+    // ON RESUME
+    // =====================================================
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+
+        /*
+         * Refresh financial calculations when the Activity
+         * becomes visible again.
+         *
+         * The AI proactive insight generation itself is
+         * protected by initialInsightsGenerated so that
+         * Qwen is not called repeatedly.
+         */
+
+        if (
+                advisorEngine != null &&
+                        databaseHelper != null &&
+                        currentUser != null
+        ) {
+
+            loadFinancialAnalysis();
+        }
+    }
+
+
+    // =====================================================
+    // ON DESTROY
     // =====================================================
 
     @Override
     protected void onDestroy() {
 
-        // -------------------------------------------------
-        // STOP API SERVICE
-        // -------------------------------------------------
-
         if (apiService != null) {
 
             apiService.shutdown();
         }
+
 
         super.onDestroy();
     }

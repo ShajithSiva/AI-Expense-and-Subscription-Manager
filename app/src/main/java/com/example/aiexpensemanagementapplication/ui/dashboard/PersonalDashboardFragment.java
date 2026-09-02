@@ -312,12 +312,15 @@ public class PersonalDashboardFragment extends Fragment {
 
             btnViewInsights.setOnClickListener(v -> {
 
-                /*
-                 * Later we can open a dedicated
-                 * AI Insights Activity here.
-                 *
-                 * For now we keep the button ready.
-                 */
+                Intent intent =
+                        new Intent(
+                                requireContext(),
+                                com.example.aiexpensemanagementapplication
+                                        .ui.ai
+                                        .AIInsightsActivity.class
+                        );
+
+                startActivity(intent);
 
             });
         }

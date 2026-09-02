@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.ui.ai.AIInsightCacheManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +25,10 @@ import java.util.Date;
 import java.util.Locale;
 
 public class EditIncomeActivity extends AppCompatActivity {
+
+    // =========================================================
+    // UI
+    // =========================================================
 
     private EditText etIncomeAmount;
     private EditText etIncomeDate;
@@ -33,45 +40,134 @@ public class EditIncomeActivity extends AppCompatActivity {
     private Button btnUpdateIncome;
     private ImageButton btnBack;
 
+
+    // =========================================================
+    // DATABASE / AUTH
+    // =========================================================
+
     private DatabaseHelper databaseHelper;
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+
+
+    // =========================================================
+    // DATA
+    // =========================================================
 
     private Calendar calendar;
 
     private int transactionId;
 
+
+    // =========================================================
+    // ON CREATE
+    // =========================================================
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_edit_income);
 
         initialize();
+
         loadIncomeCategories();
+
         loadIncomeSources();
+
         loadIncome();
+
         setListeners();
     }
 
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
     private void initialize() {
 
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper =
+                new DatabaseHelper(this);
 
-        calendar = Calendar.getInstance();
 
-        transactionId = getIntent().getIntExtra(
-                "transactionId",
-                -1
-        );
+        calendar =
+                Calendar.getInstance();
 
-        etIncomeAmount = findViewById(R.id.etIncomeAmount);
-        etIncomeDate = findViewById(R.id.etIncomeDate);
-        etIncomeNotes = findViewById(R.id.etIncomeNotes);
 
-        spIncomeCategory = findViewById(R.id.spIncomeCategory);
-        spIncomeSource = findViewById(R.id.spIncomeSource);
+        transactionId =
+                getIntent().getIntExtra(
+                        "transactionId",
+                        -1
+                );
 
-        btnUpdateIncome = findViewById(R.id.btnUpdateIncome);
-        btnBack = findViewById(R.id.btnBack);
+
+        // -----------------------------------------------------
+        // Firebase Authentication
+        // -----------------------------------------------------
+
+        mAuth =
+                FirebaseAuth.getInstance();
+
+        currentUser =
+                mAuth.getCurrentUser();
+
+
+        // -----------------------------------------------------
+        // Fields
+        // -----------------------------------------------------
+
+        etIncomeAmount =
+                findViewById(
+                        R.id.etIncomeAmount
+                );
+
+        etIncomeDate =
+                findViewById(
+                        R.id.etIncomeDate
+                );
+
+        etIncomeNotes =
+                findViewById(
+                        R.id.etIncomeNotes
+                );
+
+
+        // -----------------------------------------------------
+        // Spinners
+        // -----------------------------------------------------
+
+        spIncomeCategory =
+                findViewById(
+                        R.id.spIncomeCategory
+                );
+
+        spIncomeSource =
+                findViewById(
+                        R.id.spIncomeSource
+                );
+
+
+        // -----------------------------------------------------
+        // Buttons
+        // -----------------------------------------------------
+
+        btnUpdateIncome =
+                findViewById(
+                        R.id.btnUpdateIncome
+                );
+
+        btnBack =
+                findViewById(
+                        R.id.btnBack
+                );
+
+
+        // -----------------------------------------------------
+        // Validate transaction ID
+        // -----------------------------------------------------
 
         if (transactionId == -1) {
 
@@ -85,25 +181,38 @@ public class EditIncomeActivity extends AppCompatActivity {
         }
     }
 
+
+    // =========================================================
+    // LISTENERS
+    // =========================================================
+
     private void setListeners() {
 
         btnBack.setOnClickListener(
                 view -> finish()
         );
 
+
         etIncomeDate.setOnClickListener(
                 view -> showDatePicker()
         );
+
 
         btnUpdateIncome.setOnClickListener(
                 view -> updateIncome()
         );
     }
 
+
+    // =========================================================
+    // LOAD INCOME CATEGORIES
+    // =========================================================
+
     private void loadIncomeCategories() {
 
         ArrayList<String> categories =
                 databaseHelper.getIncomeCategoryNames();
+
 
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(
@@ -112,17 +221,27 @@ public class EditIncomeActivity extends AppCompatActivity {
                         categories
                 );
 
+
         adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item
         );
 
-        spIncomeCategory.setAdapter(adapter);
+
+        spIncomeCategory.setAdapter(
+                adapter
+        );
     }
+
+
+    // =========================================================
+    // LOAD INCOME SOURCES
+    // =========================================================
 
     private void loadIncomeSources() {
 
         ArrayList<String> sources =
                 databaseHelper.getPaymentMethodNames();
+
 
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(
@@ -131,12 +250,21 @@ public class EditIncomeActivity extends AppCompatActivity {
                         sources
                 );
 
+
         adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item
         );
 
-        spIncomeSource.setAdapter(adapter);
+
+        spIncomeSource.setAdapter(
+                adapter
+        );
     }
+
+
+    // =========================================================
+    // LOAD EXISTING INCOME
+    // =========================================================
 
     private void loadIncome() {
 
@@ -145,51 +273,8 @@ public class EditIncomeActivity extends AppCompatActivity {
                         transactionId
                 );
 
-        if (cursor.moveToFirst()) {
 
-            double amount =
-                    cursor.getDouble(3);
-
-            String date =
-                    cursor.getString(4);
-
-            String note =
-                    cursor.getString(5);
-
-            String categoryName =
-                    cursor.getString(7);
-
-            String sourceName =
-                    cursor.getString(8);
-
-            etIncomeAmount.setText(
-                    String.valueOf(amount)
-            );
-
-            etIncomeDate.setText(date);
-
-            if (note == null) {
-
-                etIncomeNotes.setText("");
-
-            } else {
-
-                etIncomeNotes.setText(note);
-            }
-
-            setSpinnerSelection(
-                    spIncomeCategory,
-                    categoryName
-            );
-
-            setSpinnerSelection(
-                    spIncomeSource,
-                    sourceName
-            );
-
-            setCalendarFromDate(date);
-
-        } else {
+        if (cursor == null) {
 
             Toast.makeText(
                     this,
@@ -198,25 +283,139 @@ public class EditIncomeActivity extends AppCompatActivity {
             ).show();
 
             finish();
+
+            return;
         }
 
-        cursor.close();
+
+        try {
+
+            if (cursor.moveToFirst()) {
+
+                // -------------------------------------------------
+                // Amount
+                // -------------------------------------------------
+
+                double amount =
+                        cursor.getDouble(3);
+
+
+                // -------------------------------------------------
+                // Date
+                // -------------------------------------------------
+
+                String date =
+                        cursor.getString(4);
+
+
+                // -------------------------------------------------
+                // Notes
+                // -------------------------------------------------
+
+                String note =
+                        cursor.getString(5);
+
+
+                // -------------------------------------------------
+                // Category
+                // -------------------------------------------------
+
+                String categoryName =
+                        cursor.getString(7);
+
+
+                // -------------------------------------------------
+                // Source
+                // -------------------------------------------------
+
+                String sourceName =
+                        cursor.getString(8);
+
+
+                etIncomeAmount.setText(
+                        String.valueOf(amount)
+                );
+
+
+                etIncomeDate.setText(
+                        date
+                );
+
+
+                if (note == null) {
+
+                    etIncomeNotes.setText("");
+
+                } else {
+
+                    etIncomeNotes.setText(
+                            note
+                    );
+                }
+
+
+                setSpinnerSelection(
+                        spIncomeCategory,
+                        categoryName
+                );
+
+
+                setSpinnerSelection(
+                        spIncomeSource,
+                        sourceName
+                );
+
+
+                setCalendarFromDate(
+                        date
+                );
+
+
+            } else {
+
+                Toast.makeText(
+                        this,
+                        "Income details could not be loaded.",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                finish();
+            }
+
+        } finally {
+
+            cursor.close();
+        }
     }
+
+
+    // =========================================================
+    // SET SPINNER SELECTION
+    // =========================================================
 
     private void setSpinnerSelection(
             Spinner spinner,
-            String value) {
+            String value
+    ) {
 
         ArrayAdapter<?> adapter =
                 (ArrayAdapter<?>) spinner.getAdapter();
 
-        if (adapter == null || value == null) {
+
+        if (adapter == null ||
+                value == null) {
+
             return;
         }
 
-        for (int i = 0; i < adapter.getCount(); i++) {
 
-            Object item = adapter.getItem(i);
+        for (int i = 0;
+             i < adapter.getCount();
+             i++) {
+
+            Object item =
+                    adapter.getItem(i);
+
 
             if (item != null &&
                     item.toString().equalsIgnoreCase(value)) {
@@ -228,11 +427,21 @@ public class EditIncomeActivity extends AppCompatActivity {
         }
     }
 
-    private void setCalendarFromDate(String date) {
 
-        if (date == null || date.trim().isEmpty()) {
+    // =========================================================
+    // SET CALENDAR FROM EXISTING DATE
+    // =========================================================
+
+    private void setCalendarFromDate(
+            String date
+    ) {
+
+        if (date == null ||
+                date.trim().isEmpty()) {
+
             return;
         }
+
 
         try {
 
@@ -242,25 +451,39 @@ public class EditIncomeActivity extends AppCompatActivity {
                             Locale.getDefault()
                     );
 
+
             format.setLenient(false);
 
-            Date parsedDate = format.parse(date);
+
+            Date parsedDate =
+                    format.parse(date);
+
 
             if (parsedDate != null) {
 
-                calendar.setTime(parsedDate);
+                calendar.setTime(
+                        parsedDate
+                );
             }
+
 
         } catch (Exception ignored) {
 
-            calendar = Calendar.getInstance();
+            calendar =
+                    Calendar.getInstance();
         }
     }
+
+
+    // =========================================================
+    // DATE PICKER
+    // =========================================================
 
     private void showDatePicker() {
 
         DatePickerDialog dialog =
                 new DatePickerDialog(
+
                         this,
 
                         (view, year, month, dayOfMonth) -> {
@@ -274,13 +497,27 @@ public class EditIncomeActivity extends AppCompatActivity {
                             setSelectedDate();
                         },
 
-                        calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH)
+                        calendar.get(
+                                Calendar.YEAR
+                        ),
+
+                        calendar.get(
+                                Calendar.MONTH
+                        ),
+
+                        calendar.get(
+                                Calendar.DAY_OF_MONTH
+                        )
                 );
+
 
         dialog.show();
     }
+
+
+    // =========================================================
+    // SET SELECTED DATE
+    // =========================================================
 
     private void setSelectedDate() {
 
@@ -290,18 +527,65 @@ public class EditIncomeActivity extends AppCompatActivity {
                         Locale.getDefault()
                 );
 
+
         etIncomeDate.setText(
-                format.format(calendar.getTime())
+                format.format(
+                        calendar.getTime()
+                )
         );
     }
 
+
+    // =========================================================
+    // UPDATE INCOME
+    // =========================================================
+
     private void updateIncome() {
+
+        // -----------------------------------------------------
+        // USER
+        // -----------------------------------------------------
+
+        if (currentUser == null) {
+
+            Toast.makeText(
+                    this,
+                    "User not logged in.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+
+        int userId =
+                databaseHelper.getUserIdByFirebaseUid(
+                        currentUser.getUid()
+                );
+
+
+        if (userId == -1) {
+
+            Toast.makeText(
+                    this,
+                    "User not found.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // AMOUNT
+        // -----------------------------------------------------
 
         String amountText =
                 etIncomeAmount
                         .getText()
                         .toString()
                         .trim();
+
 
         if (amountText.isEmpty()) {
 
@@ -314,12 +598,16 @@ public class EditIncomeActivity extends AppCompatActivity {
             return;
         }
 
+
         double amount;
+
 
         try {
 
             amount =
-                    Double.parseDouble(amountText);
+                    Double.parseDouble(
+                            amountText
+                    );
 
         } catch (NumberFormatException exception) {
 
@@ -332,6 +620,7 @@ public class EditIncomeActivity extends AppCompatActivity {
             return;
         }
 
+
         if (amount <= 0) {
 
             etIncomeAmount.setError(
@@ -342,6 +631,11 @@ public class EditIncomeActivity extends AppCompatActivity {
 
             return;
         }
+
+
+        // -----------------------------------------------------
+        // CATEGORY
+        // -----------------------------------------------------
 
         if (spIncomeCategory.getSelectedItem() == null) {
 
@@ -354,6 +648,11 @@ public class EditIncomeActivity extends AppCompatActivity {
             return;
         }
 
+
+        // -----------------------------------------------------
+        // SOURCE
+        // -----------------------------------------------------
+
         if (spIncomeSource.getSelectedItem() == null) {
 
             Toast.makeText(
@@ -365,21 +664,29 @@ public class EditIncomeActivity extends AppCompatActivity {
             return;
         }
 
+
         String categoryName =
                 spIncomeCategory
                         .getSelectedItem()
                         .toString();
+
 
         String sourceName =
                 spIncomeSource
                         .getSelectedItem()
                         .toString();
 
+
+        // -----------------------------------------------------
+        // DATE
+        // -----------------------------------------------------
+
         String date =
                 etIncomeDate
                         .getText()
                         .toString()
                         .trim();
+
 
         if (date.isEmpty()) {
 
@@ -390,21 +697,37 @@ public class EditIncomeActivity extends AppCompatActivity {
             return;
         }
 
+
+        // -----------------------------------------------------
+        // NOTES
+        // -----------------------------------------------------
+
         String note =
                 etIncomeNotes
                         .getText()
                         .toString()
                         .trim();
 
+
+        // -----------------------------------------------------
+        // CATEGORY ID
+        // -----------------------------------------------------
+
         int categoryId =
                 databaseHelper.getCategoryIdByName(
                         categoryName
                 );
 
+
+        // -----------------------------------------------------
+        // PAYMENT METHOD ID
+        // -----------------------------------------------------
+
         int paymentMethodId =
                 databaseHelper.getPaymentMethodIdByName(
                         sourceName
                 );
+
 
         if (categoryId == -1) {
 
@@ -417,6 +740,7 @@ public class EditIncomeActivity extends AppCompatActivity {
             return;
         }
 
+
         if (paymentMethodId == -1) {
 
             Toast.makeText(
@@ -428,10 +752,22 @@ public class EditIncomeActivity extends AppCompatActivity {
             return;
         }
 
+
+        // =====================================================
+        // INCOME MODE
+        // =====================================================
+
         /*
          * Every income record remains personal.
          */
-        String incomeMode = "Personal";
+
+        String incomeMode =
+                "Personal";
+
+
+        // =====================================================
+        // UPDATE INCOME
+        // =====================================================
 
         int result =
                 databaseHelper.updateIncome(
@@ -444,7 +780,23 @@ public class EditIncomeActivity extends AppCompatActivity {
                         incomeMode
                 );
 
+
+        // =====================================================
+        // UPDATE SUCCESS
+        // =====================================================
+
         if (result > 0) {
+
+            // =================================================
+            // INVALIDATE AI INSIGHT CACHE
+            // Income data has changed
+            // =================================================
+
+            AIInsightCacheManager.invalidate(
+                    this,
+                    userId
+            );
+
 
             Toast.makeText(
                     this,
@@ -452,7 +804,9 @@ public class EditIncomeActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT
             ).show();
 
+
             finish();
+
 
         } else {
 
@@ -462,5 +816,21 @@ public class EditIncomeActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT
             ).show();
         }
+    }
+
+
+    // =========================================================
+    // ON DESTROY
+    // =========================================================
+
+    @Override
+    protected void onDestroy() {
+
+        if (databaseHelper != null) {
+
+            databaseHelper.close();
+        }
+
+        super.onDestroy();
     }
 }

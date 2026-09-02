@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/cardInsight"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#E5E7EB"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical"
+
+        android:padding="16dp">
+
+
+        <!-- ================================================= -->
+        <!-- HEADER                                            -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:gravity="center_vertical"
+
+            android:orientation="horizontal">
+
+
+            <!-- INSIGHT ICON -->
+
+            <FrameLayout
+
+                android:id="@+id/insightIconContainer"
+
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+
+                android:background="@drawable/bg_insight">
+
+
+                <TextView
+
+                    android:id="@+id/tvInsightIcon"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:gravity="center"
+
+                    android:text="💡"
+
+                    android:textSize="19sp" />
+
+            </FrameLayout>
+
+
+            <!-- TITLE -->
+
+            <LinearLayout
+
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="12dp"
+
+                android:layout_weight="1"
+
+                android:orientation="vertical">
+
+
+                <TextView
+
+                    android:id="@+id/tvInsightTitle"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:text="Financial Insight"
+
+                    android:textColor="#111827"
+
+                    android:textSize="15sp"
+
+                    android:textStyle="bold" />
+
+
+                <TextView
+
+                    android:id="@+id/tvInsightType"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginTop="3dp"
+
+                    android:text="AI INSIGHT"
+
+                    android:textColor="#22C55E"
+
+                    android:textSize="9sp"
+
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- DIVIDER                                           -->
+        <!-- ================================================= -->
+
+        <View
+
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="12dp"
+
+            android:background="#F1F5F9" />
+
+
+        <!-- ================================================= -->
+        <!-- MESSAGE                                           -->
+        <!-- ================================================= -->
+
+        <TextView
+
+            android:id="@+id/tvInsightMessage"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:lineSpacingExtra="3dp"
+
+            android:text="Your financial insight will appear here."
+
+            android:textColor="#4B5563"
+
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

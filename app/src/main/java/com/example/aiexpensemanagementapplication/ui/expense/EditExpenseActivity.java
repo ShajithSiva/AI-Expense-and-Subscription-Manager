@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.ui.ai.AIInsightCacheManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.firebase.auth.FirebaseAuth;
@@ -1011,6 +1012,16 @@ public class EditExpenseActivity extends AppCompatActivity {
 
             return;
         }
+
+        // =====================================================
+        // INVALIDATE AI INSIGHT CACHE
+        // Expense data has changed
+        // =====================================================
+
+        AIInsightCacheManager.invalidate(
+                this,
+                userId
+        );
 
 
         // =====================================================

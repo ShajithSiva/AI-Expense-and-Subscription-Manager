@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import com.example.aiexpensemanagementapplication.model.Budget;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.ui.ai.AIInsightCacheManager;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -133,6 +134,16 @@ public class BudgetActivity extends AppCompatActivity {
 
         if (success) {
 
+            // =====================================================
+            // INVALIDATE AI INSIGHT CACHE
+            // Budget data has changed successfully
+            // =====================================================
+
+            AIInsightCacheManager.invalidate(
+                    this,
+                    userId
+            );
+
             updateSummary(budget);
 
             Toast.makeText(
@@ -141,10 +152,17 @@ public class BudgetActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT
             ).show();
 
-            Intent intent = new Intent(BudgetActivity.this, ProfileActivity.class);
+            Intent intent =
+                    new Intent(
+                            BudgetActivity.this,
+                            ProfileActivity.class
+                    );
 
             // Prevent going back to BudgetActivity
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                            Intent.FLAG_ACTIVITY_NEW_TASK
+            );
 
             startActivity(intent);
 

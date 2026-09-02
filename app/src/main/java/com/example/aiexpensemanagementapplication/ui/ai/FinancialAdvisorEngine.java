@@ -54,8 +54,9 @@ public class FinancialAdvisorEngine {
         // -------------------------------------------------
 
         double income =
-                databaseHelper.getTotalIncome(
-                        userId
+                databaseHelper.getMonthlyIncome(
+                        userId,
+                        currentMonth
                 );
 
         // -------------------------------------------------
@@ -626,6 +627,13 @@ public class FinancialAdvisorEngine {
                             )
                                     / previousExpense
                     ) * 100.0;
+
+        } else if (currentExpense > 0) {
+
+            // Previous month had no recorded expenses.
+            // Keep percentage at 0 because a percentage
+            // comparison cannot be calculated reliably.
+            expenseChange = 0.0;
         }
 
         analysis.setExpenseChangePercentage(
@@ -712,6 +720,29 @@ public class FinancialAdvisorEngine {
         } else if (expenseChange > 15) {
 
             score -= 5;
+        }
+
+        // -------------------------------------------------
+        // BUDGET PERFORMANCE
+        // -------------------------------------------------
+
+        double budgetUsed =
+                analysis.getBudgetUsed();
+
+        if (analysis.getBudget() > 0) {
+
+            if (budgetUsed > 100) {
+
+                score -= 20;
+
+            } else if (budgetUsed >= 90) {
+
+                score -= 10;
+
+            } else if (budgetUsed >= 80) {
+
+                score -= 5;
+            }
         }
 
         // -------------------------------------------------

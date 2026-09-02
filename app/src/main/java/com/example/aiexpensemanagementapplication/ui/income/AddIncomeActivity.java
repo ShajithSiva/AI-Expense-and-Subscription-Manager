@@ -13,17 +13,14 @@ import com.google.android.material.materialswitch.MaterialSwitch;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.database.Cursor;
-import android.view.View;
-import android.widget.AdapterView;
 
-import com.google.android.material.materialswitch.MaterialSwitch;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.ui.ai.AIInsightCacheManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -548,6 +545,16 @@ public class AddIncomeActivity extends AppCompatActivity {
 
             return;
         }
+
+        // =====================================================
+        // INVALIDATE AI INSIGHT CACHE
+        // Income data has changed
+        // =====================================================
+
+        AIInsightCacheManager.invalidate(
+                this,
+                userId
+        );
 
         if ("Family".equals(incomeMode)) {
 
