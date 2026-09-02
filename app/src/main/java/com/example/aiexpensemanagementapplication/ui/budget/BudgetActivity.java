@@ -320,6 +320,5 @@ public class BudgetActivity extends AppCompatActivity {
 
     }
 
-
 }
 

@@ -1034,6 +1034,7 @@ public class AIInsightsActivity extends AppCompatActivity {
                             FinancialInsight.Severity.LOW.name()
                     );
                 }
+
             }
         }
 
