@@ -2,6 +2,8 @@ package com.example.aiexpensemanagementapplication.ui.ai;
 
 import android.util.Log;
 
+import com.example.aiexpensemanagementapplication.BuildConfig;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -42,11 +44,14 @@ public class FinancialAdvisorApiService {
      * http://localhost:3000
      */
 
+    private static final String BACKEND_BASE_URL =
+            BuildConfig.BACKEND_BASE_URL;
+
     private static final String API_URL =
-            "http://10.0.2.2:3000/api/financial-advisor";
+            BACKEND_BASE_URL + "/api/financial-advisor";
 
     private static final String INSIGHTS_API_URL =
-            "http://10.0.2.2:3000/api/financial-insights";
+            BACKEND_BASE_URL + "/api/financial-insights";
 
 
     // =====================================================

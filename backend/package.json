@@ -1,0 +1,14 @@
+{
+  "name": "financial-advisor-backend",
+  "version": "1.0.0",
+  "description": "Open-source AI Financial Advisor backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2"
+  }
+}

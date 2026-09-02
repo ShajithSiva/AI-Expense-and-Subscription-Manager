@@ -1,0 +1,13 @@
+# Node.js
+node_modules/
+
+# Environment variables
+.env
+.env.*
+
+# Keep the example environment file
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*

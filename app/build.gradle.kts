@@ -14,10 +14,17 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField(
+            "String",
+            "BACKEND_BASE_URL",
+            "\"http://10.0.2.2:3000\""
+        )
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     compileOptions {
