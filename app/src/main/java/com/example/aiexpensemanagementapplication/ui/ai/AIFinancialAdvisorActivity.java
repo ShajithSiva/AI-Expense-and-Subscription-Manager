@@ -707,6 +707,139 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
+// TOTAL INCOME
+// =================================================
+
+        if (
+                q.contains("total income") ||
+                        q.contains("my total income") ||
+                        q.contains("income total") ||
+                        q.contains("how much income") ||
+                        q.contains("how much did i earn") ||
+                        q.contains("how much have i earned") ||
+                        q.contains("how much money did i earn") ||
+                        q.contains("how much money have i earned") ||
+                        q.equals("my income") ||
+                        q.equals("income")
+        ) {
+
+            double totalIncome =
+                    financialAnalysis
+                            .getTotalIncome();
+
+
+            addAIMessage(
+                    String.format(
+                            Locale.US,
+
+                            "Your total income is Rs %.2f.",
+
+                            totalIncome
+                    )
+            );
+
+
+            return true;
+        }
+
+
+// =================================================
+// TOTAL EXPENSE
+// =================================================
+
+        if (
+                q.contains("total expense") ||
+                        q.contains("total expenses") ||
+                        q.contains("my total expense") ||
+                        q.contains("my total expenses") ||
+                        q.contains("expense total") ||
+                        q.contains("expenses total") ||
+                        q.contains("total spending") ||
+                        q.contains("my total spending") ||
+                        q.equals("how much did i spend") ||
+                        q.equals("how much have i spent") ||
+                        q.contains("how much money did i spend") ||
+                        q.contains("how much money have i spent")
+        ) {
+
+            double totalExpense =
+                    financialAnalysis
+                            .getTotalExpense();
+
+
+            addAIMessage(
+                    String.format(
+                            Locale.US,
+
+                            "Your total expense is Rs %.2f.",
+
+                            totalExpense
+                    )
+            );
+
+
+            return true;
+        }
+
+
+// =================================================
+// BALANCE
+// =================================================
+
+        if (
+                q.equals("balance") ||
+                        q.equals("my balance") ||
+                        q.contains("what is my balance") ||
+                        q.contains("what's my balance") ||
+                        q.contains("how much balance") ||
+                        q.contains("how much money do i have") ||
+                        q.contains("how much money is left") ||
+                        q.equals("money left")
+        ) {
+
+            double totalIncome =
+                    financialAnalysis
+                            .getTotalIncome();
+
+            double totalExpense =
+                    financialAnalysis
+                            .getTotalExpense();
+
+            double balance =
+                    totalIncome - totalExpense;
+
+
+            if (balance >= 0) {
+
+                addAIMessage(
+                        String.format(
+                                Locale.US,
+
+                                "Your current balance is Rs %.2f.",
+
+                                balance
+                        )
+                );
+
+            } else {
+
+                addAIMessage(
+                        String.format(
+                                Locale.US,
+
+                                "Your expenses exceed your income "
+                                        + "by Rs %.2f.",
+
+                                Math.abs(balance)
+                        )
+                );
+            }
+
+
+            return true;
+        }
+
+        // =================================================
         // BUDGET STATUS
         // =================================================
 
@@ -934,6 +1067,35 @@ public class AIFinancialAdvisorActivity
                                     + "a savings rate of %.1f%%.",
 
                             savings,
+                            savingsRate
+                    )
+            );
+
+
+            return true;
+        }
+
+        // =====================================================
+        // SAVINGS RATE
+        // =====================================================
+
+        if (
+                q.contains("savings rate") ||
+                        q.contains("savings percentage") ||
+                        q.contains("saving percentage")
+        ) {
+
+            double savingsRate =
+                    financialAnalysis
+                            .getSavingsRate();
+
+
+            addAIMessage(
+                    String.format(
+                            Locale.US,
+
+                            "Your savings rate is %.1f%%.",
+
                             savingsRate
                     )
             );

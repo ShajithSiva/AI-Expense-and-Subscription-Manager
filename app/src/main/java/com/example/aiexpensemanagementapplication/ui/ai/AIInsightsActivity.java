@@ -488,6 +488,12 @@ public class AIInsightsActivity extends AppCompatActivity {
                         + detectedInsights.size()
         );
 
+        // =================================================
+        // SHOW LOCAL INSIGHTS IMMEDIATELY
+        // =================================================
+
+        showLocalInsights();
+
 
         // =================================================
         // CREATE FINGERPRINT
@@ -587,12 +593,19 @@ public class AIInsightsActivity extends AppCompatActivity {
 
 
         // =================================================
-        // LOADING
+        // BACKGROUND AI ENHANCEMENT
         // =================================================
 
-        setLoading(
-                true
-        );
+        // Keep locally generated insights visible.
+        // Ollama runs in the background and can enhance
+        // the messages when the response arrives.
+
+        if (progressInsights != null) {
+
+            progressInsights.setVisibility(
+                    View.VISIBLE
+            );
+        }
 
 
         Log.d(
@@ -636,7 +649,7 @@ public class AIInsightsActivity extends AppCompatActivity {
                                 );
 
 
-                                showEmptyInsights();
+                                showLocalInsights();
 
                                 return;
                             }
@@ -693,17 +706,8 @@ public class AIInsightsActivity extends AppCompatActivity {
                             );
 
 
-                            /*
-                             * IMPORTANT:
-                             *
-                             * We don't save the fingerprint
-                             * when AI generation fails.
-                             *
-                             * The next attempt can therefore
-                             * retry Qwen.
-                             */
-
-                            showEmptyInsights();
+                            // Keep the locally generated insights visible
+                            showLocalInsights();
                         });
                     }
                 }
@@ -1136,6 +1140,135 @@ public class AIInsightsActivity extends AppCompatActivity {
 
             return value;
         }
+    }
+
+    // =====================================================
+    // SHOW LOCAL INSIGHTS IMMEDIATELY
+    // =====================================================
+
+    private void showLocalInsights() {
+
+        List<AIInsightResult> localResults =
+                convertLocalInsights();
+
+
+        Log.d(
+                TAG,
+                "Local insight results = "
+                        + localResults.size()
+        );
+
+
+        if (
+                localResults.isEmpty()
+        ) {
+
+            Log.d(
+                    TAG,
+                    "No local insights available."
+            );
+
+            return;
+        }
+
+
+        // ================================================
+        // DISPLAY IMMEDIATELY
+        // ================================================
+
+        if (
+                tvNoInsights != null
+        ) {
+
+            tvNoInsights.setVisibility(
+                    View.GONE
+            );
+        }
+
+
+        if (
+                rvInsights != null
+        ) {
+
+            rvInsights.setVisibility(
+                    View.VISIBLE
+            );
+        }
+
+
+        if (
+                insightAdapter != null
+        ) {
+
+            insightAdapter.setInsights(
+                    localResults
+            );
+        }
+
+
+        Log.d(
+                TAG,
+                "Displayed "
+                        + localResults.size()
+                        + " local insight cards."
+        );
+    }
+
+    // =====================================================
+// CONVERT LOCAL INSIGHTS TO ADAPTER RESULTS
+// =====================================================
+
+    private List<AIInsightResult> convertLocalInsights() {
+
+        List<AIInsightResult> results =
+                new ArrayList<>();
+
+
+        if (
+                detectedInsights == null ||
+                        detectedInsights.isEmpty()
+        ) {
+
+            return results;
+        }
+
+
+        for (
+                FinancialInsight insight
+                : detectedInsights
+        ) {
+
+            if (insight == null) {
+                continue;
+            }
+
+
+            FinancialInsight.Severity severity =
+                    insight.getSeverity();
+
+
+            if (severity == null) {
+
+                severity =
+                        FinancialInsight.Severity.LOW;
+            }
+
+
+            AIInsightResult result =
+                    new AIInsightResult(
+                            insight.getTitle(),
+                            insight.getMessage(),
+                            severity
+                    );
+
+
+            results.add(
+                    result
+            );
+        }
+
+
+        return results;
     }
 
 
