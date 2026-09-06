@@ -19,9 +19,10 @@ public class FinancialAdvisorEngine {
         this.databaseHelper = databaseHelper;
     }
 
+
     // =====================================================
-// ANALYZE USER
-// =====================================================
+    // ANALYZE USER
+    // =====================================================
 
     public FinancialAnalysis analyzeUser(
             int userId) {
@@ -29,10 +30,10 @@ public class FinancialAdvisorEngine {
         FinancialAnalysis analysis =
                 new FinancialAnalysis();
 
-        // -------------------------------------------------
-        // GET CURRENT MONTH
-        // Format: YYYY-MM
-        // -------------------------------------------------
+
+        // =================================================
+        // CURRENT MONTH
+        // =================================================
 
         Calendar calendar =
                 Calendar.getInstance();
@@ -41,17 +42,14 @@ public class FinancialAdvisorEngine {
                 String.format(
                         Locale.getDefault(),
                         "%04d-%02d",
-                        calendar.get(
-                                Calendar.YEAR
-                        ),
-                        calendar.get(
-                                Calendar.MONTH
-                        ) + 1
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH) + 1
                 );
 
-        // -------------------------------------------------
+
+        // =================================================
         // TOTAL INCOME
-        // -------------------------------------------------
+        // =================================================
 
         double income =
                 databaseHelper.getMonthlyIncome(
@@ -59,9 +57,10 @@ public class FinancialAdvisorEngine {
                         currentMonth
                 );
 
-        // -------------------------------------------------
-        // CURRENT MONTH EXPENSE
-        // -------------------------------------------------
+
+        // =================================================
+        // TOTAL EXPENSE
+        // =================================================
 
         double expense =
                 databaseHelper.getMonthlyExpense(
@@ -69,9 +68,10 @@ public class FinancialAdvisorEngine {
                         currentMonth
                 );
 
-        // -------------------------------------------------
-        // BASIC VALUES
-        // -------------------------------------------------
+
+        // =================================================
+        // BASIC FINANCIAL VALUES
+        // =================================================
 
         analysis.setTotalIncome(
                 income
@@ -81,6 +81,7 @@ public class FinancialAdvisorEngine {
                 expense
         );
 
+
         double savings =
                 income - expense;
 
@@ -88,12 +89,16 @@ public class FinancialAdvisorEngine {
                 savings
         );
 
-        // -------------------------------------------------
-        // RATES
-        // -------------------------------------------------
 
-        double expenseRate = 0.0;
-        double savingsRate = 0.0;
+        // =================================================
+        // RATES
+        // =================================================
+
+        double expenseRate =
+                0.0;
+
+        double savingsRate =
+                0.0;
 
         if (income > 0) {
 
@@ -104,6 +109,7 @@ public class FinancialAdvisorEngine {
                     (savings / income) * 100.0;
         }
 
+
         analysis.setExpenseRate(
                 expenseRate
         );
@@ -112,14 +118,16 @@ public class FinancialAdvisorEngine {
                 savingsRate
         );
 
+
         // =================================================
-        // BUDGET ANALYSIS
+        // BUDGET
         // =================================================
 
         loadBudgetAnalysis(
                 userId,
                 analysis
         );
+
 
         // =================================================
         // CATEGORY ANALYSIS
@@ -130,6 +138,7 @@ public class FinancialAdvisorEngine {
                 analysis
         );
 
+
         // =================================================
         // MONTHLY TREND
         // =================================================
@@ -138,6 +147,7 @@ public class FinancialAdvisorEngine {
                 userId,
                 analysis
         );
+
 
         // =================================================
         // FINANCIAL HEALTH
@@ -152,12 +162,14 @@ public class FinancialAdvisorEngine {
                 score
         );
 
+
         return analysis;
     }
 
+
     // =====================================================
-// LOAD BUDGET ANALYSIS
-// =====================================================
+    // LOAD BUDGET ANALYSIS
+    // =====================================================
 
     private void loadBudgetAnalysis(
             int userId,
@@ -165,60 +177,62 @@ public class FinancialAdvisorEngine {
 
         try {
 
-            // -------------------------------------------------
-            // GET CURRENT MONTH
-            // Format: YYYY-MM
-            // -------------------------------------------------
-
             Calendar calendar =
                     Calendar.getInstance();
+
 
             String currentMonth =
                     String.format(
                             Locale.getDefault(),
                             "%04d-%02d",
-                            calendar.get(
-                                    Calendar.YEAR
-                            ),
-                            calendar.get(
-                                    Calendar.MONTH
-                            ) + 1
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH) + 1
                     );
 
-            // -------------------------------------------------
-            // GET SAVED BUDGET
-            // -------------------------------------------------
+
+            // =================================================
+            // GET BUDGET
+            // =================================================
 
             Budget budget =
                     databaseHelper.getBudgetSettings(
                             userId
                     );
 
-            // -------------------------------------------------
-            // NO BUDGET FOUND
-            // -------------------------------------------------
+
+            // =================================================
+            // NO BUDGET
+            // =================================================
 
             if (budget == null) {
 
-                analysis.setBudget(0.0);
+                analysis.setBudget(
+                        0.0
+                );
 
-                analysis.setBudgetUsed(0.0);
+                analysis.setBudgetUsed(
+                        0.0
+                );
 
-                analysis.setRemainingBudget(0.0);
+                analysis.setRemainingBudget(
+                        0.0
+                );
 
                 return;
             }
 
-            // -------------------------------------------------
+
+            // =================================================
             // MONTHLY BUDGET
-            // -------------------------------------------------
+            // =================================================
 
             double monthlyBudget =
                     budget.getMonthlyBudget();
 
-            // -------------------------------------------------
+
+            // =================================================
             // CURRENT MONTH EXPENSE
-            // -------------------------------------------------
+            // =================================================
 
             double currentMonthExpense =
                     databaseHelper.getMonthlyExpense(
@@ -226,19 +240,22 @@ public class FinancialAdvisorEngine {
                             currentMonth
                     );
 
-            // -------------------------------------------------
-            // SAVE BUDGET INFORMATION
-            // -------------------------------------------------
+
+            // =================================================
+            // SAVE BUDGET
+            // =================================================
 
             analysis.setBudget(
                     monthlyBudget
             );
 
-            // -------------------------------------------------
-            // CALCULATE BUDGET USED %
-            // -------------------------------------------------
 
-            double budgetUsed = 0.0;
+            // =================================================
+            // BUDGET USED
+            // =================================================
+
+            double budgetUsed =
+                    0.0;
 
             if (monthlyBudget > 0) {
 
@@ -249,97 +266,162 @@ public class FinancialAdvisorEngine {
                         ) * 100.0;
             }
 
+
             analysis.setBudgetUsed(
                     budgetUsed
             );
 
-            // -------------------------------------------------
+
+            // =================================================
             // REMAINING BUDGET
-            // -------------------------------------------------
+            // =================================================
 
             double remainingBudget =
                     monthlyBudget
                             - currentMonthExpense;
 
+
             analysis.setRemainingBudget(
                     remainingBudget
             );
+
 
         } catch (Exception e) {
 
             e.printStackTrace();
 
-            // -------------------------------------------------
-            // RESET IF ERROR
-            // -------------------------------------------------
 
-            analysis.setBudget(0.0);
+            analysis.setBudget(
+                    0.0
+            );
 
-            analysis.setBudgetUsed(0.0);
+            analysis.setBudgetUsed(
+                    0.0
+            );
 
-            analysis.setRemainingBudget(0.0);
+            analysis.setRemainingBudget(
+                    0.0
+            );
         }
     }
+
 
     // =====================================================
     // CATEGORY ANALYSIS
     // =====================================================
+
     private void loadCategoryAnalysis(
             int userId,
             FinancialAnalysis analysis) {
 
-        Cursor cursor = null;
+        Cursor cursor =
+                null;
 
         try {
+
+            // =================================================
+            // CLEAR OLD CATEGORY DATA
+            // =================================================
+
+            analysis.clearCategoryTotals();
+
+
+            // =================================================
+            // GET CATEGORY EXPENSE DATA
+            // =================================================
 
             cursor =
                     databaseHelper.getExpenseByCategory(
                             userId
                     );
 
+
             if (cursor == null) {
+
+                setHighestCategory(
+                        analysis
+                );
+
                 return;
             }
 
-            /*
-             * getExpenseByCategory() returns:
-             *
-             * CATEGORY_ID
-             * SUM(AMOUNT) AS Total
-             */
+
+            // =================================================
+            // FIND CATEGORY ID COLUMN
+            // =================================================
 
             int categoryIdIndex =
                     cursor.getColumnIndex(
                             "CategoryID"
                     );
 
-            int totalIndex =
-                    cursor.getColumnIndex(
-                            "Total"
-                    );
 
             if (categoryIdIndex == -1) {
 
-                // Try the database constant name
                 categoryIdIndex =
                         cursor.getColumnIndex(
                                 "CATEGORY_ID"
                         );
             }
 
+
+            if (categoryIdIndex == -1) {
+
+                categoryIdIndex =
+                        cursor.getColumnIndex(
+                                "category_id"
+                        );
+            }
+
+
+            // =================================================
+            // FIND TOTAL COLUMN
+            // =================================================
+
+            int totalIndex =
+                    cursor.getColumnIndex(
+                            "Total"
+                    );
+
+
             if (totalIndex == -1) {
 
                 totalIndex =
                         cursor.getColumnIndex(
-                                "Total"
+                                "TOTAL"
                         );
             }
 
-            if (categoryIdIndex == -1 ||
-                    totalIndex == -1) {
+
+            if (totalIndex == -1) {
+
+                totalIndex =
+                        cursor.getColumnIndex(
+                                "total"
+                        );
+            }
+
+
+            // =================================================
+            // INVALID CURSOR
+            // =================================================
+
+            if (
+                    categoryIdIndex == -1 ||
+                            totalIndex == -1
+            ) {
+
+                setHighestCategory(
+                        analysis
+                );
 
                 return;
             }
+
+
+            // =================================================
+            // READ CATEGORY TOTALS
+            // =================================================
 
             while (cursor.moveToNext()) {
 
@@ -348,32 +430,54 @@ public class FinancialAdvisorEngine {
                                 categoryIdIndex
                         );
 
+
                 double amount =
                         cursor.getDouble(
                                 totalIndex
                         );
 
+
+                // Ignore zero/negative values
+
                 if (amount <= 0) {
                     continue;
                 }
+
+
+                // =================================================
+                // GET CATEGORY NAME
+                // =================================================
 
                 String categoryName =
                         getCategoryName(
                                 categoryId
                         );
 
-                if (categoryName == null ||
-                        categoryName.trim().isEmpty()) {
+
+                if (
+                        categoryName == null ||
+                                categoryName.trim().isEmpty()
+                ) {
 
                     categoryName =
                             "Other";
                 }
+
+
+                categoryName =
+                        categoryName.trim();
+
+
+                // =================================================
+                // ADD CATEGORY AMOUNT
+                // =================================================
 
                 analysis.addCategoryAmount(
                         categoryName,
                         amount
                 );
             }
+
 
         } catch (Exception e) {
 
@@ -382,34 +486,64 @@ public class FinancialAdvisorEngine {
         } finally {
 
             if (cursor != null) {
+
                 cursor.close();
             }
         }
 
-        // -------------------------------------------------
+
+        // =================================================
         // FIND HIGHEST CATEGORY
-        // -------------------------------------------------
+        // =================================================
+
+        setHighestCategory(
+                analysis
+        );
+    }
+
+
+    // =====================================================
+    // FIND HIGHEST CATEGORY
+    // =====================================================
+
+    private void setHighestCategory(
+            FinancialAnalysis analysis) {
 
         String highestCategory =
                 "Other";
 
+
         double highestAmount =
                 0.0;
+
 
         Map<String, Double> categoryTotals =
                 analysis.getCategoryTotals();
 
+
         if (categoryTotals != null) {
 
-            for (Map.Entry<String, Double> entry :
-                    categoryTotals.entrySet()) {
+            for (
+                    Map.Entry<String, Double> entry
+                    : categoryTotals.entrySet()
+            ) {
 
-                if (entry.getValue() != null &&
-                        entry.getValue() >
-                                highestAmount) {
+                if (
+                        entry.getKey() == null ||
+                                entry.getValue() == null
+                ) {
+                    continue;
+                }
+
+
+                double amount =
+                        entry.getValue();
+
+
+                if (amount > highestAmount) {
 
                     highestAmount =
-                            entry.getValue();
+                            amount;
 
                     highestCategory =
                             entry.getKey();
@@ -417,14 +551,17 @@ public class FinancialAdvisorEngine {
             }
         }
 
+
         analysis.setHighestCategory(
                 highestCategory
         );
+
 
         analysis.setHighestCategoryAmount(
                 highestAmount
         );
     }
+
 
     // =====================================================
     // GET CATEGORY NAME
@@ -433,37 +570,90 @@ public class FinancialAdvisorEngine {
     private String getCategoryName(
             int categoryId) {
 
-        Cursor cursor = null;
+        Cursor cursor =
+                null;
+
 
         try {
-
-            /*
-             * We use the existing DatabaseHelper
-             * category method if available.
-             */
 
             cursor =
                     databaseHelper.getExpenseCategories();
 
+
             if (cursor == null) {
+
                 return "Other";
             }
+
+
+            // =================================================
+            // CATEGORY ID COLUMN
+            // =================================================
 
             int idIndex =
                     cursor.getColumnIndex(
                             "CategoryID"
                     );
 
+
+            if (idIndex == -1) {
+
+                idIndex =
+                        cursor.getColumnIndex(
+                                "CATEGORY_ID"
+                        );
+            }
+
+
+            if (idIndex == -1) {
+
+                idIndex =
+                        cursor.getColumnIndex(
+                                "category_id"
+                        );
+            }
+
+
+            // =================================================
+            // CATEGORY NAME COLUMN
+            // =================================================
+
             int nameIndex =
                     cursor.getColumnIndex(
                             "CategoryName"
                     );
 
-            if (idIndex == -1 ||
-                    nameIndex == -1) {
+
+            if (nameIndex == -1) {
+
+                nameIndex =
+                        cursor.getColumnIndex(
+                                "CATEGORY_NAME"
+                        );
+            }
+
+
+            if (nameIndex == -1) {
+
+                nameIndex =
+                        cursor.getColumnIndex(
+                                "category_name"
+                        );
+            }
+
+
+            if (
+                    idIndex == -1 ||
+                            nameIndex == -1
+            ) {
 
                 return "Other";
             }
+
+
+            // =================================================
+            // FIND CATEGORY
+            // =================================================
 
             while (cursor.moveToNext()) {
 
@@ -472,6 +662,7 @@ public class FinancialAdvisorEngine {
                                 idIndex
                         );
 
+
                 if (id == categoryId) {
 
                     String name =
@@ -479,15 +670,20 @@ public class FinancialAdvisorEngine {
                                     nameIndex
                             );
 
-                    if (name != null &&
-                            !name.trim().isEmpty()) {
+
+                    if (
+                            name != null &&
+                                    !name.trim().isEmpty()
+                    ) {
 
                         return name.trim();
                     }
 
+
                     return "Other";
                 }
             }
+
 
         } catch (Exception e) {
 
@@ -496,12 +692,15 @@ public class FinancialAdvisorEngine {
         } finally {
 
             if (cursor != null) {
+
                 cursor.close();
             }
         }
 
+
         return "Other";
     }
+
 
     // =====================================================
     // MONTHLY TREND
@@ -514,46 +713,42 @@ public class FinancialAdvisorEngine {
         Calendar calendar =
                 Calendar.getInstance();
 
-        // -------------------------------------------------
+
+        // =================================================
         // CURRENT MONTH
-        // -------------------------------------------------
+        // =================================================
 
         String currentMonth =
                 String.format(
                         Locale.getDefault(),
                         "%04d-%02d",
-                        calendar.get(
-                                Calendar.YEAR
-                        ),
-                        calendar.get(
-                                Calendar.MONTH
-                        ) + 1
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH) + 1
                 );
 
-        // -------------------------------------------------
+
+        // =================================================
         // PREVIOUS MONTH
-        // -------------------------------------------------
+        // =================================================
 
         calendar.add(
                 Calendar.MONTH,
                 -1
         );
 
+
         String previousMonth =
                 String.format(
                         Locale.getDefault(),
                         "%04d-%02d",
-                        calendar.get(
-                                Calendar.YEAR
-                        ),
-                        calendar.get(
-                                Calendar.MONTH
-                        ) + 1
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH) + 1
                 );
 
-        // -------------------------------------------------
-        // CURRENT MONTH EXPENSE
-        // -------------------------------------------------
+
+        // =================================================
+        // CURRENT EXPENSE
+        // =================================================
 
         double currentExpense =
                 databaseHelper.getMonthlyExpense(
@@ -561,9 +756,10 @@ public class FinancialAdvisorEngine {
                         currentMonth
                 );
 
-        // -------------------------------------------------
-        // PREVIOUS MONTH EXPENSE
-        // -------------------------------------------------
+
+        // =================================================
+        // PREVIOUS EXPENSE
+        // =================================================
 
         double previousExpense =
                 databaseHelper.getMonthlyExpense(
@@ -571,9 +767,10 @@ public class FinancialAdvisorEngine {
                         previousMonth
                 );
 
-        // -------------------------------------------------
-        // CURRENT MONTH INCOME
-        // -------------------------------------------------
+
+        // =================================================
+        // CURRENT INCOME
+        // =================================================
 
         double currentIncome =
                 databaseHelper.getMonthlyIncome(
@@ -581,9 +778,10 @@ public class FinancialAdvisorEngine {
                         currentMonth
                 );
 
-        // -------------------------------------------------
-        // PREVIOUS MONTH INCOME
-        // -------------------------------------------------
+
+        // =================================================
+        // PREVIOUS INCOME
+        // =================================================
 
         double previousIncome =
                 databaseHelper.getMonthlyIncome(
@@ -591,9 +789,10 @@ public class FinancialAdvisorEngine {
                         previousMonth
                 );
 
-        // -------------------------------------------------
-        // SET TREND DATA
-        // -------------------------------------------------
+
+        // =================================================
+        // SAVE TREND DATA
+        // =================================================
 
         analysis.setCurrentMonthExpense(
                 currentExpense
@@ -611,11 +810,14 @@ public class FinancialAdvisorEngine {
                 previousIncome
         );
 
-        // -------------------------------------------------
-        // EXPENSE CHANGE %
-        // -------------------------------------------------
 
-        double expenseChange = 0.0;
+        // =================================================
+        // EXPENSE CHANGE
+        // =================================================
+
+        double expenseChange =
+                0.0;
+
 
         if (previousExpense > 0) {
 
@@ -627,19 +829,14 @@ public class FinancialAdvisorEngine {
                             )
                                     / previousExpense
                     ) * 100.0;
-
-        } else if (currentExpense > 0) {
-
-            // Previous month had no recorded expenses.
-            // Keep percentage at 0 because a percentage
-            // comparison cannot be calculated reliably.
-            expenseChange = 0.0;
         }
+
 
         analysis.setExpenseChangePercentage(
                 expenseChange
         );
     }
+
 
     // =====================================================
     // FINANCIAL HEALTH SCORE
@@ -651,19 +848,24 @@ public class FinancialAdvisorEngine {
         double income =
                 analysis.getTotalIncome();
 
+
         if (income <= 0) {
 
             return 0;
         }
 
-        int score = 100;
 
-        // -------------------------------------------------
-        // EXPENSE RATIO
-        // -------------------------------------------------
+        int score =
+                100;
+
+
+        // =================================================
+        // EXPENSE RATE
+        // =================================================
 
         double expenseRate =
                 analysis.getExpenseRate();
+
 
         if (expenseRate > 100) {
 
@@ -686,12 +888,14 @@ public class FinancialAdvisorEngine {
             score -= 8;
         }
 
-        // -------------------------------------------------
+
+        // =================================================
         // SAVINGS RATE
-        // -------------------------------------------------
+        // =================================================
 
         double savingsRate =
                 analysis.getSavingsRate();
+
 
         if (savingsRate < 0) {
 
@@ -706,12 +910,14 @@ public class FinancialAdvisorEngine {
             score -= 10;
         }
 
-        // -------------------------------------------------
-        // SPENDING TREND
-        // -------------------------------------------------
+
+        // =================================================
+        // EXPENSE TREND
+        // =================================================
 
         double expenseChange =
                 analysis.getExpenseChangePercentage();
+
 
         if (expenseChange > 30) {
 
@@ -723,12 +929,13 @@ public class FinancialAdvisorEngine {
         }
 
 
-        // -------------------------------------------------
-        // BUDGET PERFORMANCE
-        // -------------------------------------------------
+        // =================================================
+        // BUDGET
+        // =================================================
 
         double budgetUsed =
                 analysis.getBudgetUsed();
+
 
         if (analysis.getBudget() > 0) {
 
@@ -746,23 +953,27 @@ public class FinancialAdvisorEngine {
             }
         }
 
-        // -------------------------------------------------
-        // LIMIT
-        // -------------------------------------------------
+
+        // =================================================
+        // LIMIT SCORE
+        // =================================================
 
         if (score < 0) {
             score = 0;
         }
 
+
         if (score > 100) {
             score = 100;
         }
 
+
         return score;
     }
 
+
     // =====================================================
-    // ANSWER QUESTION
+    // LOCAL QUESTION ANSWER
     // =====================================================
 
     public String answerQuestion(
@@ -772,16 +983,20 @@ public class FinancialAdvisorEngine {
         if (analysis == null) {
 
             return "I don't have enough financial data "
-                    + "to provide an analysis yet.";
+                    + "to provide an answer yet.";
         }
 
-        if (question == null ||
-                question.trim().isEmpty()) {
+
+        if (
+                question == null ||
+                        question.trim().isEmpty()
+        ) {
 
             return getGeneralAdvice(
                     analysis
             );
         }
+
 
         String q =
                 question
@@ -790,213 +1005,490 @@ public class FinancialAdvisorEngine {
                                 Locale.getDefault()
                         );
 
-        // -------------------------------------------------
+
+        // =================================================
+        // TOTAL INCOME
+        // =================================================
+
+        if (
+                q.contains("total income") ||
+                        q.equals("income") ||
+                        q.contains("my income") ||
+                        q.contains("how much did i earn") ||
+                        q.contains("how much have i earned")
+        ) {
+
+            return "Your total income is Rs "
+                    + format(
+                    analysis.getTotalIncome()
+            )
+                    + ".";
+        }
+
+
+        // =================================================
+        // TOTAL EXPENSE
+        // =================================================
+
+        if (
+                q.contains("total expense") ||
+                        q.contains("total expenses") ||
+                        q.equals("expense") ||
+                        q.equals("expenses") ||
+                        q.contains("my expense") ||
+                        q.contains("my expenses")
+        ) {
+
+            return "Your total expenses are Rs "
+                    + format(
+                    analysis.getTotalExpense()
+            )
+                    + ".";
+        }
+
+
+        // =================================================
+        // BALANCE
+        // =================================================
+
+        if (
+                q.equals("balance") ||
+                        q.contains("my balance") ||
+                        q.contains("current balance") ||
+                        q.contains("what is my balance") ||
+                        q.contains("what's my balance") ||
+                        q.contains("how much money do i have") ||
+                        q.contains("how much money is left") ||
+                        q.contains("money left")
+        ) {
+
+            double balance =
+                    analysis.getTotalIncome()
+                            - analysis.getTotalExpense();
+
+
+            return "Your current balance is Rs "
+                    + format(balance)
+                    + ".";
+        }
+
+
+        // =================================================
         // SAVINGS
-        // -------------------------------------------------
+        // =================================================
 
-        if (q.contains("save") ||
-                q.contains("saving") ||
-                q.contains("savings")) {
+        if (
+                q.equals("savings") ||
+                        q.contains("my savings") ||
+                        q.contains("how much did i save") ||
+                        q.contains("how much have i saved")
+        ) {
 
-            return getSavingsAdvice(
-                    analysis
-            );
+            return "Your current savings are Rs "
+                    + format(
+                    analysis.getSavings()
+            )
+                    + ".";
         }
 
-        // -------------------------------------------------
-        // SPENDING
-        // -------------------------------------------------
 
-        if (q.contains("spending") ||
-                q.contains("expense") ||
-                q.contains("spend")) {
+        // =================================================
+        // SAVINGS RATE
+        // =================================================
 
-            return getSpendingAdvice(
-                    analysis
-            );
+        if (
+                q.contains("savings rate") ||
+                        q.contains("saving rate") ||
+                        q.contains("percentage saved") ||
+                        q.contains("percentage of income saved")
+        ) {
+
+            return "Your savings rate is "
+                    + format(
+                    analysis.getSavingsRate()
+            )
+                    + "%.";
         }
 
-        // -------------------------------------------------
+
+        // =================================================
+        // CURRENT MONTH EXPENSE
+        // =================================================
+
+        if (
+                q.contains("this month") &&
+                        (
+                                q.contains("expense") ||
+                                        q.contains("expenses") ||
+                                        q.contains("spending") ||
+                                        q.contains("spent")
+                        )
+        ) {
+
+            return "Your current month spending is Rs "
+                    + format(
+                    analysis.getCurrentMonthExpense()
+            )
+                    + ".";
+        }
+
+
+        // =================================================
         // BUDGET
-        // -------------------------------------------------
+        // =================================================
 
-        if (q.contains("budget")) {
+        if (
+                q.equals("budget") ||
+                        q.contains("my budget") ||
+                        q.contains("monthly budget")
+        ) {
 
-            return getBudgetAdvice(
+            double budget =
+                    analysis.getBudget();
+
+
+            if (budget <= 0) {
+
+                return "You don't have an active monthly "
+                        + "budget recorded.";
+            }
+
+
+            return "Your monthly budget is Rs "
+                    + format(budget)
+                    + ". You have Rs "
+                    + format(
+                    analysis.getRemainingBudget()
+            )
+                    + " remaining.";
+        }
+
+
+        // =================================================
+        // REMAINING BUDGET
+        // =================================================
+
+        if (
+                q.contains("remaining budget") ||
+                        q.contains("budget remaining") ||
+                        q.contains("how much budget is left") ||
+                        q.contains("how much of my budget is left")
+        ) {
+
+            double budget =
+                    analysis.getBudget();
+
+
+            if (budget <= 0) {
+
+                return "You don't have an active monthly "
+                        + "budget recorded.";
+            }
+
+
+            return "You have Rs "
+                    + format(
+                    analysis.getRemainingBudget()
+            )
+                    + " remaining from your monthly budget.";
+        }
+
+
+        // =================================================
+        // BUDGET STATUS
+        // =================================================
+
+        if (
+                q.contains("within my budget") ||
+                        q.contains("over my budget") ||
+                        q.contains("over budget") ||
+                        q.contains("budget status") ||
+                        q.contains("am i within budget")
+        ) {
+
+            double budget =
+                    analysis.getBudget();
+
+
+            if (budget <= 0) {
+
+                return "You don't have an active monthly "
+                        + "budget recorded.";
+            }
+
+
+            double remaining =
+                    analysis.getRemainingBudget();
+
+
+            if (remaining < 0) {
+
+                return "You are over your budget by Rs "
+                        + format(
+                        Math.abs(remaining)
+                )
+                        + ".";
+            }
+
+
+            return "You are currently within your budget. "
+                    + "You have Rs "
+                    + format(remaining)
+                    + " remaining.";
+        }
+
+
+        // =================================================
+        // HIGHEST SPENDING CATEGORY
+        // =================================================
+
+        if (
+                q.contains("highest spending") ||
+                        q.contains("highest expense") ||
+                        q.contains("most spending") ||
+                        q.contains("most expensive category") ||
+                        q.contains("largest expense") ||
+                        q.contains("largest spending")
+        ) {
+
+            return "Your highest spending category is "
+                    + analysis.getHighestCategory()
+                    + " with Rs "
+                    + format(
+                    analysis.getHighestCategoryAmount()
+            )
+                    + " spent.";
+        }
+
+
+        // =================================================
+        // SHOW ALL CATEGORIES
+        // =================================================
+
+        if (
+                q.contains("spending by category") ||
+                        q.contains("expenses by category") ||
+                        q.contains("expense by category") ||
+                        q.contains("category spending") ||
+                        q.contains("category expenses") ||
+                        q.contains("show categories") ||
+                        q.contains("show my categories") ||
+                        q.contains("show category spending") ||
+                        q.contains("show category expenses") ||
+                        q.contains("breakdown by category")
+        ) {
+
+            return getCategoryBreakdown(
                     analysis
             );
         }
 
-        // -------------------------------------------------
-        // HEALTH
-        // -------------------------------------------------
 
-        if (q.contains("health") ||
-                q.contains("score")) {
+        // =================================================
+        // SPECIFIC CATEGORY
+        // =================================================
 
-            return getHealthAdvice(
-                    analysis
-            );
+        String category =
+                findCategoryInQuestion(
+                        analysis,
+                        q
+                );
+
+
+        if (category != null) {
+
+            double amount =
+                    analysis.getCategoryAmount(
+                            category
+                    );
+
+
+            return "You spent Rs "
+                    + format(amount)
+                    + " on "
+                    + category
+                    + ".";
         }
 
-        // -------------------------------------------------
-        // TREND
-        // -------------------------------------------------
 
-        if (q.contains("trend") ||
-                q.contains("increasing") ||
-                q.contains("increased") ||
-                q.contains("decreased") ||
-                q.contains("last month")) {
+        // =================================================
+        // FINANCIAL HEALTH
+        // =================================================
+
+        if (
+                q.contains("financial health") ||
+                        q.contains("health score") ||
+                        q.contains("financial score") ||
+                        q.equals("health") ||
+                        q.equals("score")
+        ) {
+
+            return "Your financial health score is "
+                    + analysis.getFinancialHealthScore()
+                    + "/100.";
+        }
+
+
+        // =================================================
+        // EXPENSE TREND
+        // =================================================
+
+        if (
+                q.contains("expense change") ||
+                        q.contains("expense trend") ||
+                        q.contains("spending trend") ||
+                        q.contains("last month") ||
+                        q.contains("increased") ||
+                        q.contains("decreased")
+        ) {
 
             return getTrendAdvice(
                     analysis
             );
         }
 
-        // -------------------------------------------------
-        // CATEGORY
-        // -------------------------------------------------
 
-        if (q.contains("category") ||
-                q.contains("highest") ||
-                q.contains("largest")) {
+        // =================================================
+        // NO LOCAL ANSWER
+        // =================================================
 
-            return getCategoryAdvice(
-                    analysis
+        return null;
+    }
+
+
+    // =====================================================
+    // FIND CATEGORY IN QUESTION
+    // =====================================================
+
+    private String findCategoryInQuestion(
+            FinancialAnalysis analysis,
+            String question) {
+
+        Map<String, Double> categoryTotals =
+                analysis.getCategoryTotals();
+
+
+        if (
+                categoryTotals == null ||
+                        categoryTotals.isEmpty()
+        ) {
+
+            return null;
+        }
+
+
+        for (
+                String category
+                : categoryTotals.keySet()
+        ) {
+
+            if (
+                    category == null ||
+                            category.trim().isEmpty()
+            ) {
+                continue;
+            }
+
+
+            String categoryLower =
+                    category
+                            .trim()
+                            .toLowerCase(
+                                    Locale.getDefault()
+                            );
+
+
+            if (
+                    question.contains(
+                            categoryLower
+                    )
+            ) {
+
+                return category;
+            }
+        }
+
+
+        return null;
+    }
+
+
+    // =====================================================
+    // CATEGORY BREAKDOWN
+    // =====================================================
+
+    private String getCategoryBreakdown(
+            FinancialAnalysis analysis) {
+
+        Map<String, Double> categoryTotals =
+                analysis.getCategoryTotals();
+
+
+        if (
+                categoryTotals == null ||
+                        categoryTotals.isEmpty()
+        ) {
+
+            return "I don't have any category spending "
+                    + "data available locally.";
+        }
+
+
+        StringBuilder response =
+                new StringBuilder();
+
+
+        response.append(
+                "Your spending by category:\n\n"
+        );
+
+
+        for (
+                Map.Entry<String, Double> entry
+                : categoryTotals.entrySet()
+        ) {
+
+            if (
+                    entry.getKey() == null ||
+                            entry.getValue() == null
+            ) {
+                continue;
+            }
+
+
+            response.append(
+                    "• "
+            );
+
+
+            response.append(
+                    entry.getKey()
+            );
+
+
+            response.append(
+                    ": Rs "
+            );
+
+
+            response.append(
+                    format(
+                            entry.getValue()
+                    )
+            );
+
+
+            response.append(
+                    "\n"
             );
         }
 
-        // -------------------------------------------------
-        // GENERAL
-        // -------------------------------------------------
 
-        return getGeneralAdvice(
-                analysis
-        );
+        return response
+                .toString()
+                .trim();
     }
 
-    // =====================================================
-    // SAVINGS ADVICE
-    // =====================================================
-
-    private String getSavingsAdvice(
-            FinancialAnalysis analysis) {
-
-        double income =
-                analysis.getTotalIncome();
-
-        double savings =
-                analysis.getSavings();
-
-        double rate =
-                analysis.getSavingsRate();
-
-        if (income <= 0) {
-
-            return "I don't have enough recorded income "
-                    + "data to calculate a savings strategy yet. "
-                    + "Add your income records and I'll analyze "
-                    + "your savings potential.";
-        }
-
-        if (savings < 0) {
-
-            return "⚠ Your expenses are higher than your "
-                    + "recorded income by Rs "
-                    + format(-savings)
-                    + ". I recommend reducing non-essential "
-                    + "spending, especially "
-                    + analysis.getHighestCategory()
-                    + ".";
-        }
-
-        if (rate < 10) {
-
-            return "Your current savings are approximately "
-                    + "Rs "
-                    + format(savings)
-                    + ", which is "
-                    + format(rate)
-                    + "% of your recorded income. "
-                    + "Consider reducing "
-                    + analysis.getHighestCategory()
-                    + " spending and redirecting part of that "
-                    + "amount into savings.";
-        }
-
-        if (rate < 20) {
-
-            return "You are saving approximately Rs "
-                    + format(savings)
-                    + ", or "
-                    + format(rate)
-                    + "% of your recorded income. "
-                    + "You're building a positive savings habit. "
-                    + "You could improve it further by reviewing "
-                    + analysis.getHighestCategory()
-                    + " spending.";
-        }
-
-        return "Your savings are approximately Rs "
-                + format(savings)
-                + ", which is "
-                + format(rate)
-                + "% of your recorded income. "
-                + "That's a strong savings rate. "
-                + "Keep maintaining this habit.";
-    }
-
-    // =====================================================
-    // SPENDING ADVICE
-    // =====================================================
-
-    private String getSpendingAdvice(
-            FinancialAnalysis analysis) {
-
-        double expense =
-                analysis.getTotalExpense();
-
-        if (expense <= 0) {
-
-            return "There are not enough recorded expenses "
-                    + "yet for me to identify a spending pattern.";
-        }
-
-        return "Your recorded expenses total Rs "
-                + format(expense)
-                + ". Your highest spending category is "
-                + analysis.getHighestCategory()
-                + ", at approximately Rs "
-                + format(
-                analysis.getHighestCategoryAmount()
-        )
-                + ". I recommend reviewing this category "
-                + "first when looking for savings opportunities.";
-    }
-
-    // =====================================================
-    // CATEGORY ADVICE
-    // =====================================================
-
-    private String getCategoryAdvice(
-            FinancialAnalysis analysis) {
-
-        if (analysis.getHighestCategoryAmount() <= 0) {
-
-            return "I don't have enough category data yet "
-                    + "to identify your highest spending area.";
-        }
-
-        return "Your highest spending category is "
-                + analysis.getHighestCategory()
-                + ", with approximately Rs "
-                + format(
-                analysis.getHighestCategoryAmount()
-        )
-                + " spent. This is the category I recommend "
-                + "reviewing first.";
-    }
 
     // =====================================================
     // TREND ADVICE
@@ -1008,184 +1500,55 @@ public class FinancialAdvisorEngine {
         double current =
                 analysis.getCurrentMonthExpense();
 
+
         double previous =
                 analysis.getPreviousMonthExpense();
+
 
         double change =
                 analysis.getExpenseChangePercentage();
 
+
         if (previous <= 0) {
 
             return "There isn't enough previous-month "
-                    + "expense data yet to identify a reliable "
+                    + "expense data to calculate a reliable "
                     + "spending trend.";
         }
 
+
         if (change > 0) {
 
-            return "Your expenses increased by approximately "
+            return "Your expenses increased by "
                     + format(change)
-                    + "% compared with the previous month. "
-                    + "Your current monthly expense is Rs "
+                    + "% compared with last month. "
+                    + "This month you spent Rs "
                     + format(current)
                     + ", compared with Rs "
                     + format(previous)
                     + " last month.";
         }
 
+
         if (change < 0) {
 
-            return "Good progress! Your expenses decreased by "
-                    + format(Math.abs(change))
-                    + "% compared with the previous month. "
-                    + "Keep maintaining this spending pattern.";
+            return "Your expenses decreased by "
+                    + format(
+                    Math.abs(change)
+            )
+                    + "% compared with last month. "
+                    + "This month you spent Rs "
+                    + format(current)
+                    + ".";
         }
 
+
         return "Your expenses are approximately the same "
-                + "as the previous month at Rs "
+                + "as last month at Rs "
                 + format(current)
                 + ".";
     }
 
-    // =====================================================
-// BUDGET ADVICE
-// =====================================================
-
-    private String getBudgetAdvice(
-            FinancialAnalysis analysis) {
-
-        double budget =
-                analysis.getBudget();
-
-        double used =
-                analysis.getBudgetUsed();
-
-        double remaining =
-                analysis.getRemainingBudget();
-
-        // -------------------------------------------------
-        // NO BUDGET
-        // -------------------------------------------------
-
-        if (budget <= 0) {
-
-            return "I couldn't find an active monthly budget "
-                    + "for your financial profile yet. "
-                    + "Create a monthly budget and I'll help "
-                    + "you monitor it.";
-        }
-
-        // -------------------------------------------------
-        // OVER BUDGET
-        // -------------------------------------------------
-
-        if (remaining < 0) {
-
-            double exceededBy =
-                    Math.abs(remaining);
-
-            return "⚠ You're currently over your budget.\n\n"
-                    + "Monthly budget: Rs "
-                    + format(budget)
-                    + "\nCurrent month spending: Rs "
-                    + format(
-                    budget - remaining
-            )
-                    + "\nExceeded by: Rs "
-                    + format(exceededBy)
-                    + "\nBudget used: "
-                    + format(used)
-                    + "%\n\n"
-                    + "I recommend reducing non-essential "
-                    + "spending, especially in your highest "
-                    + "spending category: "
-                    + analysis.getHighestCategory()
-                    + ".";
-        }
-
-        // -------------------------------------------------
-        // NEAR BUDGET LIMIT
-        // -------------------------------------------------
-
-        if (used >= 90) {
-
-            return "⚠ You're still within your budget, "
-                    + "but you're getting close to the limit.\n\n"
-                    + "Monthly budget: Rs "
-                    + format(budget)
-                    + "\nCurrent month spending: Rs "
-                    + format(
-                    budget - remaining
-            )
-                    + "\nRemaining: Rs "
-                    + format(remaining)
-                    + "\nBudget used: "
-                    + format(used)
-                    + "%\n\n"
-                    + "Try to limit non-essential spending "
-                    + "for the rest of the month.";
-        }
-
-        // -------------------------------------------------
-        // WITHIN BUDGET
-        // -------------------------------------------------
-
-        return "✅ Yes, you're currently within your budget.\n\n"
-                + "Monthly budget: Rs "
-                + format(budget)
-                + "\nCurrent month spending: Rs "
-                + format(
-                budget - remaining
-        )
-                + "\nRemaining: Rs "
-                + format(remaining)
-                + "\nBudget used: "
-                + format(used)
-                + "%\n\n"
-                + "You still have "
-                + format(100.0 - used)
-                + "% of your monthly budget available.";
-    }
-
-    // =====================================================
-    // HEALTH ADVICE
-    // =====================================================
-
-    private String getHealthAdvice(
-            FinancialAnalysis analysis) {
-
-        int score =
-                analysis.getFinancialHealthScore();
-
-        if (score >= 80) {
-
-            return "🎯 Your financial health score is "
-                    + score
-                    + "/100. Your spending and savings "
-                    + "pattern currently looks healthy. "
-                    + "Keep monitoring "
-                    + analysis.getHighestCategory()
-                    + " spending.";
-        }
-
-        if (score >= 60) {
-
-            return "💡 Your financial health score is "
-                    + score
-                    + "/100. Your finances are reasonably "
-                    + "stable, but you have room to improve "
-                    + "your savings and control "
-                    + analysis.getHighestCategory()
-                    + " spending.";
-        }
-
-        return "⚠ Your financial health score is "
-                + score
-                + "/100. Your current spending pattern "
-                + "needs attention. Start by reviewing "
-                + analysis.getHighestCategory()
-                + " and reducing non-essential expenses.";
-    }
 
     // =====================================================
     // GENERAL ADVICE
@@ -1194,25 +1557,14 @@ public class FinancialAdvisorEngine {
     private String getGeneralAdvice(
             FinancialAnalysis analysis) {
 
-        double income =
-                analysis.getTotalIncome();
-
-        double expense =
-                analysis.getTotalExpense();
-
-        if (income <= 0 &&
-                expense <= 0) {
-
-            return "I don't have enough financial data yet. "
-                    + "Start recording your income and expenses "
-                    + "and I'll help you understand your financial health.";
-        }
-
-        return "Here's your current financial picture:\n\n"
-                + "Income: Rs "
-                + format(income)
+        return "Income: Rs "
+                + format(
+                analysis.getTotalIncome()
+        )
                 + "\nExpenses: Rs "
-                + format(expense)
+                + format(
+                analysis.getTotalExpense()
+        )
                 + "\nSavings: Rs "
                 + format(
                 analysis.getSavings()
@@ -1221,14 +1573,15 @@ public class FinancialAdvisorEngine {
                 + format(
                 analysis.getSavingsRate()
         )
-                + "%\nExpense rate: "
+                + "%\nBudget: Rs "
                 + format(
-                analysis.getExpenseRate()
+                analysis.getBudget()
         )
-                + "%\nFinancial health: "
-                + analysis.getFinancialHealthScore()
-                + "/100\n\n"
-                + "Largest spending category: "
+                + "\nRemaining budget: Rs "
+                + format(
+                analysis.getRemainingBudget()
+        )
+                + "\nHighest category: "
                 + analysis.getHighestCategory()
                 + " (Rs "
                 + format(
@@ -1237,8 +1590,9 @@ public class FinancialAdvisorEngine {
                 + ")";
     }
 
+
     // =====================================================
-    // FORMAT
+    // FORMAT MONEY
     // =====================================================
 
     private String format(

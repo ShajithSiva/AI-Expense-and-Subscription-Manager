@@ -5,29 +5,76 @@ import java.util.Map;
 
 public class FinancialAnalysis {
 
+    // =====================================================
+    // BASIC FINANCIAL DATA
+    // =====================================================
+
     private double totalIncome;
     private double totalExpense;
     private double savings;
     private double savingsRate;
     private double expenseRate;
 
+
+    // =====================================================
+    // BUDGET DATA
+    // =====================================================
+
     private double budget;
     private double budgetUsed;
     private double remainingBudget;
 
+
+    // =====================================================
+    // MONTHLY FINANCIAL DATA
+    // =====================================================
+
     private double currentMonthExpense;
     private double previousMonthExpense;
+
     private double currentMonthIncome;
     private double previousMonthIncome;
+
     private double expenseChangePercentage;
 
+
+    // =====================================================
+    // HIGHEST SPENDING CATEGORY
+    // =====================================================
+
     private String highestCategory;
+
     private double highestCategoryAmount;
+
+
+    // =====================================================
+    // FINANCIAL HEALTH
+    // =====================================================
 
     private int financialHealthScore;
 
+
+    // =====================================================
+    // CATEGORY TOTALS
+    // =====================================================
+
+    /*
+     * Stores total spending for each expense category.
+     *
+     * Example:
+     *
+     * Food          -> 12500
+     * Shopping      -> 8500
+     * Transport     -> 4200
+     * Entertainment -> 3000
+     *
+     * LinkedHashMap is used so that the insertion order
+     * is preserved when displaying categories.
+     */
+
     private final Map<String, Double> categoryTotals =
             new LinkedHashMap<>();
+
 
     // =====================================================
     // INCOME
@@ -41,6 +88,7 @@ public class FinancialAnalysis {
         this.totalIncome = totalIncome;
     }
 
+
     // =====================================================
     // EXPENSE
     // =====================================================
@@ -52,6 +100,7 @@ public class FinancialAnalysis {
     public void setTotalExpense(double totalExpense) {
         this.totalExpense = totalExpense;
     }
+
 
     // =====================================================
     // SAVINGS
@@ -65,6 +114,7 @@ public class FinancialAnalysis {
         this.savings = savings;
     }
 
+
     // =====================================================
     // SAVINGS RATE
     // =====================================================
@@ -76,6 +126,7 @@ public class FinancialAnalysis {
     public void setSavingsRate(double savingsRate) {
         this.savingsRate = savingsRate;
     }
+
 
     // =====================================================
     // EXPENSE RATE
@@ -89,6 +140,7 @@ public class FinancialAnalysis {
         this.expenseRate = expenseRate;
     }
 
+
     // =====================================================
     // BUDGET
     // =====================================================
@@ -101,6 +153,11 @@ public class FinancialAnalysis {
         this.budget = budget;
     }
 
+
+    // =====================================================
+    // BUDGET USED
+    // =====================================================
+
     public double getBudgetUsed() {
         return budgetUsed;
     }
@@ -109,6 +166,11 @@ public class FinancialAnalysis {
         this.budgetUsed = budgetUsed;
     }
 
+
+    // =====================================================
+    // REMAINING BUDGET
+    // =====================================================
+
     public double getRemainingBudget() {
         return remainingBudget;
     }
@@ -116,6 +178,72 @@ public class FinancialAnalysis {
     public void setRemainingBudget(double remainingBudget) {
         this.remainingBudget = remainingBudget;
     }
+
+
+    // =====================================================
+    // CURRENT MONTH EXPENSE
+    // =====================================================
+
+    public double getCurrentMonthExpense() {
+        return currentMonthExpense;
+    }
+
+    public void setCurrentMonthExpense(double value) {
+        this.currentMonthExpense = value;
+    }
+
+
+    // =====================================================
+    // PREVIOUS MONTH EXPENSE
+    // =====================================================
+
+    public double getPreviousMonthExpense() {
+        return previousMonthExpense;
+    }
+
+    public void setPreviousMonthExpense(double value) {
+        this.previousMonthExpense = value;
+    }
+
+
+    // =====================================================
+    // CURRENT MONTH INCOME
+    // =====================================================
+
+    public double getCurrentMonthIncome() {
+        return currentMonthIncome;
+    }
+
+    public void setCurrentMonthIncome(double value) {
+        this.currentMonthIncome = value;
+    }
+
+
+    // =====================================================
+    // PREVIOUS MONTH INCOME
+    // =====================================================
+
+    public double getPreviousMonthIncome() {
+        return previousMonthIncome;
+    }
+
+    public void setPreviousMonthIncome(double value) {
+        this.previousMonthIncome = value;
+    }
+
+
+    // =====================================================
+    // EXPENSE CHANGE PERCENTAGE
+    // =====================================================
+
+    public double getExpenseChangePercentage() {
+        return expenseChangePercentage;
+    }
+
+    public void setExpenseChangePercentage(double value) {
+        this.expenseChangePercentage = value;
+    }
+
 
     // =====================================================
     // HIGHEST CATEGORY
@@ -129,6 +257,11 @@ public class FinancialAnalysis {
         this.highestCategory = highestCategory;
     }
 
+
+    // =====================================================
+    // HIGHEST CATEGORY AMOUNT
+    // =====================================================
+
     public double getHighestCategoryAmount() {
         return highestCategoryAmount;
     }
@@ -140,17 +273,56 @@ public class FinancialAnalysis {
                 highestCategoryAmount;
     }
 
+
     // =====================================================
     // CATEGORY TOTALS
     // =====================================================
 
+    /**
+     * Returns all category spending totals.
+     *
+     * Example:
+     *
+     * {
+     *     Food=12500,
+     *     Shopping=8500,
+     *     Transport=4200
+     * }
+     */
     public Map<String, Double> getCategoryTotals() {
         return categoryTotals;
     }
 
+
+    /**
+     * Adds an expense amount to a category.
+     *
+     * If the category already exists, the new amount
+     * is added to the existing total.
+     *
+     * Example:
+     *
+     * Food = 5000
+     *
+     * addCategoryAmount("Food", 2000)
+     *
+     * Result:
+     *
+     * Food = 7000
+     */
     public void addCategoryAmount(
             String category,
             double amount) {
+
+        if (
+                category == null ||
+                        category.trim().isEmpty()
+        ) {
+            category = "Other";
+        }
+
+        category =
+                category.trim();
 
         Double current =
                 categoryTotals.get(category);
@@ -165,45 +337,114 @@ public class FinancialAnalysis {
         );
     }
 
-    public double getCurrentMonthExpense() {
-        return currentMonthExpense;
+
+    /**
+     * Clears all category totals.
+     *
+     * This is useful when FinancialAnalysis is being
+     * recalculated from the database.
+     */
+    public void clearCategoryTotals() {
+        categoryTotals.clear();
     }
 
-    public void setCurrentMonthExpense(double value) {
-        this.currentMonthExpense = value;
+
+    /**
+     * Returns the spending amount for a specific category.
+     *
+     * Category matching is case-insensitive.
+     *
+     * Example:
+     *
+     * getCategoryAmount("food")
+     *
+     * can find:
+     *
+     * Food
+     */
+    public double getCategoryAmount(
+            String requestedCategory) {
+
+        if (
+                requestedCategory == null ||
+                        requestedCategory.trim().isEmpty()
+        ) {
+            return 0.0;
+        }
+
+        String requested =
+                requestedCategory
+                        .trim();
+
+        for (
+                Map.Entry<String, Double> entry
+                : categoryTotals.entrySet()
+        ) {
+
+            String category =
+                    entry.getKey();
+
+            if (category == null) {
+                continue;
+            }
+
+            if (
+                    category.equalsIgnoreCase(
+                            requested
+                    )
+            ) {
+
+                Double amount =
+                        entry.getValue();
+
+                return amount == null
+                        ? 0.0
+                        : amount;
+            }
+        }
+
+        return 0.0;
     }
 
-    public double getPreviousMonthExpense() {
-        return previousMonthExpense;
+
+    /**
+     * Checks whether a category exists.
+     *
+     * Category matching is case-insensitive.
+     */
+    public boolean hasCategory(
+            String requestedCategory) {
+
+        if (
+                requestedCategory == null ||
+                        requestedCategory.trim().isEmpty()
+        ) {
+            return false;
+        }
+
+        String requested =
+                requestedCategory
+                        .trim();
+
+        for (
+                String category
+                : categoryTotals.keySet()
+        ) {
+
+            if (
+                    category != null &&
+                            category.equalsIgnoreCase(
+                                    requested
+                            )
+            ) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public void setPreviousMonthExpense(double value) {
-        this.previousMonthExpense = value;
-    }
-
-    public double getCurrentMonthIncome() {
-        return currentMonthIncome;
-    }
-
-    public void setCurrentMonthIncome(double value) {
-        this.currentMonthIncome = value;
-    }
-
-    public double getPreviousMonthIncome() {
-        return previousMonthIncome;
-    }
-
-    public void setPreviousMonthIncome(double value) {
-        this.previousMonthIncome = value;
-    }
-
-    public double getExpenseChangePercentage() {
-        return expenseChangePercentage;
-    }
-
-    public void setExpenseChangePercentage(double value) {
-        this.expenseChangePercentage = value;
-    }
 
     // =====================================================
     // FINANCIAL HEALTH
