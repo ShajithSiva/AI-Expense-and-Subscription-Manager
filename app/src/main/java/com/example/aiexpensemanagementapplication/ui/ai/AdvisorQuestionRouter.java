@@ -1,11 +1,12 @@
 package com.example.aiexpensemanagementapplication.ui.ai;
 
+import java.util.Collection;
 import java.util.Locale;
 
 public class AdvisorQuestionRouter {
 
     // =====================================================
-    // ROUTE TYPES
+    // ROUTE
     // =====================================================
 
     public enum Route {
@@ -15,31 +16,68 @@ public class AdvisorQuestionRouter {
 
 
     // =====================================================
-    // ROUTE QUESTION
+    // MAIN ROUTER
     // =====================================================
 
-    public Route route(String question) {
+    public Route route(
+            String question,
+            Collection<String> categories
+    ) {
 
-        if (question == null) {
+        if (
+                question == null ||
+                        question.trim().isEmpty()
+        ) {
+
             return Route.AI;
         }
 
-        String q = normalize(question);
 
-        if (q.isEmpty()) {
-            return Route.AI;
-        }
+        String q =
+                normalize(question);
+
 
         // =================================================
-        // LOCAL FACTUAL QUESTION
+        // STANDARD LOCAL FINANCIAL QUESTIONS
         // =================================================
 
-        if (isLocalQuestion(q)) {
+        if (isStandardLocalQuestion(q)) {
+
             return Route.LOCAL;
         }
 
+
         // =================================================
-        // DEFAULT → AI / QWEN3
+        // DYNAMIC CATEGORY ROUTING
+        // =================================================
+
+        if (
+                categories != null &&
+                        !categories.isEmpty()
+        ) {
+
+            String matchedCategory =
+                    findMatchingCategory(
+                            q,
+                            categories
+                    );
+
+
+            if (
+                    matchedCategory != null &&
+                            isLocalCategoryQuestion(
+                                    q,
+                                    matchedCategory
+                            )
+            ) {
+
+                return Route.LOCAL;
+            }
+        }
+
+
+        // =================================================
+        // EVERYTHING ELSE → AI
         // =================================================
 
         return Route.AI;
@@ -47,24 +85,48 @@ public class AdvisorQuestionRouter {
 
 
     // =====================================================
-    // NORMALIZE QUESTION
+    // BACKWARD-COMPATIBLE ROUTER
     // =====================================================
 
-    private String normalize(String question) {
+    public Route route(
+            String question
+    ) {
 
-        return question
-                .trim()
-                .toLowerCase(Locale.ROOT)
-                .replaceAll("[?!.,]+$", "")
-                .replaceAll("\\s+", " ");
+        return route(
+                question,
+                null
+        );
     }
 
 
     // =====================================================
-    // LOCAL QUESTION DETECTION
+    // NORMALIZE
     // =====================================================
 
-    private boolean isLocalQuestion(String q) {
+    private String normalize(
+            String question
+    ) {
+
+        return question
+                .trim()
+                .toLowerCase(
+                        Locale.ROOT
+                )
+                .replaceAll(
+                        "\\s+",
+                        " "
+                );
+    }
+
+
+    // =====================================================
+    // STANDARD LOCAL QUESTIONS
+    // =====================================================
+
+    private boolean isStandardLocalQuestion(
+            String q
+    ) {
+
 
         // =================================================
         // TOTAL INCOME
@@ -74,6 +136,7 @@ public class AdvisorQuestionRouter {
                 q.equals("income") ||
                         q.equals("my income") ||
                         q.equals("total income") ||
+                        q.equals("total incomes") ||
                         q.equals("my total income") ||
                         q.equals("income total") ||
                         q.equals("how much income") ||
@@ -83,6 +146,7 @@ public class AdvisorQuestionRouter {
                         q.equals("how much money have i earned") ||
                         q.contains("total income")
         ) {
+
             return true;
         }
 
@@ -94,8 +158,10 @@ public class AdvisorQuestionRouter {
         if (
                 q.equals("expense") ||
                         q.equals("expenses") ||
+                        q.equals("spending") ||
                         q.equals("my expense") ||
                         q.equals("my expenses") ||
+                        q.equals("my spending") ||
                         q.equals("total expense") ||
                         q.equals("total expenses") ||
                         q.equals("my total expense") ||
@@ -111,6 +177,7 @@ public class AdvisorQuestionRouter {
                         q.contains("total expense") ||
                         q.contains("total expenses")
         ) {
+
             return true;
         }
 
@@ -133,6 +200,7 @@ public class AdvisorQuestionRouter {
                         q.equals("how much money is left") ||
                         q.equals("money left")
         ) {
+
             return true;
         }
 
@@ -146,24 +214,12 @@ public class AdvisorQuestionRouter {
                         q.equals("current month expenses") ||
                         q.equals("this month expense") ||
                         q.equals("this month expenses") ||
-                        q.equals("my current month expense") ||
-                        q.equals("my current month expenses") ||
-                        q.equals("my spending this month") ||
-                        q.equals("my expenses this month") ||
-                        q.equals("this month's expenses") ||
-                        q.equals("this month spending") ||
                         q.equals("how much did i spend this month") ||
                         q.equals("how much have i spent this month") ||
-                        (
-                                q.contains("this month") &&
-                                        (
-                                                q.contains("spend") ||
-                                                        q.contains("spent") ||
-                                                        q.contains("expense") ||
-                                                        q.contains("spending")
-                                        )
-                        )
+                        q.contains("current month expense") ||
+                        q.contains("this month expense")
         ) {
+
             return true;
         }
 
@@ -176,14 +232,11 @@ public class AdvisorQuestionRouter {
                 q.equals("savings") ||
                         q.equals("my savings") ||
                         q.equals("total savings") ||
-                        q.equals("my total savings") ||
                         q.equals("how much did i save") ||
                         q.equals("how much have i saved") ||
-                        q.equals("how much money did i save") ||
-                        q.equals("how much money have i saved") ||
-                        q.contains("how much savings") ||
-                        q.contains("my savings")
+                        q.equals("how much money did i save")
         ) {
+
             return true;
         }
 
@@ -195,41 +248,30 @@ public class AdvisorQuestionRouter {
         if (
                 q.equals("savings rate") ||
                         q.equals("my savings rate") ||
-                        q.equals("saving rate") ||
-                        q.equals("my saving rate") ||
                         q.equals("what is my savings rate") ||
-                        q.equals("what's my savings rate") ||
-                        q.equals("what is my saving rate") ||
-                        q.equals("what's my saving rate") ||
                         q.contains("savings percentage") ||
                         q.contains("saving percentage")
         ) {
+
             return true;
         }
 
 
         // =================================================
-        // HIGHEST SPENDING CATEGORY
+        // HIGHEST SPENDING
         // =================================================
 
         if (
                 q.equals("highest spending category") ||
                         q.equals("highest expense category") ||
                         q.equals("most expensive category") ||
-                        q.equals("biggest expense category") ||
-                        q.equals("biggest spending category") ||
                         q.equals("where did i spend the most") ||
                         q.equals("where do i spend the most") ||
                         q.equals("what did i spend the most on") ||
-                        q.equals("what do i spend the most on") ||
                         q.contains("highest spending") ||
-                        q.contains("highest expense category") ||
-                        q.contains("spent the most") ||
-                        q.contains("spend the most") ||
-                        q.contains("most spending") ||
-                        q.contains("biggest expense") ||
-                        q.contains("biggest spending")
+                        q.contains("spent the most")
         ) {
+
             return true;
         }
 
@@ -242,15 +284,11 @@ public class AdvisorQuestionRouter {
                 q.equals("financial health") ||
                         q.equals("financial health score") ||
                         q.equals("my financial health") ||
-                        q.equals("my financial health score") ||
                         q.equals("what is my financial health") ||
-                        q.equals("what's my financial health") ||
-                        q.equals("what is my financial health score") ||
-                        q.equals("what's my financial health score") ||
                         q.equals("how is my financial health") ||
-                        q.contains("financial health score") ||
-                        q.contains("health score")
+                        q.contains("financial health score")
         ) {
+
             return true;
         }
 
@@ -262,22 +300,33 @@ public class AdvisorQuestionRouter {
         if (
                 q.equals("expense change") ||
                         q.equals("expense change percentage") ||
-                        q.equals("expense change percent") ||
                         q.equals("how much did my expenses change") ||
-                        q.equals("how much have my expenses changed") ||
                         q.equals("did my expenses increase") ||
                         q.equals("did my expenses decrease") ||
-                        q.equals("did my spending increase") ||
-                        q.equals("did my spending decrease") ||
                         q.contains("expense change") ||
-                        q.contains("expenses increased") ||
-                        q.contains("expenses decrease") ||
-                        q.contains("expenses decreased") ||
-                        q.contains("spending increased") ||
-                        q.contains("spending decreased") ||
                         q.contains("compared to last month") ||
                         q.contains("compared with last month")
         ) {
+
+            return true;
+        }
+
+
+        // =================================================
+        // BUDGET
+        // =================================================
+
+        if (
+                q.equals("budget") ||
+                        q.equals("my budget") ||
+                        q.equals("budget status") ||
+                        q.equals("how is my budget") ||
+                        q.equals("am i within my budget") ||
+                        q.equals("am i within budget") ||
+                        q.equals("am i over budget") ||
+                        q.contains("budget")
+        ) {
+
             return true;
         }
 
@@ -290,206 +339,347 @@ public class AdvisorQuestionRouter {
                 q.equals("remaining budget") ||
                         q.equals("budget remaining") ||
                         q.equals("how much budget is left") ||
-                        q.equals("how much budget is remaining") ||
-                        q.equals("how much money is left in my budget") ||
-                        q.equals("how much money remains in my budget") ||
+                        q.equals(
+                                "how much money is left in my budget"
+                        ) ||
                         q.contains("remaining budget") ||
-                        q.contains("budget left") ||
-                        (
-                                q.contains("budget") &&
-                                        (
-                                                q.contains("remaining") ||
-                                                        q.contains("left")
-                                        )
-                        )
+                        q.contains("budget left")
         ) {
+
             return true;
         }
 
-
-        // =================================================
-        // BUDGET STATUS
-        // =================================================
-
-        if (
-                q.equals("budget") ||
-                        q.equals("my budget") ||
-                        q.equals("budget status") ||
-                        q.equals("my budget status") ||
-                        q.equals("how is my budget") ||
-                        q.equals("am i within my budget") ||
-                        q.equals("am i within budget") ||
-                        q.equals("am i over budget") ||
-                        q.equals("am i under budget") ||
-                        q.equals("did i exceed my budget") ||
-                        q.equals("have i exceeded my budget") ||
-                        q.contains("within my budget") ||
-                        q.contains("within budget")
-        ) {
-            return true;
-        }
-
-
-        // =================================================
-        // CATEGORY BREAKDOWN
-        // =================================================
-
-        if (
-                q.contains("spending by category") ||
-                        q.contains("expenses by category") ||
-                        q.contains("expense by category") ||
-                        q.contains("category spending") ||
-                        q.contains("category expenses") ||
-                        q.contains("breakdown by category") ||
-                        q.contains("expense breakdown") ||
-                        q.contains("spending breakdown")
-        ) {
-            return true;
-        }
-
-
-        // =================================================
-        // SPECIFIC CATEGORY AMOUNT
-        // =================================================
-
-        if (isCategoryAmountQuestion(q)) {
-            return true;
-        }
-
-
-        // =================================================
-        // STANDALONE CATEGORY
-        //
-        // Example:
-        // Food
-        // Transport
-        // Shopping
-        // Bills
-        // =================================================
-
-        if (isStandaloneCategory(q)) {
-            return true;
-        }
-
-
-        // =================================================
-        // NOT LOCAL → AI
-        // =================================================
 
         return false;
     }
 
 
     // =====================================================
-    // CATEGORY AMOUNT QUESTION
+    // FIND MATCHING DATABASE CATEGORY
     // =====================================================
 
-    private boolean isCategoryAmountQuestion(String q) {
-
-        // =================================================
-        // EXPLANATION / ADVICE QUESTIONS MUST GO TO AI
-        // =================================================
+    private String findMatchingCategory(
+            String question,
+            Collection<String> categories
+    ) {
 
         if (
-                q.contains("why") ||
-                        q.contains("how can i") ||
-                        q.contains("how do i") ||
-                        q.contains("should i") ||
-                        q.contains("what should") ||
-                        q.contains("recommend") ||
-                        q.contains("recommendation") ||
-                        q.contains("advice") ||
-                        q.contains("reduce") ||
-                        q.contains("improve") ||
-                        q.contains("save more")
+                question == null ||
+                        categories == null
         ) {
-            return false;
+
+            return null;
+        }
+
+
+        String normalizedQuestion =
+                normalize(question);
+
+
+        // =================================================
+        // FIRST: EXACT CATEGORY MATCH
+        // =================================================
+
+        for (
+                String category
+                : categories
+        ) {
+
+            if (
+                    category == null ||
+                            category.trim().isEmpty()
+            ) {
+
+                continue;
+            }
+
+
+            String normalizedCategory =
+                    normalize(category);
+
+
+            if (
+                    normalizedQuestion.equals(
+                            normalizedCategory
+                    )
+            ) {
+
+                return category;
+            }
         }
 
 
         // =================================================
-        // MUST ASK ABOUT A FACTUAL AMOUNT
+        // SECOND: CATEGORY AS PHRASE
         // =================================================
 
-        boolean asksAmount =
-                q.contains("how much") ||
-                        q.contains("amount") ||
-                        q.contains("spent") ||
-                        q.contains("spending") ||
-                        q.contains("expense") ||
-                        q.contains("expenses");
+        String bestMatch = null;
+
+        int bestLength = 0;
 
 
-        if (!asksAmount) {
-            return false;
+        for (
+                String category
+                : categories
+        ) {
+
+            if (
+                    category == null ||
+                            category.trim().isEmpty()
+            ) {
+
+                continue;
+            }
+
+
+            String normalizedCategory =
+                    normalize(category);
+
+
+            if (
+                    containsWholePhrase(
+                            normalizedQuestion,
+                            normalizedCategory
+                    )
+            ) {
+
+                /*
+                 * Prefer the longest category name.
+                 *
+                 * Example:
+                 *
+                 * "Food"
+                 * "Fast Food"
+                 *
+                 * Question:
+                 * "How much did I spend on Fast Food?"
+                 *
+                 * → Fast Food
+                 */
+
+                if (
+                        normalizedCategory.length()
+                                > bestLength
+                ) {
+
+                    bestMatch =
+                            category;
+
+                    bestLength =
+                            normalizedCategory.length();
+                }
+            }
         }
 
 
-        // =================================================
-        // COMMON CATEGORY WORDS
-        // =================================================
-
-        boolean containsCategory =
-                q.contains("food") ||
-                        q.contains("grocery") ||
-                        q.contains("groceries") ||
-                        q.contains("transport") ||
-                        q.contains("transportation") ||
-                        q.contains("travel") ||
-                        q.contains("shopping") ||
-                        q.contains("bills") ||
-                        q.contains("bill") ||
-                        q.contains("utilities") ||
-                        q.contains("utility") ||
-                        q.contains("rent") ||
-                        q.contains("housing") ||
-                        q.contains("health") ||
-                        q.contains("medical") ||
-                        q.contains("education") ||
-                        q.contains("entertainment") ||
-                        q.contains("dining") ||
-                        q.contains("restaurant") ||
-                        q.contains("fuel") ||
-                        q.contains("pet") ||
-                        q.contains("pets") ||
-                        q.contains("other") ||
-                        q.contains("others");
-
-
-        return containsCategory;
+        return bestMatch;
     }
 
 
     // =====================================================
-    // STANDALONE CATEGORY
+    // CATEGORY QUESTION TYPE
     // =====================================================
 
-    private boolean isStandaloneCategory(String q) {
+    private boolean isLocalCategoryQuestion(
+            String question,
+            String category
+    ) {
 
-        return
-                q.equals("food") ||
-                        q.equals("grocery") ||
-                        q.equals("groceries") ||
-                        q.equals("transport") ||
-                        q.equals("transportation") ||
-                        q.equals("travel") ||
-                        q.equals("shopping") ||
-                        q.equals("bills") ||
-                        q.equals("bill") ||
-                        q.equals("utilities") ||
-                        q.equals("utility") ||
-                        q.equals("rent") ||
-                        q.equals("housing") ||
-                        q.equals("health") ||
-                        q.equals("medical") ||
-                        q.equals("education") ||
-                        q.equals("entertainment") ||
-                        q.equals("dining") ||
-                        q.equals("restaurant") ||
-                        q.equals("fuel") ||
-                        q.equals("pet") ||
-                        q.equals("pets") ||
-                        q.equals("other") ||
-                        q.equals("others");
+        if (
+                question == null ||
+                        category == null
+        ) {
+
+            return false;
+        }
+
+
+        // =================================================
+        // STANDALONE CATEGORY
+        // =================================================
+
+        if (
+                normalize(question)
+                        .equals(
+                                normalize(category)
+                        )
+        ) {
+
+            return true;
+        }
+
+
+        // =================================================
+        // EXPLICIT AI / ADVICE LANGUAGE
+        //
+        // These MUST remain AI.
+        // =================================================
+
+        if (containsAdviceIntent(question)) {
+
+            return false;
+        }
+
+
+        // =================================================
+        // FACTUAL CATEGORY QUESTION
+        // =================================================
+
+        if (
+                question.contains("how much") ||
+                        question.contains("how many") ||
+                        question.contains("amount") ||
+                        question.contains("spent") ||
+                        question.contains("spend") ||
+                        question.contains("expense") ||
+                        question.contains("expenses") ||
+                        question.contains("cost") ||
+                        question.contains("total")
+        ) {
+
+            return true;
+        }
+
+
+        // =================================================
+        // CATEGORY + SIMPLE FACTUAL WORD
+        // =================================================
+
+        String normalizedCategory =
+                normalize(category);
+
+
+        if (
+                question.equals(
+                        normalizedCategory
+                )
+        ) {
+
+            return true;
+        }
+
+
+        return false;
+    }
+
+
+    // =====================================================
+    // ADVICE / REASONING INTENT
+    // =====================================================
+
+    private boolean containsAdviceIntent(
+            String question
+    ) {
+
+        String[] adviceWords = {
+
+                "why",
+
+                "how can",
+
+                "how do i",
+
+                "should i",
+
+                "should",
+
+                "can i reduce",
+
+                "reduce",
+
+                "save",
+
+                "saving",
+
+                "improve",
+
+                "better",
+
+                "advice",
+
+                "recommend",
+
+                "recommendation",
+
+                "analyze",
+
+                "analysis",
+
+                "too much",
+
+                "too high",
+
+                "high spending",
+
+                "overspending",
+
+                "afford",
+
+                "habit",
+
+                "problem",
+
+                "help me",
+
+                "what should",
+
+                "what can i",
+
+                "ways to"
+        };
+
+
+        for (
+                String word
+                : adviceWords
+        ) {
+
+            if (
+                    question.contains(word)
+            ) {
+
+                return true;
+            }
+        }
+
+
+        return false;
+    }
+
+
+    // =====================================================
+    // WHOLE PHRASE MATCH
+    // =====================================================
+
+    private boolean containsWholePhrase(
+            String text,
+            String phrase
+    ) {
+
+        if (
+                text == null ||
+                        phrase == null ||
+                        phrase.trim().isEmpty()
+        ) {
+
+            return false;
+        }
+
+
+        String paddedText =
+                " "
+                        + text.trim()
+                        + " ";
+
+
+        String paddedPhrase =
+                " "
+                        + phrase.trim()
+                        + " ";
+
+
+        return paddedText.contains(
+                paddedPhrase
+        );
     }
 }

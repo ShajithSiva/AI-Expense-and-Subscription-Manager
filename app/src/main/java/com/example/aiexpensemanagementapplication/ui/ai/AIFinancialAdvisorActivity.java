@@ -538,7 +538,8 @@ public class AIFinancialAdvisorActivity
 
         AdvisorQuestionRouter.Route route =
                 questionRouter.route(
-                        question
+                        question,
+                        financialAnalysis.getCategoryTotals().keySet()
                 );
 
 
@@ -1505,14 +1506,19 @@ public class AIFinancialAdvisorActivity
 
 
     // =====================================================
-    // FIND REQUESTED CATEGORY
-    // =====================================================
+// FIND REQUESTED CATEGORY - DYNAMIC
+// =====================================================
 
     private String findRequestedCategory(
             String question
     ) {
 
-        if (question == null) {
+        if (
+                question == null ||
+                        financialAnalysis == null ||
+                        financialAnalysis.getCategoryTotals() == null
+        ) {
+
             return null;
         }
 
@@ -1525,28 +1531,20 @@ public class AIFinancialAdvisorActivity
                         );
 
 
-        Map<String, Double> categoryTotals =
-                financialAnalysis
-                        .getCategoryTotals();
-
-
-        if (
-                categoryTotals == null ||
-                        categoryTotals.isEmpty()
-        ) {
-
+        if (q.isEmpty()) {
             return null;
         }
 
 
-        // -------------------------------------------------
-        // FIRST:
-        // Try matching the actual database category name.
-        // -------------------------------------------------
+        // =================================================
+        // CHECK ACTUAL DATABASE CATEGORIES
+        // =================================================
 
         for (
                 String category
-                : categoryTotals.keySet()
+                : financialAnalysis
+                .getCategoryTotals()
+                .keySet()
         ) {
 
             if (category == null) {
@@ -1554,7 +1552,282 @@ public class AIFinancialAdvisorActivity
             }
 
 
+            String actualCategory =
+                    category.trim();
+
+
+            if (actualCategory.isEmpty()) {
+                continue;
+            }
+
+
             String normalizedCategory =
+                    actualCategory
+                            .toLowerCase(
+                                    Locale.ROOT
+                            );
+
+
+            // -------------------------------------------------
+            // EXACT MATCH
+            // -------------------------------------------------
+
+            if (
+                    q.equals(
+                            normalizedCategory
+                    )
+            ) {
+
+                return actualCategory;
+            }
+
+
+            // -------------------------------------------------
+            // CATEGORY INSIDE QUESTION
+            // -------------------------------------------------
+
+            if (
+                    containsWholePhrase(
+                            q,
+                            normalizedCategory
+                    )
+            ) {
+
+                return actualCategory;
+            }
+        }
+
+
+        // =================================================
+        // COMMON CATEGORY ALIASES
+        // =================================================
+
+        String aliasCategory =
+                findCategoryUsingAlias(
+                        q
+                );
+
+
+        if (aliasCategory != null) {
+
+            return aliasCategory;
+        }
+
+
+        return null;
+    }
+
+    // =====================================================
+// WHOLE PHRASE MATCH
+// =====================================================
+
+    private boolean containsWholePhrase(
+            String question,
+            String phrase
+    ) {
+
+        if (
+                question == null ||
+                        phrase == null ||
+                        phrase.trim().isEmpty()
+        ) {
+
+            return false;
+        }
+
+
+        String normalizedQuestion =
+                " "
+                        + question
+                        .trim()
+                        .toLowerCase(
+                                Locale.ROOT
+                        )
+                        + " ";
+
+
+        String normalizedPhrase =
+                " "
+                        + phrase
+                        .trim()
+                        .toLowerCase(
+                                Locale.ROOT
+                        )
+                        + " ";
+
+
+        return normalizedQuestion.contains(
+                normalizedPhrase
+        );
+    }
+
+    // =====================================================
+// CATEGORY ALIAS MATCHING
+// =====================================================
+
+    private String findCategoryUsingAlias(
+            String question
+    ) {
+
+        if (
+                financialAnalysis == null ||
+                        financialAnalysis.getCategoryTotals() == null
+        ) {
+
+            return null;
+        }
+
+
+        // =================================================
+        // TRANSPORT
+        // =================================================
+
+        if (
+                question.contains("transportation") ||
+                        question.contains("travel")
+        ) {
+
+            String category =
+                    findActualCategoryByName(
+                            "transport"
+                    );
+
+            if (category != null) {
+                return category;
+            }
+
+            category =
+                    findActualCategoryByName(
+                            "transportation"
+                    );
+
+            if (category != null) {
+                return category;
+            }
+        }
+
+
+        // =================================================
+        // BILL
+        // =================================================
+
+        if (
+                question.contains("bill") ||
+                        question.contains("bills")
+        ) {
+
+            String category =
+                    findActualCategoryByName(
+                            "bill"
+                    );
+
+            if (category != null) {
+                return category;
+            }
+
+            category =
+                    findActualCategoryByName(
+                            "bills"
+                    );
+
+            if (category != null) {
+                return category;
+            }
+
+            category =
+                    findActualCategoryByName(
+                            "utilities"
+                    );
+
+            if (category != null) {
+                return category;
+            }
+        }
+
+
+        // =================================================
+        // FOOD
+        // =================================================
+
+        if (
+                question.contains("food") ||
+                        question.contains("meals") ||
+                        question.contains("meal")
+        ) {
+
+            String category =
+                    findActualCategoryByName(
+                            "food"
+                    );
+
+            if (category != null) {
+                return category;
+            }
+        }
+
+
+        // =================================================
+        // SHOPPING
+        // =================================================
+
+        if (
+                question.contains("shopping") ||
+                        question.contains("shop")
+        ) {
+
+            String category =
+                    findActualCategoryByName(
+                            "shopping"
+                    );
+
+            if (category != null) {
+                return category;
+            }
+        }
+
+
+        return null;
+    }
+
+    // =====================================================
+// FIND ACTUAL CATEGORY BY NAME
+// =====================================================
+
+    private String findActualCategoryByName(
+            String requestedName
+    ) {
+
+        if (
+                requestedName == null ||
+                        financialAnalysis == null ||
+                        financialAnalysis.getCategoryTotals() == null
+        ) {
+
+            return null;
+        }
+
+
+        String normalizedRequested =
+                requestedName
+                        .trim()
+                        .toLowerCase(
+                                Locale.ROOT
+                        );
+
+
+        for (
+                String category
+                : financialAnalysis
+                .getCategoryTotals()
+                .keySet()
+        ) {
+
+            if (category == null) {
+                continue;
+            }
+
+
+            String normalizedActual =
                     category
                             .trim()
                             .toLowerCase(
@@ -1563,270 +1836,13 @@ public class AIFinancialAdvisorActivity
 
 
             if (
-                    !normalizedCategory.isEmpty() &&
-                            q.equals(
-                                    normalizedCategory
-                            )
+                    normalizedActual.equals(
+                            normalizedRequested
+                    )
             ) {
 
                 return category;
             }
-
-
-            if (
-                    !normalizedCategory.isEmpty() &&
-                            (
-                                    q.contains(
-                                            "spent on "
-                                                    + normalizedCategory
-                                    ) ||
-                                            q.contains(
-                                                    "spending on "
-                                                            + normalizedCategory
-                                            ) ||
-                                            q.contains(
-                                                    "expense on "
-                                                            + normalizedCategory
-                                            ) ||
-                                            q.contains(
-                                                    "expenses on "
-                                                            + normalizedCategory
-                                            ) ||
-                                            q.contains(
-                                                    "spend on "
-                                                            + normalizedCategory
-                                            ) ||
-                                            q.contains(
-                                                    "spent in "
-                                                            + normalizedCategory
-                                            ) ||
-                                            q.contains(
-                                                    "spending in "
-                                                            + normalizedCategory
-                                            ) ||
-                                            q.contains(
-                                                    "expense in "
-                                                            + normalizedCategory
-                                            ) ||
-                                            q.contains(
-                                                    "expenses in "
-                                                            + normalizedCategory
-                                            ) ||
-                                            q.contains(
-                                                    "spend in "
-                                                            + normalizedCategory
-                                            )
-                            )
-            ) {
-
-                return category;
-            }
-        }
-
-
-        // -------------------------------------------------
-        // COMMON ALIASES
-        // -------------------------------------------------
-
-        if (q.contains("food")) {
-
-            return findActualCategory(
-                    "food"
-            );
-        }
-
-
-        if (
-                q.contains("transport") ||
-                        q.contains("transportation")
-        ) {
-
-            return findActualCategory(
-                    "transport"
-            );
-        }
-
-
-        if (
-                q.contains("grocery") ||
-                        q.contains("groceries")
-        ) {
-
-            return findActualCategory(
-                    "grocery"
-            );
-        }
-
-
-        if (q.contains("shopping")) {
-
-            return findActualCategory(
-                    "shopping"
-            );
-        }
-
-
-        if (
-                q.contains("bill") ||
-                        q.contains("bills")
-        ) {
-
-            String result =
-                    findActualCategory(
-                            "bill"
-                    );
-
-
-            if (result != null) {
-                return result;
-            }
-
-
-            return findActualCategory(
-                    "bills"
-            );
-        }
-
-
-        if (
-                q.contains("utility") ||
-                        q.contains("utilities")
-        ) {
-
-            String result =
-                    findActualCategory(
-                            "utility"
-                    );
-
-
-            if (result != null) {
-                return result;
-            }
-
-
-            return findActualCategory(
-                    "utilities"
-            );
-        }
-
-
-        if (q.contains("rent")) {
-
-            return findActualCategory(
-                    "rent"
-            );
-        }
-
-
-        if (
-                q.contains("health") ||
-                        q.contains("medical")
-        ) {
-
-            String result =
-                    findActualCategory(
-                            "health"
-                    );
-
-
-            if (result != null) {
-                return result;
-            }
-
-
-            return findActualCategory(
-                    "medical"
-            );
-        }
-
-
-        if (q.contains("education")) {
-
-            return findActualCategory(
-                    "education"
-            );
-        }
-
-
-        if (q.contains("entertainment")) {
-
-            return findActualCategory(
-                    "entertainment"
-            );
-        }
-
-
-        if (
-                q.contains("dining") ||
-                        q.contains("restaurant")
-        ) {
-
-            String result =
-                    findActualCategory(
-                            "dining"
-                    );
-
-
-            if (result != null) {
-                return result;
-            }
-
-
-            return findActualCategory(
-                    "restaurant"
-            );
-        }
-
-
-        if (q.contains("fuel")) {
-
-            return findActualCategory(
-                    "fuel"
-            );
-        }
-
-
-        if (
-                q.contains("pet") ||
-                        q.contains("pets")
-        ) {
-
-            String result =
-                    findActualCategory(
-                            "pet"
-                    );
-
-
-            if (result != null) {
-                return result;
-            }
-
-
-            return findActualCategory(
-                    "pets"
-            );
-        }
-
-
-        if (
-                q.equals("other") ||
-                        q.equals("others")
-        ) {
-
-            String result =
-                    findActualCategory(
-                            "other"
-                    );
-
-
-            if (result != null) {
-                return result;
-            }
-
-
-            return findActualCategory(
-                    "others"
-            );
         }
 
 

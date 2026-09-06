@@ -2967,39 +2967,196 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    // =====================================================
+    // GET EXPENSE TOTALS BY CATEGORY
+    //
+    // Returns:
+    //
+    // CategoryID
+    // CategoryName
+    // Total
+    //
+    // Only the specified user's Expense transactions
+    // are included.
+    //
+    // Category information is obtained using a JOIN so
+    // FinancialAdvisorEngine does not need to perform
+    // a separate category lookup for every transaction
+    // category.
+    // =====================================================
+
     public Cursor getExpenseByCategory(int userId) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db =
+                this.getReadableDatabase();
 
-        return db.rawQuery(
+        String query =
 
                 "SELECT " +
 
+                        "c." + CATEGORY_ID +
+                        " AS CategoryID, " +
+
+                        "c." + CATEGORY_NAME +
+                        " AS CategoryName, " +
+
+                        "IFNULL(SUM(t." +
+                        AMOUNT +
+                        "),0) AS Total " +
+
+                        "FROM " +
+                        TABLE_TRANSACTION + " t " +
+
+                        "INNER JOIN " +
+                        TABLE_CATEGORY + " c " +
+
+                        " ON t." +
                         CATEGORY_ID +
 
-                        ", SUM(" +
+                        " = c." +
+                        CATEGORY_ID +
 
-                        AMOUNT +
+                        " WHERE t." +
+                        USER_ID +
+                        "=?" +
 
-                        ") AS Total FROM " +
-
-                        TABLE_TRANSACTION +
-
-                        " WHERE " +
-
-                        USER_ID + "=? AND " +
-
-                        TRANSACTION_TYPE + "='Expense'" +
+                        " AND t." +
+                        TRANSACTION_TYPE +
+                        "='Expense' " +
 
                         " GROUP BY " +
 
-                        CATEGORY_ID,
+                        "c." + CATEGORY_ID +
+                        ", c." + CATEGORY_NAME +
 
+                        " ORDER BY Total DESC";
+
+        return db.rawQuery(
+                query,
                 new String[]{
                         String.valueOf(userId)
-                });
-
+                }
+        );
     }
+
+    // =====================================================
+// GET EXPENSE CATEGORY ID BY NAME
+// =====================================================
+
+    public int getExpenseCategoryIdByName(
+            String categoryName
+    ) {
+
+        if (
+                categoryName == null ||
+                        categoryName.trim().isEmpty()
+        ) {
+
+            return -1;
+        }
+
+
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT " +
+                                CATEGORY_ID +
+
+                                " FROM " +
+                                TABLE_CATEGORY +
+
+                                " WHERE " +
+                                CATEGORY_TYPE +
+                                "=? AND " +
+
+                                "LOWER(" +
+                                CATEGORY_NAME +
+                                ") = LOWER(?) " +
+
+                                "LIMIT 1",
+
+                        new String[]{
+                                "Expense",
+                                categoryName.trim()
+                        }
+                );
+
+
+        int categoryId =
+                -1;
+
+
+        if (cursor.moveToFirst()) {
+
+            categoryId =
+                    cursor.getInt(0);
+        }
+
+
+        cursor.close();
+
+
+        return categoryId;
+    }
+
+// =====================================================
+// GET EXPENSE CATEGORY NAME BY ID
+// =====================================================
+
+    public String getExpenseCategoryNameById(
+            int categoryId
+    ) {
+
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT " +
+                                CATEGORY_NAME +
+
+                                " FROM " +
+                                TABLE_CATEGORY +
+
+                                " WHERE " +
+                                CATEGORY_ID +
+                                "=? AND " +
+
+                                CATEGORY_TYPE +
+                                "=? " +
+
+                                "LIMIT 1",
+
+                        new String[]{
+                                String.valueOf(categoryId),
+                                "Expense"
+                        }
+                );
+
+
+        String categoryName =
+                null;
+
+
+        if (cursor.moveToFirst()) {
+
+            categoryName =
+                    cursor.getString(0);
+        }
+
+
+        cursor.close();
+
+
+        return categoryName;
+    }
+
     public double getCategoryExpense(int userId, int categoryId) {
 
         SQLiteDatabase db = getReadableDatabase();

@@ -306,29 +306,39 @@ public class FinancialAdvisorEngine {
     }
 
 
-    // =====================================================
-    // CATEGORY ANALYSIS
-    // =====================================================
+// =====================================================
+// CATEGORY ANALYSIS
+// =====================================================
 
     private void loadCategoryAnalysis(
             int userId,
             FinancialAnalysis analysis) {
 
-        Cursor cursor =
-                null;
+        // -------------------------------------------------
+        // GET CATEGORY TOTALS MAP
+        // -------------------------------------------------
+
+        Map<String, Double> categoryTotals =
+                analysis.getCategoryTotals();
+
+
+        // -------------------------------------------------
+        // CLEAR OLD DATA
+        // -------------------------------------------------
+
+        if (categoryTotals != null) {
+
+            categoryTotals.clear();
+        }
+
+
+        Cursor cursor = null;
 
         try {
 
-            // =================================================
-            // CLEAR OLD CATEGORY DATA
-            // =================================================
-
-            analysis.clearCategoryTotals();
-
-
-            // =================================================
-            // GET CATEGORY EXPENSE DATA
-            // =================================================
+            // -------------------------------------------------
+            // GET CATEGORY TOTALS FROM DATABASE
+            // -------------------------------------------------
 
             cursor =
                     databaseHelper.getExpenseByCategory(
@@ -338,45 +348,26 @@ public class FinancialAdvisorEngine {
 
             if (cursor == null) {
 
-                setHighestCategory(
-                        analysis
+                analysis.setHighestCategory(
+                        "Other"
+                );
+
+                analysis.setHighestCategoryAmount(
+                        0.0
                 );
 
                 return;
             }
 
 
-            // =================================================
-            // FIND CATEGORY ID COLUMN
-            // =================================================
+            // -------------------------------------------------
+            // FIND COLUMN INDEXES
+            // -------------------------------------------------
 
-            int categoryIdIndex =
+            int categoryNameIndex =
                     cursor.getColumnIndex(
-                            "CategoryID"
+                            "CategoryName"
                     );
-
-
-            if (categoryIdIndex == -1) {
-
-                categoryIdIndex =
-                        cursor.getColumnIndex(
-                                "CATEGORY_ID"
-                        );
-            }
-
-
-            if (categoryIdIndex == -1) {
-
-                categoryIdIndex =
-                        cursor.getColumnIndex(
-                                "category_id"
-                        );
-            }
-
-
-            // =================================================
-            // FIND TOTAL COLUMN
-            // =================================================
 
             int totalIndex =
                     cursor.getColumnIndex(
@@ -384,50 +375,24 @@ public class FinancialAdvisorEngine {
                     );
 
 
-            if (totalIndex == -1) {
-
-                totalIndex =
-                        cursor.getColumnIndex(
-                                "TOTAL"
-                        );
-            }
-
-
-            if (totalIndex == -1) {
-
-                totalIndex =
-                        cursor.getColumnIndex(
-                                "total"
-                        );
-            }
-
-
-            // =================================================
-            // INVALID CURSOR
-            // =================================================
-
             if (
-                    categoryIdIndex == -1 ||
+                    categoryNameIndex == -1 ||
                             totalIndex == -1
             ) {
-
-                setHighestCategory(
-                        analysis
-                );
 
                 return;
             }
 
 
-            // =================================================
-            // READ CATEGORY TOTALS
-            // =================================================
+            // -------------------------------------------------
+            // READ CATEGORY DATA
+            // -------------------------------------------------
 
             while (cursor.moveToNext()) {
 
-                int categoryId =
-                        cursor.getInt(
-                                categoryIdIndex
+                String categoryName =
+                        cursor.getString(
+                                categoryNameIndex
                         );
 
 
@@ -437,51 +402,63 @@ public class FinancialAdvisorEngine {
                         );
 
 
-                // Ignore zero/negative values
-
-                if (amount <= 0) {
-                    continue;
-                }
-
-
-                // =================================================
-                // GET CATEGORY NAME
-                // =================================================
-
-                String categoryName =
-                        getCategoryName(
-                                categoryId
-                        );
-
+                // -------------------------------------------------
+                // HANDLE EMPTY CATEGORY
+                // -------------------------------------------------
 
                 if (
                         categoryName == null ||
                                 categoryName.trim().isEmpty()
                 ) {
 
+                    categoryName = "Other";
+
+                } else {
+
                     categoryName =
-                            "Other";
+                            categoryName.trim();
                 }
 
 
-                categoryName =
-                        categoryName.trim();
+                // -------------------------------------------------
+                // IGNORE INVALID AMOUNTS
+                // -------------------------------------------------
+
+                if (amount <= 0) {
+                    continue;
+                }
 
 
-                // =================================================
-                // ADD CATEGORY AMOUNT
-                // =================================================
+                // -------------------------------------------------
+                // ADD TO FINANCIAL ANALYSIS
+                // -------------------------------------------------
 
-                analysis.addCategoryAmount(
-                        categoryName,
-                        amount
-                );
+                if (categoryTotals != null) {
+
+                    Double current =
+                            categoryTotals.get(
+                                    categoryName
+                            );
+
+
+                    if (current == null) {
+
+                        current = 0.0;
+                    }
+
+
+                    categoryTotals.put(
+                            categoryName,
+                            current + amount
+                    );
+                }
             }
 
 
         } catch (Exception e) {
 
             e.printStackTrace();
+
 
         } finally {
 
@@ -492,12 +469,53 @@ public class FinancialAdvisorEngine {
         }
 
 
-        // =================================================
-        // FIND HIGHEST CATEGORY
-        // =================================================
+        // =====================================================
+        // FIND HIGHEST SPENDING CATEGORY
+        // =====================================================
 
-        setHighestCategory(
-                analysis
+        String highestCategory =
+                "Other";
+
+
+        double highestAmount =
+                0.0;
+
+
+        if (categoryTotals != null) {
+
+            for (
+                    Map.Entry<String, Double> entry
+                    : categoryTotals.entrySet()
+            ) {
+
+                if (
+                        entry.getValue() != null &&
+                                entry.getValue() >
+                                        highestAmount
+                ) {
+
+                    highestAmount =
+                            entry.getValue();
+
+
+                    highestCategory =
+                            entry.getKey();
+                }
+            }
+        }
+
+
+        // =====================================================
+        // SAVE HIGHEST CATEGORY
+        // =====================================================
+
+        analysis.setHighestCategory(
+                highestCategory
+        );
+
+
+        analysis.setHighestCategoryAmount(
+                highestAmount
         );
     }
 
@@ -562,149 +580,6 @@ public class FinancialAdvisorEngine {
         );
     }
 
-
-    // =====================================================
-    // GET CATEGORY NAME
-    // =====================================================
-
-    private String getCategoryName(
-            int categoryId) {
-
-        Cursor cursor =
-                null;
-
-
-        try {
-
-            cursor =
-                    databaseHelper.getExpenseCategories();
-
-
-            if (cursor == null) {
-
-                return "Other";
-            }
-
-
-            // =================================================
-            // CATEGORY ID COLUMN
-            // =================================================
-
-            int idIndex =
-                    cursor.getColumnIndex(
-                            "CategoryID"
-                    );
-
-
-            if (idIndex == -1) {
-
-                idIndex =
-                        cursor.getColumnIndex(
-                                "CATEGORY_ID"
-                        );
-            }
-
-
-            if (idIndex == -1) {
-
-                idIndex =
-                        cursor.getColumnIndex(
-                                "category_id"
-                        );
-            }
-
-
-            // =================================================
-            // CATEGORY NAME COLUMN
-            // =================================================
-
-            int nameIndex =
-                    cursor.getColumnIndex(
-                            "CategoryName"
-                    );
-
-
-            if (nameIndex == -1) {
-
-                nameIndex =
-                        cursor.getColumnIndex(
-                                "CATEGORY_NAME"
-                        );
-            }
-
-
-            if (nameIndex == -1) {
-
-                nameIndex =
-                        cursor.getColumnIndex(
-                                "category_name"
-                        );
-            }
-
-
-            if (
-                    idIndex == -1 ||
-                            nameIndex == -1
-            ) {
-
-                return "Other";
-            }
-
-
-            // =================================================
-            // FIND CATEGORY
-            // =================================================
-
-            while (cursor.moveToNext()) {
-
-                int id =
-                        cursor.getInt(
-                                idIndex
-                        );
-
-
-                if (id == categoryId) {
-
-                    String name =
-                            cursor.getString(
-                                    nameIndex
-                            );
-
-
-                    if (
-                            name != null &&
-                                    !name.trim().isEmpty()
-                    ) {
-
-                        return name.trim();
-                    }
-
-
-                    return "Other";
-                }
-            }
-
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        } finally {
-
-            if (cursor != null) {
-
-                cursor.close();
-            }
-        }
-
-
-        return "Other";
-    }
-
-
-    // =====================================================
-    // MONTHLY TREND
-    // =====================================================
 
     private void loadMonthlyTrend(
             int userId,
