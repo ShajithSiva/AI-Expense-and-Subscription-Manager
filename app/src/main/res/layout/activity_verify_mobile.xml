@@ -1,140 +1,369 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#F5F5F5">
+    android:background="#F8FAFC">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Logo -->
-        <ImageView
-            android:src="@drawable/logo"
-            android:layout_width="128dp"
-            android:layout_height="128dp"
-            android:layout_gravity="center_horizontal"
-            android:contentDescription="Logo"/>
-
-        <!-- Title -->
-        <TextView
-            android:text="Verify Mobile Number"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="32dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <!-- Subtitle -->
-        <TextView
-            android:text="Enter your mobile number to receive a one-time verification code to secure your vault."
-            android:textSize="16sp"
-            android:textColor="#666666"
-            android:layout_marginTop="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <!-- Label -->
-        <TextView
-            android:text="PHONE NUMBER"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#888888"
-            android:layout_marginTop="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <!-- Phone Input Card -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="8dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="28dp">
 
-            <com.hbb20.CountryCodePicker
-                android:id="@+id/countryCodePicker"
+
+            <!-- ===================================================== -->
+            <!-- Logo -->
+            <!-- ===================================================== -->
+
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="82dp"
+                android:layout_height="82dp"
+                android:src="@drawable/logo"
+                android:scaleType="fitCenter"
+                android:contentDescription="ExpenseVault Logo" />
+
+
+            <!-- Brand -->
+
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingStart="8dp"
-                app:ccp_defaultNameCode="LK"
-                app:ccp_showFlag="true"
-                app:ccp_showPhoneCode="true"
-                app:ccp_showNameCode="false"
-                app:ccp_autoDetectCountry="false"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="ExpenseVault"
+                android:textColor="#22C55E"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.04" />
 
-            <EditText
-                android:id="@+id/etPhone"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:hint="771234567"
-                android:inputType="phone"
-                android:maxLength="15"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:textSize="16sp" />
+
+            <!-- ===================================================== -->
+            <!-- Progress -->
+            <!-- ===================================================== -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="4dp"
+                    android:layout_weight="1"
+                    android:background="#22C55E" />
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="4dp"
+                    android:background="@android:color/transparent" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="4dp"
+                    android:layout_weight="1"
+                    android:background="#E2E8F0" />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="STEP 1 OF 2"
+                android:textColor="#16A34A"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
+
+
+            <!-- ===================================================== -->
+            <!-- Title -->
+            <!-- ===================================================== -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:gravity="center"
+                android:text="Verify your mobile number"
+                android:textColor="#111827"
+                android:textSize="27sp"
+                android:textStyle="bold" />
+
+
+            <!-- Subtitle -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:gravity="center"
+                android:lineSpacingExtra="3dp"
+                android:text="We'll send a one-time verification code to confirm your phone number and help secure your ExpenseVault account."
+                android:textColor="#64748B"
+                android:textSize="14sp" />
+
+
+            <!-- ===================================================== -->
+            <!-- Phone Number Card -->
+            <!-- ===================================================== -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+
+                    <!-- Label -->
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MOBILE NUMBER"
+                        android:textColor="#64748B"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.06" />
+
+
+                    <!-- Input Container -->
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_input_rounded"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="8dp">
+
+
+                        <!-- Country Code -->
+
+                        <com.hbb20.CountryCodePicker
+                            android:id="@+id/countryCodePicker"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="2dp"
+                            app:ccp_defaultNameCode="LK"
+                            app:ccp_showFlag="true"
+                            app:ccp_showPhoneCode="true"
+                            app:ccp_showNameCode="false"
+                            app:ccp_autoDetectCountry="false" />
+
+
+                        <!-- Divider -->
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="28dp"
+                            android:background="#CBD5E1" />
+
+
+                        <!-- Phone -->
+
+                        <EditText
+                            android:id="@+id/etPhone"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:hint="77 123 4567"
+                            android:inputType="phone"
+                            android:maxLength="15"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="8dp"
+                            android:textColor="#111827"
+                            android:textColorHint="#94A3B8"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+
+                    <!-- Helper Text -->
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="9dp"
+                        android:text="Make sure you have access to this number."
+                        android:textColor="#94A3B8"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- ===================================================== -->
+            <!-- Security Card -->
+            <!-- ===================================================== -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                app:cardBackgroundColor="#F0FDF4"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#BBF7D0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="15dp">
+
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="#DCFCE7">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_lock_lock"
+                            android:contentDescription="Security" />
+
+                    </FrameLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Secure verification"
+                            android:textColor="#166534"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Your phone number is used to verify your account."
+                            android:textColor="#4B7A5A"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- ===================================================== -->
+            <!-- Send OTP -->
+            <!-- ===================================================== -->
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSendOtp"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="22dp"
+                android:text="Send Verification Code"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="#22C55E"
+                app:cornerRadius="14dp"
+                app:elevation="0dp" />
+
+
+            <!-- ===================================================== -->
+            <!-- Login -->
+            <!-- ===================================================== -->
+
+            <TextView
+                android:id="@+id/tvLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:padding="8dp"
+                android:text="Already registered?  Login"
+                android:textColor="#64748B"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+
+            <!-- ===================================================== -->
+            <!-- Footer -->
+            <!-- ===================================================== -->
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:src="@android:drawable/ic_lock_lock"
+                    android:contentDescription="Secure" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="YOUR SECURITY MATTERS"
+                    android:textColor="#94A3B8"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <!-- Button -->
-        <Button
-            android:id="@+id/btnSendOtp"
-            android:text="Send OTP →"
-            android:textAllCaps="false"
-            android:backgroundTint="#22C55E"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="24dp"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"/>
+    </androidx.core.widget.NestedScrollView>
 
-        <!-- Security text -->
-        <TextView
-            android:text="Secure 256-bit encrypted verification"
-            android:textSize="12sp"
-            android:textColor="#666666"
-            android:layout_marginTop="12dp"
-            android:drawableStart="@android:drawable/ic_lock_lock"
-            android:drawablePadding="6dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-
-        <!-- Step pill -->
-        <TextView
-            android:text="Step 1 of 2"
-            android:textSize="12sp"
-            android:textColor="#22C55E"
-            android:background="@drawable/back1"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="85dp"
-            android:layout_height="25dp"/>
-
-        <!-- Login -->
-        <TextView
-            android:text="Already registered? Login"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <!-- Footer -->
-        <TextView
-            android:text="POWERED BY CENTRAL BANK COMPLIANCE"
-            android:textSize="10sp"
-            android:textColor="#BBBBBB"
-            android:layout_marginTop="24dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
