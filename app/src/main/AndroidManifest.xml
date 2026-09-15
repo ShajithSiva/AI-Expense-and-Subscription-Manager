@@ -153,6 +153,15 @@
         <activity
             android:name=".ui.family.SetFamilyBudgetActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.profile.HelpSupportActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.TermsConditionsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.PrivacyPolicyActivity"
+            android:exported="false" />
 
         <receiver
             android:name=".notification.ReminderReceiver"

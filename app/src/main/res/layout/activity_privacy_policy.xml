@@ -26,7 +26,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="48dp"
@@ -37,7 +36,6 @@
             android:src="@drawable/ic_back_arrow"
             app:tint="#111827" />
 
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -47,7 +45,6 @@
             android:textColor="#111827"
             android:textSize="20sp"
             android:textStyle="bold" />
-
 
         <Space
             android:layout_width="48dp"
@@ -73,7 +70,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topAppBar">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -92,9 +88,7 @@
             <FrameLayout
                 android:layout_width="127dp"
                 android:layout_height="102dp"
-                android:background="@drawable/privacy">
-
-            </FrameLayout>
+                android:background="@drawable/privacy" />
 
 
             <!-- ================================================= -->
@@ -124,7 +118,7 @@
                 android:layout_marginEnd="22dp"
                 android:gravity="center"
                 android:lineSpacingExtra="3dp"
-                android:text="ExpenseVault is designed to help you manage your finances while protecting your personal information."
+                android:text="ExpenseVault helps you manage your finances while providing information about how your personal and financial data is collected, used and protected."
                 android:textColor="#64748B"
                 android:textSize="14sp" />
 
@@ -143,7 +137,6 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-
                 <ImageView
                     android:layout_width="19dp"
                     android:layout_height="19dp"
@@ -151,12 +144,11 @@
                     android:src="@drawable/calendar"
                     app:tint="@color/black" />
 
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="Last updated: July 5, 2026"
+                    android:text="Last updated: September 15, 2026"
                     android:textColor="#16A34A"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -165,7 +157,7 @@
 
 
             <!-- ================================================= -->
-            <!-- PRIVACY OVERVIEW TITLE                            -->
+            <!-- PRIVACY OVERVIEW                                  -->
             <!-- ================================================= -->
 
             <TextView
@@ -178,10 +170,6 @@
                 android:textStyle="bold" />
 
 
-            <!-- ================================================= -->
-            <!-- PRIVACY OVERVIEW CARD                             -->
-            <!-- ================================================= -->
-
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -192,7 +180,6 @@
                 app:strokeColor="#BBF7D0"
                 app:strokeWidth="1dp">
 
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -200,23 +187,20 @@
                     android:orientation="horizontal"
                     android:padding="18dp">
 
-
                     <FrameLayout
                         android:layout_width="58dp"
                         android:layout_height="58dp"
                         android:background="@drawable/bg_notification_icon">
 
-
                         <ImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center"
-                            android:contentDescription="Data Control"
+                            android:contentDescription="Data Protection"
                             android:src="@drawable/ic_lock"
                             app:tint="#22C55E" />
 
                     </FrameLayout>
-
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -224,7 +208,6 @@
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
-
 
                         <TextView
                             android:layout_width="match_parent"
@@ -234,13 +217,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
-
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:lineSpacingExtra="2dp"
-                            android:text="We are committed to protecting your personal and financial information."
+                            android:text="We explain what information ExpenseVault uses and how it supports the application's financial management features."
                             android:textColor="#64748B"
                             android:textSize="13sp" />
 
@@ -252,7 +234,7 @@
 
 
             <!-- ================================================= -->
-            <!-- PRIVACY POLICY TITLE                              -->
+            <!-- PRIVACY POLICY                                    -->
             <!-- ================================================= -->
 
             <TextView
@@ -265,10 +247,6 @@
                 android:textStyle="bold" />
 
 
-            <!-- ================================================= -->
-            <!-- PRIVACY POLICY CARD                               -->
-            <!-- ================================================= -->
-
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -279,23 +257,19 @@
                 app:strokeColor="#E2E8F0"
                 app:strokeWidth="1dp">
 
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
 
-                    <!-- ================================================= -->
-                    <!-- SECTION 01                                       -->
-                    <!-- ================================================= -->
+                    <!-- SECTION 01 -->
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:padding="20dp">
-
 
                         <TextView
                             android:layout_width="44dp"
@@ -307,14 +281,12 @@
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
-
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -324,20 +296,18 @@
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
-
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:lineSpacingExtra="3dp"
-                                android:text="We may collect account information, transaction details, subscription information, financial records and app usage data required to provide ExpenseVault features."
+                                android:text="ExpenseVault may collect account information, transaction details, subscription information, financial records and app usage information required to provide its features."
                                 android:textColor="#64748B"
                                 android:textSize="13sp" />
 
                         </LinearLayout>
 
                     </LinearLayout>
-
 
                     <View
                         android:layout_width="match_parent"
@@ -347,16 +317,13 @@
                         android:background="#E5E7EB" />
 
 
-                    <!-- ================================================= -->
-                    <!-- SECTION 02                                       -->
-                    <!-- ================================================= -->
+                    <!-- SECTION 02 -->
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:padding="20dp">
-
 
                         <TextView
                             android:layout_width="44dp"
@@ -368,14 +335,12 @@
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
-
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -385,20 +350,18 @@
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
-
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:lineSpacingExtra="3dp"
-                                android:text="Your information is used to manage expenses, analyze spending patterns, detect subscriptions, provide financial insights and improve your experience."
+                                android:text="Your information is used to manage expenses and income, analyze spending patterns, detect subscriptions, provide financial insights and support other ExpenseVault features."
                                 android:textColor="#64748B"
                                 android:textSize="13sp" />
 
                         </LinearLayout>
 
                     </LinearLayout>
-
 
                     <View
                         android:layout_width="match_parent"
@@ -408,16 +371,13 @@
                         android:background="#E5E7EB" />
 
 
-                    <!-- ================================================= -->
-                    <!-- SECTION 03                                       -->
-                    <!-- ================================================= -->
+                    <!-- SECTION 03 -->
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:padding="20dp">
-
 
                         <TextView
                             android:layout_width="44dp"
@@ -429,14 +389,12 @@
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
-
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -445,7 +403,6 @@
                                 android:textColor="#111827"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
-
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -460,7 +417,6 @@
 
                     </LinearLayout>
 
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -469,16 +425,13 @@
                         android:background="#E5E7EB" />
 
 
-                    <!-- ================================================= -->
-                    <!-- SECTION 04                                       -->
-                    <!-- ================================================= -->
+                    <!-- SECTION 04 -->
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:padding="20dp">
-
 
                         <TextView
                             android:layout_width="44dp"
@@ -490,14 +443,12 @@
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
-
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -507,20 +458,18 @@
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
-
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:lineSpacingExtra="3dp"
-                                android:text="Your personal financial information remains private unless you choose to share specific information through ExpenseVault family features."
+                                android:text="Family features may allow financial information to be shared with authorized family members according to the sharing and access controls provided by ExpenseVault."
                                 android:textColor="#64748B"
                                 android:textSize="13sp" />
 
                         </LinearLayout>
 
                     </LinearLayout>
-
 
                     <View
                         android:layout_width="match_parent"
@@ -530,16 +479,13 @@
                         android:background="#E5E7EB" />
 
 
-                    <!-- ================================================= -->
-                    <!-- SECTION 05                                       -->
-                    <!-- ================================================= -->
+                    <!-- SECTION 05 -->
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:padding="20dp">
-
 
                         <TextView
                             android:layout_width="44dp"
@@ -551,14 +497,12 @@
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
-
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -568,20 +512,18 @@
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
-
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:lineSpacingExtra="3dp"
-                                android:text="We use security features and account protection measures designed to help protect your personal and financial information."
+                                android:text="ExpenseVault uses account authentication and application security measures intended to help protect stored personal and financial information."
                                 android:textColor="#64748B"
                                 android:textSize="13sp" />
 
                         </LinearLayout>
 
                     </LinearLayout>
-
 
                     <View
                         android:layout_width="match_parent"
@@ -591,16 +533,13 @@
                         android:background="#E5E7EB" />
 
 
-                    <!-- ================================================= -->
-                    <!-- SECTION 06                                       -->
-                    <!-- ================================================= -->
+                    <!-- SECTION 06 -->
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:padding="20dp">
-
 
                         <TextView
                             android:layout_width="44dp"
@@ -612,14 +551,12 @@
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
-
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -629,13 +566,12 @@
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
-
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:lineSpacingExtra="3dp"
-                                android:text="You can review and manage certain account, notification, security and privacy preferences available within ExpenseVault."
+                                android:text="You can review and manage available account, notification, security and other preferences through the settings provided in ExpenseVault."
                                 android:textColor="#64748B"
                                 android:textSize="13sp" />
 
@@ -649,7 +585,7 @@
 
 
             <!-- ================================================= -->
-            <!-- YOUR RIGHTS TITLE                                 -->
+            <!-- YOUR RIGHTS                                      -->
             <!-- ================================================= -->
 
             <TextView
@@ -662,10 +598,6 @@
                 android:textStyle="bold" />
 
 
-            <!-- ================================================= -->
-            <!-- YOUR RIGHTS CARD                                  -->
-            <!-- ================================================= -->
-
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -675,7 +607,6 @@
                 app:cardElevation="0dp"
                 app:strokeColor="#E2E8F0"
                 app:strokeWidth="1dp">
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -687,14 +618,11 @@
                     android:paddingBottom="18dp">
 
 
-                    <!-- RIGHT 1 -->
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-
 
                         <TextView
                             android:layout_width="30dp"
@@ -705,7 +633,6 @@
                             android:textColor="#16A34A"
                             android:textSize="16sp"
                             android:textStyle="bold" />
-
 
                         <TextView
                             android:layout_width="0dp"
@@ -720,14 +647,11 @@
                     </LinearLayout>
 
 
-                    <!-- RIGHT 2 -->
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-
 
                         <TextView
                             android:layout_width="30dp"
@@ -738,7 +662,6 @@
                             android:textColor="#16A34A"
                             android:textSize="16sp"
                             android:textStyle="bold" />
-
 
                         <TextView
                             android:layout_width="0dp"
@@ -753,14 +676,11 @@
                     </LinearLayout>
 
 
-                    <!-- RIGHT 3 -->
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-
 
                         <TextView
                             android:layout_width="30dp"
@@ -772,13 +692,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
-
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="14dp"
                             android:layout_weight="1"
-                            android:text="Manage your privacy preferences"
+                            android:text="Manage available privacy preferences"
                             android:textColor="#334155"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -786,14 +705,11 @@
                     </LinearLayout>
 
 
-                    <!-- RIGHT 4 -->
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-
 
                         <TextView
                             android:layout_width="30dp"
@@ -805,13 +721,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
-
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="14dp"
                             android:layout_weight="1"
-                            android:text="Request account and data deletion"
+                            android:text="Request removal of your account data"
                             android:textColor="#334155"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -824,7 +739,7 @@
 
 
             <!-- ================================================= -->
-            <!-- PRIVACY CONTACT TITLE                             -->
+            <!-- PRIVACY CONTACT                                   -->
             <!-- ================================================= -->
 
             <TextView
@@ -837,10 +752,6 @@
                 android:textStyle="bold" />
 
 
-            <!-- ================================================= -->
-            <!-- CONTACT PRIVACY TEAM CARD                         -->
-            <!-- ================================================= -->
-
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -850,7 +761,6 @@
                 app:cardElevation="0dp"
                 app:strokeColor="#BBF7D0"
                 app:strokeWidth="1dp">
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -862,12 +772,10 @@
                     android:paddingEnd="22dp"
                     android:paddingBottom="24dp">
 
-
                     <FrameLayout
                         android:layout_width="76dp"
                         android:layout_height="76dp"
                         android:background="@drawable/contact_privacy_team">
-
 
                         <ImageView
                             android:layout_width="40dp"
@@ -937,13 +845,11 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="horizontal">
-
 
                     <ImageView
                         android:layout_width="18dp"
@@ -951,7 +857,6 @@
                         android:contentDescription="Privacy Protected"
                         android:src="@drawable/ic_lock"
                         app:tint="#22C55E" />
-
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -963,7 +868,6 @@
                         android:textStyle="bold" />
 
                 </LinearLayout>
-
 
                 <TextView
                     android:layout_width="wrap_content"

@@ -54,6 +54,10 @@ public class ProfileActivity extends AppCompatActivity{
     private LinearLayout layoutBudget;
     private LinearLayout layoutSubscription;
 
+    private LinearLayout layoutHelp;
+    private LinearLayout layoutTerms;
+    private LinearLayout layoutPrivacy;
+
     private DatabaseHelper databaseHelper;
 
     private FirebaseAuth mAuth;
@@ -118,6 +122,12 @@ public class ProfileActivity extends AppCompatActivity{
         layoutBudget = findViewById(R.id.layoutBudget);
 
         layoutSubscription = findViewById(R.id.layoutSubscription);
+
+        layoutHelp = findViewById(R.id.layoutHelp);
+
+        layoutTerms = findViewById(R.id.layoutTerms);
+
+        layoutPrivacy = findViewById(R.id.layoutPrivacy);
 
     }
     private void loadProfile() {
@@ -327,6 +337,41 @@ public class ProfileActivity extends AppCompatActivity{
                     this,
                     BudgetActivity.class));
 
+        });
+
+        layoutHelp.setOnClickListener(
+                v -> {
+
+                    Intent intent =
+                            new Intent(
+                                    ProfileActivity.this,
+                                    HelpSupportActivity.class
+                            );
+
+                    startActivity(intent);
+                }
+        );
+
+        layoutTerms.setOnClickListener(v -> {
+
+            Intent intent =
+                    new Intent(
+                            ProfileActivity.this,
+                            TermsConditionsActivity.class
+                    );
+
+            startActivity(intent);
+        });
+
+        layoutPrivacy.setOnClickListener(v -> {
+
+            Intent intent =
+                    new Intent(
+                            ProfileActivity.this,
+                            PrivacyPolicyActivity.class
+                    );
+
+            startActivity(intent);
         });
 
     }
