@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
+import com.example.aiexpensemanagementapplication.ui.profile.TermsConditionsActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
     private TextView tvLogin;
+    private TextView tvTerms;
 
     private static final String TEMP_PASSWORD = "Temp@123";
 
@@ -44,6 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
         cbTerms = findViewById(R.id.cbTerms);
         btnVerifyEmail = findViewById(R.id.btnVerifyEmail);
         tvLogin = findViewById(R.id.tvLogin);
+        tvTerms = findViewById(R.id.tvTerms);
 
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
@@ -54,6 +57,14 @@ public class RegisterActivity extends AppCompatActivity {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
             finish(); // Optional: closes RegisterActivity
+        });
+
+        tvTerms.setOnClickListener(v -> {
+            Intent intent = new Intent(
+                    RegisterActivity.this,
+                    TermsConditionsActivity.class
+            );
+            startActivity(intent);
         });
     }
 

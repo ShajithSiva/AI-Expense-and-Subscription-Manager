@@ -101,7 +101,7 @@
                     android:background="@drawable/badge_red"
                     android:gravity="center"
                     android:text="0"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:textSize="10sp"
                     android:textStyle="bold"
                     android:visibility="gone"

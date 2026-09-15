@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -10,83 +9,57 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
         <!-- Logo -->
         <ImageView
+            android:id="@+id/imgLogo"
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="24dp"
             android:src="@drawable/logo"
             android:contentDescription="App Logo" />
 
         <!-- Welcome -->
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Welcome Back"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#111827"
-            android:layout_marginTop="32dp"
-            android:gravity="center" />
+            android:layout_marginBottom="4dp" />
 
         <!-- Subtitle -->
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Login to manage your finances securely."
             android:textSize="14sp"
             android:textColor="#6B7280"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="24dp"
-            android:gravity="center" />
+            android:layout_marginBottom="16dp" />
 
         <!-- Email -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilEmail"
+        <EditText
+            android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:boxBackgroundMode="filled"
-            app:boxBackgroundColor="#E5E7EB"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="name@example.com"
-                android:inputType="textEmailAddress"
-                android:padding="16dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            android:hint="Email Address"
+            android:inputType="textEmailAddress"
+            android:layout_marginTop="8dp" />
 
         <!-- Password -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilPassword"
+        <EditText
+            android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:endIconMode="password_toggle"
-            app:boxBackgroundMode="filled"
-            app:boxBackgroundColor="#E5E7EB"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:padding="16dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:layout_marginTop="12dp" />
 
         <!-- Forgot Password -->
         <TextView
@@ -97,29 +70,32 @@
             android:textColor="#22C55E"
             android:textSize="13sp"
             android:layout_gravity="end"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true" />
 
         <!-- Login Button -->
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
             android:text="Login →"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:backgroundTint="#4CAF50"
-            android:layout_marginTop="24dp"/>
+            android:layout_marginTop="24dp" />
 
         <!-- Register -->
         <TextView
             android:id="@+id/tvRegister"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Don't have an account? Register"
             android:textSize="14sp"
             android:textColor="#6B7280"
-            android:gravity="center"
-            android:layout_marginTop="24dp"/>
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:focusable="true" />
 
     </LinearLayout>
 

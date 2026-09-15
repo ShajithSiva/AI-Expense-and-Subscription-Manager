@@ -321,7 +321,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/bg_insight" />
+                        android:src="@drawable/income1" />
 
                     <LinearLayout
                         android:layout_width="0dp"
