@@ -174,7 +174,8 @@ public class PersonalDashboardActivity extends AppCompatActivity {
 
         int userId = databaseHelper.getUserIdByEmail(currentUser.getEmail());
 
-        ReminderScheduler scheduler = new ReminderScheduler(this);
+        ReminderScheduler scheduler =
+                new ReminderScheduler(this);
 
         scheduler.checkBudgetReminder(
                 databaseHelper,
@@ -182,6 +183,11 @@ public class PersonalDashboardActivity extends AppCompatActivity {
         );
 
         scheduler.checkSubscriptionReminder(
+                databaseHelper,
+                userId
+        );
+
+        scheduler.applySubscriptionSettings(
                 databaseHelper,
                 userId
         );

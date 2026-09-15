@@ -128,124 +128,183 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardCornerRadius="20dp"
+                app:cardCornerRadius="22dp"
                 app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:weightSum="3">
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                    <!-- Expenses -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <!-- Section Title -->
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:text="THIS MONTH"
+                        android:textColor="#6B7280"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08"
+                        android:layout_marginBottom="16dp"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Expenses"
-                            android:textColor="#6B7280"
-                            android:textStyle="bold"/>
 
-                        <TextView
-                            android:id="@+id/tvExpense"
-                            android:layout_width="wrap_content"
+                    <!-- Expenses + Balance -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Expenses -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Rs 0"
-                            android:textSize="18sp"
-                            android:textStyle="bold"/>
-                        <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:paddingEnd="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Expenses"
+                                android:textColor="#6B7280"
+                                android:textSize="14sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/tvExpense"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="Rs. 0.00"
+                                android:textColor="#111827"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="14sp"
+                                android:autoSizeMaxTextSize="20sp"
+                                android:autoSizeStepGranularity="1sp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="This Month"
+                                android:textColor="#6B7280"
+                                android:textSize="12sp"/>
+
+                        </LinearLayout>
+
+
+                        <!-- Vertical Divider -->
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="72dp"
+                            android:background="#E5E7EB"/>
+
+
+                        <!-- Balance -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="This Month"
-                            android:layout_marginTop="5dp"
-                            android:textColor="#6B7280"
-                            android:textStyle="bold"/>
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:paddingStart="18dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Balance"
+                                android:textColor="#6B7280"
+                                android:textSize="14sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/tvBalance"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="Rs. 0.00"
+                                android:textColor="#111827"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="14sp"
+                                android:autoSizeMaxTextSize="20sp"
+                                android:autoSizeStepGranularity="1sp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="Available"
+                                android:textColor="#6B7280"
+                                android:textSize="12sp"/>
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
+
+                    <!-- Horizontal Divider -->
                     <View
-                        android:layout_width="1dp"
-                        android:layout_height="80dp"
-                        android:background="#D1D5DB"/>
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="#E5E7EB"/>
 
-                    <!-- Balance -->
+
+                    <!-- Remaining Budget -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Left -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Balance"
-                            android:textColor="#6B7280"
-                            android:textStyle="bold"/>
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/tvBalance"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Rs 0"
-                            android:textSize="18sp"
-                            android:textStyle="bold"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Remaining Budget"
+                                android:textColor="#6B7280"
+                                android:textSize="14sp"
+                                android:textStyle="bold"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Available"
-                            android:layout_marginTop="5dp"
-                            android:textColor="#6B7280"
-                            android:textStyle="bold"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="Budget remaining this month"
+                                android:textColor="#6B7280"
+                                android:textSize="12sp"/>
 
-                    </LinearLayout>
+                        </LinearLayout>
 
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="80dp"
-                        android:background="#D1D5DB"/>
 
-                    <!-- Budget -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Budget"
-                            android:textColor="#6B7280"
-                            android:textStyle="bold"/>
-
+                        <!-- Remaining Amount -->
                         <TextView
                             android:id="@+id/tvBudget"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Rs 0"
-                            android:textSize="18sp"
-                            android:textStyle="bold"/>
+                            android:text="Rs. 0.00"
+                            android:textColor="#111827"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:maxLines="1"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="22sp"
+                            android:autoSizeStepGranularity="1sp"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Remaining"
-                            android:layout_marginTop="5dp"
-                            android:textColor="#6B7280"
-                            android:textStyle="bold" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -566,99 +625,6 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_marginStart="10dp"
-                            android:src="@drawable/ic_chevron_right"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:layout_marginBottom="12dp"
-                android:text="SECURITY"
-                android:textStyle="bold"
-                android:textSize="13sp"
-                android:textColor="#6B7280"/>
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <!-- Biometric -->
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="68dp"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="18dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/biometric"/>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="18dp"
-                            android:layout_weight="1"
-                            android:text="Enable Biometric Login"
-                            android:textSize="17sp"/>
-
-                        <Switch
-                            android:id="@+id/switchBiometric"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="68dp"
-                        android:layout_marginEnd="16dp"
-                        android:background="#D1D5DB"/>
-
-                    <!-- Login Activity -->
-
-                    <LinearLayout
-                        android:id="@+id/layoutLoginActivity"
-                        android:layout_width="match_parent"
-                        android:layout_height="68dp"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="18dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/login_act"/>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="18dp"
-                            android:layout_weight="1"
-                            android:text="Login Activity"
-                            android:textSize="17sp"/>
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
                             android:src="@drawable/ic_chevron_right"/>
 
                     </LinearLayout>

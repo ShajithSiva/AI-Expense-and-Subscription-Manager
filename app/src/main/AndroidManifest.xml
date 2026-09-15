@@ -151,6 +151,9 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".ui.profile.SubscriptionSettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.family.SetFamilyBudgetActivity"
             android:exported="false" />
         <activity
@@ -170,5 +173,6 @@
             android:name=".ui.family.FamilyInvitationsActivity"
             android:exported="false" />
     </application>
+
 
 </manifest>

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
+import com.example.aiexpensemanagementapplication.model.Budget;
 import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
 import com.example.aiexpensemanagementapplication.ui.budget.BudgetActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
@@ -170,23 +171,87 @@ public class ProfileActivity extends AppCompatActivity{
 
     private void loadStatistics() {
 
-        if (currentUser == null) return;
+        if (currentUser == null) {
+            return;
+        }
 
-        int userId = databaseHelper.getUserIdByFirebaseUid(currentUser.getUid());
+        int userId =
+                databaseHelper.getUserIdByFirebaseUid(
+                        currentUser.getUid()
+                );
 
-        if (userId == -1) return;
+        if (userId == -1) {
+            return;
+        }
 
-        double totalExpense = databaseHelper.getTotalExpense(userId);
+        // =========================
+        // TOTAL EXPENSES
+        // =========================
 
-        double totalBalance = databaseHelper.getTotalBalance(userId);
+        double totalExpense =
+                databaseHelper.getTotalExpense(userId);
 
-        double totalBudget = databaseHelper.getTotalBudget(userId);
 
-        tvExpense.setText(String.format("Rs. %.2f", totalExpense));
+        // =========================
+        // TOTAL BALANCE
+        // =========================
 
-        tvBalance.setText(String.format("Rs. %.2f", totalBalance));
+        double totalBalance =
+                databaseHelper.getTotalBalance(userId);
 
-        tvBudget.setText(String.format("Rs. %.2f", totalBudget));
+
+        // =========================
+        // MONTHLY BUDGET
+        // =========================
+
+        Budget budget =
+                databaseHelper.getBudgetSettings(userId);
+
+        double monthlyBudget = 0.0;
+
+        if (budget != null) {
+
+            monthlyBudget =
+                    budget.getMonthlyBudget();
+        }
+
+
+        // =========================
+        // REMAINING BUDGET
+        // =========================
+
+        double remainingBudget =
+                monthlyBudget - totalExpense;
+
+        if (remainingBudget < 0) {
+            remainingBudget = 0;
+        }
+
+
+        // =========================
+        // DISPLAY
+        // =========================
+
+        tvExpense.setText(
+                String.format(
+                        "Rs. %.2f",
+                        totalExpense
+                )
+        );
+
+        tvBalance.setText(
+                String.format(
+                        "Rs. %.2f",
+                        totalBalance
+                )
+        );
+
+        tvBudget.setText(
+                String.format(
+                        "Rs. %.2f",
+                        remainingBudget
+                )
+        );
     }
 
     private void setupBottomNavigation() {
@@ -337,6 +402,16 @@ public class ProfileActivity extends AppCompatActivity{
                     this,
                     BudgetActivity.class));
 
+        });
+
+        layoutSubscription.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    ProfileActivity.this,
+                    SubscriptionSettingsActivity.class
+            );
+
+            startActivity(intent);
         });
 
         layoutHelp.setOnClickListener(

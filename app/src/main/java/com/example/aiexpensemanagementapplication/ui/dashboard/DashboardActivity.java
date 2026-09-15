@@ -796,6 +796,11 @@ public class DashboardActivity extends AppCompatActivity {
                 userId
         );
 
+        scheduler.applySubscriptionSettings(
+                databaseHelper,
+                userId
+        );
+
 
         Calendar calendar =
                 Calendar.getInstance();
