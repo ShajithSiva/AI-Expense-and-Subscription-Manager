@@ -56,12 +56,10 @@ app.get(
                 "AI Financial Advisor backend is running",
 
             provider:
-                config.aiProvider,
+                "Ollama",
 
             model:
-                config.aiProvider === "gemini"
-                    ? config.gemini.model
-                    : config.ollama.model,
+                config.ollama.model,
 
             endpoints: {
 
