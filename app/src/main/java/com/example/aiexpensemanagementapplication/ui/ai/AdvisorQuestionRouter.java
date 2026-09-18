@@ -28,13 +28,25 @@ public class AdvisorQuestionRouter {
                 question == null ||
                         question.trim().isEmpty()
         ) {
-
             return Route.AI;
         }
 
 
-        String q =
-                normalize(question);
+        String q = normalize(question);
+
+
+        // =================================================
+        // IMPORTANT:
+        // Advice / reasoning questions MUST go to AI.
+        //
+        // Example:
+        // "Why is my food spending high?"
+        // "How can I improve my budget?"
+        // =================================================
+
+        if (containsAdviceIntent(q)) {
+            return Route.AI;
+        }
 
 
         // =================================================
@@ -42,7 +54,6 @@ public class AdvisorQuestionRouter {
         // =================================================
 
         if (isStandardLocalQuestion(q)) {
-
             return Route.LOCAL;
         }
 
@@ -63,15 +74,17 @@ public class AdvisorQuestionRouter {
                     );
 
 
-            if (
-                    matchedCategory != null &&
-                            isLocalCategoryQuestion(
-                                    q,
-                                    matchedCategory
-                            )
-            ) {
+            if (matchedCategory != null) {
 
-                return Route.LOCAL;
+                if (
+                        isLocalCategoryQuestion(
+                                q,
+                                matchedCategory
+                        )
+                ) {
+
+                    return Route.LOCAL;
+                }
             }
         }
 
@@ -109,13 +122,9 @@ public class AdvisorQuestionRouter {
 
         return question
                 .trim()
-                .toLowerCase(
-                        Locale.ROOT
-                )
-                .replaceAll(
-                        "\\s+",
-                        " "
-                );
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("\\s+", " ")
+                .replaceAll("[?!.,]+$", "");
     }
 
 
@@ -126,7 +135,6 @@ public class AdvisorQuestionRouter {
     private boolean isStandardLocalQuestion(
             String q
     ) {
-
 
         // =================================================
         // TOTAL INCOME
@@ -146,7 +154,6 @@ public class AdvisorQuestionRouter {
                         q.equals("how much money have i earned") ||
                         q.contains("total income")
         ) {
-
             return true;
         }
 
@@ -177,7 +184,6 @@ public class AdvisorQuestionRouter {
                         q.contains("total expense") ||
                         q.contains("total expenses")
         ) {
-
             return true;
         }
 
@@ -200,7 +206,6 @@ public class AdvisorQuestionRouter {
                         q.equals("how much money is left") ||
                         q.equals("money left")
         ) {
-
             return true;
         }
 
@@ -214,12 +219,24 @@ public class AdvisorQuestionRouter {
                         q.equals("current month expenses") ||
                         q.equals("this month expense") ||
                         q.equals("this month expenses") ||
+                        q.equals("my current month expense") ||
+                        q.equals("my current month expenses") ||
+                        q.equals("my spending this month") ||
+                        q.equals("my expenses this month") ||
+                        q.equals("this month's expenses") ||
+                        q.equals("this month spending") ||
                         q.equals("how much did i spend this month") ||
                         q.equals("how much have i spent this month") ||
-                        q.contains("current month expense") ||
-                        q.contains("this month expense")
+                        (
+                                q.contains("this month") &&
+                                        (
+                                                q.contains("spend") ||
+                                                        q.contains("spent") ||
+                                                        q.contains("expense") ||
+                                                        q.contains("spending")
+                                        )
+                        )
         ) {
-
             return true;
         }
 
@@ -232,11 +249,12 @@ public class AdvisorQuestionRouter {
                 q.equals("savings") ||
                         q.equals("my savings") ||
                         q.equals("total savings") ||
+                        q.equals("my total savings") ||
                         q.equals("how much did i save") ||
                         q.equals("how much have i saved") ||
-                        q.equals("how much money did i save")
+                        q.equals("how much money did i save") ||
+                        q.equals("how much money have i saved")
         ) {
-
             return true;
         }
 
@@ -248,11 +266,15 @@ public class AdvisorQuestionRouter {
         if (
                 q.equals("savings rate") ||
                         q.equals("my savings rate") ||
+                        q.equals("saving rate") ||
+                        q.equals("my saving rate") ||
                         q.equals("what is my savings rate") ||
+                        q.equals("what's my savings rate") ||
+                        q.equals("what is my saving rate") ||
+                        q.equals("what's my saving rate") ||
                         q.contains("savings percentage") ||
                         q.contains("saving percentage")
         ) {
-
             return true;
         }
 
@@ -265,13 +287,20 @@ public class AdvisorQuestionRouter {
                 q.equals("highest spending category") ||
                         q.equals("highest expense category") ||
                         q.equals("most expensive category") ||
+                        q.equals("biggest expense category") ||
+                        q.equals("biggest spending category") ||
                         q.equals("where did i spend the most") ||
                         q.equals("where do i spend the most") ||
                         q.equals("what did i spend the most on") ||
+                        q.equals("what do i spend the most on") ||
                         q.contains("highest spending") ||
-                        q.contains("spent the most")
+                        q.contains("highest expense category") ||
+                        q.contains("spent the most") ||
+                        q.contains("spend the most") ||
+                        q.contains("most spending") ||
+                        q.contains("biggest expense") ||
+                        q.contains("biggest spending")
         ) {
-
             return true;
         }
 
@@ -284,11 +313,15 @@ public class AdvisorQuestionRouter {
                 q.equals("financial health") ||
                         q.equals("financial health score") ||
                         q.equals("my financial health") ||
+                        q.equals("my financial health score") ||
                         q.equals("what is my financial health") ||
+                        q.equals("what's my financial health") ||
+                        q.equals("what is my financial health score") ||
+                        q.equals("what's my financial health score") ||
                         q.equals("how is my financial health") ||
-                        q.contains("financial health score")
+                        q.contains("financial health score") ||
+                        q.contains("health score")
         ) {
-
             return true;
         }
 
@@ -300,33 +333,43 @@ public class AdvisorQuestionRouter {
         if (
                 q.equals("expense change") ||
                         q.equals("expense change percentage") ||
+                        q.equals("expense change percent") ||
                         q.equals("how much did my expenses change") ||
+                        q.equals("how much have my expenses changed") ||
                         q.equals("did my expenses increase") ||
                         q.equals("did my expenses decrease") ||
+                        q.equals("did my spending increase") ||
+                        q.equals("did my spending decrease") ||
                         q.contains("expense change") ||
+                        q.contains("expenses increased") ||
+                        q.contains("expenses decrease") ||
+                        q.contains("expenses decreased") ||
+                        q.contains("spending increased") ||
+                        q.contains("spending decreased") ||
                         q.contains("compared to last month") ||
                         q.contains("compared with last month")
         ) {
-
             return true;
         }
 
 
         // =================================================
-        // BUDGET
+        // CATEGORY BREAKDOWN
         // =================================================
 
         if (
-                q.equals("budget") ||
-                        q.equals("my budget") ||
-                        q.equals("budget status") ||
-                        q.equals("how is my budget") ||
-                        q.equals("am i within my budget") ||
-                        q.equals("am i within budget") ||
-                        q.equals("am i over budget") ||
-                        q.contains("budget")
+                q.contains("spending by category") ||
+                        q.contains("expenses by category") ||
+                        q.contains("expense by category") ||
+                        q.contains("category spending") ||
+                        q.contains("category expenses") ||
+                        q.contains("breakdown by category") ||
+                        q.contains("expense breakdown") ||
+                        q.contains("spending breakdown") ||
+                        q.contains("show categories") ||
+                        q.contains("show category spending") ||
+                        q.contains("show category expenses")
         ) {
-
             return true;
         }
 
@@ -339,13 +382,35 @@ public class AdvisorQuestionRouter {
                 q.equals("remaining budget") ||
                         q.equals("budget remaining") ||
                         q.equals("how much budget is left") ||
-                        q.equals(
-                                "how much money is left in my budget"
-                        ) ||
+                        q.equals("how much budget is remaining") ||
+                        q.equals("how much money is left in my budget") ||
+                        q.equals("how much money remains in my budget") ||
                         q.contains("remaining budget") ||
                         q.contains("budget left")
         ) {
+            return true;
+        }
 
+
+        // =================================================
+        // BUDGET STATUS
+        // =================================================
+
+        if (
+                q.equals("budget") ||
+                        q.equals("my budget") ||
+                        q.equals("budget status") ||
+                        q.equals("my budget status") ||
+                        q.equals("how is my budget") ||
+                        q.equals("am i within my budget") ||
+                        q.equals("am i within budget") ||
+                        q.equals("am i over budget") ||
+                        q.equals("am i under budget") ||
+                        q.equals("did i exceed my budget") ||
+                        q.equals("have i exceeded my budget") ||
+                        q.contains("within my budget") ||
+                        q.contains("within budget")
+        ) {
             return true;
         }
 
@@ -367,7 +432,6 @@ public class AdvisorQuestionRouter {
                 question == null ||
                         categories == null
         ) {
-
             return null;
         }
 
@@ -377,19 +441,17 @@ public class AdvisorQuestionRouter {
 
 
         // =================================================
-        // FIRST: EXACT CATEGORY MATCH
+        // EXACT MATCH FIRST
         // =================================================
 
         for (
-                String category
-                : categories
+                String category : categories
         ) {
 
             if (
                     category == null ||
                             category.trim().isEmpty()
             ) {
-
                 continue;
             }
 
@@ -403,14 +465,13 @@ public class AdvisorQuestionRouter {
                             normalizedCategory
                     )
             ) {
-
                 return category;
             }
         }
 
 
         // =================================================
-        // SECOND: CATEGORY AS PHRASE
+        // LONGEST PHRASE MATCH
         // =================================================
 
         String bestMatch = null;
@@ -419,15 +480,13 @@ public class AdvisorQuestionRouter {
 
 
         for (
-                String category
-                : categories
+                String category : categories
         ) {
 
             if (
                     category == null ||
                             category.trim().isEmpty()
             ) {
-
                 continue;
             }
 
@@ -443,27 +502,12 @@ public class AdvisorQuestionRouter {
                     )
             ) {
 
-                /*
-                 * Prefer the longest category name.
-                 *
-                 * Example:
-                 *
-                 * "Food"
-                 * "Fast Food"
-                 *
-                 * Question:
-                 * "How much did I spend on Fast Food?"
-                 *
-                 * → Fast Food
-                 */
-
                 if (
                         normalizedCategory.length()
                                 > bestLength
                 ) {
 
-                    bestMatch =
-                            category;
+                    bestMatch = category;
 
                     bestLength =
                             normalizedCategory.length();
@@ -489,7 +533,6 @@ public class AdvisorQuestionRouter {
                 question == null ||
                         category == null
         ) {
-
             return false;
         }
 
@@ -504,20 +547,7 @@ public class AdvisorQuestionRouter {
                                 normalize(category)
                         )
         ) {
-
             return true;
-        }
-
-
-        // =================================================
-        // EXPLICIT AI / ADVICE LANGUAGE
-        //
-        // These MUST remain AI.
-        // =================================================
-
-        if (containsAdviceIntent(question)) {
-
-            return false;
         }
 
 
@@ -536,25 +566,6 @@ public class AdvisorQuestionRouter {
                         question.contains("cost") ||
                         question.contains("total")
         ) {
-
-            return true;
-        }
-
-
-        // =================================================
-        // CATEGORY + SIMPLE FACTUAL WORD
-        // =================================================
-
-        String normalizedCategory =
-                normalize(category);
-
-
-        if (
-                question.equals(
-                        normalizedCategory
-                )
-        ) {
-
             return true;
         }
 
@@ -571,73 +582,69 @@ public class AdvisorQuestionRouter {
             String question
     ) {
 
+        if (
+                question == null ||
+                        question.trim().isEmpty()
+        ) {
+            return false;
+        }
+
+
         String[] adviceWords = {
 
+                // Reasoning
                 "why",
 
+                // Advice
                 "how can",
-
                 "how do i",
-
                 "should i",
-
                 "should",
-
-                "can i reduce",
-
-                "reduce",
-
-                "save",
-
-                "saving",
-
-                "improve",
-
-                "better",
-
                 "advice",
-
                 "recommend",
-
                 "recommendation",
 
-                "analyze",
+                // Improvement
+                "improve",
+                "better",
+                "manage",
+                "optimize",
 
+                // Saving / reducing
+                "can i reduce",
+                "reduce",
+                "save more",
+                "saving more",
+                "cut down",
+
+                // Analysis
+                "analyze",
                 "analysis",
 
+                // Problem / concern
                 "too much",
-
                 "too high",
-
-                "high spending",
-
                 "overspending",
-
                 "afford",
-
                 "habit",
-
                 "problem",
 
+                // Help
                 "help me",
 
+                // Suggestions
                 "what should",
-
                 "what can i",
-
-                "ways to"
+                "ways to",
+                "tips"
         };
 
 
         for (
-                String word
-                : adviceWords
+                String word : adviceWords
         ) {
 
-            if (
-                    question.contains(word)
-            ) {
-
+            if (question.contains(word)) {
                 return true;
             }
         }
@@ -661,21 +668,20 @@ public class AdvisorQuestionRouter {
                         phrase == null ||
                         phrase.trim().isEmpty()
         ) {
-
             return false;
         }
 
 
         String paddedText =
-                " "
-                        + text.trim()
-                        + " ";
+                " " +
+                        text.trim() +
+                        " ";
 
 
         String paddedPhrase =
-                " "
-                        + phrase.trim()
-                        + " ";
+                " " +
+                        phrase.trim() +
+                        " ";
 
 
         return paddedText.contains(

@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -536,10 +537,16 @@ public class AIFinancialAdvisorActivity
         // that could potentially trigger AI.
         // =================================================
 
+        Collection<String> availableCategories =
+                financialAnalysis != null &&
+                        financialAnalysis.getCategoryTotals() != null
+                        ? financialAnalysis.getCategoryTotals().keySet()
+                        : null;
+
         AdvisorQuestionRouter.Route route =
                 questionRouter.route(
                         question,
-                        financialAnalysis.getCategoryTotals().keySet()
+                        availableCategories
                 );
 
 
@@ -751,16 +758,11 @@ public class AIFinancialAdvisorActivity
             String question
     ) {
 
-        if (financialAnalysis == null) {
-            return false;
-        }
-
-
         if (
-                question == null ||
+                financialAnalysis == null ||
+                        question == null ||
                         question.trim().isEmpty()
         ) {
-
             return false;
         }
 
@@ -768,42 +770,35 @@ public class AIFinancialAdvisorActivity
         String q =
                 question
                         .trim()
-                        .toLowerCase(
-                                Locale.ROOT
-                        )
-                        .replaceAll(
-                                "[?!.,]+$",
-                                ""
-                        );
+                        .toLowerCase(Locale.ROOT)
+                        .replaceAll("\\s+", " ")
+                        .replaceAll("[?!.,]+$", "");
 
 
-        // =================================================
-        // TOTAL INCOME
-        // =================================================
+        // =====================================================
+        // 1. TOTAL INCOME
+        // =====================================================
 
         if (
-                q.contains("total income") ||
-                        q.contains("my total income") ||
-                        q.contains("income total") ||
-                        q.contains("how much income") ||
+                q.equals("income") ||
+                        q.equals("my income") ||
+                        q.equals("total income") ||
+                        q.equals("my total income") ||
                         q.contains("how much did i earn") ||
                         q.contains("how much have i earned") ||
                         q.contains("how much money did i earn") ||
-                        q.contains("how much money have i earned") ||
-                        q.equals("my income") ||
-                        q.equals("income")
+                        q.contains("how much money have i earned")
         ) {
 
-            double totalIncome =
-                    financialAnalysis
-                            .getTotalIncome();
+            double income =
+                    financialAnalysis.getTotalIncome();
 
 
             addAIMessage(
                     String.format(
                             Locale.US,
                             "Your total income is Rs %.2f.",
-                            totalIncome
+                            income
                     )
             );
 
@@ -812,39 +807,38 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // TOTAL EXPENSE
-        // =================================================
+        // =====================================================
+        // 2. TOTAL EXPENSE
+        // =====================================================
 
         if (
-                q.contains("total expense") ||
-                        q.contains("total expenses") ||
-                        q.contains("my total expense") ||
-                        q.contains("my total expenses") ||
-                        q.contains("expense total") ||
-                        q.contains("expenses total") ||
-                        q.contains("total spending") ||
-                        q.contains("my total spending") ||
-                        q.equals("how much did i spend") ||
-                        q.equals("how much have i spent") ||
-                        q.contains("how much money did i spend") ||
-                        q.contains("how much money have i spent") ||
-                        q.equals("expense") ||
+                q.equals("expense") ||
                         q.equals("expenses") ||
                         q.equals("my expense") ||
-                        q.equals("my expenses")
+                        q.equals("my expenses") ||
+                        q.equals("spending") ||
+                        q.equals("my spending") ||
+                        q.equals("total expense") ||
+                        q.equals("total expenses") ||
+                        q.equals("my total expense") ||
+                        q.equals("my total expenses") ||
+                        q.equals("total spending") ||
+                        q.equals("my total spending") ||
+                        q.contains("how much did i spend") ||
+                        q.contains("how much have i spent") ||
+                        q.contains("how much money did i spend") ||
+                        q.contains("how much money have i spent")
         ) {
 
-            double totalExpense =
-                    financialAnalysis
-                            .getTotalExpense();
+            double expense =
+                    financialAnalysis.getTotalExpense();
 
 
             addAIMessage(
                     String.format(
                             Locale.US,
                             "Your total expense is Rs %.2f.",
-                            totalExpense
+                            expense
                     )
             );
 
@@ -853,9 +847,9 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // BALANCE
-        // =================================================
+        // =====================================================
+        // 3. CURRENT BALANCE
+        // =====================================================
 
         if (
                 q.equals("balance") ||
@@ -866,24 +860,19 @@ public class AIFinancialAdvisorActivity
                         q.contains("what's my balance") ||
                         q.contains("what is my current balance") ||
                         q.contains("what's my current balance") ||
-                        q.contains("how much balance") ||
-                        q.contains("how much money do i have") ||
-                        q.contains("how much money is left") ||
-                        q.equals("money left")
+                        q.contains("how much money do i have")
         ) {
 
-            double totalIncome =
-                    financialAnalysis
-                            .getTotalIncome();
+            double income =
+                    financialAnalysis.getTotalIncome();
 
 
-            double totalExpense =
-                    financialAnalysis
-                            .getTotalExpense();
+            double expense =
+                    financialAnalysis.getTotalExpense();
 
 
             double balance =
-                    totalIncome - totalExpense;
+                    income - expense;
 
 
             if (balance >= 0) {
@@ -901,8 +890,8 @@ public class AIFinancialAdvisorActivity
                 addAIMessage(
                         String.format(
                                 Locale.US,
-                                "Your expenses exceed your "
-                                        + "income by Rs %.2f.",
+                                "Your expenses exceed your income "
+                                        + "by Rs %.2f.",
                                 Math.abs(balance)
                         )
                 );
@@ -913,31 +902,17 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // CURRENT MONTH EXPENSE
-        // =================================================
+        // =====================================================
+        // 4. CURRENT MONTH EXPENSE
+        // =====================================================
 
         if (
-                q.equals("current month expense") ||
-                        q.equals("current month expenses") ||
-                        q.equals("this month expense") ||
-                        q.equals("this month expenses") ||
-                        q.equals("my current month expense") ||
-                        q.equals("my current month expenses") ||
-                        q.equals("my spending this month") ||
-                        q.equals("my expenses this month") ||
-                        q.equals("this month's expenses") ||
-                        q.equals("this month spending") ||
-                        q.equals("how much did i spend this month") ||
-                        q.equals("how much have i spent this month") ||
+                q.contains("this month") &&
                         (
-                                q.contains("this month") &&
-                                        (
-                                                q.contains("spend") ||
-                                                        q.contains("spent") ||
-                                                        q.contains("expense") ||
-                                                        q.contains("spending")
-                                        )
+                                q.contains("spend") ||
+                                        q.contains("spent") ||
+                                        q.contains("expense") ||
+                                        q.contains("spending")
                         )
         ) {
 
@@ -959,26 +934,55 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // SAVINGS RATE
-        // =================================================
+        // =====================================================
+        // 5. SAVINGS
+        // =====================================================
+
+        if (
+                q.equals("savings") ||
+                        q.equals("my savings") ||
+                        q.equals("total savings") ||
+                        q.equals("my total savings") ||
+                        q.contains("how much did i save") ||
+                        q.contains("how much have i saved") ||
+                        q.contains("how much money did i save") ||
+                        q.contains("how much money have i saved")
+        ) {
+
+            double savings =
+                    financialAnalysis.getSavings();
+
+
+            addAIMessage(
+                    String.format(
+                            Locale.US,
+                            "You've saved Rs %.2f.",
+                            savings
+                    )
+            );
+
+
+            return true;
+        }
+
+
+        // =====================================================
+        // 6. SAVINGS RATE
+        // =====================================================
 
         if (
                 q.equals("savings rate") ||
                         q.equals("my savings rate") ||
                         q.equals("saving rate") ||
                         q.equals("my saving rate") ||
-                        q.equals("what is my savings rate") ||
-                        q.equals("what's my savings rate") ||
-                        q.equals("what is my saving rate") ||
-                        q.equals("what's my saving rate") ||
+                        q.contains("what is my savings rate") ||
+                        q.contains("what's my savings rate") ||
                         q.contains("savings percentage") ||
                         q.contains("saving percentage")
         ) {
 
             double savingsRate =
-                    financialAnalysis
-                            .getSavingsRate();
+                    financialAnalysis.getSavingsRate();
 
 
             addAIMessage(
@@ -994,78 +998,25 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // SAVINGS
-        // =================================================
-
-        if (
-                q.equals("savings") ||
-                        q.equals("my savings") ||
-                        q.equals("total savings") ||
-                        q.equals("my total savings") ||
-                        q.equals("how much did i save") ||
-                        q.equals("how much have i saved") ||
-                        q.equals("how much money did i save") ||
-                        q.equals("how much money have i saved") ||
-                        q.contains("how much savings") ||
-                        q.contains("my savings")
-        ) {
-
-            double savings =
-                    financialAnalysis
-                            .getSavings();
-
-
-            double savingsRate =
-                    financialAnalysis
-                            .getSavingsRate();
-
-
-            addAIMessage(
-                    String.format(
-                            Locale.US,
-                            "You've saved Rs %.2f, with "
-                                    + "a savings rate of %.1f%%.",
-                            savings,
-                            savingsRate
-                    )
-            );
-
-
-            return true;
-        }
-
-
-        // =================================================
-        // REMAINING BUDGET
-        // =================================================
+        // =====================================================
+        // 7. REMAINING BUDGET
+        // =====================================================
 
         if (
                 q.equals("remaining budget") ||
                         q.equals("budget remaining") ||
-                        q.equals("how much budget is left") ||
-                        q.equals("how much budget is remaining") ||
-                        q.equals("how much money is left in my budget") ||
-                        q.equals("how much money remains in my budget") ||
-                        q.contains("remaining budget") ||
-                        q.contains("budget left") ||
-                        (
-                                q.contains("budget") &&
-                                        (
-                                                q.contains("remaining") ||
-                                                        q.contains("left")
-                                        )
-                        )
+                        q.contains("how much budget is left") ||
+                        q.contains("how much budget is remaining") ||
+                        q.contains("how much money is left in my budget") ||
+                        q.contains("how much money remains in my budget")
         ) {
 
             double budget =
-                    financialAnalysis
-                            .getBudget();
+                    financialAnalysis.getBudget();
 
 
             double remaining =
-                    financialAnalysis
-                            .getRemainingBudget();
+                    financialAnalysis.getRemainingBudget();
 
 
             if (budget <= 0) {
@@ -1084,9 +1035,9 @@ public class AIFinancialAdvisorActivity
                 addAIMessage(
                         String.format(
                                 Locale.US,
-                                "You have Rs %.2f remaining "
-                                        + "from your monthly "
-                                        + "budget of Rs %.2f.",
+                                "You have Rs %.2f remaining from "
+                                        + "your monthly budget of "
+                                        + "Rs %.2f.",
                                 remaining,
                                 budget
                         )
@@ -1109,9 +1060,9 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // BUDGET STATUS
-        // =================================================
+        // =====================================================
+        // 8. BUDGET STATUS
+        // =====================================================
 
         if (
                 q.equals("budget") ||
@@ -1124,14 +1075,11 @@ public class AIFinancialAdvisorActivity
                         q.equals("am i over budget") ||
                         q.equals("am i under budget") ||
                         q.equals("did i exceed my budget") ||
-                        q.equals("have i exceeded my budget") ||
-                        q.contains("within my budget") ||
-                        q.contains("within budget")
+                        q.equals("have i exceeded my budget")
         ) {
 
             double budget =
-                    financialAnalysis
-                            .getBudget();
+                    financialAnalysis.getBudget();
 
 
             double expense =
@@ -1139,23 +1087,19 @@ public class AIFinancialAdvisorActivity
                             .getCurrentMonthExpense();
 
 
-            double remaining =
-                    financialAnalysis
-                            .getRemainingBudget();
-
-
             if (budget <= 0) {
 
                 addAIMessage(
-                        "I couldn't find an active monthly "
-                                + "budget for your financial "
-                                + "profile. Create a monthly "
-                                + "budget and I'll help you "
-                                + "monitor it."
+                        "You don't currently have an active "
+                                + "monthly budget."
                 );
 
                 return true;
             }
+
+
+            double remaining =
+                    budget - expense;
 
 
             double usedPercentage =
@@ -1167,13 +1111,11 @@ public class AIFinancialAdvisorActivity
                 addAIMessage(
                         String.format(
                                 Locale.US,
-                                "Yes, you're within your "
-                                        + "monthly budget. You've "
-                                        + "spent Rs %.2f of "
-                                        + "Rs %.2f, which is "
-                                        + "%.1f%% of your budget. "
-                                        + "You have Rs %.2f "
-                                        + "remaining.",
+                                "You're within your monthly "
+                                        + "budget. You've spent "
+                                        + "Rs %.2f of Rs %.2f "
+                                        + "(%.1f%%), with "
+                                        + "Rs %.2f remaining.",
                                 expense,
                                 budget,
                                 usedPercentage,
@@ -1194,10 +1136,9 @@ public class AIFinancialAdvisorActivity
                 addAIMessage(
                         String.format(
                                 Locale.US,
-                                "You're currently over your "
-                                        + "monthly budget. You've "
-                                        + "spent Rs %.2f against "
-                                        + "a budget of Rs %.2f, "
+                                "You're over your monthly "
+                                        + "budget. You've spent "
+                                        + "Rs %.2f against Rs %.2f, "
                                         + "exceeding it by Rs %.2f "
                                         + "(%.1f%%).",
                                 expense,
@@ -1213,9 +1154,9 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // HIGHEST SPENDING CATEGORY
-        // =================================================
+        // =====================================================
+        // 9. HIGHEST SPENDING CATEGORY
+        // =====================================================
 
         if (
                 q.equals("highest spending category") ||
@@ -1223,17 +1164,10 @@ public class AIFinancialAdvisorActivity
                         q.equals("most expensive category") ||
                         q.equals("biggest expense category") ||
                         q.equals("biggest spending category") ||
-                        q.equals("where did i spend the most") ||
-                        q.equals("where do i spend the most") ||
-                        q.equals("what did i spend the most on") ||
-                        q.equals("what do i spend the most on") ||
-                        q.contains("highest spending") ||
-                        q.contains("highest expense category") ||
-                        q.contains("spent the most") ||
-                        q.contains("spend the most") ||
-                        q.contains("most spending") ||
-                        q.contains("biggest expense") ||
-                        q.contains("biggest spending")
+                        q.contains("where did i spend the most") ||
+                        q.contains("where do i spend the most") ||
+                        q.contains("what did i spend the most on") ||
+                        q.contains("what do i spend the most on")
         ) {
 
             String category =
@@ -1251,8 +1185,12 @@ public class AIFinancialAdvisorActivity
                             category.trim().isEmpty()
             ) {
 
-                category =
-                        "Unknown";
+                addAIMessage(
+                        "I couldn't determine your highest "
+                                + "spending category."
+                );
+
+                return true;
             }
 
 
@@ -1271,63 +1209,20 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // FINANCIAL HEALTH
-        // =================================================
-
-        if (
-                q.equals("financial health") ||
-                        q.equals("financial health score") ||
-                        q.equals("my financial health") ||
-                        q.equals("my financial health score") ||
-                        q.equals("what is my financial health") ||
-                        q.equals("what's my financial health") ||
-                        q.equals("what is my financial health score") ||
-                        q.equals("what's my financial health score") ||
-                        q.equals("how is my financial health") ||
-                        q.contains("financial health score") ||
-                        q.contains("health score")
-        ) {
-
-            int score =
-                    financialAnalysis
-                            .getFinancialHealthScore();
-
-
-            addAIMessage(
-                    String.format(
-                            Locale.US,
-                            "Your current financial health "
-                                    + "score is %d out of 100.",
-                            score
-                    )
-            );
-
-
-            return true;
-        }
-
-
-        // =================================================
-        // EXPENSE CHANGE
-        // =================================================
+        // =====================================================
+        // 10. EXPENSE CHANGE
+        // =====================================================
 
         if (
                 q.equals("expense change") ||
                         q.equals("expense change percentage") ||
                         q.equals("expense change percent") ||
-                        q.equals("how much did my expenses change") ||
-                        q.equals("how much have my expenses changed") ||
-                        q.equals("did my expenses increase") ||
-                        q.equals("did my expenses decrease") ||
-                        q.equals("did my spending increase") ||
-                        q.equals("did my spending decrease") ||
-                        q.contains("expense change") ||
-                        q.contains("expenses increased") ||
-                        q.contains("expenses decrease") ||
-                        q.contains("expenses decreased") ||
-                        q.contains("spending increased") ||
-                        q.contains("spending decreased") ||
+                        q.contains("how much did my expenses change") ||
+                        q.contains("how much have my expenses changed") ||
+                        q.contains("did my expenses increase") ||
+                        q.contains("did my expenses decrease") ||
+                        q.contains("did my spending increase") ||
+                        q.contains("did my spending decrease") ||
                         q.contains("compared to last month") ||
                         q.contains("compared with last month")
         ) {
@@ -1374,9 +1269,9 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // CATEGORY BREAKDOWN
-        // =================================================
+        // =====================================================
+        // 11. CATEGORY BREAKDOWN
+        // =====================================================
 
         if (
                 q.contains("spending by category") ||
@@ -1409,12 +1304,9 @@ public class AIFinancialAdvisorActivity
 
 
             StringBuilder response =
-                    new StringBuilder();
-
-
-            response.append(
-                    "Your spending by category:\n\n"
-            );
+                    new StringBuilder(
+                            "Your spending by category:\n\n"
+                    );
 
 
             for (
@@ -1422,7 +1314,10 @@ public class AIFinancialAdvisorActivity
                     : categoryTotals.entrySet()
             ) {
 
-                if (entry.getKey() == null) {
+                if (
+                        entry.getKey() == null ||
+                                entry.getKey().trim().isEmpty()
+                ) {
                     continue;
                 }
 
@@ -1453,9 +1348,9 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // SPECIFIC CATEGORY
-        // =================================================
+        // =====================================================
+        // 12. SPECIFIC CATEGORY
+        // =====================================================
 
         String requestedCategory =
                 findRequestedCategory(
@@ -1497,9 +1392,9 @@ public class AIFinancialAdvisorActivity
         }
 
 
-        // =================================================
-        // UNHANDLED LOCAL QUESTION
-        // =================================================
+        // =====================================================
+        // NOT HANDLED
+        // =====================================================
 
         return false;
     }
@@ -1518,18 +1413,13 @@ public class AIFinancialAdvisorActivity
                         financialAnalysis == null ||
                         financialAnalysis.getCategoryTotals() == null
         ) {
-
             return null;
         }
-
 
         String q =
                 question
                         .trim()
-                        .toLowerCase(
-                                Locale.ROOT
-                        );
-
+                        .toLowerCase(Locale.ROOT);
 
         if (q.isEmpty()) {
             return null;
@@ -1537,7 +1427,7 @@ public class AIFinancialAdvisorActivity
 
 
         // =================================================
-        // CHECK ACTUAL DATABASE CATEGORIES
+        // 1. EXACT CATEGORY MATCH
         // =================================================
 
         for (
@@ -1551,10 +1441,57 @@ public class AIFinancialAdvisorActivity
                 continue;
             }
 
-
             String actualCategory =
                     category.trim();
 
+            if (actualCategory.isEmpty()) {
+                continue;
+            }
+
+            if (
+                    q.equals(
+                            actualCategory.toLowerCase(
+                                    Locale.ROOT
+                            )
+                    )
+            ) {
+
+                return actualCategory;
+            }
+        }
+
+
+        // =================================================
+        // 2. FIND LONGEST CATEGORY MATCH
+        //
+        // Example:
+        //
+        // Food
+        // Fast Food
+        //
+        // "How much did I spend on Fast Food?"
+        //
+        // → Fast Food
+        // =================================================
+
+        String bestCategory = null;
+
+        int bestLength = 0;
+
+
+        for (
+                String category
+                : financialAnalysis
+                .getCategoryTotals()
+                .keySet()
+        ) {
+
+            if (category == null) {
+                continue;
+            }
+
+            String actualCategory =
+                    category.trim();
 
             if (actualCategory.isEmpty()) {
                 continue;
@@ -1563,28 +1500,8 @@ public class AIFinancialAdvisorActivity
 
             String normalizedCategory =
                     actualCategory
-                            .toLowerCase(
-                                    Locale.ROOT
-                            );
+                            .toLowerCase(Locale.ROOT);
 
-
-            // -------------------------------------------------
-            // EXACT MATCH
-            // -------------------------------------------------
-
-            if (
-                    q.equals(
-                            normalizedCategory
-                    )
-            ) {
-
-                return actualCategory;
-            }
-
-
-            // -------------------------------------------------
-            // CATEGORY INSIDE QUESTION
-            // -------------------------------------------------
 
             if (
                     containsWholePhrase(
@@ -1593,30 +1510,33 @@ public class AIFinancialAdvisorActivity
                     )
             ) {
 
-                return actualCategory;
+                if (
+                        normalizedCategory.length()
+                                > bestLength
+                ) {
+
+                    bestCategory =
+                            actualCategory;
+
+                    bestLength =
+                            normalizedCategory.length();
+                }
             }
         }
 
 
-        // =================================================
-        // COMMON CATEGORY ALIASES
-        // =================================================
+        if (bestCategory != null) {
 
-        String aliasCategory =
-                findCategoryUsingAlias(
-                        q
-                );
-
-
-        if (aliasCategory != null) {
-
-            return aliasCategory;
+            return bestCategory;
         }
 
 
-        return null;
-    }
+        // =================================================
+        // 3. CATEGORY ALIASES
+        // =================================================
 
+        return findCategoryUsingAlias(q);
+    }
     // =====================================================
 // WHOLE PHRASE MATCH
 // =====================================================
@@ -1640,9 +1560,7 @@ public class AIFinancialAdvisorActivity
                 " "
                         + question
                         .trim()
-                        .toLowerCase(
-                                Locale.ROOT
-                        )
+                        .toLowerCase(Locale.ROOT)
                         + " ";
 
 
@@ -1650,9 +1568,7 @@ public class AIFinancialAdvisorActivity
                 " "
                         + phrase
                         .trim()
-                        .toLowerCase(
-                                Locale.ROOT
-                        )
+                        .toLowerCase(Locale.ROOT)
                         + " ";
 
 
