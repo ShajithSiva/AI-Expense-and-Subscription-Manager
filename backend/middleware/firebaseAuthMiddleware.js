@@ -1,4 +1,7 @@
-const admin = require("../config/firebaseAdmin");
+const { getAuth } = require("firebase-admin/auth");
+const firebaseApp = require("../config/firebaseAdmin");
+
+const auth = getAuth(firebaseApp);
 
 async function firebaseAuthMiddleware(req, res, next) {
     try {
@@ -13,13 +16,16 @@ async function firebaseAuthMiddleware(req, res, next) {
 
         const idToken = authHeader.substring(7);
 
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const decodedToken = await auth.verifyIdToken(idToken);
 
         req.user = decodedToken;
 
         next();
     } catch (error) {
-        console.error("Firebase authentication error:", error.message);
+        console.error(
+            "Firebase authentication error:",
+            error.message
+        );
 
         return res.status(401).json({
             success: false,
