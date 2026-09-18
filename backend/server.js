@@ -232,7 +232,11 @@ app.listen(
         );
 
         console.log(
-            `Model: ${config.ollama.model}`
+            `AI Model: ${
+                config.aiProvider === "gemini"
+                    ? config.gemini.model
+                    : config.ollama.model
+            }`
         );
 
         console.log(
