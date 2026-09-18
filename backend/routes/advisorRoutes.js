@@ -1,12 +1,12 @@
 const express = require("express");
 const { askFinancialAdvisor } = require("../controllers/advisorController");
-const apiKeyMiddleware = require("../middleware/apiKeyMiddleware");
+const firebaseAuthMiddleware = require("../middleware/firebaseAuthMiddleware");
 
 const router = express.Router();
 
 router.post(
     "/financial-advisor",
-    apiKeyMiddleware,
+    firebaseAuthMiddleware,
     askFinancialAdvisor
 );
 

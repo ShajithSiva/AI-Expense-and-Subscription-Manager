@@ -2,13 +2,13 @@ const express = require("express");
 const {
     generateFinancialInsights
 } = require("../controllers/insightController");
-const apiKeyMiddleware = require("../middleware/apiKeyMiddleware");
+const firebaseAuthMiddleware = require("../middleware/firebaseAuthMiddleware");
 
 const router = express.Router();
 
 router.post(
     "/financial-insights",
-    apiKeyMiddleware,
+    firebaseAuthMiddleware,
     generateFinancialInsights
 );
 
