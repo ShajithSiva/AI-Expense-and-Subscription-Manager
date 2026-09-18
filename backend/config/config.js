@@ -9,6 +9,9 @@ const config = {
     port:
         Number(process.env.PORT) || 3000,
 
+    api: {
+        clientKey: process.env.API_CLIENT_KEY || ""
+    },
     // =================================================
     // AI PROVIDER
     // =================================================
