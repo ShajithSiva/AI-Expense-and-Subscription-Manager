@@ -62,7 +62,7 @@ const config = {
     ai: {
 
         advisorMaxOutput:
-            200,
+            350,
 
         insightMaxOutput:
             180,
