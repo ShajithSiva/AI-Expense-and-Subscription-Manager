@@ -17,6 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,16 +36,6 @@ public class FinancialAdvisorApiService {
     // =====================================================
     // BACKEND URL
     // =====================================================
-
-    /*
-     * Android Emulator -> Windows PC
-     *
-     * 10.0.2.2 points to the host computer.
-     *
-     * Your Node.js backend must be running on:
-     *
-     * http://localhost:3000
-     */
 
     private static final String BACKEND_BASE_URL =
             BuildConfig.BACKEND_BASE_URL;
@@ -78,6 +71,9 @@ public class FinancialAdvisorApiService {
     private final ExecutorService executor =
             Executors.newSingleThreadExecutor();
 
+    private final FirebaseAuth firebaseAuth =
+            FirebaseAuth.getInstance();
+
 
     // =====================================================
     // ADVISOR CALLBACK
@@ -108,6 +104,27 @@ public class FinancialAdvisorApiService {
         void onFailure(
                 String message
         );
+    }
+
+    // =====================================================
+    // GET FIREBASE ID TOKEN
+    // =====================================================
+
+    private String getFirebaseIdToken() throws Exception {
+
+        FirebaseUser user =
+                firebaseAuth.getCurrentUser();
+
+        if (user == null) {
+
+            throw new Exception(
+                    "Please sign in to use the Financial Advisor."
+            );
+        }
+
+        return Tasks.await(
+                user.getIdToken(false)
+        ).getToken();
     }
 
 
@@ -203,6 +220,13 @@ public class FinancialAdvisorApiService {
                 connection.setRequestProperty(
                         "Accept",
                         "application/json"
+                );
+                String idToken =
+                        getFirebaseIdToken();
+
+                connection.setRequestProperty(
+                        "Authorization",
+                        "Bearer " + idToken
                 );
 
 
@@ -419,6 +443,14 @@ public class FinancialAdvisorApiService {
                 connection.setRequestProperty(
                         "Accept",
                         "application/json"
+                );
+
+                String idToken =
+                        getFirebaseIdToken();
+
+                connection.setRequestProperty(
+                        "Authorization",
+                        "Bearer " + idToken
                 );
 
 

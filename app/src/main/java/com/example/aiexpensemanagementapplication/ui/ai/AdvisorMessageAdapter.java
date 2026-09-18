@@ -5,6 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,7 +49,9 @@ public class AdvisorMessageAdapter
 
         AdvisorMessage message = messages.get(position);
 
-        holder.tvMessage.setText(message.getMessage());
+        holder.tvMessage.setText(
+                formatAIMessage(message.getMessage())
+        );
 
         if (message.getType() == AdvisorMessage.TYPE_AI) {
 
@@ -88,6 +93,47 @@ public class AdvisorMessageAdapter
                     View.LAYOUT_DIRECTION_RTL
             );
         }
+    }
+
+    // =====================================================
+    // FORMAT AI MESSAGE
+    // =====================================================
+
+    private Spanned formatAIMessage(String message) {
+
+        if (message == null || message.trim().isEmpty()) {
+
+            return Html.fromHtml(
+                    "",
+                    Html.FROM_HTML_MODE_LEGACY
+            );
+        }
+
+        String formatted =
+                TextUtils.htmlEncode(message);
+
+        // Convert numbered lists to separate lines
+        formatted = formatted.replaceAll(
+                "\\s+(?=\\d+\\.\\s)",
+                "<br><br>"
+        );
+
+        // Convert bullet separators (*) to new lines
+        formatted = formatted.replaceAll(
+                "\\s+\\*\\s+(?=\\*\\*)",
+                "<br><br>"
+        );
+
+        // Convert **bold** text
+        formatted = formatted.replaceAll(
+                "\\*\\*(.+?)\\*\\*",
+                "<b>$1</b>"
+        );
+
+        return Html.fromHtml(
+                formatted,
+                Html.FROM_HTML_MODE_LEGACY
+        );
     }
 
     @Override

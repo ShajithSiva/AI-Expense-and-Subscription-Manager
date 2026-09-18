@@ -18,8 +18,7 @@ android {
         buildConfigField(
             "String",
             "BACKEND_BASE_URL",
-            "\"http://10.0.2.2:3000\""  //Emulator
-//            "\"http://172.31.98.224:3000\""
+            "\"https://ai-expense-backend-zqjy.onrender.com\""
         )
     }
 
