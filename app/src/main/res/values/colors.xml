@@ -10,4 +10,5 @@
     <color name="dashboard_selected">#22C55E</color>
     <color name="dashboard_unselected">#E9ECEF</color>
     <color name="dashboard_unselected_text">#6B7280</color>
+    <color name="nav_selected_background">#DCFCE7</color>S
 </resources>
