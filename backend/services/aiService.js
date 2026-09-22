@@ -168,7 +168,7 @@ async function generateWithGemini({
 
 
     const url =
-         `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
 
     const generationConfig = {
@@ -182,10 +182,6 @@ async function generateWithGemini({
 
     /*
      * Gemini structured JSON output.
-     *
-     * The insight controller already supplies
-     * a JSON schema. We translate the required
-     * Ollama format into Gemini's response format.
      */
 
     if (
@@ -246,133 +242,259 @@ async function generateWithGemini({
     };
 
 
-    const startTime =
-        Date.now();
+    // =====================================================
+    // GEMINI RETRY CONFIGURATION
+    // =====================================================
+
+    const MAX_RETRIES = 3;
+
+    const RETRY_DELAYS = [
+        2000,
+        4000,
+        8000
+    ];
 
 
-    const response =
-        await fetch(
-            url,
-            {
-                method:
-                    "POST",
+    // =====================================================
+    // SEND REQUEST WITH RETRY
+    // =====================================================
 
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                    "x-goog-api-key": config.gemini.apiKey
-                },
+    for (
+        let attempt = 0;
+        attempt <= MAX_RETRIES;
+        attempt++
+    ) {
 
-                body:
-                    JSON.stringify(
-                        body
-                    )
+        const startTime =
+            Date.now();
+
+
+        try {
+
+            console.log(
+                `Gemini request attempt ${
+                    attempt + 1
+                }/${MAX_RETRIES + 1}`
+            );
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method:
+                            "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            "Accept":
+                                "application/json",
+
+                            "x-goog-api-key":
+                                config.gemini.apiKey
+                        },
+
+                        body:
+                            JSON.stringify(
+                                body
+                            )
+                    }
+                );
+
+
+            const responseTime =
+                (
+                    Date.now()
+                    - startTime
+                ) / 1000;
+
+
+            console.log(
+                "Gemini response time:",
+                responseTime.toFixed(2),
+                "seconds"
+            );
+
+
+            // =================================================
+            // SUCCESS
+            // =================================================
+
+            if (
+                response.ok
+            ) {
+
+                const data =
+                    await response.json();
+
+
+                const candidate =
+                    data.candidates &&
+                    data.candidates[0];
+
+
+                if (
+                    !candidate
+                ) {
+
+                    throw new Error(
+                        "Gemini returned no candidate."
+                    );
+                }
+
+
+                const parts =
+                    candidate.content &&
+                    candidate.content.parts;
+
+
+                if (
+                    !Array.isArray(parts)
+                ) {
+
+                    throw new Error(
+                        "Gemini returned no response content."
+                    );
+                }
+
+
+                const text =
+                    parts
+                        .map(
+                            part =>
+                                part.text || ""
+                        )
+                        .join("")
+                        .trim();
+
+
+                if (
+                    text.length === 0
+                ) {
+
+                    throw new Error(
+                        "Gemini returned an empty response."
+                    );
+                }
+
+
+                console.log(
+                    "Gemini request successful."
+                );
+
+
+                return {
+
+                    response:
+                        text,
+
+                    model:
+                        model,
+
+                    done:
+                        true,
+
+                    done_reason:
+                        candidate.finishReason,
+
+                    eval_count:
+                        undefined
+                };
             }
-        );
 
 
-    const responseTime =
-        (
-            Date.now()
-            - startTime
-        ) / 1000;
+            // =================================================
+            // ERROR RESPONSE
+            // =================================================
+
+            const errorText =
+                await response.text();
 
 
-    console.log(
-        "Gemini response time:",
-        responseTime.toFixed(2),
-        "seconds"
+            // =================================================
+            // RETRY TEMPORARY ERRORS
+            // =================================================
+
+            const isRetryable =
+                response.status === 503 ||
+                response.status === 429 ||
+                response.status === 500 ||
+                response.status === 502 ||
+                response.status === 504;
+
+
+            if (
+                isRetryable &&
+                attempt < MAX_RETRIES
+            ) {
+
+                const delay =
+                    RETRY_DELAYS[attempt];
+
+
+                console.warn(
+                    `Gemini returned HTTP ${
+                        response.status
+                    }. Retrying in ${
+                        delay / 1000
+                    } seconds...`
+                );
+
+
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            delay
+                        )
+                );
+
+
+                continue;
+            }
+
+
+            // =================================================
+            // FINAL ERROR
+            // =================================================
+
+            throw new Error(
+                "Gemini returned HTTP "
+                + response.status
+                + ": "
+                + errorText
+            );
+
+
+        } catch (error) {
+
+            /*
+             * Network/fetch errors do not automatically
+             * get retried here.
+             *
+             * HTTP 503/429/5xx responses are handled above.
+             */
+
+            console.error(
+                "Gemini request failed:",
+                error.message
+            );
+
+
+            throw error;
+        }
+    }
+
+
+    // =====================================================
+    // SAFETY FALLBACK
+    // =====================================================
+
+    throw new Error(
+        "Gemini request failed after all retry attempts."
     );
-
-
-    if (
-        !response.ok
-    ) {
-
-        const errorText =
-            await response.text();
-
-
-        throw new Error(
-            "Gemini returned HTTP "
-            + response.status
-            + ": "
-            + errorText
-        );
-    }
-
-
-    const data =
-        await response.json();
-
-
-    const candidate =
-        data.candidates &&
-        data.candidates[0];
-
-
-    if (
-        !candidate
-    ) {
-
-        throw new Error(
-            "Gemini returned no candidate."
-        );
-    }
-
-
-    const parts =
-        candidate.content &&
-        candidate.content.parts;
-
-
-    if (
-        !Array.isArray(parts)
-    ) {
-
-        throw new Error(
-            "Gemini returned no response content."
-        );
-    }
-
-
-    const text =
-        parts
-            .map(
-                part =>
-                    part.text || ""
-            )
-            .join("")
-            .trim();
-
-
-    if (
-        text.length === 0
-    ) {
-
-        throw new Error(
-            "Gemini returned an empty response."
-        );
-    }
-
-
-    return {
-
-        response:
-            text,
-
-        model:
-            model,
-
-        done:
-            true,
-
-        done_reason:
-            candidate.finishReason,
-
-        eval_count:
-            undefined
-    };
 }
 
 
