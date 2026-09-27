@@ -131,6 +131,9 @@ public class DashboardActivity extends AppCompatActivity {
         // Android 13+ notification permission
         requestNotificationPermission();
 
+        // SMS permission
+        requestSmsPermission();
+
 
         // Budget / Subscription reminders
         setupReminders();
@@ -153,6 +156,28 @@ public class DashboardActivity extends AppCompatActivity {
                     );
 
             updateDashboardModeUI();
+        }
+    }
+
+    // =========================================================
+    // SMS PERMISSION
+    // =========================================================
+
+    private void requestSmsPermission() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            if (checkSelfPermission(
+                    Manifest.permission.RECEIVE_SMS
+            ) != PackageManager.PERMISSION_GRANTED) {
+
+                requestPermissions(
+                        new String[]{
+                                Manifest.permission.RECEIVE_SMS
+                        },
+                        102
+                );
+            }
         }
     }
 
