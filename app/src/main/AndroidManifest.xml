@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -14,10 +17,13 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
-        android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AIExpenseManagementApplication">
+        android:theme="@style/Theme.AIExpenseManagementApplication"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.smsreview.ReviewSmsTransactionActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.ai.AIFinancialAdvisorActivity"
             android:exported="false" />
@@ -171,22 +177,19 @@
         <receiver
             android:name=".notification.ReminderReceiver"
             android:exported="false" />
+
         <activity
             android:name=".ui.family.FamilyInvitationsActivity"
             android:exported="false" />
+
         <receiver
             android:name=".notification.SMSReceiver"
             android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">
-
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
-
         </receiver>
-
-
     </application>
-
 
 </manifest>

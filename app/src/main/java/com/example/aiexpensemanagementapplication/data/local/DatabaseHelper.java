@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 15;
 
     //========================================================
     // USER TABLE
@@ -116,6 +116,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TRANSACTION_TYPE = "TransactionType";
     public static final String TRANSACTION_DATE = "TransactionDate";
     public static final String SOURCE = "Source";
+
+    //========================================================
+    // PENDING SMS TRANSACTION
+    // Used when Model 2 predicts "Others"
+    //========================================================
+
+    public static final String TABLE_PENDING_SMS_TRANSACTION =
+            "PendingSmsTransaction";
+
+    public static final String PENDING_SMS_ID =
+            "PendingSmsID";
+
+    public static final String PENDING_SMS_USER_ID =
+            "UserID";
+
+    public static final String PENDING_SMS_SENDER =
+            "Sender";
+
+    public static final String PENDING_SMS_BODY =
+            "SmsBody";
+
+    public static final String PENDING_SMS_AMOUNT =
+            "Amount";
+
+    public static final String PENDING_SMS_DETECTED_CATEGORY =
+            "DetectedCategory";
+
+    public static final String PENDING_SMS_TRANSACTION_DATE =
+            "TransactionDate";
+
+    public static final String PENDING_SMS_STATUS =
+            "Status";
+
+    public static final String PENDING_SMS_CREATED_AT =
+            "CreatedAt";
 
 // EXPENSE FAMILY SHARE
 
@@ -309,6 +344,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_TRANSACTION_TABLE);
 
+        db.execSQL(CREATE_PENDING_SMS_TRANSACTION_TABLE);
+
         db.execSQL(CREATE_EXPENSE_FAMILY_SHARE_TABLE);
 
         db.execSQL(CREATE_BUDGET_TABLE);
@@ -425,7 +462,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " +
                     TABLE_CATEGORY + "(" + CATEGORY_ID + ")" +
                     ");";
+    //========================================================
+    // CREATE PENDING SMS TRANSACTION TABLE
+    //========================================================
 
+    private static final String CREATE_PENDING_SMS_TRANSACTION_TABLE =
+            "CREATE TABLE IF NOT EXISTS " +
+                    TABLE_PENDING_SMS_TRANSACTION + " (" +
+
+                    PENDING_SMS_ID +
+                    " INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                    PENDING_SMS_USER_ID +
+                    " INTEGER NOT NULL," +
+
+                    PENDING_SMS_SENDER +
+                    " TEXT," +
+
+                    PENDING_SMS_BODY +
+                    " TEXT NOT NULL," +
+
+                    PENDING_SMS_AMOUNT +
+                    " REAL," +
+
+                    PENDING_SMS_DETECTED_CATEGORY +
+                    " TEXT," +
+
+                    PENDING_SMS_TRANSACTION_DATE +
+                    " TEXT," +
+
+                    PENDING_SMS_STATUS +
+                    " TEXT NOT NULL DEFAULT 'PENDING'," +
+
+                    PENDING_SMS_CREATED_AT +
+                    " INTEGER NOT NULL," +
+
+                    "FOREIGN KEY(" +
+                    PENDING_SMS_USER_ID +
+                    ") REFERENCES " +
+                    TABLE_USER +
+                    "(" + USER_ID + ") " +
+                    "ON DELETE CASCADE" +
+
+                    ");";
     private static final String CREATE_EXPENSE_FAMILY_SHARE_TABLE =
             "CREATE TABLE " + TABLE_EXPENSE_FAMILY_SHARE + " (" +
 
@@ -738,6 +817,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             ")"
             );
         }
+
+        // -------------------------------------------------
+        // VERSION 13 -> VERSION 14
+        // Add pending SMS transaction review support
+        // -------------------------------------------------
+
+        if (oldVersion < 14) {
+
+            db.execSQL(
+                    CREATE_PENDING_SMS_TRANSACTION_TABLE
+            );
+        }
+
+        // -------------------------------------------------
+// VERSION 14 -> VERSION 15
+// Add "Others" expense category for SMS review
+// -------------------------------------------------
+
+        if (oldVersion < 15) {
+
+            db.execSQL(
+                    "INSERT INTO " + TABLE_CATEGORY +
+                            " (" + CATEGORY_NAME + ", " + CATEGORY_TYPE + ") " +
+                            "SELECT 'Others', 'Expense' " +
+                            "WHERE NOT EXISTS (" +
+                            "SELECT 1 FROM " + TABLE_CATEGORY +
+                            " WHERE " + CATEGORY_NAME + "='Others'" +
+                            ")"
+            );
+        }
     }
 
     @Override
@@ -779,6 +888,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO Category(CategoryName,CategoryType) VALUES('Education','Expense')");
         db.execSQL("INSERT INTO Category(CategoryName,CategoryType) VALUES('Entertainment','Expense')");
         db.execSQL("INSERT INTO Category(CategoryName,CategoryType) VALUES('Travel','Expense')");
+        db.execSQL("INSERT INTO Category(CategoryName,CategoryType) VALUES('Others','Expense')");
         db.execSQL("INSERT INTO Category(CategoryName,CategoryType) VALUES('Salary','Income')");
         db.execSQL("INSERT INTO Category(CategoryName,CategoryType) VALUES('Business','Income')");
         db.execSQL("INSERT INTO Category(CategoryName,CategoryType) VALUES('Investment','Income')");
@@ -1222,6 +1332,96 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    //========================================================
+    // INSERT PENDING SMS TRANSACTION
+    // Used when Model 2 predicts "Others"
+    //========================================================
+
+    public long insertPendingSmsTransaction(
+            int userId,
+            String sender,
+            String smsBody,
+            double amount,
+            String detectedCategory,
+            String transactionDate) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(PENDING_SMS_USER_ID, userId);
+        values.put(PENDING_SMS_SENDER, sender);
+        values.put(PENDING_SMS_BODY, smsBody);
+        values.put(PENDING_SMS_AMOUNT, amount);
+        values.put(PENDING_SMS_DETECTED_CATEGORY, detectedCategory);
+        values.put(PENDING_SMS_TRANSACTION_DATE, transactionDate);
+
+        // New pending SMS must wait for user review
+        values.put(PENDING_SMS_STATUS, "PENDING");
+
+        // Store creation time in milliseconds
+        values.put(
+                PENDING_SMS_CREATED_AT,
+                System.currentTimeMillis()
+        );
+
+        return db.insert(
+                TABLE_PENDING_SMS_TRANSACTION,
+                null,
+                values
+        );
+    }
+
+    //========================================================
+    // GET ONE PENDING SMS TRANSACTION BY ID
+    // Used by the SMS review screen
+    //========================================================
+
+    public Cursor getPendingSmsTransaction(long pendingSmsId) {
+
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
+        return db.rawQuery(
+                "SELECT * FROM " +
+                        TABLE_PENDING_SMS_TRANSACTION +
+                        " WHERE " +
+                        PENDING_SMS_ID +
+                        "=?",
+
+                new String[]{
+                        String.valueOf(pendingSmsId)
+                }
+        );
+    }
+
+    //========================================================
+    // MARK PENDING SMS AS COMPLETED
+    // Called after user reviews and saves the transaction
+    //========================================================
+
+    public int markPendingSmsAsCompleted(long pendingSmsId) {
+
+        SQLiteDatabase db =
+                this.getWritableDatabase();
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(
+                PENDING_SMS_STATUS,
+                "COMPLETED"
+        );
+
+        return db.update(
+                TABLE_PENDING_SMS_TRANSACTION,
+                values,
+                PENDING_SMS_ID + "=?",
+                new String[]{
+                        String.valueOf(pendingSmsId)
+                }
+        );
+    }
 
     public long insertTransaction(int userId,
                                   int paymentMethodId,

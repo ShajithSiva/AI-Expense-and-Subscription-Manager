@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ============================================ -->
+        <!-- TITLE -->
+        <!-- ============================================ -->
+
+        <TextView
+            android:id="@+id/tvReviewTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Review SMS Transaction"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp" />
+
+
+        <!-- ============================================ -->
+        <!-- SENDER -->
+        <!-- ============================================ -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SMS Sender"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvSmsSender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="16sp"
+            android:paddingTop="6dp"
+            android:paddingBottom="16dp" />
+
+
+        <!-- ============================================ -->
+        <!-- SMS MESSAGE -->
+        <!-- ============================================ -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SMS Message"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvSmsBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="20dp"
+            android:background="#EEEEEE"
+            android:textIsSelectable="true" />
+
+
+        <!-- ============================================ -->
+        <!-- AMOUNT -->
+        <!-- ============================================ -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Detected Amount"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvSmsAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LKR 0.00"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:paddingTop="6dp"
+            android:paddingBottom="20dp" />
+
+
+        <!-- ============================================ -->
+        <!-- CATEGORY -->
+        <!-- ============================================ -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Correct Category"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginBottom="20dp" />
+
+
+        <!-- ============================================ -->
+        <!-- FAMILY SHARE -->
+        <!-- ============================================ -->
+
+        <CheckBox
+            android:id="@+id/checkShareFamily"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Share this transaction with family"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
+
+
+        <!-- Family selection will be enabled only when -->
+        <!-- the user chooses Share with Family. -->
+
+        <Spinner
+            android:id="@+id/spinnerFamily"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="20dp" />
+
+
+        <!-- ============================================ -->
+        <!-- SAVE BUTTON -->
+        <!-- ============================================ -->
+
+        <Button
+            android:id="@+id/btnSaveReviewedSms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Transaction"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:minHeight="52dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="24dp" />
+
+    </LinearLayout>
+
+</ScrollView>
