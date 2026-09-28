@@ -9,6 +9,7 @@ public class Notification {
     private String type;
     private long timestamp;
     private boolean isRead;
+    private long pendingSmsId;
 
     public Notification() {
     }
@@ -84,5 +85,13 @@ public class Notification {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public long getPendingSmsId() {
+        return pendingSmsId;
+    }
+
+    public void setPendingSmsId(long pendingSmsId) {
+        this.pendingSmsId = pendingSmsId;
     }
 }

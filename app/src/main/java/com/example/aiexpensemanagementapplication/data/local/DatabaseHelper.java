@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 16;
 
     //========================================================
     // USER TABLE
@@ -316,6 +316,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COL_NOTIFICATION_DATE = "date";
     private static final String COL_NOTIFICATION_TIME = "time";
     private static final String COL_NOTIFICATION_READ = "is_read";
+    private static final String COL_NOTIFICATION_PENDING_SMS_ID = "pending_sms_id";
 
     //========================================================
     // CONSTRUCTOR
@@ -384,7 +385,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + COL_NOTIFICATION_TYPE + " TEXT,"
                         + COL_NOTIFICATION_DATE + " TEXT,"
                         + COL_NOTIFICATION_TIME + " TEXT,"
-                        + COL_NOTIFICATION_READ + " INTEGER DEFAULT 0"
+                        + COL_NOTIFICATION_READ + " INTEGER DEFAULT 0,"
+                        + COL_NOTIFICATION_PENDING_SMS_ID + " INTEGER DEFAULT -1"
                         + ")";
 
         db.execSQL(CREATE_NOTIFICATION_TABLE);
@@ -845,6 +847,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             "SELECT 1 FROM " + TABLE_CATEGORY +
                             " WHERE " + CATEGORY_NAME + "='Others'" +
                             ")"
+            );
+        }
+
+        // -------------------------------------------------
+// VERSION 15 -> VERSION 16
+// Link app notifications with pending SMS reviews
+// -------------------------------------------------
+
+        if (oldVersion < 16) {
+
+            db.execSQL(
+                    "ALTER TABLE " + TABLE_NOTIFICATION +
+                            " ADD COLUMN " +
+                            COL_NOTIFICATION_PENDING_SMS_ID +
+                            " INTEGER DEFAULT -1"
             );
         }
     }
@@ -5359,6 +5376,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    public long insertSmsReviewNotification(
+            String title,
+            String message,
+            String subtitle,
+            long pendingSmsId
+    ) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(COL_NOTIFICATION_TITLE, title);
+        values.put(COL_NOTIFICATION_MESSAGE, message);
+        values.put(COL_NOTIFICATION_SUBTITLE, subtitle);
+        values.put(COL_NOTIFICATION_TYPE, "sms_review");
+        values.put(COL_NOTIFICATION_TIMESTAMP, System.currentTimeMillis());
+        values.put(COL_NOTIFICATION_PENDING_SMS_ID, pendingSmsId);
+
+        return db.insert(
+                TABLE_NOTIFICATION,
+                null,
+                values
+        );
+    }
+
     public ArrayList<Notification> getAllNotifications() {
 
         ArrayList<Notification> list = new ArrayList<>();
@@ -5419,6 +5461,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 cursor.getColumnIndexOrThrow(COL_NOTIFICATION_READ)
                         ) == 1
                 );
+                notification.setPendingSmsId(
+                        cursor.getLong(
+                                cursor.getColumnIndexOrThrow(
+                                        COL_NOTIFICATION_PENDING_SMS_ID
+                                )
+                        )
+                );
 
                 list.add(notification);
 
@@ -5477,6 +5526,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
 
         db.close();
+    }
+
+    public int deleteSmsReviewNotification(long pendingSmsId) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        return db.delete(
+                TABLE_NOTIFICATION,
+                COL_NOTIFICATION_PENDING_SMS_ID + " = ?",
+                new String[]{String.valueOf(pendingSmsId)}
+        );
     }
 
     public int getUnreadNotificationCount() {

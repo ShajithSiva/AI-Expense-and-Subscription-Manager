@@ -1,6 +1,8 @@
 package com.example.aiexpensemanagementapplication.ui.notification;
 
 import android.content.Context;
+import android.content.Intent;
+import com.example.aiexpensemanagementapplication.ui.smsreview.ReviewSmsTransactionActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,6 +104,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         holder.itemView.setOnClickListener(v -> {
 
+            // Mark notification as read
             if (!notification.isRead()) {
 
                 db.markNotificationAsRead(
@@ -110,8 +113,24 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
                 notification.setRead(true);
 
-                notifyItemChanged(position);
+                notifyItemChanged(holder.getBindingAdapterPosition());
+            }
 
+            // SMS review notification -> open exact pending SMS
+            if ("sms_review".equals(notification.getType())
+                    && notification.getPendingSmsId() > 0) {
+
+                Intent intent = new Intent(
+                        context,
+                        ReviewSmsTransactionActivity.class
+                );
+
+                intent.putExtra(
+                        ReviewSmsTransactionActivity.EXTRA_PENDING_SMS_ID,
+                        notification.getPendingSmsId()
+                );
+
+                context.startActivity(intent);
             }
         });
 

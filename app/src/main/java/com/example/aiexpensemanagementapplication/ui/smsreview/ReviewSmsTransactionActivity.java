@@ -916,6 +916,8 @@ public class ReviewSmsTransactionActivity extends AppCompatActivity {
             return;
         }
 
+        databaseHelper.deleteSmsReviewNotification(pendingSmsId);
+
         Toast.makeText(
                 this,
                 message,

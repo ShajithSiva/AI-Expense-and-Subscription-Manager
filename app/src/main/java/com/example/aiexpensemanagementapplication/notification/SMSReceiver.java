@@ -392,6 +392,13 @@ public class SMSReceiver extends BroadcastReceiver {
                                     amount
                             );
 
+                            databaseHelper.insertSmsReviewNotification(
+                                    "Transaction needs review",
+                                    String.format("LKR %.2f needs a category", amount),
+                                    "Tap to review SMS transaction",
+                                    pendingSmsId
+                            );
+
                         } else {
 
                             Log.e(
