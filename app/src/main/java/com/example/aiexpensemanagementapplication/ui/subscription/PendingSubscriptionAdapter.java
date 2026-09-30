@@ -4,46 +4,59 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aiexpensemanagementapplication.R;
-import com.example.aiexpensemanagementapplication.model.Subscription;
+import com.example.aiexpensemanagementapplication.model.PendingSubscription;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
-public class SubscriptionAdapter
-        extends RecyclerView.Adapter<SubscriptionAdapter.ViewHolder> {
+public class PendingSubscriptionAdapter
+        extends RecyclerView.Adapter<
+        PendingSubscriptionAdapter.PendingViewHolder> {
+
+    // =========================================================
+    // LISTENER
+    // =========================================================
+
+    public interface OnPendingSubscriptionClickListener {
+
+        void onPendingSubscriptionClick(
+                PendingSubscription subscription
+        );
+    }
 
 
     // =========================================================
-    // VARIABLES
+    // FIELDS
     // =========================================================
 
     private final Context context;
 
-    private final ArrayList<Subscription> subscriptionList;
+    private final ArrayList<PendingSubscription> pendingList;
 
-    private final OnSubscriptionClickListener listener;
+    private final OnPendingSubscriptionClickListener listener;
 
 
     // =========================================================
     // CONSTRUCTOR
     // =========================================================
 
-    public SubscriptionAdapter(
+    public PendingSubscriptionAdapter(
             Context context,
-            ArrayList<Subscription> subscriptionList,
-            OnSubscriptionClickListener listener
+            ArrayList<PendingSubscription> pendingList,
+            OnPendingSubscriptionClickListener listener
     ) {
 
         this.context = context;
-        this.subscriptionList = subscriptionList;
+
+        this.pendingList = pendingList;
+
         this.listener = listener;
     }
 
@@ -54,7 +67,7 @@ public class SubscriptionAdapter
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(
+    public PendingViewHolder onCreateViewHolder(
             @NonNull ViewGroup parent,
             int viewType
     ) {
@@ -63,13 +76,15 @@ public class SubscriptionAdapter
                 LayoutInflater
                         .from(context)
                         .inflate(
-                                R.layout.item_subscription,
+                                R.layout.item_pending_subscription,
                                 parent,
                                 false
                         );
 
 
-        return new ViewHolder(view);
+        return new PendingViewHolder(
+                view
+        );
     }
 
 
@@ -79,12 +94,14 @@ public class SubscriptionAdapter
 
     @Override
     public void onBindViewHolder(
-            @NonNull ViewHolder holder,
+            @NonNull PendingViewHolder holder,
             int position
     ) {
 
-        Subscription subscription =
-                subscriptionList.get(position);
+        PendingSubscription subscription =
+                pendingList.get(
+                        position
+                );
 
 
         if (subscription == null) {
@@ -105,114 +122,74 @@ public class SubscriptionAdapter
 
         if (serviceName.isEmpty()) {
 
-            holder.tvServiceName.setText(
-                    "Unknown Service"
-            );
-
-        } else {
-
-            holder.tvServiceName.setText(
-                    serviceName
-            );
+            serviceName =
+                    "Unknown Service";
         }
+
+
+        holder.tvServiceName.setText(
+                serviceName
+        );
+
+
+        // =====================================================
+        // AMOUNT
+        // =====================================================
+
+        holder.tvAmount.setText(
+                subscription.getDisplayAmount()
+        );
 
 
         // =====================================================
         // BILLING CYCLE
         // =====================================================
 
-        String billingCycle =
-                safeString(
-                        subscription.getBillingCycle()
-                );
-
-
-        if (billingCycle.isEmpty()) {
-
-            holder.tvPlanType.setText(
-                    "Billing cycle not set"
-            );
-
-        } else {
-
-            holder.tvPlanType.setText(
-                    billingCycle
-            );
-        }
-
-
-        // =====================================================
-        // AMOUNT + ORIGINAL CURRENCY
-        // =====================================================
-
-        double amount =
-                subscription.getAmount();
-
-
-        String currency =
-                safeString(
-                        subscription.getCurrency()
-                );
-
-
-        /*
-         * IMPORTANT:
-         *
-         * Do NOT display "Rs" for every subscription.
-         *
-         * Examples:
-         *
-         * USD 15.49
-         * EUR 9.99
-         * LKR 2500.00
-         *
-         * If the original currency is unknown,
-         * do not default it to LKR.
-         */
-
-        if (currency.isEmpty()) {
-
-            holder.tvAmount.setText(
-                    String.format(
-                            Locale.US,
-                            "%.2f · Currency not set",
-                            amount
-                    )
-            );
-
-        } else {
-
-            holder.tvAmount.setText(
-                    String.format(
-                            Locale.US,
-                            "%s %.2f",
-                            currency,
-                            amount
-                    )
-            );
-        }
+        holder.tvBillingCycle.setText(
+                subscription.getDisplayBillingCycle()
+        );
 
 
         // =====================================================
         // NEXT BILLING DATE
         // =====================================================
 
-        String nextBillingDate =
+        holder.tvNextBillingDate.setText(
+                subscription.getDisplayNextBillingDate()
+        );
+
+
+        // =====================================================
+        // CONFIDENCE
+        // =====================================================
+
+        holder.tvConfidence.setText(
+                "AI confidence: "
+                        + subscription.getDisplayConfidence()
+        );
+
+
+        // =====================================================
+        // EMAIL SUBJECT
+        // =====================================================
+
+        String emailSubject =
                 safeString(
-                        subscription.getNextBillingDate()
+                        subscription.getEmailSubject()
                 );
 
 
-        if (nextBillingDate.isEmpty()) {
+        if (emailSubject.isEmpty()) {
 
-            holder.tvDueDate.setText(
-                    "Date not set"
+            holder.tvEmailSubject.setText(
+                    "Detected from Gmail"
             );
+
 
         } else {
 
-            holder.tvDueDate.setText(
-                    nextBillingDate
+            holder.tvEmailSubject.setText(
+                    emailSubject
             );
         }
 
@@ -222,34 +199,27 @@ public class SubscriptionAdapter
         // =====================================================
 
         holder.chipStatus.setText(
-                "Active"
+                "Review"
         );
 
 
         // =====================================================
-        // USAGE TEXT
+        // CLICK
         // =====================================================
 
-        holder.tvUsage.setText(
-                "Subscription Active"
-        );
+        holder.cardPendingSubscription
+                .setOnClickListener(
+                        v -> {
 
+                            if (listener != null) {
 
-        // =====================================================
-        // ITEM CLICK
-        // =====================================================
-
-        holder.itemView.setOnClickListener(
-                v -> {
-
-                    if (listener != null) {
-
-                        listener.onSubscriptionClick(
-                                subscription
-                        );
-                    }
-                }
-        );
+                                listener
+                                        .onPendingSubscriptionClick(
+                                                subscription
+                                        );
+                            }
+                        }
+                );
     }
 
 
@@ -260,12 +230,13 @@ public class SubscriptionAdapter
     @Override
     public int getItemCount() {
 
-        if (subscriptionList == null) {
+        if (pendingList == null) {
 
             return 0;
         }
 
-        return subscriptionList.size();
+
+        return pendingList.size();
     }
 
 
@@ -282,6 +253,7 @@ public class SubscriptionAdapter
             return "";
         }
 
+
         return value.trim();
     }
 
@@ -290,37 +262,36 @@ public class SubscriptionAdapter
     // VIEW HOLDER
     // =========================================================
 
-    static class ViewHolder
+    public static class PendingViewHolder
             extends RecyclerView.ViewHolder {
 
-
-        ImageView ivLogo;
-
+        MaterialCardView cardPendingSubscription;
 
         TextView tvServiceName;
 
-        TextView tvPlanType;
-
         TextView tvAmount;
 
-        TextView tvUsage;
+        TextView tvBillingCycle;
 
-        TextView tvDueDate;
+        TextView tvNextBillingDate;
 
+        TextView tvConfidence;
+
+        TextView tvEmailSubject;
 
         Chip chipStatus;
 
 
-        ViewHolder(
+        public PendingViewHolder(
                 @NonNull View itemView
         ) {
 
             super(itemView);
 
 
-            ivLogo =
+            cardPendingSubscription =
                     itemView.findViewById(
-                            R.id.ivLogo
+                            R.id.cardPendingSubscription
                     );
 
 
@@ -330,27 +301,33 @@ public class SubscriptionAdapter
                     );
 
 
-            tvPlanType =
-                    itemView.findViewById(
-                            R.id.tvPlanType
-                    );
-
-
             tvAmount =
                     itemView.findViewById(
                             R.id.tvAmount
                     );
 
 
-            tvUsage =
+            tvBillingCycle =
                     itemView.findViewById(
-                            R.id.tvUsage
+                            R.id.tvBillingCycle
                     );
 
 
-            tvDueDate =
+            tvNextBillingDate =
                     itemView.findViewById(
-                            R.id.tvDueDate
+                            R.id.tvNextBillingDate
+                    );
+
+
+            tvConfidence =
+                    itemView.findViewById(
+                            R.id.tvConfidence
+                    );
+
+
+            tvEmailSubject =
+                    itemView.findViewById(
+                            R.id.tvEmailSubject
                     );
 
 
@@ -359,17 +336,5 @@ public class SubscriptionAdapter
                             R.id.chipStatus
                     );
         }
-    }
-
-
-    // =========================================================
-    // CLICK LISTENER
-    // =========================================================
-
-    public interface OnSubscriptionClickListener {
-
-        void onSubscriptionClick(
-                Subscription subscription
-        );
     }
 }

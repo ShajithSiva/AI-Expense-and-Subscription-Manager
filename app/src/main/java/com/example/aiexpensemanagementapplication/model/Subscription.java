@@ -7,12 +7,20 @@ public class Subscription {
 
     private String serviceName;
     private double amount;
+    private String currency;
     private String billingCycle;
     private String nextBillingDate;
 
+    // ==========================
+    // Empty Constructor
+    // ==========================
     public Subscription() {
     }
 
+    // ==========================
+    // Old Constructor
+    // Keep this for compatibility
+    // ==========================
     public Subscription(int subscriptionId,
                         int userId,
                         String serviceName,
@@ -24,6 +32,28 @@ public class Subscription {
         this.userId = userId;
         this.serviceName = serviceName;
         this.amount = amount;
+        this.currency = null;
+        this.billingCycle = billingCycle;
+        this.nextBillingDate = nextBillingDate;
+    }
+
+    // ==========================
+    // New Constructor
+    // With Currency
+    // ==========================
+    public Subscription(int subscriptionId,
+                        int userId,
+                        String serviceName,
+                        double amount,
+                        String currency,
+                        String billingCycle,
+                        String nextBillingDate) {
+
+        this.subscriptionId = subscriptionId;
+        this.userId = userId;
+        this.serviceName = serviceName;
+        this.amount = amount;
+        this.currency = currency;
         this.billingCycle = billingCycle;
         this.nextBillingDate = nextBillingDate;
     }
@@ -46,6 +76,10 @@ public class Subscription {
 
     public double getAmount() {
         return amount;
+    }
+
+    public String getCurrency() {
+        return currency;
     }
 
     public String getBillingCycle() {
@@ -74,6 +108,15 @@ public class Subscription {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public void setCurrency(String currency) {
+
+        if (currency == null || currency.trim().isEmpty()) {
+            this.currency = null;
+        } else {
+            this.currency = currency.trim().toUpperCase();
+        }
     }
 
     public void setBillingCycle(String billingCycle) {

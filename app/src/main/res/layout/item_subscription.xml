@@ -5,11 +5,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginTop="12dp"
-    app:cardCornerRadius="18dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E5E7EB"
+    app:strokeWidth="1dp">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,44 +23,173 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Top Section -->
+
+        <!-- ================================================= -->
+        <!-- TOP SECTION -->
+        <!-- ================================================= -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/ivLogo"
-                android:layout_width="54dp"
-                android:layout_height="54dp"
-                android:background="@drawable/bg_circle"
-                android:scaleType="centerCrop"
-                android:src="@drawable/subscribtion"/>
+
+            <!-- ================================================= -->
+            <!-- SUBSCRIPTION ICON -->
+            <!-- ================================================= -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:cardBackgroundColor="#ECFDF3"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:id="@+id/ivLogo"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Subscription service"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/subscribtion" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- ================================================= -->
+            <!-- SERVICE + BILLING CYCLE -->
+            <!-- ================================================= -->
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="14dp"
+                android:layout_weight="1"
                 android:orientation="vertical">
+
 
                 <TextView
                     android:id="@+id/tvServiceName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text="Netflix"
-                    android:textStyle="bold"
-                    android:textSize="19sp"/>
+                    android:textColor="#111827"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
 
                 <TextView
                     android:id="@+id/tvPlanType"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Monthly Plan"
-                    android:textColor="#808080"
-                    android:textSize="14sp"/>
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Monthly"
+                    android:textColor="#6B7280"
+                    android:textSize="13sp" />
 
             </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- AMOUNT + STATUS -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:gravity="end"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:id="@+id/tvAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:text="USD 15.49"
+                    android:textColor="#111827"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="5dp"
+                    android:checkable="false"
+                    android:clickable="false"
+                    android:text="Active"
+                    android:textColor="#087A37"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#EAFBF0"
+                    app:chipCornerRadius="16dp"
+                    app:chipMinHeight="28dp"
+                    app:chipStartPadding="6dp"
+                    app:chipEndPadding="6dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- DIVIDER -->
+        <!-- ================================================= -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="12dp"
+            android:background="#EEF0F2" />
+
+
+        <!-- ================================================= -->
+        <!-- BOTTOM SECTION -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+
+            <!-- STATUS / USAGE ICON -->
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:contentDescription="Subscription status"
+                android:src="@drawable/bg_insight"
+                app:tint="#4F5663" />
+
+
+            <!-- STATUS TEXT -->
+
+            <TextView
+                android:id="@+id/tvUsage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Subscription Active"
+                android:textColor="#6B7280"
+                android:textSize="12sp" />
+
+
+            <!-- NEXT BILLING DATE -->
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -62,64 +197,38 @@
                 android:gravity="end"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Rs 799"
-                    android:textStyle="bold"
-                    android:textSize="20sp"/>
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipStatus"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Active"
-                    app:chipCornerRadius="50dp"/>
+                    android:text="NEXT BILL"
+                    android:textColor="#9CA3AF"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/tvDueDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="2026-10-30"
+                    android:textColor="#4F5663"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
-        </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="14dp"
-            android:background="#E5E5E5"/>
-
-        <!-- Bottom Section -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
+            <!-- CHEVRON -->
 
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:src="@drawable/bg_insight"/>
-
-            <TextView
-                android:id="@+id/tvUsage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="Watched 14 hours this week"
-                android:textColor="#666666"/>
-
-            <TextView
-                android:id="@+id/tvDueDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="DUE OCT 28"
-                android:textStyle="bold"
-                android:textSize="12sp"/>
-
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginStart="6dp"
-                android:src="@drawable/ic_chevron_right"/>
+                android:contentDescription="View subscription"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="#9CA3AF" />
 
         </LinearLayout>
 

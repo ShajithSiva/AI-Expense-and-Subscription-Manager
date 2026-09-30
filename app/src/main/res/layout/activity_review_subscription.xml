@@ -9,7 +9,7 @@
 
 
     <!-- ===================================================== -->
-    <!-- TOP APP BAR -->
+    <!-- TOP TOOLBAR -->
     <!-- ===================================================== -->
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -19,12 +19,12 @@
         android:background="@android:color/white"
         android:elevation="2dp"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Add Subscription"
+        app:title="Review Subscription"
         app:titleTextColor="#111827" />
 
 
     <!-- ===================================================== -->
-    <!-- SCROLLABLE CONTENT -->
+    <!-- CONTENT -->
     <!-- ===================================================== -->
 
     <ScrollView
@@ -39,31 +39,113 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="16dp"
-            android:paddingTop="16dp"
+            android:paddingTop="18dp"
             android:paddingEnd="16dp"
             android:paddingBottom="32dp">
 
 
             <!-- ================================================= -->
-            <!-- TITLE -->
+            <!-- PROGRESS -->
             <!-- ================================================= -->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Subscription details"
-                android:textColor="#111827"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Enter the original subscription details."
-                android:textColor="#6B7280"
-                android:textSize="14sp" />
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="4dp"
+                android:paddingBottom="12dp">
+
+
+                <TextView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_badge_green"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Analyze"
+                    android:textColor="#4F5663"
+                    android:textSize="14sp" />
+
+
+                <View
+                    android:layout_width="45dp"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="#CBD5E1" />
+
+
+                <TextView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_badge_green"
+                    android:gravity="center"
+                    android:text="2"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Review"
+                    android:textColor="#00A840"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- DETECTION STATUS -->
+            <!-- ================================================= -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                app:cardBackgroundColor="#EAFBF0"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+
+                    <TextView
+                        android:id="@+id/tvDetectionStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Subscription detected"
+                        android:textColor="#008A35"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Check the detected details before saving."
+                        android:textColor="#4F5663"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
 
             <!-- ================================================= -->
@@ -73,7 +155,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="16dp"
                 app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
@@ -84,12 +166,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="18dp">
 
 
-                    <!-- ================================================= -->
                     <!-- SERVICE NAME -->
-                    <!-- ================================================= -->
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layoutServiceName"
@@ -97,66 +177,54 @@
                         android:layout_height="wrap_content"
                         android:hint="Service name"
                         app:boxBackgroundMode="outline"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etServiceName"
                             android:layout_width="match_parent"
                             android:layout_height="56dp"
                             android:inputType="textCapWords"
-                            android:maxLines="1"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="16dp" />
+                            android:maxLines="1" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
 
-                    <!-- ================================================= -->
-                    <!-- ORIGINAL AMOUNT -->
-                    <!-- ================================================= -->
+                    <!-- AMOUNT -->
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layoutAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="14dp"
                         android:hint="Original amount"
                         app:boxBackgroundMode="outline"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etAmount"
                             android:layout_width="match_parent"
                             android:layout_height="56dp"
                             android:inputType="numberDecimal"
-                            android:maxLines="1"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="16dp" />
+                            android:maxLines="1" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
 
-                    <!-- ================================================= -->
                     <!-- CURRENCY -->
-                    <!-- ================================================= -->
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layoutCurrency"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="Currency"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        android:layout_marginTop="14dp"
+                        android:hint="Currency">
 
                         <AutoCompleteTextView
                             android:id="@+id/actCurrency"
@@ -164,26 +232,65 @@
                             android:layout_height="56dp"
                             android:clickable="true"
                             android:focusable="false"
-                            android:inputType="none"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="16dp" />
+                            android:inputType="none" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
 
-                    <TextView
+                    <!-- ================================================= -->
+                    <!-- LKR ESTIMATE -->
+                    <!-- ================================================= -->
+
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginTop="5dp"
-                        android:text="Select the original currency used by this subscription."
-                        android:textColor="#6B7280"
-                        android:textSize="12sp" />
+                        android:layout_marginTop="16dp"
+                        app:cardBackgroundColor="#ECFDF3"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
 
 
-                    <!-- ================================================= -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="LKR estimate"
+                                android:textColor="#374151"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+
+                            <TextView
+                                android:id="@+id/tvLkrEstimate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="Rs. —"
+                                android:textColor="#111827"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+
+                            <TextView
+                                android:id="@+id/tvRateInfo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Conversion information will appear here."
+                                android:textColor="#6B7280"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+
                     <!-- BILLING CYCLE -->
-                    <!-- ================================================= -->
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layoutBillingCycle"
@@ -191,11 +298,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:hint="Billing cycle"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        android:hint="Billing cycle">
 
                         <AutoCompleteTextView
                             android:id="@+id/actBillingCycle"
@@ -203,28 +306,20 @@
                             android:layout_height="56dp"
                             android:clickable="true"
                             android:focusable="false"
-                            android:inputType="none"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="16dp" />
+                            android:inputType="none" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
 
-                    <!-- ================================================= -->
                     <!-- NEXT BILLING DATE -->
-                    <!-- ================================================= -->
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layoutNextBillingDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="14dp"
                         android:hint="Next billing date"
                         app:boxBackgroundMode="outline"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp"
                         app:endIconMode="custom"
                         app:endIconDrawable="@drawable/ic_calendar">
 
@@ -234,9 +329,7 @@
                             android:layout_height="56dp"
                             android:clickable="true"
                             android:focusable="false"
-                            android:inputType="none"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="16dp" />
+                            android:inputType="none" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -247,93 +340,30 @@
 
 
             <!-- ================================================= -->
-            <!-- FAMILY SHARING -->
+            <!-- CONFIRM CHECKBOX -->
             <!-- ================================================= -->
 
-            <com.google.android.material.card.MaterialCardView
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkConfirmed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#E5E7EB"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/switchShareFamily"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Share with family"
-                        android:textColor="#111827"
-                        android:textSize="16sp" />
-
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Make this subscription visible to a selected family group."
-                        android:textColor="#6B7280"
-                        android:textSize="13sp" />
-
-
-                    <!-- ================================================= -->
-                    <!-- FAMILY SELECTION -->
-                    <!-- ================================================= -->
-
-                    <LinearLayout
-                        android:id="@+id/layoutFamilySelection"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:orientation="vertical"
-                        android:visibility="gone">
-
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Select family"
-                            android:textColor="#374151"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-
-                        <Spinner
-                            android:id="@+id/spFamily"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:layout_marginTop="8dp"
-                            android:background="@android:drawable/editbox_background"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp" />
-
-                    </LinearLayout>
-
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginTop="16dp"
+                android:text="I checked these details"
+                android:textColor="#374151"
+                android:textSize="14sp"
+                app:buttonTint="#00C94F" />
 
 
             <!-- ================================================= -->
-            <!-- SAVE -->
+            <!-- CONFIRM BUTTON -->
             <!-- ================================================= -->
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSave"
+                android:id="@+id/btnConfirmSave"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="24dp"
-                android:text="Save Subscription"
+                android:layout_marginTop="14dp"
+                android:text="Confirm &amp; Save"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="17sp"
@@ -343,22 +373,19 @@
 
 
             <!-- ================================================= -->
-            <!-- CANCEL -->
+            <!-- DO NOT SAVE -->
             <!-- ================================================= -->
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancel"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:id="@+id/btnDoNotSave"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_marginTop="12dp"
-                android:text="Cancel"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:text="Do not save"
                 android:textAllCaps="false"
-                android:textColor="#4F5663"
-                android:textSize="16sp"
-                app:cornerRadius="12dp"
-                app:strokeColor="#D1D5DB"
-                app:strokeWidth="1dp" />
+                android:textColor="#008A35"
+                android:textSize="16sp" />
 
 
         </LinearLayout>

@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 16;
+    private static final int DATABASE_VERSION = 19;
 
     //========================================================
     // USER TABLE
@@ -192,15 +192,107 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String OTHERS_BUDGET = "OthersBudget";
 
     //========================================================
-    // SUBSCRIPTION
-    //========================================================
+// SUBSCRIPTION
+//========================================================
 
     public static final String TABLE_SUBSCRIPTION = "Subscription";
 
     public static final String SUBSCRIPTION_ID = "SubscriptionID";
     public static final String SERVICE_NAME = "ServiceName";
+
+    // Original subscription currency.
+// Examples: LKR, USD, EUR, GBP.
+// NULL means currency is not known yet.
+    public static final String SUBSCRIPTION_CURRENCY = "Currency";
+
     public static final String BILLING_CYCLE = "BillingCycle";
     public static final String NEXT_BILLING_DATE = "NextBillingDate";
+
+    // =========================================================
+// PENDING SUBSCRIPTIONS
+// =========================================================
+
+    public static final String TABLE_PENDING_SUBSCRIPTION =
+            "PendingSubscription";
+
+    public static final String PENDING_ID =
+            "PendingId";
+
+    public static final String PENDING_USER_ID =
+            "UserId";
+
+    public static final String PENDING_GMAIL_MESSAGE_ID =
+            "GmailMessageId";
+
+    public static final String PENDING_SUGGESTION_ID =
+            "SuggestionId";
+
+    public static final String PENDING_SERVICE_NAME =
+            "ServiceName";
+
+    public static final String PENDING_AMOUNT =
+            "Amount";
+
+    public static final String PENDING_CURRENCY =
+            "Currency";
+
+    public static final String PENDING_BILLING_CYCLE =
+            "BillingCycle";
+
+    public static final String PENDING_NEXT_BILLING_DATE =
+            "NextBillingDate";
+
+    public static final String PENDING_CONFIDENCE =
+            "Confidence";
+
+    public static final String PENDING_EMAIL_SUBJECT =
+            "EmailSubject";
+
+    public static final String PENDING_EMAIL_SENDER =
+            "EmailSender";
+
+    public static final String PENDING_EMAIL_BODY =
+            "EmailBody";
+
+    public static final String PENDING_STATUS =
+            "Status";
+
+    public static final String PENDING_CREATED_AT =
+            "CreatedAt";
+
+
+    public static final String PENDING_STATUS_PENDING =
+            "PENDING";
+
+    public static final String PENDING_STATUS_SAVED =
+            "SAVED";
+
+    public static final String PENDING_STATUS_IGNORED =
+            "IGNORED";
+    // =========================================================
+// PROCESSED GMAIL MESSAGES
+// =========================================================
+
+    public static final String TABLE_PROCESSED_GMAIL_MESSAGE =
+            "ProcessedGmailMessage";
+
+    public static final String PROCESSED_ID =
+            "ProcessedId";
+
+    public static final String PROCESSED_USER_ID =
+            "UserId";
+
+    public static final String PROCESSED_GMAIL_MESSAGE_ID =
+            "GmailMessageId";
+
+    public static final String PROCESSED_PREDICTED_LABEL =
+            "PredictedLabel";
+
+    public static final String PROCESSED_PROBABILITY =
+            "Probability";
+
+    public static final String PROCESSED_AT =
+            "ProcessedAt";
 
     //========================================================
     // USAGE DATA
@@ -354,6 +446,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_FAMILY_BUDGET_TABLE);
 
         db.execSQL(CREATE_SUBSCRIPTION_TABLE);
+
+        db.execSQL(CREATE_PENDING_SUBSCRIPTION_TABLE);
+
+        db.execSQL(CREATE_PROCESSED_GMAIL_MESSAGE_TABLE);
 
         db.execSQL(CREATE_USAGE_DATA_TABLE);
 
@@ -593,16 +689,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     ");";
     private static final String CREATE_SUBSCRIPTION_TABLE =
             "CREATE TABLE " + TABLE_SUBSCRIPTION + " (" +
-                    SUBSCRIPTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    USER_ID + " INTEGER," +
-                    SERVICE_NAME + " TEXT," +
-                    AMOUNT + " REAL," +
-                    BILLING_CYCLE + " TEXT," +
-                    NEXT_BILLING_DATE + " TEXT," +
-                    "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
-                    TABLE_USER + "(" + USER_ID + ")" +
-                    ");";
 
+                    SUBSCRIPTION_ID +
+                    " INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                    USER_ID +
+                    " INTEGER," +
+
+                    SERVICE_NAME +
+                    " TEXT," +
+
+                    AMOUNT +
+                    " REAL," +
+
+                    SUBSCRIPTION_CURRENCY +
+                    " TEXT," +
+
+                    BILLING_CYCLE +
+                    " TEXT," +
+
+                    NEXT_BILLING_DATE +
+                    " TEXT," +
+
+                    "FOREIGN KEY(" +
+                    USER_ID +
+                    ") REFERENCES " +
+                    TABLE_USER +
+                    "(" + USER_ID + ")" +
+
+                    ");";
     private static final String CREATE_BUDGET_SETTINGS_TABLE =
             "CREATE TABLE " + TABLE_BUDGET_SETTINGS + " (" +
                     USER_ID + " INTEGER PRIMARY KEY," +
@@ -618,6 +733,97 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + USER_ID + ") REFERENCES " +
                     TABLE_USER + "(" + USER_ID + ")" +
                     ");";
+
+    private static final String CREATE_PENDING_SUBSCRIPTION_TABLE =
+
+            "CREATE TABLE IF NOT EXISTS "
+                    + TABLE_PENDING_SUBSCRIPTION
+                    + " ("
+
+                    + PENDING_ID
+                    + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+
+                    + PENDING_USER_ID
+                    + " INTEGER NOT NULL, "
+
+                    + PENDING_GMAIL_MESSAGE_ID
+                    + " TEXT NOT NULL, "
+
+                    + PENDING_SUGGESTION_ID
+                    + " TEXT, "
+
+                    + PENDING_SERVICE_NAME
+                    + " TEXT, "
+
+                    + PENDING_AMOUNT
+                    + " REAL, "
+
+                    + PENDING_CURRENCY
+                    + " TEXT, "
+
+                    + PENDING_BILLING_CYCLE
+                    + " TEXT, "
+
+                    + PENDING_NEXT_BILLING_DATE
+                    + " TEXT, "
+
+                    + PENDING_CONFIDENCE
+                    + " REAL, "
+
+                    + PENDING_EMAIL_SUBJECT
+                    + " TEXT, "
+
+                    + PENDING_EMAIL_SENDER
+                    + " TEXT, "
+
+                    + PENDING_EMAIL_BODY
+                    + " TEXT, "
+
+                    + PENDING_STATUS
+                    + " TEXT NOT NULL DEFAULT 'PENDING', "
+
+                    + PENDING_CREATED_AT
+                    + " TEXT DEFAULT CURRENT_TIMESTAMP, "
+
+                    + "UNIQUE("
+                    + PENDING_USER_ID
+                    + ", "
+                    + PENDING_GMAIL_MESSAGE_ID
+                    + ") ON CONFLICT IGNORE"
+
+                    + ")";
+
+    private static final String CREATE_PROCESSED_GMAIL_MESSAGE_TABLE =
+
+            "CREATE TABLE IF NOT EXISTS "
+                    + TABLE_PROCESSED_GMAIL_MESSAGE
+                    + " ("
+
+                    + PROCESSED_ID
+                    + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+
+                    + PROCESSED_USER_ID
+                    + " INTEGER NOT NULL, "
+
+                    + PROCESSED_GMAIL_MESSAGE_ID
+                    + " TEXT NOT NULL, "
+
+                    + PROCESSED_PREDICTED_LABEL
+                    + " TEXT, "
+
+                    + PROCESSED_PROBABILITY
+                    + " REAL, "
+
+                    + PROCESSED_AT
+                    + " TEXT DEFAULT CURRENT_TIMESTAMP, "
+
+                    + "UNIQUE("
+                    + PROCESSED_USER_ID
+                    + ", "
+                    + PROCESSED_GMAIL_MESSAGE_ID
+                    + ") ON CONFLICT IGNORE"
+
+                    + ")";
     private static final String CREATE_USAGE_DATA_TABLE =
             "CREATE TABLE " + TABLE_USAGE_DATA + " (" +
                     USAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -864,7 +1070,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             " INTEGER DEFAULT -1"
             );
         }
+        // -------------------------------------------------
+// VERSION 16 -> VERSION 17
+// Add original currency to Subscription table
+// -------------------------------------------------
+
+        if (oldVersion < 17) {
+
+            db.execSQL(
+                    "ALTER TABLE " +
+                            TABLE_SUBSCRIPTION +
+                            " ADD COLUMN " +
+                            SUBSCRIPTION_CURRENCY +
+                            " TEXT"
+            );
+
+            System.out.println(
+                    "DATABASE UPGRADE 17: " +
+                            "Subscription currency column added."
+            );
+        }
+        if (oldVersion < 18) {
+
+            db.execSQL(
+                    CREATE_PENDING_SUBSCRIPTION_TABLE
+            );
+        }
+        if (oldVersion < 19) {
+
+            db.execSQL(
+                    CREATE_PROCESSED_GMAIL_MESSAGE_TABLE
+            );
+        }
     }
+
+
 
     @Override
     public void onDowngrade(
@@ -1252,73 +1492,202 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public ArrayList<Subscription> getUpcomingSubscriptions(int userId) {
+    public ArrayList<Subscription> getUpcomingSubscriptions(
+            int userId
+    ) {
 
-        ArrayList<Subscription> subscriptions = new ArrayList<>();
+        ArrayList<Subscription> subscriptions =
+                new ArrayList<>();
 
-        SQLiteDatabase db = getReadableDatabase();
 
-        Calendar today = Calendar.getInstance();
+        if (userId <= 0) {
 
-        Calendar nextWeek = Calendar.getInstance();
-        nextWeek.add(Calendar.DAY_OF_YEAR, 7);
-
-        SimpleDateFormat sdf =
-                new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-        Cursor cursor = db.rawQuery(
-
-                "SELECT * FROM " + TABLE_SUBSCRIPTION +
-                        " WHERE " + USER_ID + "=?" +
-                        " ORDER BY " + NEXT_BILLING_DATE + " ASC",
-
-                new String[]{
-                        String.valueOf(userId)
-                });
-
-        while (cursor.moveToNext()) {
-
-            try {
-
-                String dateString = cursor.getString(
-                        cursor.getColumnIndexOrThrow(NEXT_BILLING_DATE));
-
-                Calendar billingDate = Calendar.getInstance();
-                billingDate.setTime(sdf.parse(dateString));
-
-                if (!billingDate.before(today)
-                        && !billingDate.after(nextWeek)) {
-
-                    Subscription subscription = new Subscription();
-
-                    subscription.setSubscriptionId(
-                            cursor.getInt(
-                                    cursor.getColumnIndexOrThrow(SUBSCRIPTION_ID)));
-
-                    subscription.setServiceName(
-                            cursor.getString(
-                                    cursor.getColumnIndexOrThrow(SERVICE_NAME)));
-
-                    subscription.setAmount(
-                            cursor.getDouble(
-                                    cursor.getColumnIndexOrThrow(AMOUNT)));
-
-                    subscription.setBillingCycle(
-                            cursor.getString(
-                                    cursor.getColumnIndexOrThrow(BILLING_CYCLE)));
-
-                    subscription.setNextBillingDate(dateString);
-
-                    subscriptions.add(subscription);
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            return subscriptions;
         }
 
-        cursor.close();
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Calendar today =
+                Calendar.getInstance();
+
+        Calendar nextWeek =
+                Calendar.getInstance();
+
+        nextWeek.add(
+                Calendar.DAY_OF_YEAR,
+                7
+        );
+
+
+        SimpleDateFormat sdf =
+                new SimpleDateFormat(
+                        "yyyy-MM-dd",
+                        Locale.getDefault()
+                );
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT * FROM " +
+                                TABLE_SUBSCRIPTION +
+
+                                " WHERE " +
+                                USER_ID +
+                                "=?" +
+
+                                " AND " +
+                                NEXT_BILLING_DATE +
+                                " IS NOT NULL" +
+
+                                " AND TRIM(" +
+                                NEXT_BILLING_DATE +
+                                ") <> ''" +
+
+                                " ORDER BY " +
+                                NEXT_BILLING_DATE +
+                                " ASC",
+
+                        new String[]{
+                                String.valueOf(userId)
+                        }
+                );
+
+
+        try {
+
+            while (cursor.moveToNext()) {
+
+                try {
+
+                    String dateString =
+                            cursor.getString(
+                                    cursor.getColumnIndexOrThrow(
+                                            NEXT_BILLING_DATE
+                                    )
+                            );
+
+
+                    if (dateString == null ||
+                            dateString.trim().isEmpty()) {
+
+                        continue;
+                    }
+
+
+                    Calendar billingDate =
+                            Calendar.getInstance();
+
+                    billingDate.setTime(
+                            sdf.parse(
+                                    dateString
+                            )
+                    );
+
+
+                    if (!billingDate.before(today)
+                            && !billingDate.after(nextWeek)) {
+
+                        Subscription subscription =
+                                new Subscription();
+
+
+                        subscription.setSubscriptionId(
+                                cursor.getInt(
+                                        cursor.getColumnIndexOrThrow(
+                                                SUBSCRIPTION_ID
+                                        )
+                                )
+                        );
+
+
+                        subscription.setUserId(
+                                cursor.getInt(
+                                        cursor.getColumnIndexOrThrow(
+                                                USER_ID
+                                        )
+                                )
+                        );
+
+
+                        subscription.setServiceName(
+                                cursor.getString(
+                                        cursor.getColumnIndexOrThrow(
+                                                SERVICE_NAME
+                                        )
+                                )
+                        );
+
+
+                        subscription.setAmount(
+                                cursor.getDouble(
+                                        cursor.getColumnIndexOrThrow(
+                                                AMOUNT
+                                        )
+                                )
+                        );
+
+
+                        // =========================================
+                        // CURRENCY
+                        // =========================================
+
+                        int currencyIndex =
+                                cursor.getColumnIndex(
+                                        SUBSCRIPTION_CURRENCY
+                                );
+
+
+                        if (currencyIndex != -1 &&
+                                !cursor.isNull(currencyIndex)) {
+
+                            subscription.setCurrency(
+                                    cursor.getString(
+                                            currencyIndex
+                                    )
+                            );
+
+                        } else {
+
+                            subscription.setCurrency(null);
+                        }
+
+
+                        subscription.setBillingCycle(
+                                cursor.getString(
+                                        cursor.getColumnIndexOrThrow(
+                                                BILLING_CYCLE
+                                        )
+                                )
+                        );
+
+
+                        subscription.setNextBillingDate(
+                                dateString
+                        );
+
+
+                        subscriptions.add(
+                                subscription
+                        );
+                    }
+
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+                }
+            }
+
+
+        } finally {
+
+            cursor.close();
+        }
+
 
         return subscriptions;
     }
@@ -2094,9 +2463,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int userId,
             String serviceName,
             double amount,
+            String currency,
             String billingCycle,
             String nextBillingDate
     ) {
+
+        // =========================================================
+        // VALIDATE USER ID
+        // =========================================================
 
         if (userId <= 0) {
 
@@ -2114,16 +2488,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 this.getWritableDatabase();
 
 
-        Cursor cursor = db.rawQuery(
+        // =========================================================
+        // CHECK USER EXISTS
+        // =========================================================
 
-                "SELECT " + USER_ID +
-                        " FROM " + TABLE_USER +
-                        " WHERE " + USER_ID + "=?",
+        Cursor cursor =
+                db.rawQuery(
 
-                new String[]{
-                        String.valueOf(userId)
-                }
-        );
+                        "SELECT " +
+                                USER_ID +
+
+                                " FROM " +
+                                TABLE_USER +
+
+                                " WHERE " +
+                                USER_ID +
+                                "=?",
+
+                        new String[]{
+                                String.valueOf(userId)
+                        }
+                );
 
 
         boolean userExists =
@@ -2144,34 +2529,99 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
 
+        // =========================================================
+        // CLEAN VALUES
+        // =========================================================
+
+        String cleanServiceName =
+                serviceName == null
+                        ? ""
+                        : serviceName.trim();
+
+
+        String cleanCurrency =
+                currency == null
+                        ? ""
+                        : currency.trim();
+
+
+        String cleanBillingCycle =
+                billingCycle == null
+                        ? ""
+                        : billingCycle.trim();
+
+
+        String cleanNextBillingDate =
+                nextBillingDate == null
+                        ? ""
+                        : nextBillingDate.trim();
+
+
+        // =========================================================
+        // CONTENT VALUES
+        // =========================================================
+
         ContentValues values =
                 new ContentValues();
+
 
         values.put(
                 USER_ID,
                 userId
         );
 
+
         values.put(
                 SERVICE_NAME,
-                serviceName
+                cleanServiceName
         );
+
 
         values.put(
                 AMOUNT,
                 amount
         );
 
+
+        // =========================================================
+        // ORIGINAL CURRENCY
+        //
+        // Do NOT default unknown currency to LKR.
+        // =========================================================
+
+        if (cleanCurrency.isEmpty()) {
+
+            values.putNull(
+                    SUBSCRIPTION_CURRENCY
+            );
+
+        } else {
+
+            values.put(
+                    SUBSCRIPTION_CURRENCY,
+                    cleanCurrency
+                            .toUpperCase(
+                                    Locale.US
+                            )
+            );
+        }
+
+
         values.put(
                 BILLING_CYCLE,
-                billingCycle
+                cleanBillingCycle
         );
+
 
         values.put(
                 NEXT_BILLING_DATE,
-                nextBillingDate
+                cleanNextBillingDate
         );
 
+
+        // =========================================================
+        // INSERT
+        // =========================================================
 
         long result =
                 db.insert(
@@ -2182,61 +2632,216 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         System.out.println(
+                "========================================"
+        );
+
+        System.out.println(
                 "SUBSCRIPTION INSERT RESULT: "
                         + result
+        );
+
+        System.out.println(
+                "SERVICE: "
+                        + cleanServiceName
+        );
+
+        System.out.println(
+                "AMOUNT: "
+                        + amount
+        );
+
+        System.out.println(
+                "CURRENCY: "
+                        + (
+                        cleanCurrency.isEmpty()
+                                ? "UNKNOWN"
+                                : cleanCurrency
+                )
+        );
+
+        System.out.println(
+                "BILLING CYCLE: "
+                        + cleanBillingCycle
+        );
+
+        System.out.println(
+                "NEXT BILLING DATE: "
+                        + cleanNextBillingDate
+        );
+
+        System.out.println(
+                "========================================"
         );
 
 
         return result;
     }
-    public Cursor getSubscriptions(int userId) {
+    // =========================================================
+// LEGACY INSERT METHOD
+//
+// Keeps older screens compiling until they are updated
+// with a currency selector.
+//
+// IMPORTANT:
+// Unknown currency is stored as NULL.
+// It is NOT automatically changed to LKR.
+// =========================================================
 
-        SQLiteDatabase db = this.getReadableDatabase();
+    public long insertSubscription(
+            int userId,
+            String serviceName,
+            double amount,
+            String billingCycle,
+            String nextBillingDate
+    ) {
+
+        return insertSubscription(
+                userId,
+                serviceName,
+                amount,
+                null,
+                billingCycle,
+                nextBillingDate
+        );
+    }
+    public Cursor getSubscriptions(
+            int userId
+    ) {
+
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
 
         return db.rawQuery(
 
-                "SELECT * FROM " + TABLE_SUBSCRIPTION +
-                        " WHERE " + USER_ID + "=?" +
-                        " ORDER BY " + NEXT_BILLING_DATE,
+                "SELECT * FROM " +
+                        TABLE_SUBSCRIPTION +
+
+                        " WHERE " +
+                        USER_ID +
+                        "=?" +
+
+                        " ORDER BY " +
+                        NEXT_BILLING_DATE +
+                        " ASC",
 
                 new String[]{
                         String.valueOf(userId)
-                });
-
+                }
+        );
     }
 
-    public Cursor getSubscription(int subscriptionId) {
+    public Cursor getSubscription(
+            int subscriptionId
+    ) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
 
         return db.rawQuery(
 
-                "SELECT * FROM " + TABLE_SUBSCRIPTION +
+                "SELECT * FROM " +
+                        TABLE_SUBSCRIPTION +
 
                         " WHERE " +
-
-                        SUBSCRIPTION_ID + "=?",
+                        SUBSCRIPTION_ID +
+                        "=?",
 
                 new String[]{
-                        String.valueOf(subscriptionId)
-                });
-
+                        String.valueOf(
+                                subscriptionId
+                        )
+                }
+        );
     }
 
-    public int updateSubscription(int subscriptionId,
-                                  String serviceName,
-                                  double amount,
-                                  String billingCycle,
-                                  String nextBillingDate) {
+    public int updateSubscription(
+            int subscriptionId,
+            String serviceName,
+            double amount,
+            String currency,
+            String billingCycle,
+            String nextBillingDate
+    ) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db =
+                this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
 
-        values.put(SERVICE_NAME, serviceName);
-        values.put(AMOUNT, amount);
-        values.put(BILLING_CYCLE, billingCycle);
-        values.put(NEXT_BILLING_DATE, nextBillingDate);
+        ContentValues values =
+                new ContentValues();
+
+
+        String cleanServiceName =
+                serviceName == null
+                        ? ""
+                        : serviceName.trim();
+
+
+        String cleanCurrency =
+                currency == null
+                        ? ""
+                        : currency.trim();
+
+
+        String cleanBillingCycle =
+                billingCycle == null
+                        ? ""
+                        : billingCycle.trim();
+
+
+        String cleanNextBillingDate =
+                nextBillingDate == null
+                        ? ""
+                        : nextBillingDate.trim();
+
+
+        values.put(
+                SERVICE_NAME,
+                cleanServiceName
+        );
+
+
+        values.put(
+                AMOUNT,
+                amount
+        );
+
+
+        // =========================================================
+        // CURRENCY
+        // =========================================================
+
+        if (cleanCurrency.isEmpty()) {
+
+            values.putNull(
+                    SUBSCRIPTION_CURRENCY
+            );
+
+        } else {
+
+            values.put(
+                    SUBSCRIPTION_CURRENCY,
+                    cleanCurrency
+                            .toUpperCase(
+                                    Locale.US
+                            )
+            );
+        }
+
+
+        values.put(
+                BILLING_CYCLE,
+                cleanBillingCycle
+        );
+
+
+        values.put(
+                NEXT_BILLING_DATE,
+                cleanNextBillingDate
+        );
+
 
         return db.update(
 
@@ -2244,28 +2849,165 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 values,
 
-                SUBSCRIPTION_ID + "=?",
+                SUBSCRIPTION_ID +
+                        "=?",
 
                 new String[]{
-                        String.valueOf(subscriptionId)
-                });
+                        String.valueOf(
+                                subscriptionId
+                        )
+                }
+        );
+    }
+    public int updateSubscription(
+            int subscriptionId,
+            String serviceName,
+            double amount,
+            String billingCycle,
+            String nextBillingDate
+    ) {
 
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
+
+        String existingCurrency =
+                null;
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT " +
+                                SUBSCRIPTION_CURRENCY +
+
+                                " FROM " +
+                                TABLE_SUBSCRIPTION +
+
+                                " WHERE " +
+                                SUBSCRIPTION_ID +
+                                "=?",
+
+                        new String[]{
+                                String.valueOf(
+                                        subscriptionId
+                                )
+                        }
+                );
+
+
+        if (cursor.moveToFirst()) {
+
+            int currencyIndex =
+                    cursor.getColumnIndex(
+                            SUBSCRIPTION_CURRENCY
+                    );
+
+
+            if (currencyIndex != -1 &&
+                    !cursor.isNull(currencyIndex)) {
+
+                existingCurrency =
+                        cursor.getString(
+                                currencyIndex
+                        );
+            }
+        }
+
+
+        cursor.close();
+
+
+        return updateSubscription(
+                subscriptionId,
+                serviceName,
+                amount,
+                existingCurrency,
+                billingCycle,
+                nextBillingDate
+        );
     }
 
-    public int deleteSubscription(int subscriptionId) {
+    public int deleteSubscription(
+            int subscriptionId
+    ) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db =
+                this.getWritableDatabase();
+
 
         return db.delete(
 
                 TABLE_SUBSCRIPTION,
 
-                SUBSCRIPTION_ID + "=?",
+                SUBSCRIPTION_ID +
+                        "=?",
 
                 new String[]{
-                        String.valueOf(subscriptionId)
-                });
+                        String.valueOf(
+                                subscriptionId
+                        )
+                }
+        );
+    }
 
+    public double getTotalSubscriptionAmountByCurrency(
+            int userId,
+            String currency
+    ) {
+
+        if (userId <= 0 ||
+                currency == null ||
+                currency.trim().isEmpty()) {
+
+            return 0;
+        }
+
+
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT IFNULL(SUM(" +
+                                AMOUNT +
+                                "), 0)" +
+
+                                " FROM " +
+                                TABLE_SUBSCRIPTION +
+
+                                " WHERE " +
+                                USER_ID +
+                                "=?" +
+
+                                " AND UPPER(" +
+                                SUBSCRIPTION_CURRENCY +
+                                ")=UPPER(?)",
+
+                        new String[]{
+                                String.valueOf(userId),
+                                currency.trim()
+                        }
+                );
+
+
+        double total =
+                0;
+
+
+        if (cursor.moveToFirst()) {
+
+            total =
+                    cursor.getDouble(0);
+        }
+
+
+        cursor.close();
+
+
+        return total;
     }
 
     public double getTotalSubscriptionAmount(int userId) {
@@ -2298,100 +3040,157 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public int getSubscriptionCount(int userId) {
+    public int getSubscriptionCount(
+            int userId
+    ) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db =
+                this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery(
 
-                "SELECT COUNT(*)" +
+        Cursor cursor =
+                db.rawQuery(
 
-                        " FROM " + TABLE_SUBSCRIPTION +
+                        "SELECT COUNT(*)" +
 
-                        " WHERE " + USER_ID + "=?",
+                                " FROM " +
+                                TABLE_SUBSCRIPTION +
 
-                new String[]{
-                        String.valueOf(userId)
-                });
+                                " WHERE " +
+                                USER_ID +
+                                "=?",
 
-        int count = 0;
+                        new String[]{
+                                String.valueOf(userId)
+                        }
+                );
+
+
+        int count =
+                0;
+
 
         if (cursor.moveToFirst()) {
 
-            count = cursor.getInt(0);
-
+            count =
+                    cursor.getInt(0);
         }
 
+
         cursor.close();
+
 
         return count;
-
     }
 
-    public boolean subscriptionExists(int userId,
-                                      String serviceName) {
+    public boolean subscriptionExists(
+            int userId,
+            String serviceName
+    ) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        if (userId <= 0 ||
+                serviceName == null ||
+                serviceName.trim().isEmpty()) {
 
-        Cursor cursor = db.rawQuery(
+            return false;
+        }
 
-                "SELECT * FROM " + TABLE_SUBSCRIPTION +
 
-                        " WHERE " +
+        SQLiteDatabase db =
+                this.getReadableDatabase();
 
-                        USER_ID + "=? AND " +
 
-                        SERVICE_NAME + "=?",
+        Cursor cursor =
+                db.rawQuery(
 
-                new String[]{
-                        String.valueOf(userId),
-                        serviceName
-                });
+                        "SELECT 1 FROM " +
+                                TABLE_SUBSCRIPTION +
 
-        boolean exists = cursor.getCount() > 0;
+                                " WHERE " +
+                                USER_ID +
+                                "=?" +
+
+                                " AND LOWER(TRIM(" +
+                                SERVICE_NAME +
+                                "))=LOWER(TRIM(?))" +
+
+                                " LIMIT 1",
+
+                        new String[]{
+                                String.valueOf(userId),
+                                serviceName.trim()
+                        }
+                );
+
+
+        boolean exists =
+                cursor.moveToFirst();
+
 
         cursor.close();
 
-        return exists;
 
+        return exists;
     }
 
-    public Cursor getNextSubscription(int userId) {
+    public Cursor getNextSubscription(
+            int userId
+    ) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
 
         return db.rawQuery(
 
-                "SELECT * FROM " + TABLE_SUBSCRIPTION +
+                "SELECT * FROM " +
+                        TABLE_SUBSCRIPTION +
 
-                        " WHERE " + USER_ID + "=?" +
+                        " WHERE " +
+                        USER_ID +
+                        "=?" +
 
-                        " ORDER BY " + NEXT_BILLING_DATE +
+                        " AND " +
+                        NEXT_BILLING_DATE +
+                        " IS NOT NULL" +
+
+                        " AND TRIM(" +
+                        NEXT_BILLING_DATE +
+                        ") <> ''" +
+
+                        " ORDER BY " +
+                        NEXT_BILLING_DATE +
+                        " ASC" +
 
                         " LIMIT 1",
 
                 new String[]{
                         String.valueOf(userId)
-                });
-
+                }
+        );
     }
 
-    public Cursor getSubscriptionsByDate(String date) {
+    public Cursor getSubscriptionsByDate(
+            String date
+    ) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
 
         return db.rawQuery(
 
-                "SELECT * FROM " + TABLE_SUBSCRIPTION +
+                "SELECT * FROM " +
+                        TABLE_SUBSCRIPTION +
 
                         " WHERE " +
-
-                        NEXT_BILLING_DATE + "=?",
+                        NEXT_BILLING_DATE +
+                        "=?",
 
                 new String[]{
                         date
-                });
-
+                }
+        );
     }
 
     public long insertUsageData(int subscriptionId,
@@ -7918,4 +8717,697 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return result > 0;
     }
+
+    // =========================================================
+// INSERT PENDING SUBSCRIPTION
+// =========================================================
+
+    public long insertPendingSubscription(
+            int userId,
+            String gmailMessageId,
+            String suggestionId,
+            String serviceName,
+            double amount,
+            String currency,
+            String billingCycle,
+            String nextBillingDate,
+            double confidence,
+            String emailSubject,
+            String emailSender,
+            String emailBody
+    ) {
+
+        if (userId <= 0) {
+
+            return -1;
+        }
+
+
+        if (gmailMessageId == null ||
+                gmailMessageId.trim().isEmpty()) {
+
+            return -1;
+        }
+
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        ContentValues values =
+                new ContentValues();
+
+
+        values.put(
+                PENDING_USER_ID,
+                userId
+        );
+
+
+        values.put(
+                PENDING_GMAIL_MESSAGE_ID,
+                gmailMessageId.trim()
+        );
+
+
+        putNullableString(
+                values,
+                PENDING_SUGGESTION_ID,
+                suggestionId
+        );
+
+
+        putNullableString(
+                values,
+                PENDING_SERVICE_NAME,
+                serviceName
+        );
+
+
+        values.put(
+                PENDING_AMOUNT,
+                amount
+        );
+
+
+        putNullableString(
+                values,
+                PENDING_CURRENCY,
+                currency
+        );
+
+
+        putNullableString(
+                values,
+                PENDING_BILLING_CYCLE,
+                billingCycle
+        );
+
+
+        putNullableString(
+                values,
+                PENDING_NEXT_BILLING_DATE,
+                nextBillingDate
+        );
+
+
+        values.put(
+                PENDING_CONFIDENCE,
+                confidence
+        );
+
+
+        putNullableString(
+                values,
+                PENDING_EMAIL_SUBJECT,
+                emailSubject
+        );
+
+
+        putNullableString(
+                values,
+                PENDING_EMAIL_SENDER,
+                emailSender
+        );
+
+
+        putNullableString(
+                values,
+                PENDING_EMAIL_BODY,
+                emailBody
+        );
+
+
+        values.put(
+                PENDING_STATUS,
+                PENDING_STATUS_PENDING
+        );
+
+
+        return db.insertWithOnConflict(
+
+                TABLE_PENDING_SUBSCRIPTION,
+
+                null,
+
+                values,
+
+                SQLiteDatabase.CONFLICT_IGNORE
+        );
+    }
+
+    private void putNullableString(
+            ContentValues values,
+            String column,
+            String value
+    ) {
+
+        if (value == null ||
+                value.trim().isEmpty()) {
+
+            values.putNull(
+                    column
+            );
+
+        } else {
+
+            values.put(
+                    column,
+                    value.trim()
+            );
+        }
+    }
+
+    // =========================================================
+// GET ALL PENDING SUBSCRIPTIONS
+// =========================================================
+
+    public Cursor getPendingSubscriptions(
+            int userId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        return db.query(
+
+                TABLE_PENDING_SUBSCRIPTION,
+
+                null,
+
+                PENDING_USER_ID
+                        + " = ? AND "
+                        + PENDING_STATUS
+                        + " = ?",
+
+                new String[]{
+
+                        String.valueOf(
+                                userId
+                        ),
+
+                        PENDING_STATUS_PENDING
+                },
+
+                null,
+
+                null,
+
+                PENDING_CREATED_AT
+                        + " DESC"
+        );
+    }
+
+    // =========================================================
+// GET ONE PENDING SUBSCRIPTION
+// =========================================================
+
+    public Cursor getPendingSubscription(
+            int pendingId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        return db.query(
+
+                TABLE_PENDING_SUBSCRIPTION,
+
+                null,
+
+                PENDING_ID
+                        + " = ?",
+
+                new String[]{
+                        String.valueOf(
+                                pendingId
+                        )
+                },
+
+                null,
+
+                null,
+
+                null,
+
+                "1"
+        );
+    }
+
+    // =========================================================
+// CHECK GMAIL MESSAGE EXISTS
+// =========================================================
+
+    public boolean pendingSubscriptionExistsByMessageId(
+            int userId,
+            String gmailMessageId
+    ) {
+
+        if (userId <= 0) {
+            return false;
+        }
+
+
+        if (gmailMessageId == null ||
+                gmailMessageId.trim().isEmpty()) {
+
+            return false;
+        }
+
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor = null;
+
+
+        try {
+
+            cursor =
+                    db.query(
+
+                            TABLE_PENDING_SUBSCRIPTION,
+
+                            new String[]{
+                                    PENDING_ID,
+                                    PENDING_STATUS
+                            },
+
+                            PENDING_USER_ID
+                                    + " = ? AND "
+                                    + PENDING_GMAIL_MESSAGE_ID
+                                    + " = ?",
+
+                            new String[]{
+                                    String.valueOf(userId),
+                                    gmailMessageId.trim()
+                            },
+
+                            null,
+                            null,
+                            null,
+                            "1"
+                    );
+
+
+            return cursor != null &&
+                    cursor.moveToFirst();
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return false;
+
+
+        } finally {
+
+            if (cursor != null) {
+
+                cursor.close();
+            }
+        }
+    }
+
+    // =========================================================
+// PENDING COUNT
+// =========================================================
+
+    public int getPendingSubscriptionCount(
+            int userId
+    ) {
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor = null;
+
+
+        try {
+
+            cursor =
+                    db.rawQuery(
+
+                            "SELECT COUNT(*) FROM "
+                                    + TABLE_PENDING_SUBSCRIPTION
+                                    + " WHERE "
+                                    + PENDING_USER_ID
+                                    + " = ? AND "
+                                    + PENDING_STATUS
+                                    + " = ?",
+
+                            new String[]{
+
+                                    String.valueOf(
+                                            userId
+                                    ),
+
+                                    PENDING_STATUS_PENDING
+                            }
+                    );
+
+
+            if (cursor.moveToFirst()) {
+
+                return cursor.getInt(
+                        0
+                );
+            }
+
+
+        } finally {
+
+            if (cursor != null) {
+
+                cursor.close();
+            }
+        }
+
+
+        return 0;
+    }
+
+    // =========================================================
+// MARK PENDING SUBSCRIPTION AS SAVED
+// =========================================================
+
+    public int markPendingSubscriptionSaved(
+            int pendingId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        ContentValues values =
+                new ContentValues();
+
+
+        values.put(
+                PENDING_STATUS,
+                PENDING_STATUS_SAVED
+        );
+
+
+        return db.update(
+                TABLE_PENDING_SUBSCRIPTION,
+                values,
+                PENDING_ID + " = ?",
+                new String[]{
+                        String.valueOf(pendingId)
+                }
+        );
+    }
+
+
+// =========================================================
+// MARK PENDING SUBSCRIPTION AS IGNORED
+// =========================================================
+
+    public int markPendingSubscriptionIgnored(
+            int pendingId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        ContentValues values =
+                new ContentValues();
+
+
+        values.put(
+                PENDING_STATUS,
+                PENDING_STATUS_IGNORED
+        );
+
+
+        return db.update(
+                TABLE_PENDING_SUBSCRIPTION,
+                values,
+                PENDING_ID + " = ?",
+                new String[]{
+                        String.valueOf(pendingId)
+                }
+        );
+    }
+
+
+// =========================================================
+// DELETE PENDING SUBSCRIPTION
+// =========================================================
+
+    public int deletePendingSubscription(
+            int pendingId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        return db.delete(
+                TABLE_PENDING_SUBSCRIPTION,
+                PENDING_ID + " = ?",
+                new String[]{
+                        String.valueOf(pendingId)
+                }
+        );
+    }
+
+    // =========================================================
+// CHECK IF GMAIL MESSAGE WAS ALREADY PROCESSED
+// =========================================================
+
+    public boolean isGmailMessageProcessed(
+            int userId,
+            String gmailMessageId
+    ) {
+
+        if (userId <= 0) {
+
+            return false;
+        }
+
+
+        if (gmailMessageId == null ||
+                gmailMessageId.trim().isEmpty()) {
+
+            return false;
+        }
+
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor = null;
+
+
+        try {
+
+            cursor =
+                    db.query(
+
+                            TABLE_PROCESSED_GMAIL_MESSAGE,
+
+                            new String[]{
+                                    PROCESSED_ID
+                            },
+
+                            PROCESSED_USER_ID
+                                    + " = ? AND "
+                                    + PROCESSED_GMAIL_MESSAGE_ID
+                                    + " = ?",
+
+                            new String[]{
+
+                                    String.valueOf(
+                                            userId
+                                    ),
+
+                                    gmailMessageId.trim()
+                            },
+
+                            null,
+
+                            null,
+
+                            null,
+
+                            "1"
+                    );
+
+
+            return cursor != null &&
+                    cursor.moveToFirst();
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return false;
+
+
+        } finally {
+
+            if (cursor != null) {
+
+                cursor.close();
+            }
+        }
+    }
+
+    // =========================================================
+// MARK GMAIL MESSAGE AS PROCESSED
+// =========================================================
+
+    public long markGmailMessageProcessed(
+            int userId,
+            String gmailMessageId,
+            String predictedLabel,
+            double probability
+    ) {
+
+        if (userId <= 0) {
+
+            return -1;
+        }
+
+
+        if (gmailMessageId == null ||
+                gmailMessageId.trim().isEmpty()) {
+
+            return -1;
+        }
+
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+
+        ContentValues values =
+                new ContentValues();
+
+
+        values.put(
+                PROCESSED_USER_ID,
+                userId
+        );
+
+
+        values.put(
+                PROCESSED_GMAIL_MESSAGE_ID,
+                gmailMessageId.trim()
+        );
+
+
+        if (predictedLabel == null ||
+                predictedLabel.trim().isEmpty()) {
+
+            values.putNull(
+                    PROCESSED_PREDICTED_LABEL
+            );
+
+
+        } else {
+
+            values.put(
+                    PROCESSED_PREDICTED_LABEL,
+                    predictedLabel.trim()
+            );
+        }
+
+
+        values.put(
+                PROCESSED_PROBABILITY,
+                probability
+        );
+
+
+        return db.insertWithOnConflict(
+
+                TABLE_PROCESSED_GMAIL_MESSAGE,
+
+                null,
+
+                values,
+
+                SQLiteDatabase.CONFLICT_IGNORE
+        );
+    }
+
+    // =========================================================
+// GET PROCESSED GMAIL MESSAGE COUNT
+// =========================================================
+
+    public int getProcessedGmailMessageCount(
+            int userId
+    ) {
+
+        if (userId <= 0) {
+
+            return 0;
+        }
+
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+
+        Cursor cursor = null;
+
+
+        try {
+
+            cursor =
+                    db.rawQuery(
+
+                            "SELECT COUNT(*) FROM "
+                                    + TABLE_PROCESSED_GMAIL_MESSAGE
+                                    + " WHERE "
+                                    + PROCESSED_USER_ID
+                                    + " = ?",
+
+                            new String[]{
+                                    String.valueOf(
+                                            userId
+                                    )
+                            }
+                    );
+
+
+            if (cursor != null &&
+                    cursor.moveToFirst()) {
+
+                return cursor.getInt(
+                        0
+                );
+            }
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+
+        } finally {
+
+            if (cursor != null) {
+
+                cursor.close();
+            }
+        }
+
+
+        return 0;
+    }
+
+
+
 }

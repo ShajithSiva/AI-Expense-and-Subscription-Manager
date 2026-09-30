@@ -141,15 +141,29 @@
         <activity
             android:name=".ui.profile.ChangePasswordActivity"
             android:windowSoftInputMode="adjustResize" />
+        <!-- ===================================================== -->
+        <!-- SUBSCRIPTIONS -->
+        <!-- ===================================================== -->
+
         <activity
             android:name=".ui.subscription.SubscriptionActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.subscription.AddSubscriptionActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.subscription.ReviewSubscriptionActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.subscription.EditSubscriptionActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.family.InviteMemberActivity"
             android:exported="false"
@@ -181,6 +195,10 @@
         <activity
             android:name=".ui.family.FamilyInvitationsActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.subscription.PendingSubscriptionsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <receiver
             android:name=".notification.SMSReceiver"
