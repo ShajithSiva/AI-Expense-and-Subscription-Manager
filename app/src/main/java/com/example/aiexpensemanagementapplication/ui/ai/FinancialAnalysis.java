@@ -37,6 +37,14 @@ public class FinancialAnalysis {
 
     private double expenseChangePercentage;
 
+    // =====================================================
+// EXPENSE PREDICTION
+// =====================================================
+
+    private double predictedNextMonthExpense;
+
+    private double predictionChangePercentage;
+
 
     // =====================================================
     // HIGHEST SPENDING CATEGORY
@@ -101,7 +109,27 @@ public class FinancialAnalysis {
         this.totalExpense = totalExpense;
     }
 
+    public double getPredictedNextMonthExpense() {
+        return predictedNextMonthExpense;
+    }
 
+    public void setPredictedNextMonthExpense(
+            double predictedNextMonthExpense
+    ) {
+        this.predictedNextMonthExpense =
+                predictedNextMonthExpense;
+    }
+
+    public double getPredictionChangePercentage() {
+        return predictionChangePercentage;
+    }
+
+    public void setPredictionChangePercentage(
+            double predictionChangePercentage
+    ) {
+        this.predictionChangePercentage =
+                predictionChangePercentage;
+    }
     // =====================================================
     // SAVINGS
     // =====================================================

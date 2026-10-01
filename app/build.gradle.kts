@@ -20,6 +20,12 @@ android {
             "BACKEND_BASE_URL",
             "\"https://ai-expense-backend-zqjy.onrender.com\""
         )
+
+        buildConfigField(
+            "String",
+            "EXPENSE_PREDICTION_BASE_URL",
+            "\"http://10.0.2.2:5000/\""
+        )
     }
 
     buildFeatures {

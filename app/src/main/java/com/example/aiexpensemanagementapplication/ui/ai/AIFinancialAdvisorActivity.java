@@ -12,6 +12,11 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.aiexpensemanagementapplication.ml.ExpensePredictionApiService;
+import com.example.aiexpensemanagementapplication.ml.ExpensePredictionFeatureGenerator;
+import com.example.aiexpensemanagementapplication.ml.ExpensePredictionRequest;
+
+import java.util.Calendar;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
@@ -85,8 +90,23 @@ public class AIFinancialAdvisorActivity
 
     private FinancialAnalysis financialAnalysis;
 
-    private AdvisorQuestionRouter questionRouter;
+    // =====================================================
+    // EXPENSE PREDICTION
+    // =====================================================
 
+    private ExpensePredictionApiService
+            expensePredictionApiService;
+
+    private ExpensePredictionFeatureGenerator
+            expensePredictionFeatureGenerator;
+
+    private boolean expensePredictionReady = false;
+
+    private boolean expensePredictionLoading = false;
+
+    private String pendingAdvisorQuestion = null;
+
+    private AdvisorQuestionRouter questionRouter;
 
     // =====================================================
     // PROACTIVE INSIGHTS
@@ -227,6 +247,18 @@ public class AIFinancialAdvisorActivity
 
         apiService =
                 new FinancialAdvisorApiService();
+
+        // =====================================================
+        // EXPENSE PREDICTION
+        // =====================================================
+
+        expensePredictionApiService =
+                new ExpensePredictionApiService();
+
+        expensePredictionFeatureGenerator =
+                new ExpensePredictionFeatureGenerator(
+                        this
+                );
 
 
         // -------------------------------------------------
@@ -528,6 +560,31 @@ public class AIFinancialAdvisorActivity
             return;
         }
 
+        // =================================================
+// EXPENSE PREDICTION QUESTIONS
+// =================================================
+
+        String normalizedQuestion =
+                question
+                        .trim()
+                        .toLowerCase(Locale.ROOT);
+
+        if (
+                normalizedQuestion.contains("predicted expense") ||
+                        normalizedQuestion.contains("predicted spending") ||
+                        normalizedQuestion.contains("forecasted expense") ||
+                        normalizedQuestion.contains("forecast expense") ||
+                        normalizedQuestion.contains("future expense") ||
+                        normalizedQuestion.contains("expected expense") ||
+                        normalizedQuestion.contains("next month expense") ||
+                        normalizedQuestion.contains("spend next month")
+        ) {
+
+            handleExpensePredictionQuestion();
+
+            return;
+        }
+
 
         // =================================================
         // STEP 1 — ROUTE FIRST
@@ -634,13 +691,6 @@ public class AIFinancialAdvisorActivity
         // STEP 3 — AI ROUTE
         // =================================================
 
-        // -------------------------------------------------
-        // Load financial data locally first.
-        //
-        // FALSE = analysis only.
-        // The actual Qwen3 request happens below.
-        // -------------------------------------------------
-
         if (financialAnalysis == null) {
 
             boolean loaded =
@@ -662,13 +712,59 @@ public class AIFinancialAdvisorActivity
 
 
         // -------------------------------------------------
-        // NOW QWEN3 IS ALLOWED
-        // -------------------------------------------------
+// MAKE SURE EXPENSE PREDICTION IS READY
+// -------------------------------------------------
 
-        showAIThinking(
-                true
-        );
+        if (!expensePredictionReady) {
 
+            if (expensePredictionLoading) {
+
+                pendingAdvisorQuestion =
+                        question;
+
+                showAIThinking(true);
+
+                Log.d(
+                        TAG,
+                        "Waiting for expense prediction..."
+                );
+
+                return;
+            }
+
+            // Prediction is not ready and is not loading.
+            // Start prediction first.
+
+            pendingAdvisorQuestion =
+                    question;
+
+            showAIThinking(true);
+
+            Log.d(
+                    TAG,
+                    "Starting expense prediction before "
+                            + "sending question to Financial Advisor."
+            );
+
+            loadExpensePredictionForAdvisor();
+
+            return;
+        }
+
+
+// -------------------------------------------------
+// SEND TO GEMINI THROUGH BACKEND
+// -------------------------------------------------
+
+        showAIThinking(true);
+
+        Log.d(TAG, "========== ADVISOR PREDICTION DATA ==========");
+        Log.d(TAG, "Prediction ready = " + expensePredictionReady);
+        Log.d(TAG, "Predicted expense = "
+                + financialAnalysis.getPredictedNextMonthExpense());
+        Log.d(TAG, "Prediction change = "
+                + financialAnalysis.getPredictionChangePercentage());
+        Log.d(TAG, "=============================================");
 
         apiService.askAdvisor(
                 financialAnalysis,
@@ -1391,6 +1487,83 @@ public class AIFinancialAdvisorActivity
             return true;
         }
 
+        // =====================================================
+// EXPENSE PREDICTION
+// =====================================================
+
+        if (
+                q.contains("predicted expense") ||
+                        q.contains("predicted spending") ||
+                        q.contains("forecasted expense") ||
+                        q.contains("forecast expense") ||
+                        q.contains("next month expense") ||
+                        q.contains("future expense") ||
+                        q.contains("expected expense")
+        ) {
+
+            if (!expensePredictionReady) {
+
+                addAIMessage(
+                        "Your expense prediction is still being calculated. "
+                                + "Please try again in a moment."
+                );
+
+                return true;
+            }
+
+            double predicted =
+                    financialAnalysis
+                            .getPredictedNextMonthExpense();
+
+            double change =
+                    financialAnalysis
+                            .getPredictionChangePercentage();
+
+            if (change > 0) {
+
+                addAIMessage(
+                        String.format(
+                                Locale.US,
+                                "Your forecasted monthly expense is "
+                                        + "Rs %.2f, which is %.1f%% higher "
+                                        + "than the latest completed month's "
+                                        + "actual expense.",
+                                predicted,
+                                change
+                        )
+                );
+
+            } else if (change < 0) {
+
+                addAIMessage(
+                        String.format(
+                                Locale.US,
+                                "Your forecasted monthly expense is "
+                                        + "Rs %.2f, which is %.1f%% lower "
+                                        + "than the latest completed month's "
+                                        + "actual expense.",
+                                predicted,
+                                Math.abs(change)
+                        )
+                );
+
+            } else {
+
+                addAIMessage(
+                        String.format(
+                                Locale.US,
+                                "Your forecasted monthly expense is "
+                                        + "Rs %.2f, approximately the same "
+                                        + "as the latest completed month's "
+                                        + "actual expense.",
+                                predicted
+                        )
+                );
+            }
+
+            return true;
+        }
+
 
         // =====================================================
         // NOT HANDLED
@@ -2060,6 +2233,11 @@ public class AIFinancialAdvisorActivity
                 return false;
             }
 
+            // =====================================================
+            // LOAD EXPENSE PREDICTION
+            // =====================================================
+
+            loadExpensePredictionForAdvisor();
 
             // =================================================
             // LOCAL PROACTIVE INSIGHTS
@@ -2656,6 +2834,454 @@ public class AIFinancialAdvisorActivity
                     !show
             );
         }
+    }
+
+    // =====================================================
+// LOAD EXPENSE PREDICTION FOR ADVISOR
+// =====================================================
+
+    private void loadExpensePredictionForAdvisor() {
+
+        if (currentUserId == -1) {
+            return;
+        }
+
+        expensePredictionReady = false;
+        expensePredictionLoading = true;
+
+        Calendar calendar =
+                Calendar.getInstance();
+
+        // Latest completed month
+        calendar.add(
+                Calendar.MONTH,
+                -1
+        );
+
+        int year =
+                calendar.get(Calendar.YEAR);
+
+        int month =
+                calendar.get(Calendar.MONTH) + 1;
+
+        ExpensePredictionRequest request;
+
+        try {
+
+            request =
+                    expensePredictionFeatureGenerator
+                            .generateRequest(
+                                    currentUserId,
+                                    year,
+                                    month
+                            );
+
+        } catch (Exception e) {
+
+            Log.e(
+                    TAG,
+                    "Unable to generate expense prediction features.",
+                    e
+            );
+
+            return;
+        }
+
+        expensePredictionApiService.predict(
+                request,
+                new ExpensePredictionApiService.PredictionCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            double predictedExpense
+                    ) {
+
+                        runOnUiThread(() -> {
+
+                            if (financialAnalysis == null) {
+                                return;
+                            }
+
+                            // ---------------------------------
+                            // Store prediction
+                            // ---------------------------------
+
+                            financialAnalysis
+                                    .setPredictedNextMonthExpense(
+                                            predictedExpense
+                                    );
+
+                            // ---------------------------------
+                            // Compare with completed month
+                            // ---------------------------------
+
+                            double actualExpense =
+                                    databaseHelper
+                                            .getMonthlyExpense(
+                                                    currentUserId,
+                                                    String.format(
+                                                            Locale.US,
+                                                            "%04d-%02d",
+                                                            year,
+                                                            month
+                                                    )
+                                            );
+
+                            double changePercentage = 0;
+
+                            if (actualExpense > 0) {
+
+                                changePercentage =
+                                        (
+                                                (
+                                                        predictedExpense
+                                                                - actualExpense
+                                                )
+                                                        / actualExpense
+                                        )
+                                                * 100.0;
+                            }
+
+                            financialAnalysis
+                                    .setPredictionChangePercentage(
+                                            changePercentage
+                                    );
+
+                            expensePredictionReady =
+                                    true;
+
+                            expensePredictionLoading =
+                                    false;
+
+                            Log.d(
+                                    TAG,
+                                    "Expense prediction = Rs "
+                                            + predictedExpense
+                            );
+
+                            Log.d(
+                                    TAG,
+                                    "Prediction change = "
+                                            + changePercentage
+                                            + "%"
+                            );
+
+// -------------------------------------------------
+// CONTINUE PENDING AI QUESTION
+// -------------------------------------------------
+
+                            if (
+                                    pendingAdvisorQuestion != null &&
+                                            !pendingAdvisorQuestion.trim().isEmpty()
+                            ) {
+
+                                String pendingQuestion =
+                                        pendingAdvisorQuestion;
+
+                                pendingAdvisorQuestion = null;
+
+                                generateAdvisorResponse(
+                                        pendingQuestion
+                                );
+                            }
+
+                            Log.d(
+                                    TAG,
+                                    "Prediction change = "
+                                            + changePercentage
+                                            + "%"
+                            );
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        Log.e(
+                                TAG,
+                                "Expense prediction failed: "
+                                        + message
+                        );
+
+                        expensePredictionReady =
+                                false;
+
+                        expensePredictionLoading =
+                                false;
+
+                        Log.e(
+                                TAG,
+                                "Expense prediction failed: "
+                                        + message
+                        );
+
+                        // -------------------------------------------------
+                        // CONTINUE AI QUESTION WITHOUT PREDICTION
+                        // -------------------------------------------------
+
+                        if (
+                                pendingAdvisorQuestion != null &&
+                                        !pendingAdvisorQuestion.trim().isEmpty()
+                        ) {
+
+                            String pendingQuestion =
+                                    pendingAdvisorQuestion;
+
+                            pendingAdvisorQuestion = null;
+
+                            generateAdvisorResponse(
+                                    pendingQuestion
+                            );
+                        }
+                    }
+                }
+        );
+    }
+
+    // =====================================================
+// EXPENSE PREDICTION QUESTION
+// =====================================================
+
+    private void handleExpensePredictionQuestion() {
+
+        if (currentUserId == -1) {
+
+            addAIMessage(
+                    "I couldn't identify your account."
+            );
+
+            return;
+        }
+
+        showAIThinking(true);
+
+        Calendar calendar =
+                Calendar.getInstance();
+
+        // Latest completed month
+        calendar.add(
+                Calendar.MONTH,
+                -1
+        );
+
+        int year =
+                calendar.get(Calendar.YEAR);
+
+        int month =
+                calendar.get(Calendar.MONTH) + 1;
+
+        ExpensePredictionRequest request;
+
+        try {
+
+            request =
+                    expensePredictionFeatureGenerator
+                            .generateRequest(
+                                    currentUserId,
+                                    year,
+                                    month
+                            );
+
+        } catch (Exception e) {
+
+            showAIThinking(false);
+
+            Log.e(
+                    TAG,
+                    "Unable to generate prediction request.",
+                    e
+            );
+
+            addAIMessage(
+                    "I couldn't prepare your expense prediction right now."
+            );
+
+            return;
+        }
+
+        expensePredictionApiService.predict(
+                request,
+                new ExpensePredictionApiService.PredictionCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            double predictedExpense
+                    ) {
+
+                        runOnUiThread(() -> {
+
+                            showAIThinking(false);
+
+                            String monthName =
+                                    getMonthName(month);
+
+                            double actualExpense =
+                                    databaseHelper
+                                            .getMonthlyExpense(
+                                                    currentUserId,
+                                                    String.format(
+                                                            Locale.US,
+                                                            "%04d-%02d",
+                                                            year,
+                                                            month
+                                                    )
+                                            );
+
+                            if (actualExpense > 0) {
+
+                                double change =
+                                        (
+                                                (
+                                                        predictedExpense
+                                                                - actualExpense
+                                                )
+                                                        / actualExpense
+                                        )
+                                                * 100.0;
+
+                                if (change > 0) {
+
+                                    addAIMessage(
+                                            String.format(
+                                                    Locale.US,
+                                                    "Your forecasted expense "
+                                                            + "for %s %d is "
+                                                            + "Rs %.2f. "
+                                                            + "This is %.1f%% "
+                                                            + "higher than your "
+                                                            + "%s actual expense.",
+                                                    getMonthName(
+                                                            month == 12
+                                                                    ? 1
+                                                                    : month + 1
+                                                    ),
+                                                    month == 12
+                                                            ? year + 1
+                                                            : year,
+                                                    predictedExpense,
+                                                    change,
+                                                    monthName
+                                            )
+                                    );
+
+                                } else if (change < 0) {
+
+                                    addAIMessage(
+                                            String.format(
+                                                    Locale.US,
+                                                    "Your forecasted expense "
+                                                            + "for %s %d is "
+                                                            + "Rs %.2f. "
+                                                            + "This is %.1f%% "
+                                                            + "lower than your "
+                                                            + "%s actual expense.",
+                                                    getMonthName(
+                                                            month == 12
+                                                                    ? 1
+                                                                    : month + 1
+                                                    ),
+                                                    month == 12
+                                                            ? year + 1
+                                                            : year,
+                                                    predictedExpense,
+                                                    Math.abs(change),
+                                                    monthName
+                                            )
+                                    );
+
+                                } else {
+
+                                    addAIMessage(
+                                            String.format(
+                                                    Locale.US,
+                                                    "Your forecasted expense "
+                                                            + "for %s %d is "
+                                                            + "Rs %.2f, which is "
+                                                            + "approximately the "
+                                                            + "same as your "
+                                                            + "%s actual expense.",
+                                                    getMonthName(
+                                                            month == 12
+                                                                    ? 1
+                                                                    : month + 1
+                                                    ),
+                                                    month == 12
+                                                            ? year + 1
+                                                            : year,
+                                                    predictedExpense,
+                                                    monthName
+                                            )
+                                    );
+                                }
+
+                            } else {
+
+                                addAIMessage(
+                                        String.format(
+                                                Locale.US,
+                                                "Your forecasted expense "
+                                                        + "for %s %d is "
+                                                        + "Rs %.2f.",
+                                                getMonthName(
+                                                        month == 12
+                                                                ? 1
+                                                                : month + 1
+                                                ),
+                                                month == 12
+                                                        ? year + 1
+                                                        : year,
+                                                predictedExpense
+                                        )
+                                );
+                            }
+                        });
+                    }
+
+                    private String getMonthName(int month) {
+
+                        String[] months = {
+
+                                "January",
+                                "February",
+                                "March",
+                                "April",
+                                "May",
+                                "June",
+                                "July",
+                                "August",
+                                "September",
+                                "October",
+                                "November",
+                                "December"
+                        };
+
+                        if (month < 1 || month > 12) {
+                            return "";
+                        }
+
+                        return months[month - 1];
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        runOnUiThread(() -> {
+
+                            showAIThinking(false);
+
+                            addAIMessage(
+                                    "I couldn't calculate your "
+                                            + "expense forecast right now.\n\n"
+                                            + message
+                            );
+                        });
+                    }
+                }
+        );
     }
 
 

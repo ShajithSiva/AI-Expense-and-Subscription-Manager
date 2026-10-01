@@ -1106,6 +1106,20 @@ public class FinancialAdvisorApiService {
                 analysis.getExpenseChangePercentage()
         );
 
+        // -------------------------------------------------
+// EXPENSE PREDICTION
+// -------------------------------------------------
+
+        financialData.put(
+                "predictedNextMonthExpense",
+                analysis.getPredictedNextMonthExpense()
+        );
+
+        financialData.put(
+                "predictionChangePercentage",
+                analysis.getPredictionChangePercentage()
+        );
+
 
         // -------------------------------------------------
         // HEALTH SCORE
@@ -1179,6 +1193,24 @@ public class FinancialAdvisorApiService {
                 TAG,
                 "Category totals = "
                         + categoryTotals
+        );
+
+        Log.d(
+                "ADVISOR_PREDICTION_DATA",
+                "Predicted Next Month Expense = "
+                        + financialData.optDouble(
+                        "predictedNextMonthExpense",
+                        -1
+                )
+        );
+
+        Log.d(
+                "ADVISOR_PREDICTION_DATA",
+                "Prediction Change Percentage = "
+                        + financialData.optDouble(
+                        "predictionChangePercentage",
+                        -1
+                )
         );
 
 

@@ -510,6 +510,91 @@
             app:backgroundTint="#2563EB"
             app:cornerRadius="12dp" />
 
+        <!-- ===================================================== -->
+        <!-- NEXT MONTH EXPENSE PREDICTION                         -->
+        <!-- ===================================================== -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardExpensePrediction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- HEADER -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="Expense Prediction"
+                        android:src="@drawable/expense" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Forecasted Monthly Expense"
+                        android:textColor="#111827"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+                <!-- PREDICTION VALUE -->
+
+                <TextView
+                    android:id="@+id/tvPredictedExpense"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Analyzing..."
+                    android:textColor="#111827"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvPredictionMonth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="October 2026 forecast"
+                    android:textColor="#64748B"
+                    android:textSize="13sp"
+                    android:fontFamily="sans"
+                    app:layout_constraintStart_toStartOf="@id/tvPredictedExpense"
+                    app:layout_constraintTop_toBottomOf="@id/tvPredictedExpense" />
+
+                <!-- STATUS -->
+
+                <TextView
+                    android:id="@+id/tvPredictionStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Preparing your financial data..."
+                    android:textColor="#6B7280"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- ===================================================== -->
         <!-- AI SAVINGS INSIGHTS                                   -->

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import java.util.Calendar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,9 @@ import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.example.aiexpensemanagementapplication.ui.reports.ReportsActivity;
 import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionActivity;
+import com.example.aiexpensemanagementapplication.ml.ExpensePredictionFeatureGenerator;
+import com.example.aiexpensemanagementapplication.ml.ExpensePredictionRequest;
+import com.example.aiexpensemanagementapplication.ml.ExpensePredictionApiService;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -34,6 +38,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class PersonalDashboardFragment extends Fragment {
@@ -110,6 +115,19 @@ public class PersonalDashboardFragment extends Fragment {
 
     private MaterialButton btnViewInsights;
 
+    // =========================================================
+// EXPENSE PREDICTION
+// =========================================================
+
+    private TextView tvPredictedExpense;
+
+    private TextView tvPredictionStatus;
+
+    private TextView tvPredictionMonth;
+
+    private ExpensePredictionApiService expensePredictionApiService;
+
+    private ExpensePredictionFeatureGenerator expensePredictionFeatureGenerator;
 
     // =========================================================
     // CONSTRUCTOR
@@ -244,6 +262,31 @@ public class PersonalDashboardFragment extends Fragment {
 
         btnAIFinancialAdvisor =
                 view.findViewById(R.id.btnAIFinancialAdvisor);
+        // =====================================================
+// EXPENSE PREDICTION
+// =====================================================
+
+        tvPredictedExpense =
+                view.findViewById(
+                        R.id.tvPredictedExpense
+                );
+
+        tvPredictionStatus =
+                view.findViewById(
+                        R.id.tvPredictionStatus
+                );
+
+        tvPredictionMonth = view.findViewById(R.id.tvPredictionMonth);
+
+
+        expensePredictionApiService =
+                new ExpensePredictionApiService();
+
+
+        expensePredictionFeatureGenerator =
+                new ExpensePredictionFeatureGenerator(
+                        requireContext()
+                );
     }
 
 
@@ -346,6 +389,8 @@ public class PersonalDashboardFragment extends Fragment {
         loadSubscriptions();
 
         loadAIInsights();
+
+        loadExpensePrediction();
     }
 
 
@@ -844,6 +889,305 @@ public class PersonalDashboardFragment extends Fragment {
         }
     }
 
+    // =========================================================
+// EXPENSE PREDICTION
+// =========================================================
+
+    private void loadExpensePrediction() {
+
+        if (currentUser == null) {
+            return;
+        }
+
+        String email = currentUser.getEmail();
+
+        if (email == null || email.trim().isEmpty()) {
+
+            showPredictionError(
+                    "Unable to identify your account."
+            );
+
+            return;
+        }
+
+        int userId =
+                databaseHelper.getUserIdByEmail(
+                        email.trim()
+                );
+
+        if (userId == -1) {
+
+            showPredictionError(
+                    "User account was not found."
+            );
+
+            return;
+        }
+
+        // ---------------------------------------------------------
+        // Latest completed month
+        // ---------------------------------------------------------
+
+        Calendar calendar =
+                Calendar.getInstance();
+
+        calendar.add(
+                Calendar.MONTH,
+                -1
+        );
+
+        int year =
+                calendar.get(Calendar.YEAR);
+
+        int month =
+                calendar.get(Calendar.MONTH) + 1;
+
+        String monthString =
+                String.format(
+                        Locale.US,
+                        "%04d-%02d",
+                        year,
+                        month
+                );
+
+        // ---------------------------------------------------------
+        // Actual expense of completed month
+        // ---------------------------------------------------------
+
+        double actualExpense =
+                databaseHelper.getMonthlyExpense(
+                        userId,
+                        monthString
+                );
+
+        // ---------------------------------------------------------
+        // Generate ML features
+        // ---------------------------------------------------------
+
+        ExpensePredictionRequest request;
+
+        try {
+
+            request =
+                    expensePredictionFeatureGenerator
+                            .generateRequest(
+                                    userId,
+                                    year,
+                                    month
+                            );
+
+        } catch (Exception e) {
+
+            showPredictionError(
+                    "Unable to prepare prediction data."
+            );
+
+            return;
+        }
+
+        // ---------------------------------------------------------
+        // Show loading state
+        // ---------------------------------------------------------
+
+        tvPredictedExpense.setText(
+                "Calculating..."
+        );
+
+        tvPredictionStatus.setText(
+                "Analyzing your latest completed month..."
+        );
+
+        // ---------------------------------------------------------
+        // Send to LightGBM API
+        // ---------------------------------------------------------
+
+        expensePredictionApiService.predict(
+                request,
+                new ExpensePredictionApiService.PredictionCallback() {
+
+                    @Override
+                    public void onSuccess(
+                            double predictedExpense
+                    ) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        // -----------------------------------------
+                        // Predicted expense
+                        // -----------------------------------------
+
+                        tvPredictedExpense.setText(
+                                String.format(
+                                        Locale.US,
+                                        "Rs %.2f",
+                                        predictedExpense
+                                )
+                        );
+
+                        tvPredictionMonth.setText(
+                                String.format(
+                                        Locale.US,
+                                        "%s %d forecast",
+                                        getMonthName(month),
+                                        year
+                                )
+                        );
+
+                        // -----------------------------------------
+                        // Compare with actual expense
+                        // -----------------------------------------
+
+                        if (actualExpense <= 0) {
+
+                            tvPredictionStatus.setText(
+                                    String.format(
+                                            Locale.US,
+                                            "Based on %s spending",
+                                            getMonthName(
+                                                    month
+                                            )
+                                    )
+                            );
+
+                            return;
+                        }
+
+                        double difference =
+                                predictedExpense
+                                        - actualExpense;
+
+                        double percentageChange =
+                                (difference
+                                        / actualExpense)
+                                        * 100.0;
+
+                        String monthName =
+                                getMonthName(month);
+
+                        if (difference > 0) {
+
+                            tvPredictionStatus.setText(
+                                    String.format(
+                                            Locale.US,
+                                            "↑ %.1f%% vs %s actual expense",
+                                            percentageChange,
+                                            monthName
+                                    )
+                            );
+
+                            tvPredictionStatus.setTextColor(
+                                    Color.parseColor(
+                                            "#DC2626"
+                                    )
+                            );
+
+                        } else if (difference < 0) {
+
+                            tvPredictionStatus.setText(
+                                    String.format(
+                                            Locale.US,
+                                            "↓ %.1f%% vs %s actual expense",
+                                            Math.abs(
+                                                    percentageChange
+                                            ),
+                                            monthName
+                                    )
+                            );
+
+                            tvPredictionStatus.setTextColor(
+                                    Color.parseColor(
+                                            "#16A34A"
+                                    )
+                            );
+
+                        } else {
+
+                            tvPredictionStatus.setText(
+                                    String.format(
+                                            Locale.US,
+                                            "Same as %s actual expense",
+                                            monthName
+                                    )
+                            );
+
+                            tvPredictionStatus.setTextColor(
+                                    Color.parseColor(
+                                            "#64748B"
+                                    )
+                            );
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(
+                            String message
+                    ) {
+
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        showPredictionError(
+                                message
+                        );
+                    }
+                }
+        );
+    }
+
+    // =========================================================
+// MONTH NAME
+// =========================================================
+
+    private String getMonthName(int month) {
+
+        String[] months = {
+
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+        };
+
+        if (month < 1 || month > 12) {
+            return "";
+        }
+
+        return months[month - 1];
+    }
+
+    private void showPredictionError(
+            String message
+    ) {
+
+        if (tvPredictedExpense != null) {
+
+            tvPredictedExpense.setText(
+                    "Prediction unavailable"
+            );
+        }
+
+
+        if (tvPredictionStatus != null) {
+
+            tvPredictionStatus.setText(
+                    message != null
+                            ? message
+                            : "Unable to generate prediction."
+            );
+        }
+    }
+
 
     // =========================================================
     // RESUME
@@ -909,5 +1253,7 @@ public class PersonalDashboardFragment extends Fragment {
         tvAIInsight = null;
         tvRecommendation = null;
         btnViewInsights = null;
+        tvPredictedExpense = null;
+        tvPredictionStatus = null;
     }
 }
