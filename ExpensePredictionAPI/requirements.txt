@@ -1,0 +1,6 @@
+flask
+pandas
+lightgbm
+joblib
+openpyxl
+numpy
