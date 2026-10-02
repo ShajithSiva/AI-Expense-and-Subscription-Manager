@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pytest_cache/
+data/
+final_subscription_model_v3/
+.env
+
+.DS_Store
+*.pyc
+model_service_backup.py

@@ -50,6 +50,7 @@ env/
 .venv/
 env.bak/
 venv.bak/
+/app/release/
 
 # IDE settings
 .idea/

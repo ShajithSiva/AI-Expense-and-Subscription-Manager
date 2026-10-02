@@ -1,0 +1,4 @@
+-r requirements-api.txt
+torch>=2.2,<3
+transformers>=4.44,<6
+safetensors>=0.4,<1

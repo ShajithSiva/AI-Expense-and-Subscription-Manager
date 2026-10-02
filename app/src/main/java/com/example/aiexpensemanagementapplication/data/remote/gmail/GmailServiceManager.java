@@ -527,6 +527,14 @@ public class GmailServiceManager {
                                         );
 
                                         System.out.println(
+                                                "SUBJECT TEXT: " + subject
+                                        );
+
+                                        System.out.println(
+                                                "EMAIL BODY: " + fullBody
+                                        );
+
+                                        System.out.println(
                                                 "----------------------------------------"
                                         );
 
