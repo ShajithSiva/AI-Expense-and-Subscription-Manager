@@ -13,6 +13,8 @@ local.properties
 # Node.js
 backend/node_modules/
 
+/app/release/
+
 # Node environment files
 backend/.env
 backend/.env.*
