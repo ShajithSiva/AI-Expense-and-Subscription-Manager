@@ -1772,57 +1772,38 @@ public class SubscriptionActivity extends AppCompatActivity {
             String body
     ) {
 
-        StringBuilder builder =
-                new StringBuilder();
+        String cleanSender = safeString(sender);
+        String cleanSubject = safeString(subject);
+        String cleanBody = safeString(body);
 
+        // Keep body reasonably bounded.
+        // DistilBERT backend will still perform the final token truncation.
+        final int MAX_BODY_CHARS = 4000;
 
-        if (!safeString(sender).isEmpty()) {
-
-            builder.append(
-                    "Sender: "
-            );
-
-            builder.append(
-                    safeString(sender)
-            );
-
-            builder.append(
-                    "\n"
-            );
+        if (cleanBody.length() > MAX_BODY_CHARS) {
+            cleanBody = cleanBody.substring(0, MAX_BODY_CHARS);
         }
 
+        StringBuilder builder = new StringBuilder();
 
-        if (!safeString(subject).isEmpty()) {
-
-            builder.append(
-                    "Subject: "
-            );
-
-            builder.append(
-                    safeString(subject)
-            );
-
-            builder.append(
-                    "\n"
-            );
+        if (!cleanSender.isEmpty()) {
+            builder.append("Sender: ")
+                    .append(cleanSender)
+                    .append("\n");
         }
 
-
-        if (!safeString(body).isEmpty()) {
-
-            builder.append(
-                    "Message:\n"
-            );
-
-            builder.append(
-                    safeString(body)
-            );
+        if (!cleanSubject.isEmpty()) {
+            builder.append("Subject: ")
+                    .append(cleanSubject)
+                    .append("\n");
         }
 
+        if (!cleanBody.isEmpty()) {
+            builder.append("Message:\n")
+                    .append(cleanBody);
+        }
 
-        return builder
-                .toString()
-                .trim();
+        return builder.toString().trim();
     }
 
 

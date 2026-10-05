@@ -315,18 +315,24 @@ public class GmailServiceManager {
 
                         String query =
                                 "newer_than:90d "
-                                        + "(subscription OR "
-                                        + "renewal OR "
-                                        + "renew OR "
-                                        + "recurring OR "
-                                        + "payment OR "
-                                        + "invoice OR "
-                                        + "receipt OR "
-                                        + "charged OR "
-                                        + "billing OR "
-                                        + "membership OR "
-                                        + "plan OR "
-                                        + "trial)";
+                                        + "(\"subscription\" OR "
+                                        + "\"subscription renewed\" OR "
+                                        + "\"subscription renewal\" OR "
+                                        + "\"renewal\" OR "
+                                        + "\"auto-renew\" OR "
+                                        + "\"auto renew\" OR "
+                                        + "\"recurring payment\" OR "
+                                        + "\"payment receipt\" OR "
+                                        + "\"payment successful\" OR "
+                                        + "\"payment confirmation\" OR "
+                                        + "\"you were charged\" OR "
+                                        + "\"has been charged\" OR "
+                                        + "\"invoice\" OR "
+                                        + "\"receipt\" OR "
+                                        + "\"membership renewed\" OR "
+                                        + "\"trial ends\" OR "
+                                        + "\"trial ending\" OR "
+                                        + "\"next billing\")";
 
 
                         ArrayList<GmailMessageData> result =
