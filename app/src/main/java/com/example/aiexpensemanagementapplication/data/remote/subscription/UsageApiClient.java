@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class UsageApiClient {
 
     private static final String BASE_URL =
-            "YOUR_NEW_API_LINK/";
+            "https://subscription-usage-ml-api.onrender.com/";
 
     private static Retrofit retrofit = null;
 
