@@ -52,6 +52,7 @@ public class UsageApiClient {
         }
 
         return retrofit;
+
     }
 
     public static UsageApiService getApiService() {
