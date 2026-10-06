@@ -136,6 +136,9 @@ public class NotificationHelper {
     }
 
     private String getNotificationType(int id) {
+        if (id >= NotificationConstants.SUBSCRIPTION_USAGE_ANALYSIS_BASE_ID) {
+            return "subscription_usage";
+        }
 
         switch (id) {
 

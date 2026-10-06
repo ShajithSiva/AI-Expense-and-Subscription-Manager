@@ -1,6 +1,10 @@
 package com.example.aiexpensemanagementapplication.ui.subscription;
 
 import android.content.Intent;
+import com.example.aiexpensemanagementapplication.data.remote.subscription.UsagePredictionRequest;
+import com.example.aiexpensemanagementapplication.data.remote.subscription.UsagePredictionResponse;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +16,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.aiexpensemanagementapplication.data.remote.subscription.UsagePredictionRequest;
+import com.example.aiexpensemanagementapplication.data.remote.subscription.UsagePredictionResponse;
+import com.example.aiexpensemanagementapplication.data.remote.subscription.UsageApiClient;
+import com.example.aiexpensemanagementapplication.data.remote.subscription.UsageApiService;
+import com.example.aiexpensemanagementapplication.data.remote.subscription.UsageApiClient;
+import com.example.aiexpensemanagementapplication.data.remote.subscription.UsageApiService;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
@@ -26,6 +36,7 @@ import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity
 import com.example.aiexpensemanagementapplication.ui.expense.ExpenseListActivity;
 import com.example.aiexpensemanagementapplication.ui.income.IncomeListActivity;
 import com.example.aiexpensemanagementapplication.ui.profile.ProfileActivity;
+import com.example.aiexpensemanagementapplication.data.UsageStatsHelper;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -33,9 +44,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.example.aiexpensemanagementapplication.notification.NotificationConstants;
+import com.example.aiexpensemanagementapplication.notification.NotificationHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import android.util.Log;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -74,6 +89,12 @@ public class SubscriptionActivity extends AppCompatActivity {
 
     private DatabaseHelper databaseHelper;
 
+    // =========================================================
+// USAGE STATS
+// =========================================================
+
+    private UsageStatsHelper usageStatsHelper;
+
 
     // =========================================================
     // GMAIL
@@ -90,7 +111,12 @@ public class SubscriptionActivity extends AppCompatActivity {
 
     private ApiService apiService;
 
+    private UsageApiService usageApiService;
+
     private Call<PredictionResponse> activePredictionCall;
+
+
+    private Call<UsagePredictionResponse> activeUsagePredictionCall;
 
 
     // =========================================================
@@ -116,6 +142,8 @@ public class SubscriptionActivity extends AppCompatActivity {
 
     private int userId = -1;
 
+    private NotificationHelper notificationHelper;
+
 
     // =========================================================
     // ON CREATE
@@ -139,6 +167,11 @@ public class SubscriptionActivity extends AppCompatActivity {
         databaseHelper =
                 new DatabaseHelper(this);
 
+        notificationHelper =
+                new NotificationHelper(this);
+
+        usageStatsHelper =
+                new UsageStatsHelper(this);
 
         gmailAuthManager =
                 new GmailAuthManager(this);
@@ -160,6 +193,18 @@ public class SubscriptionActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        try {
+
+            usageApiService =
+                    UsageApiClient.getApiService();
+
+        } catch (Exception e) {
+
+            usageApiService = null;
+
+            e.printStackTrace();
+        }
+
 
         if (!initializeUser()) {
 
@@ -172,15 +217,736 @@ public class SubscriptionActivity extends AppCompatActivity {
         setupListeners();
 
         setupBottomNavigation();
-
+        testFacebookDailyUsage();
         loadSubscriptions();
+
+        checkUsageAccessPermission();
+
+        saveAllSubscriptionUsage();
+
+        testAllSubscriptionUsage();
 
         updateGmailUi();
 
         updatePendingReviewButton();
     }
 
+    private void saveAllSubscriptionUsage() {
 
+        if (usageStatsHelper == null ||
+                databaseHelper == null) {
+
+            return;
+        }
+
+        if (!usageStatsHelper.hasUsageAccessPermission()) {
+
+            Log.d(
+                    "USAGE_SAVE",
+                    "Usage Access permission is not enabled."
+            );
+
+            return;
+        }
+
+        if (subscriptionList.isEmpty()) {
+
+            Log.d(
+                    "USAGE_SAVE",
+                    "No subscriptions found."
+            );
+
+            return;
+        }
+
+        for (Subscription subscription :
+                subscriptionList) {
+
+            if (subscription == null) {
+                continue;
+            }
+
+            int subscriptionId =
+                    subscription.getSubscriptionId();
+
+            String appName =
+                    subscription.getServiceName();
+
+            // Find installed app package
+            String packageName =
+                    findMatchingPackage(appName);
+
+            if (packageName == null) {
+
+                Log.d(
+                        "USAGE_SAVE",
+                        "App not installed: " + appName
+                );
+
+                continue;
+            }
+
+            // Get 30-day usage
+            long usageMinutes =
+                    usageStatsHelper
+                            .testWeeklyUsageLast30Days(
+                                    packageName
+                            );
+
+            // Convert subscription cost to monthly cost
+            double monthlyCost =
+                    convertToMonthlyAmount(
+                            subscription.getAmount(),
+                            subscription.getBillingCycle()
+                    );
+
+            // Check whether usage record already exists
+            Cursor cursor =
+                    databaseHelper
+                            .getUsageBySubscription(
+                                    subscriptionId
+                            );
+
+            try {
+
+                if (cursor != null &&
+                        cursor.moveToFirst()) {
+
+                    // Existing record → UPDATE
+
+                    int usageId =
+                            cursor.getInt(
+                                    cursor.getColumnIndexOrThrow(
+                                            DatabaseHelper.USAGE_ID
+                                    )
+                            );
+
+                    databaseHelper.updateUsageData(
+                            usageId,
+                            (int) usageMinutes,
+                            monthlyCost,
+                            "",
+                            0
+                    );
+
+                    Log.d(
+                            "USAGE_SAVE",
+                            "Usage updated: " + appName
+                    );
+
+                } else {
+
+                    // No record → INSERT
+
+                    databaseHelper.insertUsageData(
+                            subscriptionId,
+                            appName,
+                            (int) usageMinutes,
+                            monthlyCost,
+                            "",
+                            0
+                    );
+
+                    Log.d(
+                            "USAGE_SAVE",
+                            "Usage inserted: " + appName
+                    );
+                }
+
+            } finally {
+
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+
+            Log.d(
+                    "USAGE_SAVE",
+                    "SubscriptionID: " +
+                            subscriptionId
+            );
+
+            Log.d(
+                    "USAGE_SAVE",
+                    "AppName: " +
+                            appName
+            );
+
+            Log.d(
+                    "USAGE_SAVE",
+                    "UsageMinutes: " +
+                            usageMinutes
+            );
+
+            Log.d(
+                    "USAGE_SAVE",
+                    "MonthlyCost: " +
+                            monthlyCost
+            );
+            predictSubscriptionUsage(
+                    appName,
+                    monthlyCost,
+                    usageMinutes
+            );
+        }
+    }
+
+    private void predictSubscriptionUsage(
+            String appName,
+            double monthlyCost,
+            long usageMinutes
+    ) {
+
+        if (usageApiService == null) {
+            Log.d(
+                    "USAGE_PREDICTION",
+                    "ApiService is null."
+            );
+            return;
+        }
+
+        UsagePredictionRequest request =
+                new UsagePredictionRequest(
+                        monthlyCost,
+                        (int) usageMinutes
+                );
+
+        Log.d(
+                "USAGE_PREDICTION",
+                "Sending prediction request..."
+        );
+
+        Log.d(
+                "USAGE_PREDICTION",
+                "AppName: " + appName
+        );
+
+        Log.d(
+                "USAGE_PREDICTION",
+                "MonthlyCost: " + monthlyCost
+        );
+
+        Log.d(
+                "USAGE_PREDICTION",
+                "UsageMinutes: " + usageMinutes
+        );
+
+        usageApiService
+                .predictSubscriptionUsage(request)
+                .enqueue(new Callback<UsagePredictionResponse>() {
+
+                    @Override
+                    public void onResponse(
+                            Call<UsagePredictionResponse> call,
+                            Response<UsagePredictionResponse> response
+                    ) {
+
+                        if (response.isSuccessful()
+                                && response.body() != null) {
+
+                            String prediction =
+                                    response.body().getPrediction();
+
+                            Log.d(
+                                    "USAGE_PREDICTION",
+                                    "================================"
+                            );
+
+                            Log.d(
+                                    "USAGE_PREDICTION",
+                                    "AppName: " + appName
+                            );
+
+                            Log.d(
+                                    "USAGE_PREDICTION",
+                                    "Prediction: " + prediction
+                            );
+
+                            Log.d(
+                                    "USAGE_PREDICTION",
+                                    "================================"
+                            );
+
+                            showSubscriptionUsageNotification(
+                                    appName,
+                                    monthlyCost,
+                                    usageMinutes,
+                                    prediction
+                            );
+
+                        } else {
+
+                            Log.d(
+                                    "USAGE_PREDICTION",
+                                    "Prediction failed. HTTP Code: "
+                                            + response.code()
+                            );
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(
+                            Call<UsagePredictionResponse> call,
+                            Throwable t
+                    ) {
+
+                        Log.e(
+                                "USAGE_PREDICTION",
+                                "API call failed: "
+                                        + t.getMessage(),
+                                t
+                        );
+                    }
+                });
+    }
+
+    private void showSubscriptionUsageNotification(
+            String appName,
+            double monthlyCost,
+            long usageMinutes,
+            String prediction
+    ) {
+
+        if (notificationHelper == null) {
+            return;
+        }
+
+        if (prediction == null) {
+            return;
+        }
+
+        String status;
+        String message;
+
+        if (prediction.equalsIgnoreCase("Useful")) {
+
+            status = "Useful";
+
+            message =
+                    "You spend LKR "
+                            + String.format(
+                            Locale.getDefault(),
+                            "%.2f",
+                            monthlyCost
+                    )
+                            + " per month on "
+                            + appName
+                            + ". You used it for "
+                            + usageMinutes
+                            + " minutes in the last 30 days. "
+                            + "This subscription is Useful based on your usage.";
+
+        } else if (prediction.equalsIgnoreCase("Low_Usage")) {
+
+            status = "Low Usage";
+
+            message =
+                    "You spend LKR "
+                            + String.format(
+                            Locale.getDefault(),
+                            "%.2f",
+                            monthlyCost
+                    )
+                            + " per month on "
+                            + appName
+                            + ". You used it for "
+                            + usageMinutes
+                            + " minutes in the last 30 days. "
+                            + "This subscription has Low Usage. "
+                            + "Consider reviewing whether it is worth the monthly cost.";
+
+        } else if (prediction.equalsIgnoreCase("Unused")) {
+
+            status = "Unused";
+
+            message =
+                    "You spend LKR "
+                            + String.format(
+                            Locale.getDefault(),
+                            "%.2f",
+                            monthlyCost
+                    )
+                            + " per month on "
+                            + appName
+                            + ", but you used it for only "
+                            + usageMinutes
+                            + " minutes in the last 30 days. "
+                            + "This subscription is Unused based on your usage. "
+                            + "Consider cancelling it to save money.";
+
+        } else {
+
+            status = prediction;
+
+            message =
+                    "You spend LKR "
+                            + String.format(
+                            Locale.getDefault(),
+                            "%.2f",
+                            monthlyCost
+                    )
+                            + " per month on "
+                            + appName
+                            + ". Your 30-day usage is "
+                            + usageMinutes
+                            + " minutes. "
+                            + "Subscription status: "
+                            + prediction
+                            + ".";
+
+        }
+
+        int notificationId =
+                NotificationConstants.SUBSCRIPTION_USAGE_ANALYSIS_BASE_ID;
+
+        notificationId += Math.abs(
+                appName.hashCode()
+        );
+
+        notificationHelper.showNotification(
+                notificationId,
+                appName + " Subscription Analysis",
+                message,
+                status
+        );
+    }
+
+    // =========================================================
+// FIND INSTALLED APP PACKAGE
+// =========================================================
+
+    private String findMatchingPackage(String serviceName) {
+
+        if (serviceName == null ||
+                serviceName.trim().isEmpty()) {
+
+            return null;
+        }
+
+        String targetName =
+                serviceName.trim()
+                        .toLowerCase(Locale.ROOT);
+
+        PackageManager packageManager =
+                getPackageManager();
+
+        Intent launchIntent =
+                new Intent(Intent.ACTION_MAIN);
+
+        launchIntent.addCategory(
+                Intent.CATEGORY_LAUNCHER
+        );
+
+        List<ResolveInfo> installedApps =
+                packageManager.queryIntentActivities(
+                        launchIntent,
+                        PackageManager.MATCH_ALL
+                );
+
+        for (ResolveInfo resolveInfo : installedApps) {
+
+            if (resolveInfo == null ||
+                    resolveInfo.activityInfo == null) {
+
+                continue;
+            }
+
+            CharSequence appLabel =
+                    resolveInfo.loadLabel(
+                            packageManager
+                    );
+
+            if (appLabel == null) {
+                continue;
+            }
+
+            String installedAppName =
+                    appLabel.toString()
+                            .trim()
+                            .toLowerCase(Locale.ROOT);
+
+            if (installedAppName.equals(targetName)) {
+
+                return resolveInfo.activityInfo.packageName;
+            }
+        }
+
+        return null;
+    }
+
+    // =========================================================
+// TEST SUBSCRIPTION APP MATCHING
+// =========================================================
+
+    // =========================================================
+// TEST SUBSCRIPTION APP MATCHING
+// =========================================================
+
+    private void testSubscriptionAppMatching() {
+
+        if (subscriptionList == null ||
+                subscriptionList.isEmpty()) {
+
+            Log.d(
+                    "SUBSCRIPTION_MATCH",
+                    "No subscriptions found."
+            );
+
+            return;
+        }
+
+        for (Subscription subscription : subscriptionList) {
+
+            if (subscription == null) {
+                continue;
+            }
+
+            String serviceName =
+                    subscription.getServiceName();
+
+            String packageName =
+                    findMatchingPackage(serviceName);
+
+            Log.d(
+                    "SUBSCRIPTION_MATCH",
+                    "Service Name: " + serviceName
+            );
+
+            Log.d(
+                    "SUBSCRIPTION_MATCH",
+                    "Package Name: " + packageName
+            );
+
+            Log.d(
+                    "SUBSCRIPTION_MATCH",
+                    "--------------------------------"
+            );
+        }
+    }
+
+    private void testFacebookDailyUsage() {
+
+        if (usageStatsHelper == null) {
+            Log.d(
+                    "FACEBOOK_DAILY",
+                    "UsageStatsHelper is null."
+            );
+            return;
+        }
+
+        if (!usageStatsHelper.hasUsageAccessPermission()) {
+            Log.d(
+                    "FACEBOOK_DAILY",
+                    "Usage Access permission is not enabled."
+            );
+            return;
+        }
+
+        String packageName =
+                findMatchingPackage("Facebook");
+
+        if (packageName == null) {
+            Log.d(
+                    "FACEBOOK_DAILY",
+                    "Facebook package not found."
+            );
+            return;
+        }
+
+        Log.d(
+                "FACEBOOK_DAILY",
+                "Package: " + packageName
+        );
+
+        android.app.usage.UsageStatsManager usageStatsManager =
+                (android.app.usage.UsageStatsManager)
+                        getSystemService(
+                                android.content.Context.USAGE_STATS_SERVICE
+                        );
+
+        java.util.Calendar calendar =
+                java.util.Calendar.getInstance();
+
+        long endTime =
+                calendar.getTimeInMillis();
+
+        calendar.add(
+                java.util.Calendar.DAY_OF_YEAR,
+                -30
+        );
+
+        long startTime =
+                calendar.getTimeInMillis();
+
+        java.util.List<android.app.usage.UsageStats> usageStatsList =
+                usageStatsManager.queryUsageStats(
+                        android.app.usage.UsageStatsManager.INTERVAL_DAILY,
+                        startTime,
+                        endTime
+                );
+
+        long totalMinutes = 0;
+
+        if (usageStatsList != null) {
+
+            for (android.app.usage.UsageStats usageStats :
+                    usageStatsList) {
+
+                if (usageStats == null) {
+                    continue;
+                }
+
+                if (!packageName.equals(
+                        usageStats.getPackageName()
+                )) {
+                    continue;
+                }
+
+                long foregroundMillis =
+                        usageStats.getTotalTimeInForeground();
+
+                long minutes =
+                        foregroundMillis / (1000 * 60);
+
+                java.text.SimpleDateFormat dateFormat =
+                        new java.text.SimpleDateFormat(
+                                "yyyy-MM-dd",
+                                java.util.Locale.getDefault()
+                        );
+
+                String date =
+                        dateFormat.format(
+                                new java.util.Date(
+                                        usageStats.getFirstTimeStamp()
+                                )
+                        );
+
+                Log.d(
+                        "FACEBOOK_DAILY",
+                        "Date: " + date +
+                                " | Minutes: " + minutes
+                );
+
+                totalMinutes += minutes;
+            }
+        }
+
+        Log.d(
+                "FACEBOOK_DAILY",
+                "================================"
+        );
+
+        Log.d(
+                "FACEBOOK_DAILY",
+                "TOTAL DAILY USAGE: " +
+                        totalMinutes +
+                        " minutes"
+        );
+
+        Log.d(
+                "FACEBOOK_DAILY",
+                "TOTAL HOURS: " +
+                        (totalMinutes / 60.0)
+        );
+
+        Log.d(
+                "FACEBOOK_DAILY",
+                "================================"
+        );
+    }
+    private void testAllSubscriptionUsage() {
+
+        if (usageStatsHelper == null) {
+
+            Log.d(
+                    "SUB_USAGE",
+                    "UsageStatsHelper is null."
+            );
+
+            return;
+        }
+
+        if (!usageStatsHelper.hasUsageAccessPermission()) {
+
+            Log.d(
+                    "SUB_USAGE",
+                    "Usage Access permission is not enabled."
+            );
+
+            return;
+        }
+
+        if (subscriptionList == null ||
+                subscriptionList.isEmpty()) {
+
+            Log.d(
+                    "SUB_USAGE",
+                    "No subscriptions found."
+            );
+
+            return;
+        }
+
+        for (Subscription subscription :
+                subscriptionList) {
+
+            if (subscription == null) {
+                continue;
+            }
+
+            String serviceName =
+                    subscription.getServiceName();
+
+            String packageName =
+                    findMatchingPackage(serviceName);
+
+            Log.d(
+                    "SUB_USAGE",
+                    "Service: " + serviceName
+            );
+
+            Log.d(
+                    "SUB_USAGE",
+                    "Package: " + packageName
+            );
+
+            if (packageName == null) {
+
+                Log.d(
+                        "SUB_USAGE",
+                        "App not installed or package not found."
+                );
+
+                continue;
+            }
+
+            long usageMinutes =
+                    usageStatsHelper
+                            .getUsageMinutesLast30DaysWeekly(
+                                    packageName
+                            );
+
+            double usageHours =
+                    usageMinutes / 60.0;
+
+            Log.d(
+                    "SUB_USAGE",
+                    "30-Day Usage Minutes: "
+                            + usageMinutes
+            );
+
+            Log.d(
+                    "SUB_USAGE",
+                    "30-Day Usage Hours: "
+                            + usageHours
+            );
+
+            Log.d(
+                    "SUB_USAGE",
+                    "--------------------------------"
+            );
+        }
+    }
     // =========================================================
     // INITIALIZE VIEWS
     // =========================================================
@@ -2582,6 +3348,8 @@ public class SubscriptionActivity extends AppCompatActivity {
 
             loadSubscriptions();
 
+
+
             updateGmailUi();
 
             updatePendingReviewButton();
@@ -2613,5 +3381,37 @@ public class SubscriptionActivity extends AppCompatActivity {
 
 
         super.onDestroy();
+    }
+    // =========================================================
+// USAGE ACCESS PERMISSION
+// =========================================================
+
+    private void checkUsageAccessPermission() {
+
+        if (usageStatsHelper == null) {
+            return;
+        }
+
+        if (usageStatsHelper.hasUsageAccessPermission()) {
+            return;
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Usage Access Required")
+                .setMessage(
+                        "To analyze subscription usage, " +
+                                "please allow Usage Access for this app."
+                )
+                .setPositiveButton(
+                        "Enable",
+                        (dialog, which) -> {
+                            usageStatsHelper.openUsageAccessSettings();
+                        }
+                )
+                .setNegativeButton(
+                        "Cancel",
+                        null
+                )
+                .show();
     }
 }

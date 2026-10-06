@@ -3213,6 +3213,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return db.insert(TABLE_USAGE_DATA, null, values);
     }
+    public int updateUsageBySubscription(
+            int subscriptionId,
+            int usageMinutes,
+            double cost
+    ) {
+
+        SQLiteDatabase db =
+                this.getWritableDatabase();
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(
+                USAGE_FREQUENCY,
+                usageMinutes
+        );
+
+        values.put(
+                COST_PER_USE,
+                cost
+        );
+
+        return db.update(
+                TABLE_USAGE_DATA,
+                values,
+                SUBSCRIPTION_ID + "=?",
+                new String[]{
+                        String.valueOf(subscriptionId)
+                }
+        );
+    }
+
 
     public Cursor getUsageData() {
 

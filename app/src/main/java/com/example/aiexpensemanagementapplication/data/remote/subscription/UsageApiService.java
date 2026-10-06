@@ -4,12 +4,8 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-public interface ApiService {
+public interface UsageApiService {
 
-    @POST("predict")
-    Call<PredictionResponse> predict(
-            @Body PredictionRequest request
-    );
     @POST("predict-subscription-usage")
     Call<UsagePredictionResponse> predictSubscriptionUsage(
             @Body UsagePredictionRequest request

@@ -18,4 +18,6 @@ public class NotificationConstants {
 
     public static final int MONTHLY_REPORT_ID = 1004;
 
+    public static final int SUBSCRIPTION_USAGE_ANALYSIS_BASE_ID = 2000;
+
 }
