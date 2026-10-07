@@ -254,7 +254,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            app:singleSelection="false"
+            app:singleSelection="true"
             app:chipSpacingHorizontal="8dp">
 
             <com.google.android.material.chip.Chip
