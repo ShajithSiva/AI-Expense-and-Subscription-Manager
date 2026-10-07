@@ -160,6 +160,10 @@ public class ProfileActivity extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
 
+        if (bottomNavigation != null) {
+            bottomNavigation.setSelectedItemId(R.id.nav_profile);
+        }
+
         loadProfile();
 
         loadStatistics();

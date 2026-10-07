@@ -714,6 +714,10 @@ public class IncomeListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        if (bottomNavigation != null) {
+            bottomNavigation.setSelectedItemId(R.id.nav_income);
+        }
+
         loadIncome();
     }
 }

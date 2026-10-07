@@ -3342,6 +3342,10 @@ public class SubscriptionActivity extends AppCompatActivity {
 
         super.onResume();
 
+        if (bottomNavigation != null) {
+            bottomNavigation.setSelectedItemId(R.id.nav_subscriptions);
+        }
+
 
         if (databaseHelper != null &&
                 userId > 0) {

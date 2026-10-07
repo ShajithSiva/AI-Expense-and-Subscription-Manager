@@ -1320,17 +1320,11 @@ public class ExpenseListActivity extends AppCompatActivity {
 
         super.onResume();
 
-
-        /*
-         * Refresh after:
-         *
-         * - Add Expense
-         * - Edit Expense
-         * - Expense Details
-         */
+        if (bottomNavigation != null) {
+            bottomNavigation.setSelectedItemId(R.id.nav_expenses);
+        }
 
         if (databaseHelper != null) {
-
             loadExpenses();
         }
     }
