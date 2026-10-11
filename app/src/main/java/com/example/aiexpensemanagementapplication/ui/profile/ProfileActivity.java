@@ -26,6 +26,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import android.net.Uri;
+import android.content.SharedPreferences;
+import android.app.Activity;
+
 
 public class ProfileActivity extends AppCompatActivity{
     private TextView tvName;
@@ -131,29 +135,46 @@ public class ProfileActivity extends AppCompatActivity{
         layoutPrivacy = findViewById(R.id.layoutPrivacy);
 
     }
-    private void loadProfile() {
 
+    private void loadProfile() {
         if (currentUser == null) return;
 
-        int userId = databaseHelper.getUserIdByFirebaseUid(currentUser.getUid());
+        SharedPreferences prefs = getSharedPreferences(
+                "profile_picture_preferences",
+                MODE_PRIVATE
+        );
 
-        if (userId == -1) return;
+        String savedImage = prefs.getString(
+                "profile_picture_" + currentUser.getUid(),
+                null
+        );
 
-        Cursor cursor = databaseHelper.getUserById(userId);
-
-        if (cursor.moveToFirst()) {
-
-            String name = cursor.getString(
-                    cursor.getColumnIndexOrThrow(DatabaseHelper.USER_NAME));
-
-            String email = cursor.getString(
-                    cursor.getColumnIndexOrThrow(DatabaseHelper.USER_EMAIL));
-
-            tvName.setText(name);
-
-            tvEmail.setText(email);
+        if (savedImage != null) {
+            try {
+                imgProfile.setImageURI(Uri.parse(savedImage));
+            } catch (Exception e) {
+                imgProfile.setImageResource(
+                        R.drawable.profile
+                );
+            }
         }
-        cursor.close();
+    }
+
+    private static final int PICK_PROFILE_IMAGE = 1001;
+
+
+
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+        );
+
+        startActivityForResult(intent, PICK_PROFILE_IMAGE);
     }
 
     @Override
@@ -171,6 +192,59 @@ public class ProfileActivity extends AppCompatActivity{
         loadCurrencyPreference();
 
         loadBudgetPeriodPreference();
+    }
+
+    @Override
+    protected void onActivityResult(
+            int requestCode,
+            int resultCode,
+            Intent data) {
+
+        super.onActivityResult(
+                requestCode, resultCode, data
+        );
+
+        if (requestCode == PICK_PROFILE_IMAGE
+                && resultCode == Activity.RESULT_OK
+                && data != null
+                && data.getData() != null) {
+
+            Uri imageUri = data.getData();
+
+            try {
+                getContentResolver()
+                        .takePersistableUriPermission(
+                                imageUri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        );
+            } catch (SecurityException e) {
+                // The selected URI may not support
+                // persistent permission.
+            }
+
+            if (currentUser == null) return;
+
+            SharedPreferences prefs =
+                    getSharedPreferences(
+                            "profile_picture_preferences",
+                            MODE_PRIVATE
+                    );
+
+            prefs.edit()
+                    .putString(
+                            "profile_picture_" + currentUser.getUid(),
+                            imageUri.toString()
+                    )
+                    .apply();
+
+            imgProfile.setImageURI(imageUri);
+
+            Toast.makeText(
+                    this,
+                    "Profile picture updated!",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
     }
 
     private void loadStatistics() {
@@ -329,13 +403,7 @@ public class ProfileActivity extends AppCompatActivity{
     private void listeners() {
 
         btnChangePhoto.setOnClickListener(v -> {
-
-            Toast.makeText(
-                    this,
-                    "Profile picture update coming soon",
-                    Toast.LENGTH_SHORT
-            ).show();
-
+            openImagePicker();
         });
 
         btnLogout.setOnClickListener(v -> {
