@@ -55,7 +55,6 @@ public class SMSReceiver extends BroadcastReceiver {
                     "NSB",
                     "PeoplesBank",
                     "My airtel",
-                    "BOCONLINE",
                     "SLTMOBITEL",
                     "5555",
                     "SDB Bank",
