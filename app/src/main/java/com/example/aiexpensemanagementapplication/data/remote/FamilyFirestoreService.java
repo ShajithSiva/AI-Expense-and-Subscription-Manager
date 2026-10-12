@@ -10,6 +10,9 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -2210,6 +2213,7 @@ public class FamilyFirestoreService {
 
         private final String billingCycle;
         private final String nextBillingDate;
+        private final String startDate;
 
         public FamilySubscriptionData(
                 String transactionId,
@@ -2218,7 +2222,8 @@ public class FamilyFirestoreService {
                 String serviceName,
                 double amount,
                 String billingCycle,
-                String nextBillingDate
+                String nextBillingDate,
+                String startDate
         ) {
 
             this.transactionId = transactionId;
@@ -2228,6 +2233,7 @@ public class FamilyFirestoreService {
             this.amount = amount;
             this.billingCycle = billingCycle;
             this.nextBillingDate = nextBillingDate;
+            this.startDate = startDate;
         }
 
         public String getTransactionId() {
@@ -2257,6 +2263,7 @@ public class FamilyFirestoreService {
         public String getNextBillingDate() {
             return nextBillingDate;
         }
+        public String getStartDate() {return startDate;}
     }
 
     // =====================================================
@@ -2682,6 +2689,11 @@ public class FamilyFirestoreService {
 
             return;
         }
+        String subscriptionStartDate =
+                new SimpleDateFormat(
+                        "yyyy-MM-dd",
+                        Locale.US
+                ).format(new Date());
 
         Map<String, Object> subscription =
                 new HashMap<>();
@@ -2732,6 +2744,10 @@ public class FamilyFirestoreService {
                 nextBillingDate == null
                         ? ""
                         : nextBillingDate
+        );
+        subscription.put(
+                "startDate",
+                subscriptionStartDate
         );
 
         subscription.put(
@@ -2833,6 +2849,8 @@ public class FamilyFirestoreService {
                                 document.getString(
                                         "nextBillingDate"
                                 );
+                        String startDate =
+                                document.getString("startDate");
 
                         double finalAmount =
                                 amount == null
@@ -2854,7 +2872,9 @@ public class FamilyFirestoreService {
 
                                         billingCycle,
 
-                                        nextBillingDate
+                                        nextBillingDate,
+
+                                        startDate
                                 )
                         );
                     }

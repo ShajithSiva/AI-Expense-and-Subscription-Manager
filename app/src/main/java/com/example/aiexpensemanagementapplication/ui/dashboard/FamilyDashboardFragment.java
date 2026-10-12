@@ -135,6 +135,8 @@ public class FamilyDashboardFragment extends Fragment {
 
     private boolean showAllSubscriptions = false;
     private boolean showAllTransactions = false;
+    private double currentFamilyNormalExpense = 0.0;
+    private double currentFamilySubscriptionExpense = 0.0;
 
     // =====================================================
     // CONSTRUCTOR
@@ -980,7 +982,14 @@ public class FamilyDashboardFragment extends Fragment {
 
 // IMPORTANT:
 // Java inner callbacks can only access final/effectively-final variables.
-                        final double finalTotalExpense = totalExpense;
+                        currentFamilyNormalExpense = totalExpense;
+
+                        double combinedFamilyExpense =
+                                currentFamilyNormalExpense
+                                        + currentFamilySubscriptionExpense;
+
+                        final double finalTotalExpense =
+                                combinedFamilyExpense;
 
                         // -----------------------------------------
                         // UPDATE TOTAL SPENDING
@@ -992,7 +1001,7 @@ public class FamilyDashboardFragment extends Fragment {
                                     String.format(
                                             Locale.getDefault(),
                                             "Rs %,.2f",
-                                            totalExpense
+                                            combinedFamilyExpense
                                     )
                             );
                         }
@@ -1232,6 +1241,25 @@ public class FamilyDashboardFragment extends Fragment {
                         // -----------------------------------------
                         // UPDATE TOTAL
                         // -----------------------------------------
+                        currentFamilySubscriptionExpense =
+                                getCurrentMonthFamilySubscriptionExpense(
+                                        subscriptions
+                                );
+
+                        double combinedFamilyExpense =
+                                currentFamilyNormalExpense
+                                        + currentFamilySubscriptionExpense;
+
+                        if (tvFamilySpending != null) {
+
+                            tvFamilySpending.setText(
+                                    String.format(
+                                            Locale.getDefault(),
+                                            "Rs %,.2f",
+                                            combinedFamilyExpense
+                                    )
+                            );
+                        }
 
                         if (tvSharedSubscriptionTotal != null) {
 
@@ -1286,6 +1314,184 @@ public class FamilyDashboardFragment extends Fragment {
                     }
                 }
         );
+    }
+
+    private double getCurrentMonthFamilySubscriptionExpense(
+            ArrayList<FamilyFirestoreService.FamilySubscriptionData>
+                    subscriptions
+    ) {
+
+        if (subscriptions == null ||
+                subscriptions.isEmpty()) {
+
+            return 0.0;
+        }
+
+        java.util.Calendar calendar =
+                java.util.Calendar.getInstance();
+
+        int targetYear =
+                calendar.get(java.util.Calendar.YEAR);
+
+        int targetMonth =
+                calendar.get(java.util.Calendar.MONTH) + 1;
+
+        double total = 0.0;
+
+        for (
+                FamilyFirestoreService.FamilySubscriptionData subscription
+                : subscriptions
+        ) {
+
+            if (subscription == null) {
+                continue;
+            }
+
+            double amount =
+                    subscription.getAmount();
+
+            String billingCycle =
+                    subscription.getBillingCycle();
+
+            String nextBillingDate =
+                    subscription.getNextBillingDate();
+
+            String startDate =
+                    subscription.getStartDate();
+            String anchorDate = startDate;
+
+            if (anchorDate == null ||
+                    anchorDate.trim().isEmpty()) {
+
+                anchorDate = nextBillingDate;
+            }
+
+            if (billingCycle == null ||
+                    nextBillingDate == null ||
+                    billingCycle.trim().isEmpty() ||
+                    nextBillingDate.trim().isEmpty()) {
+
+                continue;
+            }
+
+            String[] parts =
+                    anchorDate.split("-");
+
+            if (parts.length < 3) {
+                continue;
+            }
+
+            try {
+
+                int billingYear =
+                        Integer.parseInt(parts[0]);
+
+                int billingMonth =
+                        Integer.parseInt(parts[1]);
+
+                int billingDay =
+                        Integer.parseInt(parts[2]);
+
+                String cycle =
+                        billingCycle.trim();
+
+                // Monthly
+                if (cycle.equalsIgnoreCase("Monthly")) {
+
+                    int monthDifference =
+                            (targetYear - billingYear) * 12
+                                    + (targetMonth - billingMonth);
+
+                    if (monthDifference >= 0) {
+                        total += amount;
+                    }
+                }
+
+                // Yearly
+                else if (cycle.equalsIgnoreCase("Yearly")) {
+
+                    int yearDifference =
+                            targetYear - billingYear;
+
+                    if (yearDifference >= 0 &&
+                            targetMonth == billingMonth) {
+
+                        total += amount;
+                    }
+                }
+
+                // Quarterly
+                else if (cycle.equalsIgnoreCase("Quarterly")) {
+
+                    int monthDifference =
+                            (targetYear - billingYear) * 12
+                                    + (targetMonth - billingMonth);
+
+                    if (monthDifference >= 0 &&
+                            monthDifference % 3 == 0) {
+
+                        total += amount;
+                    }
+                }
+
+                // Weekly
+                else if (cycle.equalsIgnoreCase("Weekly")) {
+
+                    java.util.Calendar billingCalendar =
+                            java.util.Calendar.getInstance();
+
+                    billingCalendar.clear();
+
+                    billingCalendar.set(
+                            billingYear,
+                            billingMonth - 1,
+                            billingDay
+                    );
+
+                    java.util.Calendar targetCalendar =
+                            java.util.Calendar.getInstance();
+
+                    targetCalendar.clear();
+
+                    targetCalendar.set(
+                            targetYear,
+                            targetMonth - 1,
+                            1
+                    );
+
+                    java.util.Calendar nextMonth =
+                            (java.util.Calendar)
+                                    targetCalendar.clone();
+
+                    nextMonth.add(
+                            java.util.Calendar.MONTH,
+                            1
+                    );
+
+                    while (
+                            billingCalendar.before(nextMonth)
+                    ) {
+
+                        if (!billingCalendar.before(
+                                targetCalendar
+                        )) {
+
+                            total += amount;
+                        }
+
+                        billingCalendar.add(
+                                java.util.Calendar.DAY_OF_YEAR,
+                                7
+                        );
+                    }
+                }
+
+            } catch (Exception ignored) {
+
+            }
+        }
+
+        return total;
     }
 
     // =====================================================

@@ -6,7 +6,8 @@ import com.example.aiexpensemanagementapplication.ui.income.IncomeModel;
 import com.example.aiexpensemanagementapplication.model.NotificationPreferences;
 import com.example.aiexpensemanagementapplication.model.Budget;
 
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import android.content.Context;
 import com.github.mikephil.charting.data.PieEntry;
 import java.util.List;
@@ -30,7 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //========================================================
 
     private static final String DATABASE_NAME = "ExpenseVaultDB.db";
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 20;
 
     //========================================================
     // USER TABLE
@@ -207,6 +208,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String BILLING_CYCLE = "BillingCycle";
     public static final String NEXT_BILLING_DATE = "NextBillingDate";
+    public static final String SUBSCRIPTION_START_DATE = "StartDate";
 
     // =========================================================
 // PENDING SUBSCRIPTIONS
@@ -705,6 +707,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     SUBSCRIPTION_CURRENCY +
                     " TEXT," +
 
+                    SUBSCRIPTION_START_DATE +
+                    " TEXT," +
+
                     BILLING_CYCLE +
                     " TEXT," +
 
@@ -1100,6 +1105,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             db.execSQL(
                     CREATE_PROCESSED_GMAIL_MESSAGE_TABLE
+            );
+        }
+        if (oldVersion < 20) {
+
+            db.execSQL(
+                    "ALTER TABLE " + TABLE_SUBSCRIPTION +
+                            " ADD COLUMN " + SUBSCRIPTION_START_DATE +
+                            " TEXT"
             );
         }
     }
@@ -2556,6 +2569,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         ? ""
                         : nextBillingDate.trim();
 
+        String subscriptionStartDate =
+                new SimpleDateFormat(
+                        "yyyy-MM-dd",
+                        Locale.US
+                ).format(new Date());
+
 
         // =========================================================
         // CONTENT VALUES
@@ -2616,6 +2635,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(
                 NEXT_BILLING_DATE,
                 cleanNextBillingDate
+        );
+        values.put(
+                SUBSCRIPTION_START_DATE,
+                subscriptionStartDate
         );
 
 
@@ -3901,8 +3924,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public double getTotalBalance(int userId) {
 
-        return getTotalIncome(userId) - getTotalExpense(userId);
+        double income =
+                getTotalIncome(userId);
 
+        double expense =
+                getTotalExpense(userId);
+
+        Calendar calendar =
+                Calendar.getInstance();
+
+        String currentMonth =
+                String.format(
+                        Locale.US,
+                        "%04d-%02d",
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH) + 1
+                );
+
+        double currentMonthSubscription =
+                getSubscriptionExpenseForMonth(
+                        userId,
+                        currentMonth
+                );
+
+        return income
+                - expense
+                - currentMonthSubscription;
     }
 
     public ArrayList<String> getExpenseCategoryNames() {
@@ -4011,8 +4058,216 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
-        return expense;
+        // Add subscription charges for this month
+        double subscriptionExpense =
+                getSubscriptionExpenseForMonth(
+                        userId,
+                        month
+                );
 
+        return expense + subscriptionExpense;
+
+    }
+
+    public double getSubscriptionExpenseForMonth(
+            int userId,
+            String month
+    ) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT " +
+                        AMOUNT + ", " +
+                        BILLING_CYCLE + ", " +
+                        SUBSCRIPTION_START_DATE + ", " +
+                        NEXT_BILLING_DATE +
+                        " FROM " + TABLE_SUBSCRIPTION +
+                        " WHERE " + USER_ID + "=?",
+
+                new String[]{
+                        String.valueOf(userId)
+                }
+        );
+
+        double total = 0;
+
+        try {
+
+            int targetYear =
+                    Integer.parseInt(
+                            month.substring(0, 4)
+                    );
+
+            int targetMonth =
+                    Integer.parseInt(
+                            month.substring(5, 7)
+                    );
+
+            while (cursor.moveToNext()) {
+
+                double amount =
+                        cursor.getDouble(
+                                cursor.getColumnIndexOrThrow(
+                                        AMOUNT
+                                )
+                        );
+
+                String billingCycle =
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                        BILLING_CYCLE
+                                )
+                        );
+                String startDate =
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                        SUBSCRIPTION_START_DATE
+                                )
+                        );
+
+                String nextBillingDate =
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                        NEXT_BILLING_DATE
+                                )
+                        );
+
+                if (billingCycle == null ||
+                        nextBillingDate == null ||
+                        billingCycle.trim().isEmpty() ||
+                        nextBillingDate.trim().isEmpty()) {
+
+                    continue;
+                }
+
+                String anchorDate =
+                        startDate;
+
+                if (anchorDate == null ||
+                        anchorDate.trim().isEmpty()) {
+
+                    anchorDate =
+                            nextBillingDate;
+                }
+
+                String[] parts =
+                        anchorDate.split("-");
+
+                if (parts.length < 3) {
+                    continue;
+                }
+
+                int billingYear =
+                        Integer.parseInt(parts[0]);
+
+                int billingMonth =
+                        Integer.parseInt(parts[1]);
+
+                int billingDay =
+                        Integer.parseInt(parts[2]);
+                String cycle =
+                        billingCycle.trim();
+
+                // Monthly subscription
+                if (cycle.equalsIgnoreCase("Monthly")) {
+
+                    int monthDifference =
+                            (targetYear - billingYear) * 12
+                                    + (targetMonth - billingMonth);
+
+                    if (monthDifference >= 0) {
+                        total += amount;
+                    }
+                }
+
+                // Yearly subscription
+                else if (cycle.equalsIgnoreCase("Yearly")) {
+
+                    int yearDifference =
+                            targetYear - billingYear;
+
+                    if (yearDifference >= 0 &&
+                            targetMonth == billingMonth) {
+
+                        total += amount;
+                    }
+                }
+
+                // Quarterly subscription
+                else if (cycle.equalsIgnoreCase("Quarterly")) {
+
+                    int monthDifference =
+                            (targetYear - billingYear) * 12
+                                    + (targetMonth - billingMonth);
+
+                    if (monthDifference >= 0 &&
+                            monthDifference % 3 == 0) {
+
+                        total += amount;
+                    }
+                }
+
+                // Weekly subscription
+                else if (cycle.equalsIgnoreCase("Weekly")) {
+
+                    Calendar billingCalendar =
+                            Calendar.getInstance();
+
+                    billingCalendar.clear();
+
+                    billingCalendar.set(
+                            billingYear,
+                            billingMonth - 1,
+                            billingDay
+                    );
+
+                    Calendar targetCalendar =
+                            Calendar.getInstance();
+
+                    targetCalendar.clear();
+
+                    targetCalendar.set(
+                            targetYear,
+                            targetMonth - 1,
+                            1
+                    );
+
+                    Calendar nextMonth =
+                            (Calendar) targetCalendar.clone();
+
+                    nextMonth.add(
+                            Calendar.MONTH,
+                            1
+                    );
+
+                    while (
+                            billingCalendar.before(nextMonth)
+                    ) {
+
+                        if (!billingCalendar.before(
+                                targetCalendar
+                        )) {
+
+                            total += amount;
+                        }
+
+                        billingCalendar.add(
+                                Calendar.DAY_OF_YEAR,
+                                7
+                        );
+                    }
+                }
+            }
+
+        } catch (Exception ignored) {
+
+        } finally {
+
+            cursor.close();
+        }
+
+        return total;
     }
 
     // =====================================================

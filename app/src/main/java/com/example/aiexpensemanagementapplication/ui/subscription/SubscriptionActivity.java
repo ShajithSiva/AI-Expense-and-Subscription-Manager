@@ -22,6 +22,7 @@ import com.example.aiexpensemanagementapplication.data.remote.subscription.Usage
 import com.example.aiexpensemanagementapplication.data.remote.subscription.UsageApiService;
 import com.example.aiexpensemanagementapplication.data.remote.subscription.UsageApiClient;
 import com.example.aiexpensemanagementapplication.data.remote.subscription.UsageApiService;
+import android.content.SharedPreferences;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
@@ -135,6 +136,9 @@ public class SubscriptionActivity extends AppCompatActivity {
 
     private SubscriptionAdapter adapter;
 
+    private boolean subscriptionNotificationShown = false;
+    private SharedPreferences subscriptionPreferences;
+
 
     // =========================================================
     // USER
@@ -169,6 +173,18 @@ public class SubscriptionActivity extends AppCompatActivity {
 
         notificationHelper =
                 new NotificationHelper(this);
+
+        subscriptionPreferences =
+                getSharedPreferences(
+                        "SubscriptionNotificationPrefs",
+                        MODE_PRIVATE
+                );
+
+        subscriptionNotificationShown =
+                subscriptionPreferences.getBoolean(
+                        "subscription_notification_shown",
+                        false
+                );
 
         usageStatsHelper =
                 new UsageStatsHelper(this);
@@ -514,6 +530,23 @@ public class SubscriptionActivity extends AppCompatActivity {
         if (prediction == null) {
             return;
         }
+        String notificationKey =
+                "notification_shown_"
+                        + appName.trim().toLowerCase(Locale.ROOT);
+
+        if (subscriptionPreferences.getBoolean(
+                notificationKey,
+                false
+        )) {
+            return;
+        }
+
+        subscriptionPreferences.edit()
+                .putBoolean(
+                        notificationKey,
+                        true
+                )
+                .apply();
 
         String status;
         String message;
