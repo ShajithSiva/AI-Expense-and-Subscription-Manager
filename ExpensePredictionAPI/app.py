@@ -74,6 +74,22 @@ def predict_expense():
                 "missingFeatures": missing_features
             }), 400
 
+            # Validate year and month
+            try:
+                year = int(data["Year"])
+                month = int(data["Month"])
+            except (ValueError, TypeError):
+                return jsonify({
+                    "success": False,
+                    "error": "Year and Month must be integers."
+                }), 400
+
+            if year < 2000 or not 1 <= month <= 12:
+                return jsonify({
+                    "success": False,
+                    "error": "Year must be >= 2000 and Month must be between 1 and 12."
+                }), 400
+
 
         # Create dataframe
         input_data = {
