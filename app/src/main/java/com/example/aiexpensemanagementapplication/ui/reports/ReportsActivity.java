@@ -55,6 +55,12 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import android.content.Intent;
+import android.net.Uri;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileInputStream;
+
 public class ReportsActivity extends AppCompatActivity {
 
     private MaterialToolbar toolbar;
@@ -88,6 +94,10 @@ public class ReportsActivity extends AppCompatActivity {
 
     private int userId;
 
+    private static final int CREATE_EXPORT_FILE = 2001;
+    private File pendingExportFile;
+    private String pendingFileName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,6 +126,110 @@ public class ReportsActivity extends AppCompatActivity {
         setupListeners();
 
         loadAdvancedAnalytics();
+    }
+
+
+
+    private void saveFileWithPicker(File sourceFile, String mimeType,
+                                    String fileName) {
+        if (sourceFile == null || !sourceFile.exists()) {
+            Toast.makeText(this, "Export file not found",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        pendingExportFile = sourceFile;
+        pendingFileName = fileName;
+
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+
+        startActivityForResult(intent, CREATE_EXPORT_FILE);
+    }
+
+    @Override
+    protected void onActivityResult(
+            int requestCode,
+            int resultCode,
+            Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CREATE_EXPORT_FILE) {
+
+            if (resultCode == RESULT_OK
+                    && data != null
+                    && data.getData() != null) {
+
+                Uri destinationUri = data.getData();
+
+                if (pendingExportFile == null
+                        || !pendingExportFile.exists()) {
+
+                    Toast.makeText(
+                            this,
+                            "Source export file not found",
+                            Toast.LENGTH_LONG
+                    ).show();
+                    return;
+                }
+
+                try (InputStream inputStream =
+                             new FileInputStream(pendingExportFile);
+                     OutputStream outputStream =
+                             getContentResolver()
+                                     .openOutputStream(destinationUri, "w")) {
+
+                    if (outputStream == null) {
+                        throw new IOException(
+                                "Unable to open destination file");
+                    }
+
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+
+                    outputStream.flush();
+
+                    android.util.Log.d(
+                            "REPORT_EXPORT",
+                            "Source bytes: " + pendingExportFile.length()
+                    );
+
+                    Toast.makeText(
+                            this,
+                            "Report saved successfully",
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                } catch (IOException e) {
+                    android.util.Log.e(
+                            "REPORT_EXPORT",
+                            "Failed to save report",
+                            e
+                    );
+
+                    Toast.makeText(
+                            this,
+                            "Failed to save report: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                } finally {
+                    pendingExportFile = null;
+                    pendingFileName = null;
+                }
+
+            } else {
+                pendingExportFile = null;
+                pendingFileName = null;
+            }
+        }
     }
 
     private void initializeViews(){
@@ -853,12 +967,11 @@ public class ReportsActivity extends AppCompatActivity {
 
             pdfDocument.close();
 
-            Toast.makeText(
-                    this,
-                    "PDF exported successfully!\n\nLocation:\n"
-                            + file.getAbsolutePath(),
-                    Toast.LENGTH_LONG
-            ).show();
+            saveFileWithPicker(
+                    file,
+                    "application/pdf",
+                    "ExpenseReport.pdf"
+            );
 
         } catch (IOException e) {
 
@@ -941,11 +1054,11 @@ public class ReportsActivity extends AppCompatActivity {
             writer.flush();
             writer.close();
 
-            Toast.makeText(
-                    this,
-                    "CSV exported successfully!",
-                    Toast.LENGTH_LONG
-            ).show();
+            saveFileWithPicker(
+                    file,
+                    "text/csv",
+                    "ExpenseReport.csv"
+            );
 
         } catch (IOException e) {
 

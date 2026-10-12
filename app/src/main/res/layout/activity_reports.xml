@@ -632,6 +632,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            ```xml
             <!-- ================= EXPORT ================= -->
 
             <TextView
@@ -642,7 +643,7 @@
                 android:text="Export Reports"
                 android:textStyle="bold"
                 android:textSize="20sp"
-                android:textColor="#212121"/>
+                android:textColor="#212121" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnExportPDF"
@@ -653,17 +654,22 @@
                 android:layout_marginBottom="12dp"
                 app:icon="@drawable/ic_picture_as_pdf"
                 app:iconGravity="textStart"
-                app:cornerRadius="12dp"/>
+                app:cornerRadius="12dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnExportExcel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Export as Excel"
+                android:text="Export as CSV"
                 android:textAllCaps="false"
                 app:icon="@drawable/ic_table_chart"
                 app:iconGravity="textStart"
-                app:cornerRadius="12dp"/>
+                app:cornerRadius="12dp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
+            ```
 
             <Space
                 android:layout_width="match_parent"
