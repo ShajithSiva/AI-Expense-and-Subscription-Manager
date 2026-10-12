@@ -53,7 +53,13 @@ public class SMSReceiver extends BroadcastReceiver {
                     "NDB",
                     "DFCC",
                     "NSB",
-                    "PEOPLES"
+                    "PeoplesBank",
+                    "My airtel",
+                    "BOCONLINE",
+                    "SLTMOBITEL",
+                    "5555",
+                    "SDB Bank",
+                    "SLTB.eSeat"
 
             ));
 
@@ -189,8 +195,11 @@ public class SMSReceiver extends BroadcastReceiver {
                 // MODEL 1 - TRANSACTION DETECTION
                 // =================================================
 
+                String textForModel1 =
+                        preprocessForTransactionDetection(message);
+
                 SMSMNBClassifier.Prediction prediction =
-                        model1Classifier.predict(message);
+                        model1Classifier.predict(textForModel1);
 
                 Log.d(
                         TAG,
@@ -612,6 +621,21 @@ public class SMSReceiver extends BroadcastReceiver {
             );
         }
     }
+
+
+    private String preprocessForTransactionDetection(String sms) {
+        if (sms == null) {
+            return "";
+        }
+
+        return sms
+                .replaceAll(
+                        "(?i)\\s*[-–]\\s*thank you for banking with BOC\\s*$",
+                        ""
+                )
+                .trim();
+    }
+
     private boolean isTrustedFinancialSender(String sender) {
 
         if (sender == null ||
