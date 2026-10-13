@@ -1,237 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="4dp"
-    android:foreground="?attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    app:cardBackgroundColor="@android:color/white"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    app:strokeColor="#E5E7EB"
-    app:strokeWidth="1dp">
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-
-        <!-- ================================================= -->
-        <!-- TOP SECTION -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-
-            <!-- ================================================= -->
-            <!-- SUBSCRIPTION ICON -->
-            <!-- ================================================= -->
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:cardBackgroundColor="#ECFDF3"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp">
-
-                <ImageView
-                    android:id="@+id/ivLogo"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="Subscription service"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/subscribtion" />
-
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="16dp" android:layout_marginTop="7dp" android:layout_marginBottom="7dp" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="20dp" app:cardElevation="1dp" app:strokeColor="#E0ECE3" app:strokeWidth="1dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+        <!--  Service name, logo and price  -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+            <com.google.android.material.card.MaterialCardView android:layout_width="52dp" android:layout_height="52dp" app:cardBackgroundColor="#E8F6EC" app:cardCornerRadius="16dp" app:cardElevation="0dp" app:strokeWidth="0dp">
+                <ImageView android:id="@+id/ivLogo" android:layout_width="30dp" android:layout_height="30dp" android:layout_gravity="center" android:contentDescription="Subscription service" android:scaleType="centerInside" android:src="@drawable/subscribtion"/>
             </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- ================================================= -->
-            <!-- SERVICE + BILLING CYCLE -->
-            <!-- ================================================= -->
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-
-                <TextView
-                    android:id="@+id/tvServiceName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="Netflix"
-                    android:textColor="#111827"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-
-                <TextView
-                    android:id="@+id/tvPlanType"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="Monthly"
-                    android:textColor="#6B7280"
-                    android:textSize="13sp" />
-
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/tvServiceName" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:text="Netflix" android:textColor="#173B2A" android:textSize="16sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/tvPlanType" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:ellipsize="end" android:maxLines="1" android:text="Monthly plan" android:textColor="#718078" android:textSize="12sp"/>
             </LinearLayout>
-
-
-            <!-- ================================================= -->
-            <!-- AMOUNT + STATUS -->
-            <!-- ================================================= -->
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:gravity="end"
-                android:orientation="vertical">
-
-
-                <TextView
-                    android:id="@+id/tvAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:maxLines="1"
-                    android:text="USD 15.49"
-                    android:textColor="#111827"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginTop="5dp"
-                    android:checkable="false"
-                    android:clickable="false"
-                    android:text="Active"
-                    android:textColor="#087A37"
-                    android:textSize="11sp"
-                    app:chipBackgroundColor="#EAFBF0"
-                    app:chipCornerRadius="16dp"
-                    app:chipMinHeight="28dp"
-                    app:chipStartPadding="6dp"
-                    app:chipEndPadding="6dp" />
-
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:gravity="end" android:orientation="vertical">
+                <TextView android:id="@+id/tvAmount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="end" android:maxWidth="145dp" android:maxLines="2" android:text="USD 15.49" android:textColor="#167C45" android:textSize="15sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/tvLkrEstimate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:gravity="end" android:text="≈ LKR 0.00 / month" android:textColor="#718078" android:textSize="10sp"/>
             </LinearLayout>
-
         </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- DIVIDER -->
-        <!-- ================================================= -->
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="12dp"
-            android:background="#EEF0F2" />
-
-
-        <!-- ================================================= -->
-        <!-- BOTTOM SECTION -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-
-            <!-- STATUS / USAGE ICON -->
-
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:contentDescription="Subscription status"
-                android:src="@drawable/bg_insight"
-                app:tint="#4F5663" />
-
-
-            <!-- STATUS TEXT -->
-
-            <TextView
-                android:id="@+id/tvUsage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Subscription Active"
-                android:textColor="#6B7280"
-                android:textSize="12sp" />
-
-
-            <!-- NEXT BILLING DATE -->
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:orientation="vertical">
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="NEXT BILL"
-                    android:textColor="#9CA3AF"
-                    android:textSize="9sp"
-                    android:textStyle="bold" />
-
-
-                <TextView
-                    android:id="@+id/tvDueDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="2026-10-30"
-                    android:textColor="#4F5663"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="15dp" android:layout_marginBottom="12dp" android:background="#EAF0EC"/>
+        <!--  Payment note and next billing date  -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+            <ImageView android:layout_width="18dp" android:layout_height="18dp" android:contentDescription="Payment information" android:src="@drawable/bg_insight" app:tint="#16834A"/>
+            <TextView android:id="@+id/tvUsage" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="7dp" android:layout_weight="1" android:ellipsize="end" android:maxLines="2" android:text="Next payment scheduled" android:textColor="#718078" android:textSize="11sp"/>
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:gravity="end" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="NEXT BILLING" android:textColor="#8A9990" android:textSize="9sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/tvDueDate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="30 Oct 2026" android:textColor="#28523A" android:textSize="11sp" android:textStyle="bold"/>
             </LinearLayout>
-
-
-            <!-- CHEVRON -->
-
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="View subscription"
-                android:src="@drawable/ic_chevron_right"
-                app:tint="#9CA3AF" />
-
+            <ImageView android:layout_width="18dp" android:layout_height="18dp" android:layout_marginStart="6dp" android:contentDescription="View subscription details" android:src="@drawable/ic_chevron_right" app:tint="#91A196"/>
         </LinearLayout>
-
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

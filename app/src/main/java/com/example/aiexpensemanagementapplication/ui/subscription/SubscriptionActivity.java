@@ -51,6 +51,8 @@ import com.example.aiexpensemanagementapplication.notification.NotificationHelpe
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Collections;
 import android.util.Log;
 
 import retrofit2.Call;
@@ -79,9 +81,25 @@ public class SubscriptionActivity extends AppCompatActivity {
     private TextView tvNextDue;
     private TextView tvOptimization;
     private TextView tvGmailStatus;
+    private TextView tvAnalysisStatus;
+    private TextView tvUsefulCount;
+    private TextView tvLowUsageCount;
+    private TextView tvUnusedCount;
+    private TextView tvUsageAnalysisDetails;
+    private Button btnAnalyzeUsage;
+
+    private int usefulAnalysisCount = 0;
+    private int lowUsageAnalysisCount = 0;
+    private int unusedAnalysisCount = 0;
+    private int completedAnalysisCount = 0;
+    private final StringBuilder usageAnalysisDetails = new StringBuilder();
 
     private Button btnConnectGmail;
     private Button btnViewDetectedSubscriptions;
+    private TextView tvCurrencyRateStatus;
+    private Button btnRefreshCurrencyRates;
+    private CurrencyRateManager currencyRateManager;
+    private Map<String, Double> exchangeRates = Collections.emptyMap();
 
 
     // =========================================================
@@ -229,6 +247,23 @@ public class SubscriptionActivity extends AppCompatActivity {
 
 
         setupRecyclerView();
+        currencyRateManager = new CurrencyRateManager(this);
+        exchangeRates = currencyRateManager.getRates();
+        if (adapter != null) adapter.setExchangeRates(exchangeRates);
+        updateCurrencyRateStatus("Loading exchange rates...", false);
+        currencyRateManager.refresh(false, (rates, updatedAt, fromCache, error) -> {
+            if (isFinishing() || isDestroyed()) return;
+            exchangeRates = rates == null ? Collections.emptyMap() : rates;
+            if (adapter != null) adapter.setExchangeRates(exchangeRates);
+            updateSummary();
+            if (error != null && exchangeRates.isEmpty()) {
+                updateCurrencyRateStatus("Rates unavailable. Check internet and tap Refresh.", true);
+            } else {
+                String time = safeString(updatedAt);
+                updateCurrencyRateStatus("Foreign amounts are estimated in LKR. Rates by ExchangeRate-API · " +
+                        (time.isEmpty() ? "daily updates" : time), false);
+            }
+        });
 
         setupListeners();
 
@@ -249,6 +284,8 @@ public class SubscriptionActivity extends AppCompatActivity {
 
     private void saveAllSubscriptionUsage() {
 
+        resetUsageAnalysis();
+
         if (usageStatsHelper == null ||
                 databaseHelper == null) {
 
@@ -261,7 +298,7 @@ public class SubscriptionActivity extends AppCompatActivity {
                     "USAGE_SAVE",
                     "Usage Access permission is not enabled."
             );
-
+            if (tvAnalysisStatus != null) tvAnalysisStatus.setText("Enable Usage Access to analyze installed app usage.");
             return;
         }
 
@@ -271,7 +308,8 @@ public class SubscriptionActivity extends AppCompatActivity {
                     "USAGE_SAVE",
                     "No subscriptions found."
             );
-
+            if (tvAnalysisStatus != null) tvAnalysisStatus.setText("Add a subscription before running usage analysis.");
+            if (tvUsageAnalysisDetails != null) tvUsageAnalysisDetails.setText("No saved subscriptions to analyze.");
             return;
         }
 
@@ -483,6 +521,13 @@ public class SubscriptionActivity extends AppCompatActivity {
                                     "================================"
                             );
 
+                            updateUsageAnalysis(
+                                    appName,
+                                    monthlyCost,
+                                    usageMinutes,
+                                    prediction
+                            );
+
                             showSubscriptionUsageNotification(
                                     appName,
                                     monthlyCost,
@@ -514,6 +559,58 @@ public class SubscriptionActivity extends AppCompatActivity {
                         );
                     }
                 });
+    }
+
+    private void resetUsageAnalysis() {
+        usefulAnalysisCount = 0;
+        lowUsageAnalysisCount = 0;
+        unusedAnalysisCount = 0;
+        completedAnalysisCount = 0;
+        usageAnalysisDetails.setLength(0);
+        if (tvUsefulCount != null) tvUsefulCount.setText("0");
+        if (tvLowUsageCount != null) tvLowUsageCount.setText("0");
+        if (tvUnusedCount != null) tvUnusedCount.setText("0");
+        if (tvUsageAnalysisDetails != null) {
+            tvUsageAnalysisDetails.setText("Checking installed app usage…");
+        }
+        if (tvAnalysisStatus != null) {
+            tvAnalysisStatus.setText("AI analysis is running using your existing usage prediction service.");
+        }
+    }
+
+    private void updateUsageAnalysis(
+            String appName,
+            double monthlyCost,
+            long usageMinutes,
+            String prediction
+    ) {
+        if (prediction == null) return;
+
+        String normalized = prediction.trim().toLowerCase(Locale.ROOT);
+        if (normalized.equals("useful")) {
+            usefulAnalysisCount++;
+        } else if (normalized.equals("low_usage") || normalized.equals("low usage")) {
+            lowUsageAnalysisCount++;
+        } else if (normalized.equals("unused")) {
+            unusedAnalysisCount++;
+        }
+        completedAnalysisCount++;
+
+        usageAnalysisDetails.append("• ")
+                .append(safeString(appName).isEmpty() ? "Unknown app" : safeString(appName))
+                .append(" — ").append(prediction.replace('_', ' '))
+                .append(" | ").append(usageMinutes).append(" min / 30 days")
+                .append(" | Monthly cost estimate: ")
+                .append(String.format(Locale.US, "%,.2f", monthlyCost))
+                .append("\n");
+
+        if (tvUsefulCount != null) tvUsefulCount.setText(String.valueOf(usefulAnalysisCount));
+        if (tvLowUsageCount != null) tvLowUsageCount.setText(String.valueOf(lowUsageAnalysisCount));
+        if (tvUnusedCount != null) tvUnusedCount.setText(String.valueOf(unusedAnalysisCount));
+        if (tvUsageAnalysisDetails != null) tvUsageAnalysisDetails.setText(usageAnalysisDetails.toString().trim());
+        if (tvAnalysisStatus != null) {
+            tvAnalysisStatus.setText(completedAnalysisCount + " app(s) analyzed. Results are based on the existing usage prediction API.");
+        }
     }
 
     private void showSubscriptionUsageNotification(
@@ -1045,6 +1142,13 @@ public class SubscriptionActivity extends AppCompatActivity {
                         R.id.tvGmailStatus
                 );
 
+        tvAnalysisStatus = findViewById(R.id.tvAnalysisStatus);
+        tvUsefulCount = findViewById(R.id.tvUsefulCount);
+        tvLowUsageCount = findViewById(R.id.tvLowUsageCount);
+        tvUnusedCount = findViewById(R.id.tvUnusedCount);
+        tvUsageAnalysisDetails = findViewById(R.id.tvUsageAnalysisDetails);
+        btnAnalyzeUsage = findViewById(R.id.btnAnalyzeUsage);
+
 
         btnConnectGmail =
                 findViewById(
@@ -1055,6 +1159,9 @@ public class SubscriptionActivity extends AppCompatActivity {
                 findViewById(
                         R.id.btnViewDetectedSubscriptions
                 );
+
+        tvCurrencyRateStatus = findViewById(R.id.tvCurrencyRateStatus);
+        btnRefreshCurrencyRates = findViewById(R.id.btnRefreshCurrencyRates);
     }
 
 
@@ -1409,6 +1516,44 @@ public class SubscriptionActivity extends AppCompatActivity {
                 }
         );
 
+
+        // Refresh the existing usage prediction API analysis.
+        btnAnalyzeUsage.setOnClickListener(v -> {
+            if (usageStatsHelper == null || !usageStatsHelper.hasUsageAccessPermission()) {
+                tvAnalysisStatus.setText("Enable Usage Access in Android Settings to analyze installed app usage.");
+                Toast.makeText(this, "Usage Access permission is required.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            saveAllSubscriptionUsage();
+        });
+
+        btnRefreshCurrencyRates.setOnClickListener(v -> {
+            if (currencyRateManager == null) return;
+            updateCurrencyRateStatus("Refreshing exchange rates...", false);
+            currencyRateManager.refresh(true, (rates, updatedAt, fromCache, error) -> {
+                if (isFinishing() || isDestroyed()) return;
+                exchangeRates = rates == null ? Collections.emptyMap() : rates;
+                if (adapter != null) adapter.setExchangeRates(exchangeRates);
+                updateSummary();
+                if (error != null) {
+                    if (exchangeRates.isEmpty()) {
+                        updateCurrencyRateStatus("Unable to load rates. Check internet and try again.", true);
+                        Toast.makeText(this, "Currency rates unavailable. Please try again later.", Toast.LENGTH_LONG).show();
+                    } else {
+                        updateCurrencyRateStatus("Could not refresh; using cached rates. Rates by ExchangeRate-API · " +
+                                (safeString(updatedAt).isEmpty() ? "last saved update" : updatedAt), true);
+                        if (!fromCache) Toast.makeText(this, "Could not refresh rates; cached rates remain in use.", Toast.LENGTH_LONG).show();
+                    }
+                } else if (fromCache) {
+                    updateCurrencyRateStatus("Using saved rates · " +
+                            (safeString(updatedAt).isEmpty() ? "daily updates" : updatedAt) + " · Refreshing...", false);
+                } else {
+                    updateCurrencyRateStatus("Foreign amounts are estimated in LKR. Rates by ExchangeRate-API · " +
+                            (safeString(updatedAt).isEmpty() ? "daily updates" : updatedAt), false);
+                    Toast.makeText(this, "Exchange rates updated.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
 
         // =====================================================
         // CONNECT / SCAN GMAIL
@@ -2956,6 +3101,13 @@ public class SubscriptionActivity extends AppCompatActivity {
     // SUMMARY
     // =========================================================
 
+    private void updateCurrencyRateStatus(String message, boolean warning) {
+        if (tvCurrencyRateStatus != null) {
+            tvCurrencyRateStatus.setText(message);
+            tvCurrencyRateStatus.setTextColor(warning ? 0xFFB45309 : 0xFF718078);
+        }
+    }
+
     private void updateSummary() {
 
         if (databaseHelper == null ||
@@ -2979,120 +3131,36 @@ public class SubscriptionActivity extends AppCompatActivity {
 
 
         // =====================================================
-        // MONTHLY TOTAL
+        // MONTHLY TOTAL — convert each known currency into LKR
         // =====================================================
-
         if (subscriptionList.isEmpty()) {
-
-            tvMonthlySpend.setText(
-                    "No subscriptions"
-            );
-
-
+            tvMonthlySpend.setText("No subscriptions");
         } else {
+            double monthlyLkrTotal = 0.0;
+            int convertedCount = 0;
+            int unconvertedCount = 0;
 
-            String commonCurrency =
-                    null;
-
-
-            boolean mixedCurrencies =
-                    false;
-
-
-            boolean unknownCurrency =
-                    false;
-
-
-            double monthlyTotal =
-                    0.0;
-
-
-            for (
-                    Subscription subscription :
-                    subscriptionList
-            ) {
-
-                if (subscription == null) {
-
-                    continue;
+            for (Subscription subscription : subscriptionList) {
+                if (subscription == null) continue;
+                String currency = safeString(subscription.getCurrency());
+                double monthlyAmount = convertToMonthlyAmount(
+                        subscription.getAmount(), subscription.getBillingCycle());
+                Double lkrAmount = CurrencyRateManager.convertToLkr(
+                        monthlyAmount, currency, exchangeRates);
+                if (lkrAmount == null) {
+                    unconvertedCount++;
+                } else {
+                    monthlyLkrTotal += lkrAmount;
+                    convertedCount++;
                 }
-
-
-                String currency =
-                        safeString(
-                                subscription.getCurrency()
-                        );
-
-
-                if (currency.isEmpty() ||
-                        currency.equals("$")) {
-
-                    unknownCurrency =
-                            true;
-
-                    continue;
-                }
-
-
-                if (commonCurrency == null) {
-
-                    commonCurrency =
-                            currency;
-
-
-                } else if (
-                        !commonCurrency
-                                .equalsIgnoreCase(
-                                        currency
-                                )
-                ) {
-
-                    mixedCurrencies =
-                            true;
-                }
-
-
-                monthlyTotal +=
-                        convertToMonthlyAmount(
-
-                                subscription.getAmount(),
-
-                                subscription.getBillingCycle()
-                        );
             }
 
-
-            if (mixedCurrencies) {
-
-                tvMonthlySpend.setText(
-                        "Mixed currencies"
-                );
-
-
-            } else if (unknownCurrency) {
-
-                tvMonthlySpend.setText(
-                        "Review currency"
-                );
-
-
-            } else if (commonCurrency != null) {
-
-                tvMonthlySpend.setText(
-                        String.format(
-                                Locale.US,
-                                "%s %,.2f",
-                                commonCurrency,
-                                monthlyTotal
-                        )
-                );
-
-
+            if (convertedCount == 0) {
+                tvMonthlySpend.setText("Waiting for exchange rates");
+            } else if (unconvertedCount > 0) {
+                tvMonthlySpend.setText(String.format(Locale.US, "LKR %,.2f + review", monthlyLkrTotal));
             } else {
-
-                tvMonthlySpend.setText(
-                        "Review currency"
-                );
+                tvMonthlySpend.setText(String.format(Locale.US, "LKR %,.2f", monthlyLkrTotal));
             }
         }
 
@@ -3400,6 +3468,11 @@ public class SubscriptionActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+
+        if (currencyRateManager != null) {
+            currencyRateManager.shutdown();
+            currencyRateManager = null;
+        }
 
         if (activePredictionCall != null) {
 

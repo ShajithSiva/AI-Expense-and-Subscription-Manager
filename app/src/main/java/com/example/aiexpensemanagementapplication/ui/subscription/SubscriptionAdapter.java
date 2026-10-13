@@ -1,3 +1,4 @@
+
 package com.example.aiexpensemanagementapplication.ui.subscription;
 
 import android.content.Context;
@@ -12,364 +13,146 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.model.Subscription;
-import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Collections;
+import java.util.Map;
 
 public class SubscriptionAdapter
         extends RecyclerView.Adapter<SubscriptionAdapter.ViewHolder> {
 
-
-    // =========================================================
-    // VARIABLES
-    // =========================================================
-
     private final Context context;
-
     private final ArrayList<Subscription> subscriptionList;
-
     private final OnSubscriptionClickListener listener;
-
-
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
+    private Map<String, Double> exchangeRates = Collections.emptyMap();
 
     public SubscriptionAdapter(
             Context context,
             ArrayList<Subscription> subscriptionList,
-            OnSubscriptionClickListener listener
-    ) {
+            OnSubscriptionClickListener listener) {
 
         this.context = context;
         this.subscriptionList = subscriptionList;
         this.listener = listener;
     }
 
-
-    // =========================================================
-    // CREATE VIEW HOLDER
-    // =========================================================
+    public void setExchangeRates(Map<String, Double> rates) {
+        exchangeRates = rates == null ? Collections.emptyMap() : rates;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(
-            @NonNull ViewGroup parent,
-            int viewType
-    ) {
+            @NonNull ViewGroup parent, int viewType) {
 
-        View view =
-                LayoutInflater
-                        .from(context)
-                        .inflate(
-                                R.layout.item_subscription,
-                                parent,
-                                false
-                        );
-
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.item_subscription, parent, false);
 
         return new ViewHolder(view);
     }
 
-
-    // =========================================================
-    // BIND DATA
-    // =========================================================
-
     @Override
     public void onBindViewHolder(
-            @NonNull ViewHolder holder,
-            int position
-    ) {
+            @NonNull ViewHolder holder, int position) {
 
-        Subscription subscription =
-                subscriptionList.get(position);
+        Subscription subscription = subscriptionList.get(position);
 
+        // Service name
+        String serviceName = safeString(subscription.getServiceName());
+        holder.tvServiceName.setText(
+                serviceName.isEmpty() ? "Unknown service" : serviceName
+        );
 
-        if (subscription == null) {
+        // Billing cycle
+        String billingCycle = safeString(subscription.getBillingCycle());
+        holder.tvPlanType.setText(
+                billingCycle.isEmpty() ? "Billing cycle not set" : billingCycle
+        );
 
-            return;
-        }
+        // Amount and currency
+        String currency = safeString(subscription.getCurrency());
 
+        String amount = String.format(
+                Locale.getDefault(),
+                "%.2f",
+                subscription.getAmount()
+        );
 
-        // =====================================================
-        // SERVICE NAME
-        // =====================================================
+        holder.tvAmount.setText(
+                currency.isEmpty()
+                        ? amount
+                        : currency + " " + amount
+        );
 
-        String serviceName =
-                safeString(
-                        subscription.getServiceName()
-                );
-
-
-        if (serviceName.isEmpty()) {
-
-            holder.tvServiceName.setText(
-                    "Unknown Service"
-            );
-
+        String cycle = safeString(subscription.getBillingCycle()).toLowerCase(Locale.ROOT);
+        double monthlyAmount = subscription.getAmount();
+        if (cycle.contains("year") || cycle.contains("annual")) monthlyAmount /= 12.0;
+        else if (cycle.contains("quarter")) monthlyAmount /= 3.0;
+        else if (cycle.contains("week")) monthlyAmount = monthlyAmount * 52.0 / 12.0;
+        Double lkr = CurrencyRateManager.convertToLkr(monthlyAmount, currency, exchangeRates);
+        if (lkr == null) {
+            holder.tvLkrEstimate.setText(currency.equals("$") || currency.isEmpty()
+                    ? "Set currency code to convert"
+                    : "LKR rate unavailable");
         } else {
-
-            holder.tvServiceName.setText(
-                    serviceName
-            );
+            holder.tvLkrEstimate.setText(String.format(Locale.US, "≈ LKR %,.2f / month", lkr));
         }
 
-
-        // =====================================================
-        // BILLING CYCLE
-        // =====================================================
-
-        String billingCycle =
-                safeString(
-                        subscription.getBillingCycle()
-                );
-
-
-        if (billingCycle.isEmpty()) {
-
-            holder.tvPlanType.setText(
-                    "Billing cycle not set"
-            );
-
-        } else {
-
-            holder.tvPlanType.setText(
-                    billingCycle
-            );
-        }
-
-
-        // =====================================================
-        // AMOUNT + ORIGINAL CURRENCY
-        // =====================================================
-
-        double amount =
-                subscription.getAmount();
-
-
-        String currency =
-                safeString(
-                        subscription.getCurrency()
-                );
-
-
-        /*
-         * IMPORTANT:
-         *
-         * Do NOT display "Rs" for every subscription.
-         *
-         * Examples:
-         *
-         * USD 15.49
-         * EUR 9.99
-         * LKR 2500.00
-         *
-         * If the original currency is unknown,
-         * do not default it to LKR.
-         */
-
-        if (currency.isEmpty()) {
-
-            holder.tvAmount.setText(
-                    String.format(
-                            Locale.US,
-                            "%.2f · Currency not set",
-                            amount
-                    )
-            );
-
-        } else {
-
-            holder.tvAmount.setText(
-                    String.format(
-                            Locale.US,
-                            "%s %.2f",
-                            currency,
-                            amount
-                    )
-            );
-        }
-
-
-        // =====================================================
-        // NEXT BILLING DATE
-        // =====================================================
-
+        // Next billing date
         String nextBillingDate =
-                safeString(
-                        subscription.getNextBillingDate()
-                );
-
+                safeString(subscription.getNextBillingDate());
 
         if (nextBillingDate.isEmpty()) {
-
-            holder.tvDueDate.setText(
-                    "Date not set"
-            );
-
+            holder.tvDueDate.setText("Date not set");
+            holder.tvUsage.setText("Billing date unavailable");
         } else {
-
-            holder.tvDueDate.setText(
-                    nextBillingDate
-            );
+            holder.tvDueDate.setText(nextBillingDate);
+            holder.tvUsage.setText("Next payment scheduled");
         }
 
-
-        // =====================================================
-        // STATUS
-        // =====================================================
-
-        holder.chipStatus.setText(
-                "Active"
-        );
-
-
-        // =====================================================
-        // USAGE TEXT
-        // =====================================================
-
-        holder.tvUsage.setText(
-                "Subscription Active"
-        );
-
-
-        // =====================================================
-        // ITEM CLICK
-        // =====================================================
-
-        holder.itemView.setOnClickListener(
-                v -> {
-
-                    if (listener != null) {
-
-                        listener.onSubscriptionClick(
-                                subscription
-                        );
-                    }
-                }
-        );
+        // Open subscription details when the card is clicked
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onSubscriptionClick(subscription);
+            }
+        });
     }
-
-
-    // =========================================================
-    // ITEM COUNT
-    // =========================================================
 
     @Override
     public int getItemCount() {
-
-        if (subscriptionList == null) {
-
-            return 0;
-        }
-
-        return subscriptionList.size();
+        return subscriptionList == null ? 0 : subscriptionList.size();
     }
 
-
-    // =========================================================
-    // SAFE STRING
-    // =========================================================
-
-    private String safeString(
-            String value
-    ) {
-
-        if (value == null) {
-
-            return "";
-        }
-
-        return value.trim();
+    private String safeString(String value) {
+        return value == null ? "" : value.trim();
     }
 
-
-    // =========================================================
-    // VIEW HOLDER
-    // =========================================================
-
-    static class ViewHolder
-            extends RecyclerView.ViewHolder {
-
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView ivLogo;
-
-
         TextView tvServiceName;
-
         TextView tvPlanType;
-
         TextView tvAmount;
-
+        TextView tvLkrEstimate;
         TextView tvUsage;
-
         TextView tvDueDate;
 
-
-        Chip chipStatus;
-
-
-        ViewHolder(
-                @NonNull View itemView
-        ) {
-
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-
-            ivLogo =
-                    itemView.findViewById(
-                            R.id.ivLogo
-                    );
-
-
-            tvServiceName =
-                    itemView.findViewById(
-                            R.id.tvServiceName
-                    );
-
-
-            tvPlanType =
-                    itemView.findViewById(
-                            R.id.tvPlanType
-                    );
-
-
-            tvAmount =
-                    itemView.findViewById(
-                            R.id.tvAmount
-                    );
-
-
-            tvUsage =
-                    itemView.findViewById(
-                            R.id.tvUsage
-                    );
-
-
-            tvDueDate =
-                    itemView.findViewById(
-                            R.id.tvDueDate
-                    );
-
-
-            chipStatus =
-                    itemView.findViewById(
-                            R.id.chipStatus
-                    );
+            ivLogo = itemView.findViewById(R.id.ivLogo);
+            tvServiceName = itemView.findViewById(R.id.tvServiceName);
+            tvPlanType = itemView.findViewById(R.id.tvPlanType);
+            tvAmount = itemView.findViewById(R.id.tvAmount);
+            tvLkrEstimate = itemView.findViewById(R.id.tvLkrEstimate);
+            tvUsage = itemView.findViewById(R.id.tvUsage);
+            tvDueDate = itemView.findViewById(R.id.tvDueDate);
         }
     }
 
-
-    // =========================================================
-    // CLICK LISTENER
-    // =========================================================
-
     public interface OnSubscriptionClickListener {
-
-        void onSubscriptionClick(
-                Subscription subscription
-        );
+        void onSubscriptionClick(Subscription subscription);
     }
 }
