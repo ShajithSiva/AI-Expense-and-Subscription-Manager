@@ -137,8 +137,39 @@ public class ProfileActivity extends AppCompatActivity{
     }
 
     private void loadProfile() {
-        if (currentUser == null) return;
 
+
+        if (currentUser == null) {
+            tvName.setText("User");
+            tvEmail.setText("No email available");
+            return;
+        }
+
+        // Get the user's email from Firebase Authentication
+        String email = currentUser.getEmail();
+
+        if (email != null && !email.trim().isEmpty()) {
+            tvEmail.setText(email);
+        } else {
+            tvEmail.setText("No email available");
+        }
+
+        // Get the user's display name from Firebase Authentication
+        String displayName = currentUser.getDisplayName();
+
+        if (displayName != null && !displayName.trim().isEmpty()) {
+            tvName.setText(displayName);
+        } else {
+            // Fallback when Firebase does not contain a display name
+            if (email != null && email.contains("@")) {
+                String username = email.substring(0, email.indexOf("@"));
+                tvName.setText(username);
+            } else {
+                tvName.setText("User");
+            }
+        }
+
+        // Load the saved profile picture
         SharedPreferences prefs = getSharedPreferences(
                 "profile_picture_preferences",
                 MODE_PRIVATE
@@ -153,10 +184,10 @@ public class ProfileActivity extends AppCompatActivity{
             try {
                 imgProfile.setImageURI(Uri.parse(savedImage));
             } catch (Exception e) {
-                imgProfile.setImageResource(
-                        R.drawable.profile
-                );
+                imgProfile.setImageResource(R.drawable.profile);
             }
+        } else {
+            imgProfile.setImageResource(R.drawable.profile);
         }
     }
 
@@ -542,6 +573,8 @@ public class ProfileActivity extends AppCompatActivity{
 
         tvCurrency.setText(currencyDisplay);
     }
+
+
 
     private void loadBudgetPeriodPreference() {
 
