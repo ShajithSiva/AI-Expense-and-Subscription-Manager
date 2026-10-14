@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC"
+    android:background="#F4F6FA"
     tools:context=".ui.expense.ExpenseDetailsActivity">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/topBar"
         android:layout_width="0dp"
-        android:layout_height="72dp"
-        android:layout_margin="16dp"
+        android:layout_height="68dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
         app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="18dp"
-        app:cardElevation="3dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#E4E9EF"
+        app:strokeWidth="1dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -24,27 +27,29 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingHorizontal="16dp">
+            android:paddingStart="14dp"
+            android:paddingEnd="16dp">
 
             <ImageButton
                 android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:layout_centerVertical="true"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_back_arrow"/>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:padding="10dp"
+                android:src="@drawable/ic_back_arrow"
+                android:tint="#172033" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="Expense Details"
-                android:textStyle="bold"
-                android:textSize="22sp"
-                android:textColor="#111827"/>
-
+                android:textColor="#172033"
+                android:textSize="20sp"
+                android:textStyle="bold" />
         </RelativeLayout>
-
     </com.google.android.material.card.MaterialCardView>
 
     <ScrollView
@@ -52,6 +57,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:clipToPadding="false"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
@@ -63,16 +69,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="12dp">
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@android:color/white"
-                app:strokeColor="#E5E7EB"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -84,11 +91,12 @@
 
                     <ImageView
                         android:id="@+id/imgCategory"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:src="@drawable/ic_food"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
                         android:background="@drawable/circle_green"
-                        android:padding="16dp"/>
+                        android:contentDescription="Expense category"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_food" />
 
                     <TextView
                         android:id="@+id/tvCategory"
@@ -96,8 +104,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="Food"
+                        android:textColor="#172033"
                         android:textSize="22sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvAmount"
@@ -107,21 +116,18 @@
                         android:text="Rs. 450.00"
                         android:textColor="#DC2626"
                         android:textSize="32sp"
-                        android:textStyle="bold"/>
-
+                        android:textStyle="bold" />
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@android:color/white"
-                app:strokeColor="#E5E7EB"
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -130,14 +136,13 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Payment Method -->
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Payment Method"
-                        android:textStyle="bold"
-                        android:textColor="#6B7280"/>
+                        android:textColor="#667085"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvPaymentMethod"
@@ -145,26 +150,24 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="Cash"
-                        android:textColor="#111827"
-                        android:textSize="18sp"
+                        android:textColor="#172033"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="18dp"
-                        android:background="#E5E7EB"/>
-
-
-                    <!-- Family Sharing -->
+                        android:background="#E4E9EF" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="18dp"
                         android:text="Family Sharing"
-                        android:textStyle="bold"
-                        android:textColor="#6B7280"/>
+                        android:textColor="#667085"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvFamilySharing"
@@ -172,9 +175,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="Not Shared"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#111827"/>
+                        android:textColor="#172033"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvFamilySharingHint"
@@ -182,24 +185,23 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Visible only in your personal expenses"
-                        android:textSize="13sp"
-                        android:textColor="#9CA3AF"/>
+                        android:textColor="#667085"
+                        android:textSize="13sp" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="18dp"
-                        android:background="#E5E7EB"/>
-
-                    <!-- Date -->
+                        android:background="#E4E9EF" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="18dp"
                         android:text="Date"
-                        android:textStyle="bold"
-                        android:textColor="#6B7280"/>
+                        android:textColor="#667085"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvDate"
@@ -207,25 +209,24 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="15 Jul 2026"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#111827"/>
+                        android:textColor="#172033"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="18dp"
-                        android:background="#E5E7EB"/>
-
-                    <!-- Notes -->
+                        android:background="#E4E9EF" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="18dp"
                         android:text="Notes"
-                        android:textStyle="bold"
-                        android:textColor="#6B7280"/>
+                        android:textColor="#667085"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvNotes"
@@ -233,17 +234,16 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="Lunch with friends"
-                        android:textColor="#111827"
-                        android:textSize="16sp"/>
-
+                        android:textColor="#172033"
+                        android:textSize="16sp" />
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:orientation="vertical">
 
                 <com.google.android.material.button.MaterialButton
@@ -252,10 +252,12 @@
                     android:layout_height="56dp"
                     android:text="Edit Expense"
                     android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
                     android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#159A68"
                     app:cornerRadius="16dp"
-                    app:backgroundTint="#2563EB"
-                    android:textColor="#FFFFFF"/>
+                    app:elevation="0dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDeleteExpense"
@@ -264,17 +266,16 @@
                     android:layout_marginTop="12dp"
                     android:text="Delete Expense"
                     android:textAllCaps="false"
+                    android:textColor="#DC2626"
                     android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#FFFFFF"
                     app:cornerRadius="16dp"
-                    app:backgroundTint="#DC2626"
-                    android:textColor="#FFFFFF"/>
-
+                    app:strokeColor="#F2C7C7"
+                    app:strokeWidth="1dp"
+                    app:elevation="0dp" />
             </LinearLayout>
-
         </LinearLayout>
-
     </ScrollView>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

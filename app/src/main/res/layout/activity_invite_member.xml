@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FA"
+    android:background="#F4F6FA"
     tools:context=".ui.family.InviteMemberActivity">
 
     <!-- HEADER -->
@@ -32,7 +32,7 @@
             android:contentDescription="Back"
             android:padding="9dp"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#111827" />
+            app:tint="#172033" />
 
         <TextView
             android:layout_width="0dp"
@@ -40,7 +40,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:text="Invite Member"
-            android:textColor="#111827"
+            android:textColor="#172033"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -71,7 +71,7 @@
                 android:layout_width="72dp"
                 android:layout_height="72dp"
                 android:layout_gravity="center_horizontal"
-                app:cardBackgroundColor="#EAF9F0"
+                app:cardBackgroundColor="#E8F7EF"
                 app:cardCornerRadius="36dp"
                 app:cardElevation="0dp">
 
@@ -81,7 +81,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="Invite member"
                     android:src="@drawable/ic_family"
-                    app:tint="#22C55E" />
+                    app:tint="#159A68" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -92,7 +92,7 @@
                 android:layout_marginTop="16dp"
                 android:gravity="center"
                 android:text="Invite Family Member"
-                android:textColor="#111827"
+                android:textColor="#172033"
                 android:textSize="21sp"
                 android:textStyle="bold" />
 
@@ -103,7 +103,7 @@
                 android:layout_marginTop="5dp"
                 android:gravity="center"
                 android:text="Invite someone to your family group"
-                android:textColor="#7A8190"
+                android:textColor="#667085"
                 android:textSize="12sp"
                 tools:text="Invite someone to Home Family" />
 
@@ -116,7 +116,7 @@
                 android:layout_marginTop="32dp"
                 android:letterSpacing="0.08"
                 android:text="MEMBER EMAIL"
-                android:textColor="#626A72"
+                android:textColor="#667085"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -132,7 +132,7 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#22C55E"
+                app:boxStrokeColor="#159A68"
                 app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -144,8 +144,8 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:singleLine="true"
-                    android:textColor="#111827"
-                    android:textColorHint="#A1A7B0"
+                    android:textColor="#172033"
+                    android:textColorHint="#98A2B3"
                     android:textSize="14sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -159,7 +159,7 @@
                 android:layout_marginTop="24dp"
                 android:letterSpacing="0.08"
                 android:text="ASSIGN ROLE"
-                android:textColor="#626A72"
+                android:textColor="#667085"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -177,9 +177,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="14dp"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="#DDE1E6"
+                    app:strokeColor="#E1E7EF"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -193,7 +193,7 @@
                             android:id="@+id/radioMember"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:buttonTint="#22C55E"
+                            android:buttonTint="#159A68"
                             android:checked="true" />
 
                         <TextView
@@ -203,7 +203,7 @@
                             android:paddingStart="8dp"
                             android:paddingEnd="12dp"
                             android:text="Member&#10;Can add and share family financial data"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="13sp" />
 
                     </LinearLayout>
@@ -218,9 +218,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="14dp"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="#DDE1E6"
+                    app:strokeColor="#E1E7EF"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -234,7 +234,7 @@
                             android:id="@+id/radioViewer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:buttonTint="#22C55E" />
+                            android:buttonTint="#159A68" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -243,7 +243,7 @@
                             android:paddingStart="8dp"
                             android:paddingEnd="12dp"
                             android:text="Viewer&#10;Can view shared family financial information"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="13sp" />
 
                     </LinearLayout>
@@ -259,10 +259,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="#F0FBF4"
-                app:cardCornerRadius="14dp"
+                app:cardBackgroundColor="#EAF7F0"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:strokeColor="#D2F2DD"
+                app:strokeColor="#CDEBDD"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -276,7 +276,7 @@
                         android:layout_height="30dp"
                         android:gravity="center"
                         android:text="i"
-                        android:textColor="#16A34A"
+                        android:textColor="#159A68"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
@@ -287,7 +287,7 @@
                         android:layout_weight="1"
                         android:lineSpacingExtra="2dp"
                         android:text="The email must belong to a registered ExpenseVault user. They must accept the invitation before joining your family."
-                        android:textColor="#4D7C5B"
+                        android:textColor="#426B56"
                         android:textSize="11sp" />
 
                 </LinearLayout>
@@ -307,8 +307,8 @@
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:backgroundTint="#22C55E"
-                app:cornerRadius="13dp" />
+                app:backgroundTint="#159A68"
+                app:cornerRadius="16dp" />
 
         </LinearLayout>
 

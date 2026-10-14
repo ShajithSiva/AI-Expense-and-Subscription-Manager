@@ -1,87 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginTop="10dp"
-
-    app:cardCornerRadius="16dp"
-    app:cardElevation="3dp">
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E4E9EF"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/imgType"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:padding="10dp"
-            android:background="@drawable/bg_notification_icon"
-            android:src="@drawable/notification"/>
+        <FrameLayout
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:background="#E8F7EF">
+
+            <ImageView
+                android:id="@+id/imgType"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="11dp"
+                android:contentDescription="Notification type"
+                android:src="@drawable/notification"
+                android:tint="#159A68" />
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/txtTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#172033"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="#111111"/>
+                android:maxLines="2" />
 
             <TextView
                 android:id="@+id/txtMessage"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="#666666"
-                android:textSize="14sp"/>
+                android:layout_marginTop="5dp"
+                android:textColor="#475467"
+                android:textSize="14sp"
+                android:lineSpacingExtra="2dp" />
 
             <TextView
                 android:id="@+id/txtSubtitle"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="#888888"
-                android:textSize="13sp"/>
+                android:layout_marginTop="5dp"
+                android:textColor="#667085"
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/txtTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:textColor="#999999"
-                android:textSize="12sp"/>
+                android:layout_marginTop="8dp"
+                android:textColor="#98A2B3"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imgDelete"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/delete"
-            android:padding="4dp"
-            android:contentDescription="Delete"
-            android:layout_gravity="center_vertical"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <View
-            android:id="@+id/viewUnread"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:background="@drawable/dot_orange"/>
+            <ImageView
+                android:id="@+id/imgDelete"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="9dp"
+                android:src="@drawable/delete"
+                android:tint="#667085"
+                android:contentDescription="Delete" />
+
+            <View
+                android:id="@+id/viewUnread"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/dot_orange" />
+        </LinearLayout>
 
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

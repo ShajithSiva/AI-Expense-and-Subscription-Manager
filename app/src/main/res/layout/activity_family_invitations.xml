@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FA">
+    android:background="#F4F6FA">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +21,8 @@
             android:background="#FFFFFF"
             app:navigationIcon="@drawable/ic_back_arrow"
             app:title="Family Invitations"
-            app:titleTextColor="#111827" />
+            app:titleTextColor="#172033"
+            app:elevation="0dp" />
 
 
         <!-- INVITATIONS LIST -->
@@ -32,9 +33,9 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:paddingStart="16dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="16dp"
+            android:paddingStart="18dp"
+            android:paddingTop="18dp"
+            android:paddingEnd="18dp"
             android:paddingBottom="24dp"
             android:visibility="visible" />
 
@@ -49,8 +50,8 @@
             android:gravity="center"
             android:padding="40dp"
             android:text="No pending family invitations"
-            android:textColor="#6B7280"
-            android:textSize="16sp"
+            android:textColor="#667085"
+            android:textSize="15sp"
             android:visibility="gone" />
 
     </LinearLayout>
@@ -63,6 +64,8 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="center"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:indicatorColor="#159A68"
+        app:trackColor="#D8EDE2" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

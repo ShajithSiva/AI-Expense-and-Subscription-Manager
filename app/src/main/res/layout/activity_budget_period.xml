@@ -21,11 +21,11 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#FFFFFF"
-            android:elevation="2dp"
+            android:elevation="1dp"
             android:title="Budget Period Settings"
-            android:titleTextColor="#111827"
+            android:titleTextColor="#172033"
             app:navigationIcon="@drawable/ic_back_arrow"
-            app:navigationIconTint="#111827" />
+            app:navigationIconTint="#172033" />
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:text="CURRENT BUDGET PERIOD"
-                    android:textColor="#6B7280"
+                    android:textColor="#667085"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
@@ -55,10 +55,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="28dp"
-                    app:cardBackgroundColor="#F8FAFC"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="1dp"
-                    app:strokeColor="#E5E7EB"
+                    app:cardBackgroundColor="#F4F6FA"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E4E9EF"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -73,7 +73,7 @@
                             android:layout_height="30dp"
                             android:contentDescription="Budget period"
                             android:src="@drawable/calendar"
-                            app:tint="#16A34A" />
+                            app:tint="#159A68" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -86,7 +86,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Selected period"
-                                android:textColor="#6B7280"
+                                android:textColor="#667085"
                                 android:textSize="13sp" />
 
                             <TextView
@@ -95,7 +95,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
                                 android:text="Monthly"
-                                android:textColor="#111827"
+                                android:textColor="#172033"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
 
@@ -112,17 +112,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:text="SELECT BUDGET PERIOD"
-                    android:textColor="#6B7280"
+                    android:textColor="#667085"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardBackgroundColor="#F8FAFC"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="1dp"
-                    app:strokeColor="#E5E7EB"
+                    app:cardBackgroundColor="#F4F6FA"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E4E9EF"
                     app:strokeWidth="1dp">
 
                     <RadioGroup
@@ -141,16 +141,16 @@
                             android:paddingStart="18dp"
                             android:paddingEnd="18dp"
                             android:text="Weekly"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="16sp"
-                            app:buttonTint="#16A34A" />
+                            app:buttonTint="#159A68" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginStart="18dp"
                             android:layout_marginEnd="18dp"
-                            android:background="#E5E7EB" />
+                            android:background="#E4E9EF" />
 
                         <!-- Monthly -->
 
@@ -163,16 +163,16 @@
                             android:paddingStart="18dp"
                             android:paddingEnd="18dp"
                             android:text="Monthly"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="16sp"
-                            app:buttonTint="#16A34A" />
+                            app:buttonTint="#159A68" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginStart="18dp"
                             android:layout_marginEnd="18dp"
-                            android:background="#E5E7EB" />
+                            android:background="#E4E9EF" />
 
                         <!-- Quarterly -->
 
@@ -184,16 +184,16 @@
                             android:paddingStart="18dp"
                             android:paddingEnd="18dp"
                             android:text="Quarterly"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="16sp"
-                            app:buttonTint="#16A34A" />
+                            app:buttonTint="#159A68" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginStart="18dp"
                             android:layout_marginEnd="18dp"
-                            android:background="#E5E7EB" />
+                            android:background="#E4E9EF" />
 
                         <!-- Yearly -->
 
@@ -205,9 +205,9 @@
                             android:paddingStart="18dp"
                             android:paddingEnd="18dp"
                             android:text="Yearly"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="16sp"
-                            app:buttonTint="#16A34A" />
+                            app:buttonTint="#159A68" />
 
                     </RadioGroup>
 
@@ -222,7 +222,7 @@
                     android:layout_marginTop="14dp"
                     android:lineSpacingExtra="2dp"
                     android:text="Your budgets and spending summaries will be organized according to the selected period."
-                    android:textColor="#6B7280"
+                    android:textColor="#667085"
                     android:textSize="14sp" />
 
             </LinearLayout>
@@ -244,7 +244,7 @@
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:backgroundTint="#16A34A"
+            app:backgroundTint="#159A68"
             app:cornerRadius="14dp" />
 
     </LinearLayout>

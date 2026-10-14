@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FB">
+    android:background="#F4F6FA">
 
     <!-- ================================================= -->
     <!-- TOP APP BAR -->
@@ -38,8 +38,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Subscription Settings"
-            android:textColor="#1F2937"
-            android:textSize="20sp"
+            android:textColor="#172033"
+            android:textSize="19sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/btnBack"
             app:layout_constraintTop_toTopOf="parent"
@@ -77,7 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Subscription Notifications"
-                android:textColor="#1F2937"
+                android:textColor="#172033"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="Control reminders and alerts related to your subscriptions."
-                android:textColor="#64748B"
+                android:textColor="#667085"
                 android:textSize="14sp" />
 
 
@@ -99,9 +99,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#E5E7EB"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -128,7 +128,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Subscription Reminders"
-                                android:textColor="#1F2937"
+                                android:textColor="#172033"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
@@ -137,7 +137,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:text="Receive notifications about upcoming subscription payments."
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
                                 android:textSize="13sp" />
 
                         </LinearLayout>
@@ -158,7 +158,7 @@
                         android:layout_height="1dp"
                         android:layout_marginTop="18dp"
                         android:layout_marginBottom="18dp"
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- Renewal Reminder -->
@@ -179,7 +179,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Renewal Reminders"
-                                android:textColor="#1F2937"
+                                android:textColor="#172033"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
@@ -188,7 +188,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:text="Get notified before a subscription is due for renewal."
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
                                 android:textSize="13sp" />
 
                         </LinearLayout>
@@ -215,7 +215,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="Reminder Time"
-                android:textColor="#1F2937"
+                android:textColor="#172033"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -227,9 +227,9 @@
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#E5E7EB"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -249,7 +249,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Notification Time"
-                            android:textColor="#1F2937"
+                            android:textColor="#172033"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -258,7 +258,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Choose when reminder notifications should be scheduled."
-                            android:textColor="#64748B"
+                            android:textColor="#667085"
                             android:textSize="13sp" />
 
                     </LinearLayout>
@@ -269,7 +269,7 @@
                         android:layout_height="wrap_content"
                         android:padding="8dp"
                         android:text="09:00 AM"
-                        android:textColor="#4CAF50"
+                        android:textColor="#159A68"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -286,9 +286,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="#F0FDF4"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp">
+                app:cardBackgroundColor="#E8F7EF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -300,7 +300,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="About Subscription Alerts"
-                        android:textColor="#166534"
+                        android:textColor="#137A53"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
@@ -309,7 +309,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="These settings control subscription and renewal notifications. Your subscription records are managed separately from these notification preferences."
-                        android:textColor="#475569"
+                        android:textColor="#667085"
                         android:textSize="13sp"
                         android:lineSpacingExtra="2dp" />
 
@@ -326,12 +326,12 @@
                 android:id="@+id/btnSaveSettings"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="24dp"
                 android:text="Save Settings"
                 android:textAllCaps="false"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:backgroundTint="#4CAF50"
+                app:backgroundTint="#159A68"
                 app:cornerRadius="14dp" />
 
             <View

@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FA">
+    android:background="#F4F6FA">
 
 
     <!-- ===================================================== -->
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/white"
-        android:elevation="2dp"
+        android:elevation="0dp"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title="Edit Subscription"
         app:titleTextColor="#111827" />
@@ -52,8 +52,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Subscription details"
-                android:textColor="#111827"
-                android:textSize="22sp"
+                android:textColor="#172033"
+                android:textSize="21sp"
                 android:textStyle="bold" />
 
 
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Review and update the original subscription details."
-                android:textColor="#6B7280"
+                android:textColor="#667085"
                 android:textSize="14sp" />
 
 
@@ -177,7 +177,7 @@
                         android:layout_marginStart="4dp"
                         android:layout_marginTop="5dp"
                         android:text="Original currency used by this subscription."
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textSize="12sp" />
 
 
@@ -260,8 +260,10 @@
                 android:textColor="@android:color/white"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                app:backgroundTint="#00C94F"
-                app:cornerRadius="12dp" />
+                app:backgroundTint="#159A68"
+                app:cornerRadius="16dp"
+                app:rippleColor="#BCE8D2"
+                android:elevation="0dp" />
 
 
             <!-- ================================================= -->
@@ -276,10 +278,10 @@
                 android:layout_marginTop="14dp"
                 android:text="Delete Subscription"
                 android:textAllCaps="false"
-                android:textColor="#DC2626"
+                android:textColor="#C62828"
                 android:textSize="16sp"
                 app:cornerRadius="12dp"
-                app:strokeColor="#DC2626"
+                app:strokeColor="#C62828"
                 app:strokeWidth="1dp" />
 
 
@@ -295,7 +297,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Cancel"
                 android:textAllCaps="false"
-                android:textColor="#4F5663"
+                android:textColor="#667085"
                 android:textSize="16sp" />
 
 

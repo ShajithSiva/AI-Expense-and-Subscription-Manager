@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FC">
+    android:background="#F4F6FA">
 
     <!-- Header -->
 
@@ -24,17 +24,19 @@
             android:id="@+id/btnBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@android:color/transparent"
+            android:background="@drawable/bg_icon_circle"
             android:contentDescription="Back"
+            android:padding="10dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_back_arrow"
-            app:tint="#111827" />
+            app:tint="#172033" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Edit Income"
-            android:textColor="#111827"
+            android:textColor="#172033"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -65,10 +67,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#F8FAFC"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="3dp"
-                app:strokeColor="#B8BEC7"
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -81,7 +83,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Income Amount"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -95,8 +97,8 @@
                         android:imeOptions="actionNext"
                         android:inputType="numberDecimal"
                         android:maxLines="1"
-                        android:textColor="#111827"
-                        android:textColorHint="#9CA3AF"
+                        android:textColor="#172033"
+                        android:textColorHint="#98A2B3"
                         android:textSize="30sp"
                         android:textStyle="bold" />
 
@@ -110,10 +112,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#F8FAFC"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="3dp"
-                app:strokeColor="#B8BEC7"
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -126,7 +128,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Income Category"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -147,10 +149,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#F8FAFC"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="3dp"
-                app:strokeColor="#B8BEC7"
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -163,7 +165,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Income Source"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -184,10 +186,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#F8FAFC"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="3dp"
-                app:strokeColor="#B8BEC7"
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -200,7 +202,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Income Date"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -213,12 +215,13 @@
                         android:clickable="true"
                         android:cursorVisible="false"
                         android:drawableEnd="@android:drawable/ic_menu_today"
+                        android:drawableTint="#159A68"
                         android:focusable="false"
                         android:hint="Select Date"
                         android:paddingStart="4dp"
                         android:paddingEnd="8dp"
-                        android:textColor="#111827"
-                        android:textColorHint="#9CA3AF" />
+                        android:textColor="#172033"
+                        android:textColorHint="#98A2B3" />
 
                 </LinearLayout>
 
@@ -230,10 +233,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="#F8FAFC"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="3dp"
-                app:strokeColor="#B8BEC7"
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -246,7 +249,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Notes"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -259,9 +262,9 @@
                         android:gravity="top|start"
                         android:hint="Enter income notes..."
                         android:inputType="textMultiLine"
-                        android:padding="4dp"
-                        android:textColor="#111827"
-                        android:textColorHint="#9CA3AF" />
+                        android:padding="12dp"
+                        android:textColor="#172033"
+                        android:textColorHint="#98A2B3" />
 
                 </LinearLayout>
 
@@ -278,8 +281,10 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:backgroundTint="#22C55E"
-                app:cornerRadius="16dp" />
+                app:backgroundTint="#159A68"
+                app:cornerRadius="16dp"
+                app:rippleColor="#BCE8D2"
+                android:elevation="0dp" />
 
         </LinearLayout>
 

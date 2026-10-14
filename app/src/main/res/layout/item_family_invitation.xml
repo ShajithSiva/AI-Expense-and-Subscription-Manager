@@ -6,9 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardBackgroundColor="@android:color/white"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp">
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#E4E9EF"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,8 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Family Name"
-            android:textColor="#111827"
-            android:textSize="19sp"
+            android:textColor="#172033"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -30,24 +32,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:lineSpacingExtra="2dp"
             android:text="You have been invited to join this family."
-            android:textColor="#6B7280"
-            android:textSize="14sp" />
+            android:textColor="#667085"
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/tvRole"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
+            android:background="#E8F7EF"
+            android:paddingStart="10dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="6dp"
             android:text="Role: Member"
-            android:textColor="#374151"
-            android:textSize="14sp"
+            android:textColor="#137A50"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="18dp"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
@@ -56,9 +64,16 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
                 android:text="Reject"
                 android:textAllCaps="false"
-                app:strokeColor="#EF4444"
+                android:textColor="#D92D20"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="#FFFFFF"
+                app:cornerRadius="13dp"
+                app:strokeColor="#F4B4AF"
                 app:strokeWidth="1dp" />
 
             <com.google.android.material.button.MaterialButton
@@ -67,8 +82,15 @@
                 android:layout_height="48dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
                 android:text="Accept"
-                android:textAllCaps="false" />
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="#159A68"
+                app:cornerRadius="13dp" />
 
         </LinearLayout>
 

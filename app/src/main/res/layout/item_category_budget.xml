@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="12dp"
     app:cardBackgroundColor="#FFFFFF"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="1dp">
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E4E9EF"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +17,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- CATEGORY NAME + AMOUNT -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,41 +28,48 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginEnd="12dp"
                 android:text="Food"
-                android:textColor="#111827"
+                android:textColor="#172033"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/tvCategoryAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Rs. 5,000 / Rs. 10,000"
-                android:textColor="#6B7280"
-                android:textSize="13sp" />
+                android:textColor="#667085"
+                android:textSize="12sp"
+                android:gravity="end"
+                android:maxLines="1" />
 
         </LinearLayout>
 
-        <!-- PROGRESS -->
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/categoryProgress"
             android:layout_width="match_parent"
             android:layout_height="8dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="14dp"
             android:max="100"
             android:progress="0"
-            app:trackCornerRadius="4dp" />
+            app:trackCornerRadius="4dp"
+            app:trackColor="#E8EDF2"
+            app:indicatorColor="#159A68" />
 
-        <!-- PERCENTAGE -->
         <TextView
             android:id="@+id/tvCategoryPercentage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="7dp"
             android:text="50% used"
-            android:textColor="#6B7280"
-            android:textSize="12sp" />
+            android:textColor="#667085"
+            android:textSize="12sp"
+            android:fontFamily="sans"
+            android:maxLines="1" />
 
     </LinearLayout>
 

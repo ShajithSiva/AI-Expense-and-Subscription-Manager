@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FA"
+    android:background="#F4F6FA"
     tools:context=".ui.family.JoinFamilyActivity">
 
     <!-- HEADER -->
@@ -32,7 +32,7 @@
             android:contentDescription="Back"
             android:padding="9dp"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#111827" />
+            app:tint="#172033" />
 
         <TextView
             android:layout_width="0dp"
@@ -40,7 +40,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:text="Join Family"
-            android:textColor="#111827"
+            android:textColor="#172033"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -74,7 +74,7 @@
                 android:layout_width="72dp"
                 android:layout_height="72dp"
                 android:layout_gravity="center_horizontal"
-                app:cardBackgroundColor="#EAF9F0"
+                app:cardBackgroundColor="#E8F7EF"
                 app:cardCornerRadius="36dp"
                 app:cardElevation="0dp">
 
@@ -84,7 +84,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="Family"
                     android:src="@drawable/ic_family"
-                    app:tint="#22C55E" />
+                    app:tint="#159A68" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -97,7 +97,7 @@
                 android:layout_marginTop="16dp"
                 android:gravity="center"
                 android:text="Join a Family Group"
-                android:textColor="#111827"
+                android:textColor="#172033"
                 android:textSize="21sp"
                 android:textStyle="bold" />
 
@@ -110,7 +110,7 @@
                 android:gravity="center"
                 android:lineSpacingExtra="2dp"
                 android:text="Enter your invitation code or accept a pending invitation to join your family."
-                android:textColor="#7A8190"
+                android:textColor="#707B8D"
                 android:textSize="12sp" />
 
 
@@ -122,7 +122,7 @@
                 android:layout_marginTop="30dp"
                 android:letterSpacing="0.08"
                 android:text="INVITATION CODE"
-                android:textColor="#626A72"
+                android:textColor="#687386"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -136,11 +136,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:boxBackgroundColor="#FFFFFF"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#22C55E"
+                app:boxCornerRadiusBottomEnd="14dp"
+                app:boxCornerRadiusBottomStart="14dp"
+                app:boxCornerRadiusTopEnd="14dp"
+                app:boxCornerRadiusTopStart="14dp"
+                app:boxStrokeColor="#159A68"
                 app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -153,8 +153,8 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:singleLine="true"
-                    android:textColor="#111827"
-                    android:textColorHint="#A1A7B0"
+                    android:textColor="#172033"
+                    android:textColorHint="#9AA4B2"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -173,8 +173,8 @@
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:backgroundTint="#22C55E"
-                app:cornerRadius="13dp" />
+                app:backgroundTint="#159A68"
+                app:cornerRadius="14dp" />
 
             <!-- VIEW FAMILY INVITATIONS -->
 
@@ -185,12 +185,12 @@
                 android:layout_marginTop="12dp"
                 android:text="View Family Invitations"
                 android:textAllCaps="false"
-                android:textColor="#16A34A"
+                android:textColor="#12845A"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:backgroundTint="#EAF9F0"
-                app:cornerRadius="13dp"
-                app:strokeColor="#22C55E"
+                app:backgroundTint="#E8F7EF"
+                app:cornerRadius="14dp"
+                app:strokeColor="#159A68"
                 app:strokeWidth="1dp" />
 
             <!-- PRIVACY -->
@@ -199,10 +199,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="#F0FBF4"
+                app:cardBackgroundColor="#EAF7F0"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
-                app:strokeColor="#D2F2DD"
+                app:strokeColor="#CDEEDB"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -216,7 +216,7 @@
                         android:layout_height="30dp"
                         android:gravity="center"
                         android:text="✓"
-                        android:textColor="#16A34A"
+                        android:textColor="#12845A"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -231,7 +231,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Your personal finances remain private"
-                            android:textColor="#166534"
+                            android:textColor="#126344"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
@@ -241,7 +241,7 @@
                             android:layout_marginTop="3dp"
                             android:lineSpacingExtra="1dp"
                             android:text="Joining a family does not automatically share your personal expenses, income or subscriptions."
-                            android:textColor="#4D7C5B"
+                            android:textColor="#47765B"
                             android:textSize="11sp" />
 
                     </LinearLayout>

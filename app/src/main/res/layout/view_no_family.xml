@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FA"
+    android:background="#F4F6FA"
     android:fillViewport="true">
 
     <LinearLayout
@@ -27,7 +27,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="96dp"
             android:layout_height="96dp"
-            app:cardBackgroundColor="#EAF9F0"
+            app:cardBackgroundColor="#E8F7EF"
             app:cardCornerRadius="48dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
@@ -39,7 +39,7 @@
                 android:contentDescription="Family"
                 android:padding="4dp"
                 android:src="@drawable/family"
-                app:tint="#22C55E" />
+                app:tint="#159A68" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -54,7 +54,7 @@
             android:layout_marginTop="22dp"
             android:gravity="center"
             android:text="Start Your Family Group"
-            android:textColor="#111827"
+            android:textColor="#172033"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -72,7 +72,7 @@
             android:gravity="center"
             android:lineSpacingExtra="2dp"
             android:text="Create a family group or join an existing one to manage shared expenses, budgets and subscriptions together."
-            android:textColor="#747B87"
+            android:textColor="#667085"
             android:textSize="13sp" />
 
 
@@ -89,9 +89,9 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="1dp"
-            app:strokeColor="#E1E5E9"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E4E9EF"
             app:strokeWidth="1dp">
 
             <LinearLayout
@@ -107,8 +107,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    app:cardBackgroundColor="#EAF9F0"
-                    app:cardCornerRadius="14dp"
+                    app:cardBackgroundColor="#E8F7EF"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
 
                     <ImageView
@@ -135,7 +135,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Create a Family"
-                        android:textColor="#111827"
+                        android:textColor="#172033"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
@@ -145,7 +145,7 @@
                         android:layout_marginTop="4dp"
                         android:lineSpacingExtra="1dp"
                         android:text="Start a new family group and invite registered members."
-                        android:textColor="#858C97"
+                        android:textColor="#667085"
                         android:textSize="11sp" />
 
                 </LinearLayout>
@@ -158,7 +158,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="›"
-                    android:textColor="#A2A8B1"
+                    android:textColor="#98A2B3"
                     android:textSize="28sp" />
 
             </LinearLayout>
@@ -179,9 +179,9 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="1dp"
-            app:strokeColor="#E1E5E9"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E4E9EF"
             app:strokeWidth="1dp">
 
             <LinearLayout
@@ -197,8 +197,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="52dp"
                     android:layout_height="52dp"
-                    app:cardBackgroundColor="#F1F3F5"
-                    app:cardCornerRadius="14dp"
+                    app:cardBackgroundColor="#EEF2F6"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
 
                     <ImageView
@@ -225,7 +225,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Join a Family"
-                        android:textColor="#111827"
+                        android:textColor="#172033"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
@@ -235,7 +235,7 @@
                         android:layout_marginTop="4dp"
                         android:lineSpacingExtra="1dp"
                         android:text="Accept an invitation from an existing family group."
-                        android:textColor="#858C97"
+                        android:textColor="#667085"
                         android:textSize="11sp" />
 
                 </LinearLayout>
@@ -246,7 +246,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="›"
-                    android:textColor="#A2A8B1"
+                    android:textColor="#98A2B3"
                     android:textSize="28sp" />
 
             </LinearLayout>
@@ -262,10 +262,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            app:cardBackgroundColor="#F0FBF4"
-            app:cardCornerRadius="14dp"
+            app:cardBackgroundColor="#EAF7F0"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeColor="#D2F2DD"
+            app:strokeColor="#CDEBDD"
             app:strokeWidth="1dp">
 
             <LinearLayout
@@ -280,7 +280,7 @@
                     android:layout_height="30dp"
                     android:gravity="center"
                     android:text="✓"
-                    android:textColor="#16A34A"
+                    android:textColor="#137A50"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -295,7 +295,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Your personal finances stay private"
-                        android:textColor="#166534"
+                        android:textColor="#176044"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
@@ -305,7 +305,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="1dp"
                         android:text="Only expenses, income and subscriptions you choose to share will appear on the Family Dashboard."
-                        android:textColor="#4D7C5B"
+                        android:textColor="#4D7460"
                         android:textSize="11sp" />
 
                 </LinearLayout>

@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FC">
+    android:background="#F4F6FA">
 
     <!-- ================= HEADER ================= -->
 
@@ -24,8 +24,11 @@
             android:id="@+id/btnBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@android:color/transparent"
+            android:background="@drawable/bg_icon_circle"
+            android:padding="10dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_back_arrow"
+            android:tint="#172033"
             android:contentDescription="Back" />
 
         <TextView
@@ -33,9 +36,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Edit Expense"
+            android:fontFamily="sans"
             android:textStyle="bold"
             android:textSize="22sp"
-            android:textColor="#111827" />
+            android:textColor="#172033" />
 
     </LinearLayout>
 
@@ -63,7 +67,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="4dp"
                 app:cardBackgroundColor="#F8FAFC">
@@ -78,7 +82,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Expense Amount"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textStyle="bold"
                         android:textSize="14sp" />
 
@@ -89,10 +93,12 @@
                         android:layout_marginTop="10dp"
                         android:hint="Rs. 0.00"
                         android:inputType="numberDecimal"
+                        android:textColorHint="#98A2B3"
                         android:textSize="30sp"
                         android:textStyle="bold"
-                        android:textColor="#111827"
-                        android:background="@android:color/transparent" />
+                        android:textColor="#172033"
+                        android:background="@android:color/transparent"
+                        android:padding="0dp" />
 
                 </LinearLayout>
 
@@ -119,7 +125,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Category"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textStyle="bold"
                         android:textSize="14sp" />
 
@@ -154,7 +160,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Payment Method"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textStyle="bold"
                         android:textSize="14sp" />
 
@@ -189,7 +195,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Transaction Date"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textStyle="bold"
                         android:textSize="14sp" />
 
@@ -201,7 +207,12 @@
                         android:focusable="false"
                         android:clickable="true"
                         android:hint="Select Date"
-                        android:drawableEnd="@android:drawable/ic_menu_today" />
+                        android:drawableEnd="@android:drawable/ic_menu_today"
+                        android:drawableTint="#159A68"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="#172033"
+                        android:backgroundTint="#F8FAFC" />
 
                 </LinearLayout>
 
@@ -228,7 +239,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Notes"
-                        android:textColor="#6B7280"
+                        android:textColor="#667085"
                         android:textStyle="bold"
                         android:textSize="14sp" />
 
@@ -281,7 +292,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Share with Family"
-                                android:textColor="#111827"
+                                android:textColor="#172033"
                                 android:textStyle="bold"
                                 android:textSize="16sp" />
 
@@ -290,7 +301,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:text="Make this expense visible on a family dashboard"
-                                android:textColor="#6B7280"
+                                android:textColor="#667085"
                                 android:textSize="13sp" />
 
                         </LinearLayout>
@@ -299,7 +310,9 @@
                             android:id="@+id/switchShareFamily"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false" />
+                            android:checked="false"
+                            app:thumbTint="#FFFFFF"
+                            app:trackTint="#D9E1EA" />
 
                     </LinearLayout>
 
@@ -324,7 +337,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Family Group"
-                            android:textColor="#6B7280"
+                            android:textColor="#667085"
                             android:textStyle="bold"
                             android:textSize="14sp" />
 
@@ -340,7 +353,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:text="Select the family that should see this expense."
-                            android:textColor="#9CA3AF"
+                            android:textColor="#7B8494"
                             android:textSize="12sp" />
 
                     </LinearLayout>
@@ -361,7 +374,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
-                app:backgroundTint="#22C55E"
+                app:backgroundTint="#159A68"
                 app:cornerRadius="16dp" />
 
             <Space

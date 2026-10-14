@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="#F8F9FA">
+    android:background="#F4F6FA">
 
 
     <!-- ========================================================= -->
@@ -48,7 +47,7 @@
 
             android:src="@drawable/ic_back_arrow"
 
-            app:tint="#111827" />
+            app:tint="#172033" />
 
 
         <TextView
@@ -61,7 +60,7 @@
 
             android:text="Terms &amp; Conditions"
 
-            android:textColor="#111827"
+            android:textColor="#172033"
 
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -107,7 +106,7 @@
             android:orientation="vertical"
 
             android:paddingStart="20dp"
-            android:paddingTop="30dp"
+            android:paddingTop="24dp"
             android:paddingEnd="20dp"
             android:paddingBottom="40dp">
 
@@ -142,7 +141,7 @@
 
                 android:text="Terms &amp; Conditions"
 
-                android:textColor="#111827"
+                android:textColor="#172033"
 
                 android:textSize="25sp"
                 android:textStyle="bold" />
@@ -167,7 +166,7 @@
 
                 android:text="Please read these terms carefully before using ExpenseVault and its financial management features."
 
-                android:textColor="#64748B"
+                android:textColor="#667085"
 
                 android:textSize="14sp" />
 
@@ -214,7 +213,7 @@
 
                     android:text="Last updated: September 15, 2026"
 
-                    android:textColor="#16A34A"
+                    android:textColor="#159A68"
 
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -235,7 +234,7 @@
 
                 android:text="TERMS OVERVIEW"
 
-                android:textColor="#475569"
+                android:textColor="#667085"
 
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -252,11 +251,11 @@
 
                 android:layout_marginTop="12dp"
 
-                app:cardBackgroundColor="#F0FDF4"
+                app:cardBackgroundColor="#E8F7EF"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
 
-                app:strokeColor="#BBF7D0"
+                app:strokeColor="#C9EBDD"
                 app:strokeWidth="1dp">
 
 
@@ -289,7 +288,7 @@
 
                             android:contentDescription="Terms Agreement"
 
-                            app:tint="#22C55E" />
+                            app:tint="#159A68" />
 
                     </FrameLayout>
 
@@ -313,7 +312,7 @@
 
                             android:text="Using ExpenseVault"
 
-                            android:textColor="#111827"
+                            android:textColor="#172033"
 
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -330,7 +329,7 @@
 
                             android:text="By accessing or using ExpenseVault, you agree to follow these Terms &amp; Conditions."
 
-                            android:textColor="#64748B"
+                            android:textColor="#667085"
 
                             android:textSize="13sp" />
 
@@ -354,7 +353,7 @@
 
                 android:text="TERMS &amp; CONDITIONS"
 
-                android:textColor="#475569"
+                android:textColor="#667085"
 
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -375,7 +374,7 @@
                 app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
 
-                app:strokeColor="#E2E8F0"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
 
@@ -412,7 +411,7 @@
 
                             android:text="01"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -437,7 +436,7 @@
 
                                 android:text="Acceptance of Terms"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -454,7 +453,7 @@
 
                                 android:text="By creating an account or using ExpenseVault, you agree to comply with these Terms &amp; Conditions and applicable policies."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -470,7 +469,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -498,7 +497,7 @@
 
                             android:text="02"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -523,7 +522,7 @@
 
                                 android:text="Account Responsibilities"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -540,7 +539,7 @@
 
                                 android:text="You are responsible for maintaining accurate account information and protecting your password, verification codes and other account credentials."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -556,7 +555,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -584,7 +583,7 @@
 
                             android:text="03"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -609,7 +608,7 @@
 
                                 android:text="Financial Information"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -626,7 +625,7 @@
 
                                 android:text="ExpenseVault provides financial organization and analysis features. Information displayed by the app should not be considered professional financial advice."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -642,7 +641,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -670,7 +669,7 @@
 
                             android:text="04"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -695,7 +694,7 @@
 
                                 android:text="AI-Powered Features"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -712,7 +711,7 @@
 
                                 android:text="ExpenseVault may use artificial intelligence and machine learning to categorize expenses, analyze spending patterns and generate financial insights. AI-generated results may not always be completely accurate."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -728,7 +727,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -756,7 +755,7 @@
 
                             android:text="05"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -781,7 +780,7 @@
 
                                 android:text="Subscription Detection"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -798,7 +797,7 @@
 
                                 android:text="Subscription detection, renewal predictions and usage analysis are provided for informational purposes. You remain responsible for managing and cancelling subscriptions with service providers."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -814,7 +813,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -842,7 +841,7 @@
 
                             android:text="06"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -867,7 +866,7 @@
 
                                 android:text="Family Features"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -884,7 +883,7 @@
 
                                 android:text="Users are responsible for managing family groups, invitations, permissions and information shared through the Family Dashboard."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -900,7 +899,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -928,7 +927,7 @@
 
                             android:text="07"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -953,7 +952,7 @@
 
                                 android:text="Acceptable Use"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -970,7 +969,7 @@
 
                                 android:text="You agree not to misuse ExpenseVault, attempt unauthorized access, interfere with app functionality or use the service for unlawful activities."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -986,7 +985,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -1014,7 +1013,7 @@
 
                             android:text="08"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -1039,7 +1038,7 @@
 
                                 android:text="Intellectual Property"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -1056,7 +1055,7 @@
 
                                 android:text="The ExpenseVault name, interface, design, software and related content are protected by applicable intellectual property laws."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -1072,7 +1071,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -1100,7 +1099,7 @@
 
                             android:text="09"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -1125,7 +1124,7 @@
 
                                 android:text="Service Availability"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -1142,7 +1141,7 @@
 
                                 android:text="We aim to provide reliable access to ExpenseVault, but uninterrupted or error-free availability cannot always be guaranteed."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -1158,7 +1157,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -1186,7 +1185,7 @@
 
                             android:text="10"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -1211,7 +1210,7 @@
 
                                 android:text="Limitation of Liability"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -1228,7 +1227,7 @@
 
                                 android:text="ExpenseVault is not responsible for financial decisions, losses or damages resulting from reliance on automated insights, predictions or information provided through the app."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -1244,7 +1243,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -1272,7 +1271,7 @@
 
                             android:text="11"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -1297,7 +1296,7 @@
 
                                 android:text="Changes to These Terms"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -1314,7 +1313,7 @@
 
                                 android:text="These Terms &amp; Conditions may be updated when ExpenseVault features, services or legal requirements change. The latest approved version will be made available through the application."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -1330,7 +1329,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
 
-                        android:background="#E5E7EB" />
+                        android:background="#E4E9EF" />
 
 
                     <!-- ================================================= -->
@@ -1358,7 +1357,7 @@
 
                             android:text="12"
 
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
 
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -1383,7 +1382,7 @@
 
                                 android:text="Contact Information"
 
-                                android:textColor="#111827"
+                                android:textColor="#172033"
 
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -1400,7 +1399,7 @@
 
                                 android:text="If you have questions or concerns regarding these Terms &amp; Conditions, you can contact the ExpenseVault support team."
 
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
 
                                 android:textSize="13sp" />
 
@@ -1426,7 +1425,7 @@
 
                 android:text="IMPORTANT INFORMATION"
 
-                android:textColor="#475569"
+                android:textColor="#667085"
 
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -1439,11 +1438,11 @@
 
                 android:layout_marginTop="12dp"
 
-                app:cardBackgroundColor="#FFFBEB"
+                app:cardBackgroundColor="#FFF8E7"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
 
-                app:strokeColor="#FDE68A"
+                app:strokeColor="#F2D58A"
                 app:strokeWidth="1dp">
 
 
@@ -1476,7 +1475,7 @@
 
                             android:contentDescription="Important Information"
 
-                            app:tint="#D97706" />
+                            app:tint="#A66A12" />
 
                     </FrameLayout>
 
@@ -1500,7 +1499,7 @@
 
                             android:text="Financial Information Disclaimer"
 
-                            android:textColor="#111827"
+                            android:textColor="#172033"
 
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -1517,7 +1516,7 @@
 
                             android:text="ExpenseVault is a financial management tool and does not provide professional financial, investment, tax or legal advice."
 
-                            android:textColor="#64748B"
+                            android:textColor="#667085"
 
                             android:textSize="13sp" />
 
@@ -1541,7 +1540,7 @@
 
                 android:text="QUESTIONS ABOUT THESE TERMS?"
 
-                android:textColor="#475569"
+                android:textColor="#667085"
 
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -1558,11 +1557,11 @@
 
                 android:layout_marginTop="12dp"
 
-                app:cardBackgroundColor="#F0FDF4"
+                app:cardBackgroundColor="#E8F7EF"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
 
-                app:strokeColor="#BBF7D0"
+                app:strokeColor="#C9EBDD"
                 app:strokeWidth="1dp">
 
 
@@ -1598,7 +1597,7 @@
 
                             android:contentDescription="Contact Support"
 
-                            app:tint="#22C55E" />
+                            app:tint="#159A68" />
 
                     </FrameLayout>
 
@@ -1614,7 +1613,7 @@
 
                         android:text="Contact Support"
 
-                        android:textColor="#111827"
+                        android:textColor="#172033"
 
                         android:textSize="19sp"
                         android:textStyle="bold" />
@@ -1635,7 +1634,7 @@
 
                         android:text="Have questions about these Terms &amp; Conditions? Our support team is ready to help."
 
-                        android:textColor="#64748B"
+                        android:textColor="#667085"
 
                         android:textSize="13sp" />
 
@@ -1653,7 +1652,7 @@
 
                         android:text="Expensevalut@gmail.com"
 
-                        android:textColor="#16A34A"
+                        android:textColor="#159A68"
 
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -1672,7 +1671,7 @@
 
                         android:text="0771234567"
 
-                        android:textColor="#64748B"
+                        android:textColor="#667085"
 
                         android:textSize="13sp" />
 
@@ -1695,7 +1694,7 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
 
-                        app:backgroundTint="#22C55E"
+                        app:backgroundTint="#159A68"
 
                         app:cornerRadius="15dp"
 
@@ -1735,7 +1734,7 @@
 
                     android:text="EXPENSEVAULT TERMS"
 
-                    android:textColor="#94A3B8"
+                    android:textColor="#98A2B3"
 
                     android:textSize="10sp"
                     android:textStyle="bold" />
@@ -1750,7 +1749,7 @@
 
                     android:text="Terms &amp; Conditions • Version 1.0.0"
 
-                    android:textColor="#CBD5E1"
+                    android:textColor="#98A2B3"
 
                     android:textSize="10sp" />
 

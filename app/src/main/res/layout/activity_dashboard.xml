@@ -1,35 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FB"
-
+    android:background="#F4F6FA"
     tools:context=".ui.dashboard.DashboardActivity">
-
-
-    <!-- ========================================================= -->
-    <!-- MAIN DASHBOARD LAYOUT                                     -->
-    <!-- ========================================================= -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-        <!-- ===================================================== -->
-        <!-- APP BAR                                               -->
-        <!-- ===================================================== -->
-
         <LinearLayout
             android:id="@+id/layoutAppBar"
             android:layout_width="0dp"
             android:layout_height="82dp"
-            android:background="@android:color/white"
+            android:background="#FFFFFF"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="20dp"
@@ -38,24 +25,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-
-            <!-- GREETING + USERNAME -->
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-
                 <TextView
                     android:id="@+id/tvGreeting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Good Morning,"
-                    android:textColor="#707070"
-                    android:textSize="15sp" />
-
+                    android:textColor="#667085"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/tvUserName"
@@ -63,24 +45,18 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:text="User"
-                    android:textColor="#111111"
-                    android:textSize="24sp"
+                    android:textColor="#172033"
+                    android:textSize="23sp"
                     android:textStyle="bold"
                     tools:text="Shajith" />
-
             </LinearLayout>
-
-
-            <!-- ================================================= -->
-            <!-- NOTIFICATION                                      -->
-            <!-- ================================================= -->
 
             <FrameLayout
                 android:id="@+id/layoutNotification"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginEnd="14dp">
-
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="12dp"
+                android:background="#F4F6FA">
 
                 <ImageView
                     android:id="@+id/imgNotification"
@@ -91,7 +67,6 @@
                     android:contentDescription="Notifications"
                     android:focusable="true"
                     android:src="@drawable/notification" />
-
 
                 <TextView
                     android:id="@+id/tvNotificationBadge"
@@ -106,19 +81,12 @@
                     android:textStyle="bold"
                     android:visibility="gone"
                     tools:visibility="visible" />
-
             </FrameLayout>
-
-
-            <!-- ================================================= -->
-            <!-- PROFILE                                           -->
-            <!-- ================================================= -->
 
             <FrameLayout
                 android:id="@+id/layoutProfile"
                 android:layout_width="48dp"
                 android:layout_height="48dp">
-
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/imgProfile"
@@ -131,37 +99,22 @@
                     android:src="@drawable/profile"
                     app:shapeAppearanceOverlay="@drawable/bg_icon_circle" />
 
-
-                <!-- ONLINE STATUS -->
-
                 <View
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_gravity="bottom|end"
                     android:background="@drawable/status" />
-
             </FrameLayout>
-
         </LinearLayout>
-
-
-        <!-- ===================================================== -->
-        <!-- HEADER DIVIDER                                        -->
-        <!-- ===================================================== -->
 
         <View
             android:id="@+id/headerDivider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:background="#DDDDDD"
+            android:background="#E4E9EF"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutAppBar" />
-
-
-        <!-- ===================================================== -->
-        <!-- PERSONAL / FAMILY SWITCH                              -->
-        <!-- ===================================================== -->
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardDashboardMode"
@@ -170,24 +123,19 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="14dp"
             android:layout_marginEnd="20dp"
-            app:cardBackgroundColor="#E9ECEF"
-            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#E9EDF2"
+            app:cardCornerRadius="17dp"
             app:cardElevation="0dp"
+            app:strokeWidth="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/headerDivider">
-
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:padding="5dp">
-
-
-                <!-- ============================================= -->
-                <!-- PERSONAL BUTTON                               -->
-                <!-- ============================================= -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPersonal"
@@ -196,18 +144,13 @@
                     android:layout_weight="1"
                     android:text="Personal"
                     android:textAllCaps="false"
-                    android:textColor="@android:color/white"
+                    android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    app:backgroundTint="#22C55E"
-                    app:cornerRadius="12dp"
+                    app:backgroundTint="#159A68"
+                    app:cornerRadius="13dp"
                     app:elevation="0dp"
                     app:strokeWidth="0dp" />
-
-
-                <!-- ============================================= -->
-                <!-- FAMILY BUTTON                                 -->
-                <!-- ============================================= -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFamily"
@@ -217,49 +160,34 @@
                     android:layout_weight="1"
                     android:text="Family"
                     android:textAllCaps="false"
-                    android:textColor="#6B7280"
+                    android:textColor="#667085"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    app:backgroundTint="#E9ECEF"
-                    app:cornerRadius="12dp"
+                    app:backgroundTint="#E9EDF2"
+                    app:cornerRadius="13dp"
                     app:elevation="0dp"
                     app:strokeWidth="0dp" />
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
-
-
-        <!-- ===================================================== -->
-        <!-- DASHBOARD CONTENT                                     -->
-        <!--                                                       -->
-        <!-- PersonalDashboardFragment OR                          -->
-        <!-- FamilyDashboardFragment will appear here              -->
-        <!-- ===================================================== -->
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/dashboardContainer"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
-            android:background="#F8F9FB"
+            android:background="#F4F6FA"
             app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardDashboardMode"
             tools:layout="@layout/fragment_personal_dashboard" />
 
-
-        <!-- ===================================================== -->
-        <!-- BOTTOM NAVIGATION                                     -->
-        <!-- ===================================================== -->
-
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigation"
             android:layout_width="0dp"
             android:layout_height="70dp"
-            android:background="@android:color/white"
-            android:elevation="12dp"
+            android:background="#FFFFFF"
+            android:elevation="8dp"
             app:itemIconTint="@color/bottom_nav_colors"
             app:itemTextColor="@color/bottom_nav_colors"
             app:labelVisibilityMode="labeled"
@@ -267,13 +195,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:menu="@menu/bottom_menu" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <!-- ========================================================= -->
-    <!-- FLOATING ACTION BUTTON                                    -->
-    <!-- ========================================================= -->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddExpense"
@@ -284,10 +206,9 @@
         android:layout_marginBottom="90dp"
         android:contentDescription="Add Expense"
         android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="#22C55E"
+        app:backgroundTint="#159A68"
         app:borderWidth="0dp"
-        app:elevation="10dp"
+        app:elevation="8dp"
         app:tint="#FFFFFF" />
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

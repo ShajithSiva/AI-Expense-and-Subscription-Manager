@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC">
+    android:background="#F4F6FA">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
@@ -25,7 +25,7 @@
             android:gravity="center_horizontal"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
-            android:paddingTop="32dp">
+            android:paddingTop="28dp">
 
             <!-- ===================================================== -->
             <!-- Header -->
@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="ExpenseVault"
-                android:textColor="#22C55E"
+                android:textColor="#159A68"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.04" />
@@ -55,7 +55,7 @@
                 android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="Verify your email"
-                android:textColor="#111827"
+                android:textColor="#172033"
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
@@ -68,7 +68,7 @@
                 android:gravity="center"
                 android:lineSpacingExtra="3dp"
                 android:text="We've sent a verification link to your email address. Please check your inbox and confirm your email to continue."
-                android:textColor="#64748B"
+                android:textColor="#667085"
                 android:textSize="14sp" />
 
 
@@ -83,14 +83,14 @@
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeColor="#E2E8F0"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="22dp">
+                    android:padding="20dp">
 
                     <!-- Email Icon + Label -->
 
@@ -125,7 +125,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Verification email sent"
-                                android:textColor="#111827"
+                                android:textColor="#172033"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
@@ -134,7 +134,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="3dp"
                                 android:text="Check your inbox and spam folder"
-                                android:textColor="#64748B"
+                                android:textColor="#667085"
                                 android:textSize="12sp" />
 
                         </LinearLayout>
@@ -171,7 +171,7 @@
                         android:ellipsize="end"
                         android:maxLines="2"
                         android:text="alex.rivera@example.com"
-                        android:textColor="#1E293B"
+                        android:textColor="#172033"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
@@ -188,10 +188,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardBackgroundColor="#F0FDF4"
-                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="#E8F7EF"
+                app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
-                app:strokeColor="#BBF7D0"
+                app:strokeColor="#C5EBD5"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -218,7 +218,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Secure your account"
-                            android:textColor="#166534"
+                            android:textColor="#146C4A"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -228,7 +228,7 @@
                             android:layout_marginTop="3dp"
                             android:lineSpacingExtra="2dp"
                             android:text="After verification, you can continue using your ExpenseVault account securely."
-                            android:textColor="#4B7A5A"
+                            android:textColor="#39745A"
                             android:textSize="12sp" />
 
                     </LinearLayout>
@@ -252,8 +252,8 @@
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:backgroundTint="#22C55E"
-                app:cornerRadius="14dp"
+                app:backgroundTint="#159A68"
+                app:cornerRadius="18dp"
                 app:elevation="0dp" />
 
 
@@ -268,7 +268,7 @@
                 android:layout_marginTop="18dp"
                 android:padding="8dp"
                 android:text="Didn't receive the email?  Resend"
-                android:textColor="#16A34A"
+                android:textColor="#159A68"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:clickable="true"
@@ -286,7 +286,7 @@
                 android:layout_marginTop="4dp"
                 android:padding="8dp"
                 android:text="Change email address"
-                android:textColor="#64748B"
+                android:textColor="#667085"
                 android:textSize="13sp"
                 android:clickable="true"
                 android:focusable="true" />

@@ -1,86 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:clipToPadding="false"
+    android:paddingBottom="8dp"
+    android:scrollbars="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="20dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Filter Expenses"
             android:textStyle="bold"
-            android:textSize="22sp"/>
+            android:textSize="22sp"
+            android:textColor="#172033" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Category"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#344054" />
 
         <Spinner
             android:id="@+id/spCategoryFilter"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#D0D5DD"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Payment Method"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#344054" />
 
         <Spinner
             android:id="@+id/spPaymentFilter"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#D0D5DD"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Expense Mode"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#344054" />
 
         <Spinner
             android:id="@+id/spModeFilter"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#D0D5DD"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Sort By"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#344054" />
 
         <Spinner
             android:id="@+id/spSort"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#D0D5DD"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="end">
+            android:layout_marginTop="28dp"
+            android:gravity="end|center_vertical"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnReset"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reset"/>
+                android:layout_height="48dp"
+                android:minWidth="96dp"
+                android:text="Reset"
+                android:textAllCaps="false"
+                android:textColor="#344054"
+                android:backgroundTint="#F2F4F7"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp" />
 
             <Button
                 android:id="@+id/btnApply"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_marginStart="12dp"
-                android:text="Apply"/>
+                android:minWidth="112dp"
+                android:text="Apply Filters"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#159A68"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp" />
 
         </LinearLayout>
 
     </LinearLayout>
-
 </ScrollView>

@@ -1,51 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FC">
+    android:background="#F4F6FA">
 
-    <!-- ================= HEADER ================= -->
-
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/headerLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="20dp"
+        android:layout_height="68dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#E4E9EF"
+        app:strokeWidth="1dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_back_arrow"
-            android:contentDescription="Back" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="18dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Add Expense"
-            android:textStyle="bold"
-            android:textSize="22sp"
-            android:textColor="#111827" />
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:padding="10dp"
+                android:src="@drawable/ic_back_arrow"
+                app:tint="#172033" />
 
-    </LinearLayout>
-
-
-    <!-- ================= CONTENT ================= -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Add Expense"
+                android:textColor="#172033"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
         android:fillViewport="true"
+        android:overScrollMode="never"
         app:layout_constraintTop_toBottomOf="@id/headerLayout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,18 +67,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
-
-
-            <!-- ================= AMOUNT ================= -->
+            android:paddingStart="20dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="28dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="#F8FAFC">
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#DDEEE5"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -78,36 +92,36 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Expense Amount"
-                        android:textColor="#6B7280"
-                        android:textStyle="bold"
-                        android:textSize="14sp" />
+                        android:textColor="#667085"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/etAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@android:color/transparent"
                         android:hint="Rs. 0.00"
                         android:inputType="numberDecimal"
+                        android:minHeight="54dp"
+                        android:padding="0dp"
+                        android:textColor="#172033"
+                        android:textColorHint="#98A2B3"
                         android:textSize="30sp"
-                        android:textStyle="bold"
-                        android:textColor="#111827"
-                        android:background="@android:color/transparent" />
-
+                        android:textStyle="bold" />
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- ================= CATEGORY ================= -->
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#F8FAFC">
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -119,30 +133,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Category"
-                        android:textColor="#6B7280"
-                        android:textStyle="bold"
-                        android:textSize="14sp" />
+                        android:textColor="#344054"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <Spinner
                         android:id="@+id/spCategory"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="8dp" />
-
+                        android:layout_height="50dp"
+                        android:layout_marginTop="6dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp" />
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- ================= PAYMENT METHOD ================= -->
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#F8FAFC">
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -154,30 +167,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Payment Method"
-                        android:textColor="#6B7280"
-                        android:textStyle="bold"
-                        android:textSize="14sp" />
+                        android:textColor="#344054"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <Spinner
                         android:id="@+id/spPaymentMethod"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="8dp" />
-
+                        android:layout_height="50dp"
+                        android:layout_marginTop="6dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp" />
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- ================= DATE ================= -->
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#F8FAFC">
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -189,34 +201,36 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Transaction Date"
-                        android:textColor="#6B7280"
-                        android:textStyle="bold"
-                        android:textSize="14sp" />
+                        android:textColor="#344054"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/etDate"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="8dp"
-                        android:focusable="false"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_edittext"
                         android:clickable="true"
-                        android:hint="Select Date"
-                        android:drawableEnd="@android:drawable/ic_menu_today" />
-
+                        android:focusable="false"
+                        android:hint="Select date"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:drawableEnd="@android:drawable/ic_menu_today"
+                        android:textColor="#172033"
+                        android:textColorHint="#98A2B3" />
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- ================= NOTES ================= -->
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#F8FAFC">
+                app:cardElevation="0dp"
+                app:strokeColor="#E4E9EF"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -228,34 +242,35 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Notes"
-                        android:textColor="#6B7280"
-                        android:textStyle="bold"
-                        android:textSize="14sp" />
+                        android:textColor="#344054"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/etNotes"
                         android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_edittext"
                         android:gravity="top|start"
-                        android:hint="Enter notes..."
-                        android:inputType="textMultiLine" />
-
+                        android:hint="Add a note (optional)"
+                        android:inputType="textMultiLine"
+                        android:padding="12dp"
+                        android:textColor="#172033"
+                        android:textColorHint="#98A2B3" />
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- ================= FAMILY SHARING ================= -->
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardFamilySharing"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#F8FAFC">
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#DCEFE4"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -263,14 +278,11 @@
                     android:orientation="vertical"
                     android:padding="18dp">
 
-
-                    <!-- Share switch row -->
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -282,59 +294,55 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Share with Family"
-                                android:textColor="#111827"
-                                android:textStyle="bold"
-                                android:textSize="16sp" />
+                                android:textColor="#172033"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
 
                             <TextView
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
+                                android:layout_marginTop="5dp"
                                 android:text="Make this expense visible on a family dashboard"
-                                android:textColor="#6B7280"
+                                android:textColor="#667085"
                                 android:textSize="13sp" />
-
                         </LinearLayout>
-
 
                         <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/switchShareFamily"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false" />
-
+                            android:checked="false"
+                            app:thumbTint="#FFFFFF"
+                            app:trackTint="#CFE8DA" />
                     </LinearLayout>
-
-
-                    <!-- Family selection -->
 
                     <LinearLayout
                         android:id="@+id/layoutFamilySelection"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
+                        android:layout_marginTop="16dp"
                         android:orientation="vertical"
                         android:visibility="gone">
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginBottom="16dp"
-                            android:background="#E5E7EB" />
+                            android:layout_marginBottom="14dp"
+                            android:background="#E4E9EF" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Family Group"
-                            android:textColor="#6B7280"
-                            android:textStyle="bold"
-                            android:textSize="14sp" />
+                            android:textColor="#344054"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                         <Spinner
                             android:id="@+id/spFamily"
                             android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:layout_marginTop="8dp" />
+                            android:layout_height="50dp"
+                            android:layout_marginTop="6dp" />
 
                         <TextView
                             android:id="@+id/tvFamilyShareHint"
@@ -342,17 +350,11 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:text="Select the family that should see this expense."
-                            android:textColor="#9CA3AF"
+                            android:textColor="#667085"
                             android:textSize="12sp" />
-
                     </LinearLayout>
-
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- ================= SAVE ================= -->
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveExpense"
@@ -360,18 +362,15 @@
                 android:layout_height="56dp"
                 android:text="Save Expense"
                 android:textAllCaps="false"
+                android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                app:backgroundTint="#22C55E"
+                app:backgroundTint="#159A68"
                 app:cornerRadius="16dp" />
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="24dp" />
-
+                android:layout_height="20dp" />
         </LinearLayout>
-
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
