@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FA">
+    android:background="#F4F6FA">
 
 
     <!-- ===================================================== -->
@@ -17,10 +17,10 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/white"
-        android:elevation="2dp"
+        android:elevation="0dp"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title="Review Subscription"
-        app:titleTextColor="#111827" />
+        app:titleTextColor="#172033" />
 
 
     <!-- ===================================================== -->
@@ -72,7 +72,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Analyze"
-                    android:textColor="#4F5663"
+                    android:textColor="#667085"
                     android:textSize="14sp" />
 
 
@@ -99,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Review"
-                    android:textColor="#00A840"
+                    android:textColor="#159A68"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -114,7 +114,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                app:cardBackgroundColor="#EAFBF0"
+                app:cardBackgroundColor="#E8F7EF"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp">
 
@@ -130,7 +130,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Subscription detected"
-                        android:textColor="#008A35"
+                        android:textColor="#159A68"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -140,7 +140,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Check the detected details before saving."
-                        android:textColor="#4F5663"
+                        android:textColor="#667085"
                         android:textSize="13sp" />
 
                 </LinearLayout>
@@ -245,7 +245,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        app:cardBackgroundColor="#ECFDF3"
+                        app:cardBackgroundColor="#E8F7EF"
                         app:cardCornerRadius="14dp"
                         app:cardElevation="0dp">
 
@@ -260,7 +260,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="LKR estimate"
-                                android:textColor="#374151"
+                                android:textColor="#344054"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
 
@@ -271,7 +271,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
                                 android:text="Rs. —"
-                                android:textColor="#111827"
+                                android:textColor="#172033"
                                 android:textSize="28sp"
                                 android:textStyle="bold" />
 
@@ -282,7 +282,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:text="Conversion information will appear here."
-                                android:textColor="#6B7280"
+                                android:textColor="#667085"
                                 android:textSize="12sp" />
 
                         </LinearLayout>
@@ -349,9 +349,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="I checked these details"
-                android:textColor="#374151"
+                android:textColor="#344054"
                 android:textSize="14sp"
-                app:buttonTint="#00C94F" />
+                app:buttonTint="#159A68" />
 
 
             <!-- ================================================= -->
@@ -368,8 +368,10 @@
                 android:textColor="@android:color/white"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                app:backgroundTint="#00C94F"
-                app:cornerRadius="12dp" />
+                app:backgroundTint="#159A68"
+                app:cornerRadius="16dp"
+                app:rippleColor="#BCE8D2"
+                android:elevation="0dp" />
 
 
             <!-- ================================================= -->
@@ -384,7 +386,7 @@
                 android:layout_marginTop="6dp"
                 android:text="Do not save"
                 android:textAllCaps="false"
-                android:textColor="#008A35"
+                android:textColor="#159A68"
                 android:textSize="16sp" />
 
 

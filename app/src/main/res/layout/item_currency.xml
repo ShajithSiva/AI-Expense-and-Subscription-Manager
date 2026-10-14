@@ -1,99 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:id="@+id/cardCurrency"
-
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
-    android:layout_marginTop="6dp"
-
-    app:cardCornerRadius="14dp"
-    app:cardElevation="1dp"
-    app:cardBackgroundColor="#F8FAFC"
-    app:strokeColor="#E5E7EB"
-    app:strokeWidth="1dp">
+    android:layout_marginTop="8dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeColor="#E4E9EF"
+    app:strokeWidth="1dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
-
+        android:layout_height="wrap_content"
+        android:minHeight="80dp"
+        android:gravity="center_vertical"
         android:paddingStart="18dp"
-        android:paddingEnd="18dp">
-
-        <!-- Currency Name -->
+        android:paddingEnd="18dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
         <TextView
             android:id="@+id/tvCurrencyName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/tvCurrencySymbol"
+            android:layout_marginEnd="76dp"
             android:text="Sri Lankan Rupee"
-
-            android:textColor="#111827"
+            android:textColor="#172033"
             android:textStyle="bold"
             android:textSize="16sp"
-
-            android:layout_marginTop="14dp"/>
-
-        <!-- Currency Code -->
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/tvCurrencyCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:text="LKR"
-
-            android:textColor="#6B7280"
-            android:textSize="13sp"
-
             android:layout_below="@id/tvCurrencyName"
-
-            android:layout_marginTop="3dp"/>
-
-        <!-- Currency Symbol -->
+            android:layout_alignStart="@id/tvCurrencyName"
+            android:layout_marginTop="4dp"
+            android:text="LKR"
+            android:textColor="#667085"
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/tvCurrencySymbol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:text="₨"
-
-            android:textStyle="bold"
-            android:textColor="#16A34A"
-            android:textSize="18sp"
-
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
-
-        <!-- Selected -->
+            android:layout_centerVertical="true"
+            android:minWidth="36dp"
+            android:gravity="center"
+            android:text="₨"
+            android:textStyle="bold"
+            android:textColor="#159A68"
+            android:textSize="20sp" />
 
         <ImageView
-
             android:id="@+id/imgSelected"
-
             android:layout_width="22dp"
             android:layout_height="22dp"
-
-            android:src="@drawable/ic_check"
-
-            android:visibility="gone"
-
             android:layout_toStartOf="@id/tvCurrencySymbol"
-
-            android:layout_marginEnd="14dp"
-
+            android:layout_marginEnd="12dp"
             android:layout_centerVertical="true"
-
-            app:tint="#16A34A"/>
+            android:src="@drawable/ic_check"
+            android:contentDescription="Selected currency"
+            android:visibility="gone"
+            app:tint="#159A68" />
 
     </RelativeLayout>
-
 </com.google.android.material.card.MaterialCardView>

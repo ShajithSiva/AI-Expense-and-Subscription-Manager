@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC">
+    android:background="#F4F6FA">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
@@ -26,7 +26,7 @@
             android:gravity="center_horizontal"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
-            android:paddingTop="28dp">
+            android:paddingTop="24dp">
 
 
             <!-- ===================================================== -->
@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="ExpenseVault"
-                android:textColor="#22C55E"
+                android:textColor="#159A68"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.04" />
@@ -70,7 +70,7 @@
                     android:layout_width="0dp"
                     android:layout_height="4dp"
                     android:layout_weight="1"
-                    android:background="#22C55E" />
+                    android:background="#159A68" />
 
                 <View
                     android:layout_width="8dp"
@@ -81,7 +81,7 @@
                     android:layout_width="0dp"
                     android:layout_height="4dp"
                     android:layout_weight="1"
-                    android:background="#E2E8F0" />
+                    android:background="#E4E9EF" />
 
             </LinearLayout>
 
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
                 android:text="STEP 1 OF 2"
-                android:textColor="#16A34A"
+                android:textColor="#159A68"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.08" />
@@ -107,7 +107,7 @@
                 android:layout_marginTop="18dp"
                 android:gravity="center"
                 android:text="Verify your mobile number"
-                android:textColor="#111827"
+                android:textColor="#172033"
                 android:textSize="27sp"
                 android:textStyle="bold" />
 
@@ -123,7 +123,7 @@
                 android:gravity="center"
                 android:lineSpacingExtra="3dp"
                 android:text="We'll send a one-time verification code to confirm your phone number and help secure your ExpenseVault account."
-                android:textColor="#64748B"
+                android:textColor="#667085"
                 android:textSize="14sp" />
 
 
@@ -138,7 +138,7 @@
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeColor="#E2E8F0"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -154,7 +154,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="MOBILE NUMBER"
-                        android:textColor="#64748B"
+                        android:textColor="#667085"
                         android:textSize="11sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.06" />
@@ -209,8 +209,8 @@
                             android:maxLength="15"
                             android:paddingStart="14dp"
                             android:paddingEnd="8dp"
-                            android:textColor="#111827"
-                            android:textColorHint="#94A3B8"
+                            android:textColor="#172033"
+                            android:textColorHint="#98A2B3"
                             android:textSize="16sp" />
 
                     </LinearLayout>
@@ -223,7 +223,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="9dp"
                         android:text="Make sure you have access to this number."
-                        android:textColor="#94A3B8"
+                        android:textColor="#98A2B3"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -239,10 +239,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                app:cardBackgroundColor="#F0FDF4"
-                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="#E8F7EF"
+                app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
-                app:strokeColor="#BBF7D0"
+                app:strokeColor="#C5EBD5"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -255,7 +255,7 @@
                     <FrameLayout
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:background="#DCFCE7">
+                        android:background="#D7F2E2">
 
                         <ImageView
                             android:layout_width="20dp"
@@ -278,7 +278,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Secure verification"
-                            android:textColor="#166534"
+                            android:textColor="#146C4A"
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
@@ -287,7 +287,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Your phone number is used to verify your account."
-                            android:textColor="#4B7A5A"
+                            android:textColor="#39745A"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -311,8 +311,8 @@
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:backgroundTint="#22C55E"
-                app:cornerRadius="14dp"
+                app:backgroundTint="#159A68"
+                app:cornerRadius="18dp"
                 app:elevation="0dp" />
 
 
@@ -327,7 +327,7 @@
                 android:layout_marginTop="18dp"
                 android:padding="8dp"
                 android:text="Already registered?  Login"
-                android:textColor="#64748B"
+                android:textColor="#667085"
                 android:textSize="13sp"
                 android:clickable="true"
                 android:focusable="true" />
@@ -355,7 +355,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:text="YOUR SECURITY MATTERS"
-                    android:textColor="#94A3B8"
+                    android:textColor="#98A2B3"
                     android:textSize="9sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.08" />

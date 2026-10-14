@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,14 +7,14 @@
     android:layout_marginBottom="12dp"
     app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="18dp"
-    app:cardElevation="2dp">
+    app:cardElevation="0dp"
+    app:strokeColor="#E4E9EF"
+    app:strokeWidth="1dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
-
-        <!-- Income Icon -->
 
         <ImageView
             android:id="@+id/imgCategory"
@@ -24,89 +23,97 @@
             android:background="@drawable/bg_icon_circle"
             android:contentDescription="Income Category"
             android:padding="10dp"
+            android:scaleType="centerInside"
             android:src="@drawable/money" />
-
-        <!-- Category -->
 
         <TextView
             android:id="@+id/tvCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_toEndOf="@id/imgCategory"
+            android:layout_toStartOf="@id/tvAmount"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="8dp"
             android:text="Salary"
-            android:textColor="#111827"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <!-- Amount -->
+            android:textColor="#172033"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/tvAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="8dp"
             android:text="Rs. 50,000.00"
-            android:textColor="#16A34A"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <!-- Notes -->
+            android:textColor="#159A68"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="1" />
 
         <TextView
             android:id="@+id/tvNote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvCategory"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
             android:layout_toEndOf="@id/imgCategory"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/btnMenu"
             android:text="Monthly Salary"
-            android:textColor="#6B7280"
-            android:textSize="14sp" />
-
-        <!-- Income Source -->
+            android:textColor="#667085"
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/tvPayment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvNote"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/imgCategory"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="9dp"
             android:text="Bank Transfer"
-            android:textColor="#16A34A"
-            android:textSize="13sp"
-            android:textStyle="bold" />
-
-        <!-- Date -->
+            android:textColor="#159A68"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvPayment"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/imgCategory"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="8dp"
             android:text="15 Jul 2026"
-            android:textColor="#9CA3AF"
-            android:textSize="12sp" />
-
-        <!-- Menu -->
+            android:textColor="#98A2B3"
+            android:textSize="12sp"
+            android:maxLines="1" />
 
         <ImageButton
             android:id="@+id/btnMenu"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_alignParentBottom="true"
+            android:layout_alignTop="@id/tvCategory"
             android:layout_alignParentEnd="true"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="35dp"
+            android:layout_marginEnd="9dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
             android:contentDescription="Income Options"
+            android:focusable="true"
             android:padding="6dp"
-            android:src="@drawable/ic_more_vert" />
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_more_vert"
+            android:visibility="visible" />
 
     </RelativeLayout>
 

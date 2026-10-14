@@ -16,9 +16,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="24dp"
+        android:paddingStart="20dp"
         android:paddingTop="12dp"
-        android:paddingEnd="24dp"
+        android:paddingEnd="20dp"
         android:paddingBottom="24dp">
 
 
@@ -41,7 +41,7 @@
             android:layout_marginTop="24dp"
             android:gravity="center"
             android:text="Select Budget Period"
-            android:textColor="#111827"
+            android:textColor="#172033"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -58,7 +58,7 @@
             android:gravity="center"
             android:lineSpacingExtra="2dp"
             android:text="Choose how often your budget should reset."
-            android:textColor="#6B7280"
+            android:textColor="#667085"
             android:textSize="14sp" />
 
 
@@ -68,11 +68,11 @@
             android:id="@+id/cardBudgetPeriodOptions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="18dp"
-            app:cardElevation="0dp"
-            app:strokeColor="#E5E7EB"
+            app:cardElevation="1dp"
+            app:strokeColor="#E4E9EF"
             app:strokeWidth="1dp">
 
             <RadioGroup
@@ -101,7 +101,7 @@
                         android:id="@+id/radioWeekly"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:buttonTint="#22C55E"
+                        android:buttonTint="#159A68"
                         android:clickable="false"
                         android:focusable="false" />
 
@@ -117,7 +117,7 @@
                             android:layout_height="26dp"
                             android:layout_gravity="center"
                             android:contentDescription="Weekly"
-                             />
+                            />
 
                     </FrameLayout>
 
@@ -133,7 +133,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Weekly"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -142,7 +142,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Resets every week"
-                            android:textColor="#6B7280"
+                            android:textColor="#667085"
                             android:textSize="13sp" />
 
                     </LinearLayout>
@@ -155,7 +155,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E5E7EB" />
+                    android:background="#E4E9EF" />
 
 
                 <!-- MONTHLY -->
@@ -176,7 +176,7 @@
                         android:id="@+id/radioMonthly"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:buttonTint="#22C55E"
+                        android:buttonTint="#159A68"
                         android:checked="true"
                         android:clickable="false"
                         android:focusable="false" />
@@ -207,7 +207,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Monthly"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -216,7 +216,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Resets every month"
-                            android:textColor="#6B7280"
+                            android:textColor="#667085"
                             android:textSize="13sp" />
 
                     </LinearLayout>
@@ -229,7 +229,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E5E7EB" />
+                    android:background="#E4E9EF" />
 
 
                 <!-- QUARTERLY -->
@@ -250,7 +250,7 @@
                         android:id="@+id/radioQuarterly"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:buttonTint="#22C55E"
+                        android:buttonTint="#159A68"
                         android:clickable="false"
                         android:focusable="false" />
 
@@ -281,7 +281,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Quarterly"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -290,7 +290,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Resets every 3 months"
-                            android:textColor="#6B7280"
+                            android:textColor="#667085"
                             android:textSize="13sp" />
 
                     </LinearLayout>
@@ -303,7 +303,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E5E7EB" />
+                    android:background="#E4E9EF" />
 
 
                 <!-- YEARLY -->
@@ -324,7 +324,7 @@
                         android:id="@+id/radioYearly"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:buttonTint="#22C55E"
+                        android:buttonTint="#159A68"
                         android:clickable="false"
                         android:focusable="false" />
 
@@ -355,7 +355,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Yearly"
-                            android:textColor="#111827"
+                            android:textColor="#172033"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -364,7 +364,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Resets every year"
-                            android:textColor="#6B7280"
+                            android:textColor="#667085"
                             android:textSize="13sp" />
 
                     </LinearLayout>
@@ -382,14 +382,14 @@
             android:id="@+id/btnApplyBudgetPeriod"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             android:text="Apply Period"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:backgroundTint="#22C55E"
-            app:cornerRadius="16dp"
+            app:backgroundTint="#159A68"
+            app:cornerRadius="14dp"
             app:iconGravity="textStart"
             app:iconPadding="10dp"
             app:iconTint="#FFFFFF" />
@@ -405,11 +405,11 @@
             android:layout_marginTop="12dp"
             android:text="Cancel"
             android:textAllCaps="false"
-            android:textColor="#111827"
+            android:textColor="#172033"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:cornerRadius="16dp"
-            app:strokeColor="#D1D5DB"
+            app:cornerRadius="14dp"
+            app:strokeColor="#E4E9EF"
             app:strokeWidth="1dp" />
 
     </LinearLayout>

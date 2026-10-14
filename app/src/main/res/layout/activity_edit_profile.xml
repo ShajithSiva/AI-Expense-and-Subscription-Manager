@@ -6,14 +6,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC"
+    android:background="#F4F6FA"
     tools:context=".ui.profile.EditProfileActivity">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="72dp"
-        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,7 +23,7 @@
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
-       >
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,16 +35,20 @@
                 android:layout_height="44dp"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="12dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_back_arrow"/>
+                android:background="@drawable/bg_icon_circle"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Back"
+                android:src="@drawable/ic_back_arrow"
+                app:tint="#172033"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="Edit Profile"
-                android:textColor="#111827"
-                android:textSize="22sp"
+                android:textColor="#172033"
+                android:textSize="21sp"
                 android:textStyle="bold"/>
 
         </RelativeLayout>
@@ -62,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="18dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -71,7 +77,7 @@
                 app:cardElevation="4dp"
                 android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="@android:color/white"
-                app:strokeColor="#E5E7EB"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -87,8 +93,8 @@
 
                         <ImageView
                             android:id="@+id/imgProfile"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
+                            android:layout_width="76dp"
+                            android:layout_height="76dp"
                             android:layout_gravity="center"
                             android:background="@drawable/circle_dashed_gray"
                             android:scaleType="centerCrop"
@@ -113,7 +119,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="Change Profile Picture"
-                        android:textColor="#4CAF50"
+                        android:textColor="#159A68"
                         android:textSize="16sp"
                         android:textStyle="bold"/>
 
@@ -126,7 +132,7 @@
                 android:layout_marginTop="28dp"
                 android:layout_marginBottom="12dp"
                 android:text="PERSONAL INFORMATION"
-                android:textColor="#6B7280"
+                android:textColor="#667085"
                 android:textSize="13sp"
                 android:textStyle="bold"/>
             <com.google.android.material.card.MaterialCardView
@@ -136,7 +142,7 @@
                 app:cardElevation="4dp"
                 android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="@android:color/white"
-                app:strokeColor="#E5E7EB"
+                app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -150,7 +156,7 @@
                         android:layout_height="wrap_content"
                         android:text="Full Name"
                         android:textStyle="bold"
-                        android:textColor="#374151"
+                        android:textColor="#344054"
                         android:textSize="15sp"/>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -177,7 +183,7 @@
                         android:layout_height="wrap_content"
                         android:text="Email Address"
                         android:textStyle="bold"
-                        android:textColor="#374151"
+                        android:textColor="#344054"
                         android:textSize="15sp"/>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -205,7 +211,7 @@
                         android:layout_height="wrap_content"
                         android:text="Mobile Number"
                         android:textStyle="bold"
-                        android:textColor="#374151"
+                        android:textColor="#344054"
                         android:textSize="15sp"/>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -232,7 +238,7 @@
                         android:layout_height="wrap_content"
                         android:text="Account Status"
                         android:textStyle="bold"
-                        android:textColor="#374151"
+                        android:textColor="#344054"
                         android:textSize="15sp"/>
 
                     <com.google.android.material.card.MaterialCardView
@@ -241,9 +247,9 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="20dp"
                         app:cardCornerRadius="16dp"
-                        app:cardBackgroundColor="#F9FAFB"
+                        app:cardBackgroundColor="#F8FAFC"
                         app:strokeWidth="1dp"
-                        app:strokeColor="#E5E7EB">
+                        app:strokeColor="#E4E9EF">
 
                         <TextView
                             android:id="@+id/tvStatus"
@@ -252,7 +258,7 @@
                             android:gravity="center_vertical"
                             android:paddingStart="18dp"
                             android:text="Active"
-                            android:textColor="#16A34A"
+                            android:textColor="#159A68"
                             android:textStyle="bold"/>
 
                     </com.google.android.material.card.MaterialCardView>
@@ -271,8 +277,10 @@
                 android:textSize="17sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
-                app:backgroundTint="#4CAF50"
-                app:cornerRadius="18dp"/>
+                app:backgroundTint="#159A68"
+                app:cornerRadius="16dp"
+                app:rippleColor="#BCE8D2"
+                android:elevation="0dp"/>
 
             <View
                 android:layout_width="match_parent"

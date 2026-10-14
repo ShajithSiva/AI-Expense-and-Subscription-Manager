@@ -224,7 +224,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="AI confidence: 99.2%"
-                android:textColor="#00A840"
+                android:textColor="#159A68"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -241,7 +241,7 @@
             android:layout_marginTop="12dp"
             android:gravity="end"
             android:text="Tap to review →"
-            android:textColor="#00A840"
+            android:textColor="#159A68"
             android:textSize="12sp"
             android:textStyle="bold" />
 

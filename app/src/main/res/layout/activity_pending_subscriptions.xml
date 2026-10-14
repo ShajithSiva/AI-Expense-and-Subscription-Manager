@@ -1,31 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FA">
-
-
-    <!-- ===================================================== -->
-    <!-- TOOLBAR -->
-    <!-- ===================================================== -->
+    android:background="#F4F6FA">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/white"
-        android:elevation="1dp"
+        android:background="#FFFFFF"
+        android:elevation="0dp"
         app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="#172033"
         app:title="New Subscription Messages"
-        app:titleTextColor="#111827" />
-
-
-    <!-- ===================================================== -->
-    <!-- CONTENT -->
-    <!-- ===================================================== -->
+        app:titleTextColor="#172033" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,118 +23,127 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:orientation="vertical">
 
-
-        <!-- ================================================= -->
-        <!-- HEADER -->
-        <!-- ================================================= -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingTop="18dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="10dp">
-
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="12dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Detected subscriptions"
-                android:textColor="#111827"
+                android:textColor="#172033"
                 android:textSize="22sp"
                 android:textStyle="bold" />
-
 
             <TextView
                 android:id="@+id/tvPendingCount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="6dp"
                 android:text="0 subscriptions waiting for review"
-                android:textColor="#6B7280"
+                android:textColor="#667085"
                 android:textSize="14sp" />
-
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                app:cardBackgroundColor="#ECFDF3"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp">
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#E8F7EF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#D3EDE0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="Information"
+                        android:padding="5dp"
+                        android:src="@drawable/subscribtion"
+                        android:tint="#159A68" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:text="Review each detected subscription before adding it to your active subscriptions."
+                        android:textColor="#176B4B"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="2dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPendingSubscriptions"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="24dp" />
+
+            <LinearLayout
+                android:id="@+id/layoutEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="32dp"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:background="#E8F7EF">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="No subscription messages"
+                        android:padding="24dp"
+                        android:src="@drawable/subscribtion"
+                        android:tint="#159A68" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="No subscriptions to review"
+                    android:textColor="#172033"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="14dp"
-                    android:text="Tap a detected subscription to review its details before adding it to your active subscriptions."
-                    android:textColor="#087A37"
-                    android:textSize="13sp" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- RECYCLER VIEW -->
-        <!-- ================================================= -->
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvPendingSubscriptions"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:paddingBottom="24dp" />
-
-
-        <!-- ================================================= -->
-        <!-- EMPTY STATE -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:id="@+id/layoutEmpty"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="32dp"
-            android:visibility="gone">
-
-
-            <ImageView
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:contentDescription="No subscription messages"
-                android:src="@drawable/subscribtion" />
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="No subscriptions to review"
-                android:textColor="#111827"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
-                android:text="Scan Gmail to find new subscription messages."
-                android:textColor="#6B7280"
-                android:textSize="13sp" />
-
-        </LinearLayout>
-
-
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="Scan Gmail to find new subscription messages."
+                    android:textColor="#667085"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="2dp" />
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -5,44 +5,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F7FB">
+    android:background="#F4F6FA">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/white"
-        android:elevation="4dp"
+        android:background="#FFFFFF"
+        android:elevation="1dp"
         app:title="AI Financial Insights"
         app:titleCentered="true"
-        app:navigationIcon="@drawable/ic_back_arrow"/>
+        app:titleTextColor="#172033"
+        app:navigationIcon="@drawable/ic_back_arrow"
+        app:navigationIconTint="#172033" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvInsights"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
-        android:clipToPadding="false"/>
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <ProgressBar
-        android:id="@+id/progressInsights"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        android:indeterminate="true" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvInsights"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="24dp" />
 
-    <TextView
-        android:id="@+id/tvNoInsights"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:gravity="center"
-        android:text="Your finances look good. No important insights right now."
-        android:textColor="#6B7280"
-        android:textSize="14sp"
-        android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/progressInsights"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminate="true"
+            android:indeterminateTint="#159A68" />
 
+        <TextView
+            android:id="@+id/tvNoInsights"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:gravity="center"
+            android:lineSpacingExtra="3dp"
+            android:text="Your finances look good. No important insights right now."
+            android:textColor="#667085"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </LinearLayout>

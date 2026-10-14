@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FB">
+    android:background="#F4F6FA">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,9 +22,9 @@
             android:elevation="6dp"
             app:title="Budget Management"
             app:titleCentered="true"
-            app:titleTextColor="#212121"
+            app:titleTextColor="#172033"
             app:navigationIcon="@drawable/ic_back_arrow"
-            app:navigationIconTint="#212121"/>
+            app:navigationIconTint="#172033"/>
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -48,10 +48,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="1dp"
                     app:strokeWidth="1dp"
-                    app:strokeColor="#E6EAF2"
+                    app:strokeColor="#E4E9EF"
                     app:cardBackgroundColor="@android:color/white">
 
                     <LinearLayout
@@ -66,7 +66,7 @@
                             android:text="Monthly Budget"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#212121"/>
+                            android:textColor="#172033"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -74,14 +74,14 @@
                             android:layout_marginTop="4dp"
                             android:text="Monitor your monthly spending"
                             android:textSize="13sp"
-                            android:textColor="#757575"/>
+                            android:textColor="#667085"/>
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginTop="18dp"
                             android:layout_marginBottom="18dp"
-                            android:background="#EEEEEE"/>
+                            android:background="#EEF1F5"/>
 
                         <TextView
                             android:id="@+id/tvMonthlyBudget"
@@ -90,7 +90,7 @@
                             android:text="Budget : Rs. 0.00"
                             android:textSize="22sp"
                             android:textStyle="bold"
-                            android:textColor="#1565C0"/>
+                            android:textColor="#159A68"/>
 
                         <TextView
                             android:id="@+id/tvSpentAmount"
@@ -100,7 +100,7 @@
                             android:text="Spent : Rs. 0.00"
                             android:textSize="16sp"
                             android:textStyle="bold"
-                            android:textColor="#E53935"/>
+                            android:textColor="#D92D20"/>
 
                         <TextView
                             android:id="@+id/tvRemainingAmount"
@@ -110,7 +110,7 @@
                             android:text="Remaining : Rs. 0.00"
                             android:textSize="16sp"
                             android:textStyle="bold"
-                            android:textColor="#2E7D32"/>
+                            android:textColor="#137A50"/>
 
                         <com.google.android.material.progressindicator.LinearProgressIndicator
                             android:id="@+id/progressBudget"
@@ -130,7 +130,7 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="16dp"
-                    android:background="#EAEAEA"/>
+                    android:background="#E4E9EF"/>
 
                 <!-- Category Budget Card -->
 
@@ -138,10 +138,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="1dp"
                     app:strokeWidth="1dp"
-                    app:strokeColor="#E6EAF2"
+                    app:strokeColor="#E4E9EF"
                     app:cardBackgroundColor="@android:color/white">
 
                     <LinearLayout
@@ -156,7 +156,7 @@
                             android:text="Category Budget Allocation"
                             android:textStyle="bold"
                             android:textSize="20sp"
-                            android:textColor="#212121"/>
+                            android:textColor="#172033"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -164,7 +164,7 @@
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="20dp"
                             android:text="Set spending limits for each category"
-                            android:textColor="#757575"
+                            android:textColor="#667085"
                             android:textSize="13sp"/>
 
                         <!-- Monthly Budget -->
@@ -179,14 +179,14 @@
 
                             android:hint="Monthly Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etMonthlyBudget"
@@ -197,9 +197,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -218,14 +218,14 @@
 
                             android:hint="Food Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etFoodBudget"
@@ -236,9 +236,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -257,14 +257,14 @@
 
                             android:hint="Transport Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etTransportBudget"
@@ -275,9 +275,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -296,14 +296,14 @@
 
                             android:hint="Shopping Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etShoppingBudget"
@@ -314,9 +314,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -335,14 +335,14 @@
 
                             android:hint="Bills Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etBillsBudget"
@@ -353,9 +353,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -374,14 +374,14 @@
 
                             android:hint="Health Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etHealthBudget"
@@ -392,9 +392,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -413,14 +413,14 @@
 
                             android:hint="Eductaion Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etEducationBudget"
@@ -431,9 +431,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -452,14 +452,14 @@
 
                             android:hint="Entertainment Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etEntertainmentBudget"
@@ -470,9 +470,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -491,14 +491,14 @@
 
                             android:hint="Others Budget"
 
-                            app:boxCornerRadiusTopStart="18dp"
-                            app:boxCornerRadiusTopEnd="18dp"
-                            app:boxCornerRadiusBottomStart="18dp"
-                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
 
-                            app:boxStrokeColor="#1565C0"
+                            app:boxStrokeColor="#159A68"
 
-                            app:hintTextColor="#616161">
+                            app:hintTextColor="#667085">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etOthersBudget"
@@ -509,9 +509,9 @@
 
                                 android:textSize="16sp"
 
-                                android:textColor="#212121"
+                                android:textColor="#172033"
 
-                                android:textColorHint="#9E9E9E"
+                                android:textColorHint="#98A2B3"
 
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"/>
@@ -529,7 +529,7 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSaveBudget"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="56dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="24dp"
 
@@ -538,15 +538,15 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
 
-                    android:elevation="4dp"
+                    android:elevation="0dp"
 
-                    app:cornerRadius="18dp"
+                    app:cornerRadius="14dp"
 
                     app:icon="@drawable/ic_save"
                     app:iconGravity="textStart"
                     app:iconPadding="12dp"
 
-                    app:backgroundTint="#1565C0"
+                    app:backgroundTint="#159A68"
                     android:textColor="@android:color/white"/>
 
             </LinearLayout>
