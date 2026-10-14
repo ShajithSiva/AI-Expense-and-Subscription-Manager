@@ -1,10 +1,23 @@
+
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.AIExpenseManagementApplication" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <style name="Base.Theme.AIExpenseManagementApplication"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="colorPrimary">#C7C7CC</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <!-- Status bar background: White -->
+        <item name="android:statusBarColor">#FFFFFF</item>
+
+        <!-- Dark icons on white status bar -->
+        <item name="android:windowLightStatusBar">true</item>
+
         <item name="colorSecondaryContainer">@color/nav_selected_background</item>
+
     </style>
 
-    <style name="Theme.AIExpenseManagementApplication" parent="Base.Theme.AIExpenseManagementApplication" />
+    <style name="Theme.AIExpenseManagementApplication"
+        parent="Base.Theme.AIExpenseManagementApplication" />
+
 </resources>

@@ -255,7 +255,8 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             app:singleSelection="true"
-            app:chipSpacingHorizontal="8dp">
+            app:chipSpacingHorizontal="8dp"
+            >
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipAll"
@@ -264,7 +265,8 @@
                 android:layout_height="wrap_content"
                 android:text="All"
                 android:checked="true"
-                android:checkable="true" />
+                android:checkable="true"
+                />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipFood"
@@ -272,7 +274,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Food"
-                android:checkable="true" />
+                android:checkable="true"
+                 />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipTransport"
