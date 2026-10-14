@@ -1,0 +1,50 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="@color/ash_background" android:overScrollMode="never">
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center_horizontal" android:paddingStart="24dp" android:paddingEnd="24dp" android:paddingTop="24dp" android:paddingBottom="24dp">
+        <ImageView
+            android:id="@+id/ivExpenseVaultLogo"
+            android:layout_width="220dp" android:layout_height="140dp" android:adjustViewBounds="true" android:scaleType="fitCenter" android:src="@drawable/logo_expensevault" android:contentDescription="ExpenseVault logo"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
+            android:text="Track • Plan • Save • Grow"
+            android:textColor="@color/text_secondary" android:textSize="15sp" android:letterSpacing="0.02" android:gravity="center"/>
+        <ImageView
+            android:id="@+id/ivWelcomeIllustration" android:layout_width="match_parent" android:layout_height="220dp" android:layout_marginTop="20dp" android:scaleType="centerInside" android:src="@drawable/illustration_welcome" android:contentDescription="Expense tracking dashboard illustration"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="A Smarter Way to Manage Your Money"
+            android:textColor="@color/navy"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:fontFamily="sans"/>
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center" android:lineSpacingExtra="3dp" android:text="Track your expenses, plan your budget, manage subscriptions and achieve your goals with ExpenseVault." android:textColor="@color/text_secondary" android:textSize="15sp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <View
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/dot_active" />
+            <View
+                android:layout_width="9dp"
+                android:layout_height="9dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/dot_inactive"/>
+            <View
+                android:layout_width="9dp" android:layout_height="9dp" android:layout_marginStart="8dp"
+                android:background="@drawable/dot_inactive"/>
+        </LinearLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnSignIn" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="22dp" android:text="Sign In →" android:textAllCaps="false" android:textSize="16sp" android:textStyle="bold" android:textColor="@android:color/white" app:backgroundTint="@color/green" app:cornerRadius="28dp" app:elevation="2dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnCreateAccount" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="10dp" android:text="Create Account" android:textAllCaps="false" android:textSize="16sp" android:textColor="@color/navy" app:strokeColor="@color/green" app:strokeWidth="1dp" app:cornerRadius="28dp"/>
+    </LinearLayout>
+</ScrollView>

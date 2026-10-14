@@ -10,5 +10,13 @@
     <color name="dashboard_selected">#22C55E</color>
     <color name="dashboard_unselected">#E9ECEF</color>
     <color name="dashboard_unselected_text">#6B7280</color>
-    <color name="nav_selected_background">#DCFCE7</color>S
+    <color name="nav_selected_background">#DCFCE7</color>
+    <color name="navy">#0D1B35</color>
+    <color name="green">#27B467</color>
+    <color name="green_dark">#168653</color>
+    <color name="ash_background">#F3F4F4</color>
+    <color name="text_secondary">#737B76</color>
+    <color name="border_grey">#D9DEDB</color>
+
+
 </resources>

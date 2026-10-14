@@ -1,3 +1,4 @@
+
 package com.example.aiexpensemanagementapplication.ui;
 
 import android.content.Intent;
@@ -12,19 +13,21 @@ import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.RegisterActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.VerifyEmailActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.VerifyMobileActivity;
+import com.example.aiexpensemanagementapplication.ui.auth.WelcomeActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class
-SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseActivity {
 
     private static final int SPLASH_DELAY = 2000;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,106 +36,116 @@ SplashActivity extends BaseActivity {
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
-        new Handler(Looper.getMainLooper()).postDelayed(
-                this::checkUserSession,
-                SPLASH_DELAY
-        );
+        handler.postDelayed(this::checkUserSession, SPLASH_DELAY);
     }
 
     private void checkUserSession() {
 
         FirebaseUser user = mAuth.getCurrentUser();
 
-        // No logged in user
+        // New user: open ExpenseVault Welcome Screen
         if (user == null) {
-
-            startActivity(new Intent(
-                    SplashActivity.this,
-                    RegisterActivity.class));
-
-            finish();
+            navigateTo(WelcomeActivity.class);
             return;
         }
 
         user.reload().addOnCompleteListener(task -> {
 
-            if (!user.isEmailVerified()) {
-
-                Intent intent = new Intent(
-                        SplashActivity.this,
-                        VerifyEmailActivity.class);
-
-                intent.putExtra("email", user.getEmail());
-
-                startActivity(intent);
-                finish();
+            if (isFinishing() || isDestroyed()) {
                 return;
             }
 
+            if (!task.isSuccessful()) {
+                navigateTo(WelcomeActivity.class);
+                return;
+            }
+
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+
+            if (currentUser == null) {
+                navigateTo(WelcomeActivity.class);
+                return;
+            }
+
+            // Email verification
+            if (!currentUser.isEmailVerified()) {
+
+                Intent intent = new Intent(
+                        SplashActivity.this,
+                        VerifyEmailActivity.class
+                );
+
+                intent.putExtra("email", currentUser.getEmail());
+                navigate(intent);
+                return;
+            }
+
+            // Read user account status
             firestore.collection("users")
-                    .document(user.getUid())
+                    .document(currentUser.getUid())
                     .get()
-                    .addOnSuccessListener(this::checkFirestoreStatus)
+                    .addOnSuccessListener(document -> {
+                        if (!isFinishing() && !isDestroyed()) {
+                            checkFirestoreStatus(document);
+                        }
+                    })
                     .addOnFailureListener(e -> {
-
-                        startActivity(new Intent(
-                                SplashActivity.this,
-                                LoginActivity.class));
-
-                        finish();
+                        if (!isFinishing() && !isDestroyed()) {
+                            navigateTo(LoginActivity.class);
+                        }
                     });
-
         });
     }
 
-    private void checkFirestoreStatus(@NonNull DocumentSnapshot document) {
+    private void checkFirestoreStatus(
+            @NonNull DocumentSnapshot document) {
 
         if (!document.exists()) {
-
-            startActivity(new Intent(
-                    this,
-                    RegisterActivity.class));
-
-            finish();
+            navigateTo(RegisterActivity.class);
             return;
         }
 
         Boolean phoneVerified = document.getBoolean("phoneVerified");
         Boolean accountCompleted = document.getBoolean("accountCompleted");
 
-        if (phoneVerified == null)
+        if (phoneVerified == null) {
             phoneVerified = false;
+        }
 
-        if (accountCompleted == null)
+        if (accountCompleted == null) {
             accountCompleted = false;
+        }
 
-        // Phone not verified
+        // Mobile verification required
         if (!phoneVerified) {
-
-            startActivity(new Intent(
-                    this,
-                    VerifyMobileActivity.class));
-
-            finish();
+            navigateTo(VerifyMobileActivity.class);
             return;
         }
 
-        // Password not created
+        // Account setup incomplete
         if (!accountCompleted) {
-
-            startActivity(new Intent(
-                    this,
-                    CreatePasswordActivity.class));
-
-            finish();
+            navigateTo(CreatePasswordActivity.class);
             return;
         }
 
-        // Everything completed
-        startActivity(new Intent(
-                this,
-                DashboardActivity.class));
+        // Account completed
+        navigateTo(DashboardActivity.class);
+    }
 
+    private void navigateTo(Class<?> activityClass) {
+        Intent intent = new Intent(this, activityClass);
+        navigate(intent);
+    }
+
+    private void navigate(Intent intent) {
+        handler.removeCallbacksAndMessages(null);
+        startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        handler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 }

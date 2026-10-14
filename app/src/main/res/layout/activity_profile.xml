@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Profile"
+                android:text="My Profile"
                 android:textColor="#111827"
                 android:textSize="24sp"
                 android:textStyle="bold"/>
@@ -789,7 +789,7 @@
                 android:textAllCaps="false"
                 android:textSize="17sp"
                 android:textColor="#FFFFFF"
-                app:backgroundTint="#871010"
+                app:backgroundTint="#DC2626"
                 app:cornerRadius="18dp"
                 android:foreground="?attr/selectableItemBackground"
                 android:clickable="true"
