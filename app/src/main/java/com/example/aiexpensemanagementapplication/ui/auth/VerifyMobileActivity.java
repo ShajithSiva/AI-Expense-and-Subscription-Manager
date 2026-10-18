@@ -16,6 +16,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.hbb20.CountryCodePicker;
+import android.widget.TextView;
 
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +42,18 @@ public class VerifyMobileActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         btnSendOtp.setOnClickListener(v -> sendOtp());
+
+        TextView tvLogin = findViewById(R.id.tvLogin);
+
+        tvLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(
+                    VerifyMobileActivity.this,
+                    LoginActivity.class
+            );
+            startActivity(intent);
+            finish();
+        });
+
     }
 
     private void sendOtp() {

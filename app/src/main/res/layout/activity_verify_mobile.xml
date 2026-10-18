@@ -320,17 +320,38 @@
             <!-- Login -->
             <!-- ===================================================== -->
 
-            <TextView
-                android:id="@+id/tvLogin"
-                android:layout_width="wrap_content"
+
+            <!-- Already Registered Login -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:padding="8dp"
-                android:text="Already registered?  Login"
-                android:textColor="#667085"
-                android:textSize="13sp"
-                android:clickable="true"
-                android:focusable="true" />
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:text="Already registered?"
+                    android:textColor="#667085"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="5dp"
+                    android:gravity="center_vertical"
+                    android:text="Login"
+                    android:textColor="#159A68"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
 
 
             <!-- ===================================================== -->
