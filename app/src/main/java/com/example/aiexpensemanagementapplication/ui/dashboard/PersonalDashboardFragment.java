@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import java.util.Calendar;
 import android.widget.TextView;
+import android.database.Cursor;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,10 @@ import com.example.aiexpensemanagementapplication.ui.subscription.SubscriptionAc
 import com.example.aiexpensemanagementapplication.ml.ExpensePredictionFeatureGenerator;
 import com.example.aiexpensemanagementapplication.ml.ExpensePredictionRequest;
 import com.example.aiexpensemanagementapplication.ml.ExpensePredictionApiService;
+import com.example.aiexpensemanagementapplication.ui.subscription.CurrencyRateManager;
+
+import java.util.Map;
+import java.util.Collections;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -94,6 +99,9 @@ public class PersonalDashboardFragment extends Fragment {
     private TextView tvNoSubscriptions;
 
     private TextView tvViewAllSubscriptions;
+
+    private Map<String, Double> exchangeRates = Collections.emptyMap();
+    private CurrencyRateManager currencyRateManager;
 
 
     // =========================================================
@@ -220,7 +228,7 @@ public class PersonalDashboardFragment extends Fragment {
 
 
         // -----------------------------------------------------
-        // Subscription
+        // Subscription views
         // -----------------------------------------------------
 
         rvSubscriptions =
@@ -237,6 +245,27 @@ public class PersonalDashboardFragment extends Fragment {
 
         tvViewAllSubscriptions =
                 view.findViewById(R.id.tvViewAllSubscriptions);
+
+        // -----------------------------------------------------
+        // Currency rates for converting subscription amounts to LKR
+        // Initialize this only after the subscription TextViews exist.
+        // -----------------------------------------------------
+
+        currencyRateManager = new CurrencyRateManager(requireContext());
+        exchangeRates = currencyRateManager.getRates();
+
+        currencyRateManager.refresh(false, (rates, updatedAt, fromCache, error) -> {
+            if (!isAdded() || getView() == null) {
+                return;
+            }
+
+            exchangeRates = rates == null
+                    ? Collections.emptyMap()
+                    : rates;
+
+            // Recalculate the total using the latest available rates.
+            loadSubscriptions();
+        });
 
 
         // -----------------------------------------------------
@@ -691,77 +720,120 @@ public class PersonalDashboardFragment extends Fragment {
 
     private void loadSubscriptions() {
 
-        if (currentUser == null) {
+        if (!isAdded() ||
+                getView() == null ||
+                databaseHelper == null ||
+                currentUser == null ||
+                currentUser.getEmail() == null ||
+                tvSubscriptionTotal == null ||
+                tvSubscriptionCount == null ||
+                tvNoSubscriptions == null ||
+                rvSubscriptions == null) {
             return;
         }
 
+        int userId = databaseHelper.getUserIdByEmail(
+                currentUser.getEmail()
+        );
 
-        int userId =
-                databaseHelper.getUserIdByEmail(
-                        currentUser.getEmail()
-                );
-
-
-        if (userId == -1) {
+        if (userId <= 0) {
+            tvSubscriptionTotal.setText("LKR 0.00");
+            tvSubscriptionCount.setText("0 Subscriptions");
+            tvNoSubscriptions.setVisibility(View.VISIBLE);
+            rvSubscriptions.setVisibility(View.GONE);
             return;
         }
 
+        Cursor cursor = null;
+        double totalLkr = 0.0;
+        int count = 0;
+        int convertedCount = 0;
+        int unconvertedCount = 0;
 
-        int count =
-                databaseHelper
-                        .getActiveSubscriptionCount(
-                                userId
-                        );
+        try {
+            cursor = databaseHelper.getSubscriptions(userId);
 
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
 
-        double total =
-                databaseHelper
-                        .getMonthlySubscriptionAmount(
-                                userId
-                        );
+                    double amount = cursor.getDouble(
+                            cursor.getColumnIndexOrThrow(
+                                    DatabaseHelper.AMOUNT
+                            )
+                    );
 
+                    String currency = "LKR";
 
-        // -----------------------------------------------------
-        // Display
-        // -----------------------------------------------------
+                    int currencyIndex = cursor.getColumnIndex(
+                            DatabaseHelper.SUBSCRIPTION_CURRENCY
+                    );
+
+                    if (currencyIndex != -1 &&
+                            !cursor.isNull(currencyIndex)) {
+                        currency = cursor.getString(currencyIndex);
+                    }
+
+                    // Convert original amount to LKR.
+                    Double amountLkr =
+                            CurrencyRateManager.convertToLkr(
+                                    amount,
+                                    currency,
+                                    exchangeRates
+                            );
+
+                    count++;
+
+                    if (amountLkr != null) {
+                        totalLkr += amountLkr;
+                        convertedCount++;
+                    } else {
+                        unconvertedCount++;
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
 
         tvSubscriptionCount.setText(
-                count + " Active Subscriptions"
+                count + " Subscriptions"
         );
-
-
-        tvSubscriptionTotal.setText(
-                String.format(
-                        "Rs %.2f",
-                        total
-                )
-        );
-
-
-        // -----------------------------------------------------
-        // Empty state
-        // -----------------------------------------------------
 
         if (count == 0) {
+            tvSubscriptionTotal.setText("LKR 0.00");
+            tvNoSubscriptions.setVisibility(View.VISIBLE);
+            rvSubscriptions.setVisibility(View.GONE);
+            return;
+        }
 
-            tvNoSubscriptions.setVisibility(
-                    View.VISIBLE
+        tvNoSubscriptions.setVisibility(View.GONE);
+        rvSubscriptions.setVisibility(View.VISIBLE);
+
+        if (convertedCount == 0) {
+            tvSubscriptionTotal.setText(
+                    "Exchange rates unavailable"
             );
-
-
-            rvSubscriptions.setVisibility(
-                    View.GONE
+        } else if (unconvertedCount > 0) {
+            tvSubscriptionTotal.setText(
+                    String.format(
+                            Locale.US,
+                            "LKR %,.2f + review",
+                            totalLkr
+                    )
             );
-
         } else {
-
-            tvNoSubscriptions.setVisibility(
-                    View.GONE
-            );
-
-
-            rvSubscriptions.setVisibility(
-                    View.VISIBLE
+            tvSubscriptionTotal.setText(
+                    String.format(
+                            Locale.US,
+                            "LKR %,.2f",
+                            totalLkr
+                    )
             );
         }
     }

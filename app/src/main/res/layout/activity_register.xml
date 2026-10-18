@@ -38,8 +38,8 @@
 
             <ImageView
                 android:id="@+id/imgLogo"
-                android:layout_width="84dp"
-                android:layout_height="84dp"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
                 android:layout_gravity="center_horizontal"
                 android:contentDescription="ExpenseVault Logo"
                 android:scaleType="centerInside"
@@ -50,16 +50,6 @@
             <!-- BRAND -->
             <!-- ================================================= -->
 
-            <TextView
-                android:id="@+id/tvBrand"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="8dp"
-                android:text="ExpenseVault"
-                android:textColor="#172033"
-                android:textSize="22sp"
-                android:textStyle="bold" />
 
 
             <!-- ================================================= -->

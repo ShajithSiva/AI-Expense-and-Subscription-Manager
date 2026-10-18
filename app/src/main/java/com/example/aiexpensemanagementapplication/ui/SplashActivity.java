@@ -1,20 +1,20 @@
-
 package com.example.aiexpensemanagementapplication.ui;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.example.aiexpensemanagementapplication.ui.auth.CreatePasswordActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.RegisterActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.VerifyEmailActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.VerifyMobileActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.WelcomeActivity;
+import com.example.aiexpensemanagementapplication.ui.auth.CreatePasswordActivity;
 import com.example.aiexpensemanagementapplication.ui.dashboard.DashboardActivity;
+import com.example.aiexpensemanagementapplication.ui.onboarding.OnboardingActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,9 +25,15 @@ public class SplashActivity extends BaseActivity {
 
     private static final int SPLASH_DELAY = 2000;
 
+    private static final String PREFS_NAME = "ExpenseVaultPrefs";
+    private static final String KEY_ONBOARDING_COMPLETED =
+            "onboarding_completed";
+
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    private final Handler handler =
+            new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +42,32 @@ public class SplashActivity extends BaseActivity {
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
-        handler.postDelayed(this::checkUserSession, SPLASH_DELAY);
+        handler.postDelayed(() -> {
+
+            if (isFinishing() || isDestroyed()) {
+                return;
+            }
+
+            SharedPreferences preferences =
+                    getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+            boolean onboardingCompleted = preferences.getBoolean(
+                    KEY_ONBOARDING_COMPLETED, false
+            );
+
+            if (!onboardingCompleted) {
+                navigateTo(OnboardingActivity.class);
+            } else {
+                checkUserSession();
+            }
+
+        }, SPLASH_DELAY);
     }
 
     private void checkUserSession() {
 
         FirebaseUser user = mAuth.getCurrentUser();
 
-        // New user: open ExpenseVault Welcome Screen
         if (user == null) {
             navigateTo(WelcomeActivity.class);
             return;
@@ -67,7 +91,6 @@ public class SplashActivity extends BaseActivity {
                 return;
             }
 
-            // Email verification
             if (!currentUser.isEmailVerified()) {
 
                 Intent intent = new Intent(
@@ -80,16 +103,17 @@ public class SplashActivity extends BaseActivity {
                 return;
             }
 
-            // Read user account status
             firestore.collection("users")
                     .document(currentUser.getUid())
                     .get()
                     .addOnSuccessListener(document -> {
+
                         if (!isFinishing() && !isDestroyed()) {
                             checkFirestoreStatus(document);
                         }
                     })
                     .addOnFailureListener(e -> {
+
                         if (!isFinishing() && !isDestroyed()) {
                             navigateTo(LoginActivity.class);
                         }
@@ -105,30 +129,22 @@ public class SplashActivity extends BaseActivity {
             return;
         }
 
-        Boolean phoneVerified = document.getBoolean("phoneVerified");
-        Boolean accountCompleted = document.getBoolean("accountCompleted");
+        Boolean phoneVerified =
+                document.getBoolean("phoneVerified");
 
-        if (phoneVerified == null) {
-            phoneVerified = false;
-        }
+        Boolean accountCompleted =
+                document.getBoolean("accountCompleted");
 
-        if (accountCompleted == null) {
-            accountCompleted = false;
-        }
-
-        // Mobile verification required
-        if (!phoneVerified) {
+        if (phoneVerified == null || !phoneVerified) {
             navigateTo(VerifyMobileActivity.class);
             return;
         }
 
-        // Account setup incomplete
-        if (!accountCompleted) {
+        if (accountCompleted == null || !accountCompleted) {
             navigateTo(CreatePasswordActivity.class);
             return;
         }
 
-        // Account completed
         navigateTo(DashboardActivity.class);
     }
 

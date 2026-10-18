@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,18 +13,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
-
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Calendar;
 import java.util.Locale;
-
 
 public class ReviewSubscriptionActivity extends AppCompatActivity {
 
@@ -33,68 +31,53 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
 
     private MaterialToolbar toolbar;
 
-    private TextView tvDetectionStatus;
+    private ImageView ivServiceIcon;
 
+    private TextView tvReviewServiceName;
+    private TextView tvReviewEmailSubject;
+    private TextView tvEmailSubject;
+    private TextView tvEmailFrom;
+    private TextView tvEmailDate;
+    private TextView tvEmailPreview;
     private TextView tvLkrEstimate;
-
     private TextView tvRateInfo;
 
     private TextInputEditText etServiceName;
-
     private TextInputEditText etAmount;
+    private TextInputEditText etNextBillingDate;
 
     private AutoCompleteTextView actCurrency;
-
     private AutoCompleteTextView actBillingCycle;
-
-    private TextInputEditText etNextBillingDate;
 
     private MaterialCheckBox checkConfirmed;
 
     private MaterialButton btnConfirmSave;
-
     private MaterialButton btnDoNotSave;
 
-
     // =========================================================
-    // DATABASE
+    // DATABASE AND USER
     // =========================================================
 
     private DatabaseHelper databaseHelper;
 
-
-    // =========================================================
-    // USER
-    // =========================================================
-
     private int userId = -1;
-
-
-    // =========================================================
-    // PENDING RECORD
-    // =========================================================
-
     private int pendingId = -1;
-
 
     // =========================================================
     // SOURCE DATA
     // =========================================================
 
     private String sourceType = "";
-
     private String gmailMessageId = "";
-
     private String suggestionId = "";
 
     private String emailSubject = "";
-
     private String emailSender = "";
-
     private String emailBody = "";
 
+    // Retained for compatibility with existing intent/database data.
+    // It is not displayed in the UI.
     private double subscriptionProbability = 0.0;
-
 
     // =========================================================
     // ON CREATE
@@ -102,431 +85,223 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
-        setContentView(
-                R.layout.activity_review_subscription
-        );
-
+        setContentView(R.layout.activity_review_subscription);
 
         initializeViews();
-
         setupToolbar();
 
-
-        databaseHelper =
-                new DatabaseHelper(this);
-
+        databaseHelper = new DatabaseHelper(this);
 
         if (!initializeUser()) {
-
             return;
         }
 
-
         setupCurrencyDropdown();
-
         setupBillingCycleDropdown();
-
         setupDatePicker();
-
         setupListeners();
 
-
-        // =====================================================
-        // READ PENDING ID
-        // =====================================================
-
-        pendingId =
-                getIntent()
-                        .getIntExtra(
-                                "pendingId",
-                                -1
-                        );
-
-
-        // =====================================================
-        // IF OPENED FROM PENDING LIST
-        // LOAD DATABASE RECORD
-        // =====================================================
+        pendingId = getIntent().getIntExtra("pendingId", -1);
 
         if (pendingId > 0) {
-
-            loadPendingSubscription(
-                    pendingId
-            );
-
-
+            loadPendingSubscription(pendingId);
         } else {
-
-            // Fallback for direct API review
             loadIntentData();
         }
-
 
         updateLkrEstimate();
     }
 
-
     // =========================================================
     // INITIALIZE VIEWS
+    // Optional views are checked because XML versions may differ.
     // =========================================================
 
     private void initializeViews() {
+        toolbar = findViewById(R.id.toolbar);
 
-        toolbar =
-                findViewById(
-                        R.id.toolbar
-                );
+        ivServiceIcon = findViewById(R.id.ivServiceIcon);
 
 
-        tvDetectionStatus =
-                findViewById(
-                        R.id.tvDetectionStatus
-                );
+        tvReviewServiceName = findViewById(R.id.tvReviewServiceName);
+        tvReviewEmailSubject = findViewById(R.id.tvReviewEmailSubject);
+        tvEmailSubject = findViewById(R.id.tvEmailSubject);
+        tvEmailFrom = findViewById(R.id.tvEmailFrom);
+        tvEmailDate = findViewById(R.id.tvEmailDate);
+
+        tvEmailPreview = findViewById(R.id.tvEmailPreview);
+        tvLkrEstimate = findViewById(R.id.tvLkrEstimate);
+        tvRateInfo = findViewById(R.id.tvRateInfo);
+
+        etServiceName = findViewById(R.id.etServiceName);
+        etAmount = findViewById(R.id.etAmount);
+        actCurrency = findViewById(R.id.actCurrency);
+        actBillingCycle = findViewById(R.id.actBillingCycle);
+        etNextBillingDate = findViewById(R.id.etNextBillingDate);
 
 
-        etServiceName =
-                findViewById(
-                        R.id.etServiceName
-                );
-
-
-        etAmount =
-                findViewById(
-                        R.id.etAmount
-                );
-
-
-        actCurrency =
-                findViewById(
-                        R.id.actCurrency
-                );
-
-
-        tvLkrEstimate =
-                findViewById(
-                        R.id.tvLkrEstimate
-                );
-
-
-        tvRateInfo =
-                findViewById(
-                        R.id.tvRateInfo
-                );
-
-
-        actBillingCycle =
-                findViewById(
-                        R.id.actBillingCycle
-                );
-
-
-        etNextBillingDate =
-                findViewById(
-                        R.id.etNextBillingDate
-                );
-
-
-        checkConfirmed =
-                findViewById(
-                        R.id.checkConfirmed
-                );
-
-
-        btnConfirmSave =
-                findViewById(
-                        R.id.btnConfirmSave
-                );
-
-
-        btnDoNotSave =
-                findViewById(
-                        R.id.btnDoNotSave
-                );
+        btnConfirmSave = findViewById(R.id.btnConfirmSave);
+        btnDoNotSave = findViewById(R.id.btnDoNotSave);
     }
-
 
     // =========================================================
     // TOOLBAR
     // =========================================================
 
     private void setupToolbar() {
-
-        setSupportActionBar(
-                toolbar
-        );
-
+        setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
-
-            getSupportActionBar()
-                    .setDisplayHomeAsUpEnabled(
-                            true
-                    );
-
-
-            getSupportActionBar()
-                    .setDisplayShowHomeEnabled(
-                            true
-                    );
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
-
-        toolbar.setNavigationOnClickListener(
-                v -> finish()
-        );
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
-
     // =========================================================
-    // USER
+    // USER VALIDATION
     // =========================================================
 
     private boolean initializeUser() {
-
         FirebaseUser firebaseUser =
-                FirebaseAuth
-                        .getInstance()
-                        .getCurrentUser();
-
+                FirebaseAuth.getInstance().getCurrentUser();
 
         if (firebaseUser == null) {
-
             Toast.makeText(
                     this,
                     "Please login again.",
                     Toast.LENGTH_LONG
             ).show();
 
-
             finish();
-
             return false;
         }
 
-
-        userId =
-                databaseHelper
-                        .getUserIdByFirebaseUid(
-                                firebaseUser.getUid()
-                        );
-
+        userId = databaseHelper.getUserIdByFirebaseUid(
+                firebaseUser.getUid()
+        );
 
         if (userId <= 0) {
-
             Toast.makeText(
                     this,
                     "Local user record not found.",
                     Toast.LENGTH_LONG
             ).show();
 
-
             finish();
-
             return false;
         }
-
 
         return true;
     }
 
-
     // =========================================================
-    // LOAD PENDING RECORD FROM SQLITE
+    // LOAD PENDING SUBSCRIPTION FROM SQLITE
     // =========================================================
 
-    private void loadPendingSubscription(
-            int pendingId
-    ) {
-
+    private void loadPendingSubscription(int id) {
         Cursor cursor = null;
 
-
         try {
+            cursor = databaseHelper.getPendingSubscription(id);
 
-            cursor =
-                    databaseHelper
-                            .getPendingSubscription(
-                                    pendingId
-                            );
-
-
-            if (cursor == null ||
-                    !cursor.moveToFirst()) {
-
+            if (cursor == null || !cursor.moveToFirst()) {
                 Toast.makeText(
                         this,
                         "Pending subscription not found.",
                         Toast.LENGTH_LONG
                 ).show();
 
-
                 finish();
-
                 return;
             }
 
+            int userIndex = cursor.getColumnIndexOrThrow(
+                    DatabaseHelper.PENDING_USER_ID
+            );
 
-            // =================================================
-            // CHECK RECORD BELONGS TO CURRENT USER
-            // =================================================
-
-            int recordUserId =
-                    cursor.getInt(
-                            cursor.getColumnIndexOrThrow(
-                                    DatabaseHelper.PENDING_USER_ID
-                            )
-                    );
-
+            int recordUserId = cursor.getInt(userIndex);
 
             if (recordUserId != userId) {
-
                 Toast.makeText(
                         this,
                         "This subscription does not belong to the current user.",
                         Toast.LENGTH_LONG
                 ).show();
 
-
                 finish();
-
                 return;
             }
 
-
-            // =================================================
-            // SERVICE
-            // =================================================
-
-            String serviceName =
-                    getNullableString(
-                            cursor,
-                            DatabaseHelper.PENDING_SERVICE_NAME
-                    );
-
-
-            // =================================================
-            // AMOUNT
-            // =================================================
+            String serviceName = getNullableString(
+                    cursor,
+                    DatabaseHelper.PENDING_SERVICE_NAME
+            );
 
             double amount = 0.0;
 
+            int amountIndex = cursor.getColumnIndex(
+                    DatabaseHelper.PENDING_AMOUNT
+            );
 
-            int amountIndex =
-                    cursor.getColumnIndex(
-                            DatabaseHelper.PENDING_AMOUNT
-                    );
-
-
-            if (amountIndex != -1 &&
-                    !cursor.isNull(amountIndex)) {
-
-                amount =
-                        cursor.getDouble(
-                                amountIndex
-                        );
+            if (amountIndex != -1 && !cursor.isNull(amountIndex)) {
+                amount = cursor.getDouble(amountIndex);
             }
 
-
-            // =================================================
-            // CURRENCY
-            // =================================================
-
-            String currency =
-                    normalizeCurrency(
-                            getNullableString(
-                                    cursor,
-                                    DatabaseHelper.PENDING_CURRENCY
-                            )
-                    );
-
-
-            // =================================================
-            // BILLING CYCLE
-            // =================================================
-
-            String billingCycle =
+            String currency = normalizeCurrency(
                     getNullableString(
                             cursor,
-                            DatabaseHelper.PENDING_BILLING_CYCLE
-                    );
+                            DatabaseHelper.PENDING_CURRENCY
+                    )
+            );
 
+            String billingCycle = getNullableString(
+                    cursor,
+                    DatabaseHelper.PENDING_BILLING_CYCLE
+            );
 
-            // =================================================
-            // NEXT BILL
-            // =================================================
+            String nextBillingDate = getNullableString(
+                    cursor,
+                    DatabaseHelper.PENDING_NEXT_BILLING_DATE
+            );
 
-            String nextBillingDate =
-                    getNullableString(
-                            cursor,
-                            DatabaseHelper.PENDING_NEXT_BILLING_DATE
-                    );
+            gmailMessageId = getNullableString(
+                    cursor,
+                    DatabaseHelper.PENDING_GMAIL_MESSAGE_ID
+            );
 
+            suggestionId = getNullableString(
+                    cursor,
+                    DatabaseHelper.PENDING_SUGGESTION_ID
+            );
 
-            // =================================================
-            // SOURCE INFORMATION
-            // =================================================
+            emailSubject = getNullableString(
+                    cursor,
+                    DatabaseHelper.PENDING_EMAIL_SUBJECT
+            );
 
-            gmailMessageId =
-                    getNullableString(
-                            cursor,
-                            DatabaseHelper.PENDING_GMAIL_MESSAGE_ID
-                    );
+            emailSender = getNullableString(
+                    cursor,
+                    DatabaseHelper.PENDING_EMAIL_SENDER
+            );
 
+            emailBody = getNullableString(
+                    cursor,
+                    DatabaseHelper.PENDING_EMAIL_BODY
+            );
 
-            suggestionId =
-                    getNullableString(
-                            cursor,
-                            DatabaseHelper.PENDING_SUGGESTION_ID
-                    );
+            int confidenceIndex = cursor.getColumnIndex(
+                    DatabaseHelper.PENDING_CONFIDENCE
+            );
 
-
-            emailSubject =
-                    getNullableString(
-                            cursor,
-                            DatabaseHelper.PENDING_EMAIL_SUBJECT
-                    );
-
-
-            emailSender =
-                    getNullableString(
-                            cursor,
-                            DatabaseHelper.PENDING_EMAIL_SENDER
-                    );
-
-
-            emailBody =
-                    getNullableString(
-                            cursor,
-                            DatabaseHelper.PENDING_EMAIL_BODY
-                    );
-
-
-            int confidenceIndex =
-                    cursor.getColumnIndex(
-                            DatabaseHelper.PENDING_CONFIDENCE
-                    );
-
-
-            if (confidenceIndex != -1 &&
-                    !cursor.isNull(confidenceIndex)) {
-
-                subscriptionProbability =
-                        cursor.getDouble(
-                                confidenceIndex
-                        );
+            if (confidenceIndex != -1 && !cursor.isNull(confidenceIndex)) {
+                subscriptionProbability = cursor.getDouble(confidenceIndex);
             }
 
-
-            sourceType =
-                    "GMAIL";
-
-
-            // =================================================
-            // POPULATE SCREEN
-            // =================================================
+            sourceType = "GMAIL";
 
             populateFields(
                     serviceName,
@@ -536,14 +311,11 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
                     nextBillingDate
             );
 
-
+            populateEmailInformation();
             updateDetectionStatus();
 
-
         } catch (Exception e) {
-
             e.printStackTrace();
-
 
             Toast.makeText(
                     this,
@@ -551,128 +323,64 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG
             ).show();
 
-
         } finally {
-
             if (cursor != null) {
-
                 cursor.close();
             }
         }
     }
-
 
     // =========================================================
     // LOAD DIRECT INTENT DATA
     // =========================================================
 
     private void loadIntentData() {
+        String serviceName = safeString(
+                getIntent().getStringExtra("serviceName")
+        );
 
-        String serviceName =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "serviceName"
-                                )
-                );
+        double amount = getIntent().getDoubleExtra("amount", 0.0);
 
+        String currency = normalizeCurrency(
+                getIntent().getStringExtra("currency")
+        );
 
-        double amount =
-                getIntent()
-                        .getDoubleExtra(
-                                "amount",
-                                0.0
-                        );
+        String billingCycle = safeString(
+                getIntent().getStringExtra("billingCycle")
+        );
 
+        String nextBillingDate = safeString(
+                getIntent().getStringExtra("nextBillingDate")
+        );
 
-        String currency =
-                normalizeCurrency(
-                        getIntent()
-                                .getStringExtra(
-                                        "currency"
-                                )
-                );
+        sourceType = safeString(
+                getIntent().getStringExtra("sourceType")
+        );
 
+        gmailMessageId = safeString(
+                getIntent().getStringExtra("messageId")
+        );
 
-        String billingCycle =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "billingCycle"
-                                )
-                );
+        suggestionId = safeString(
+                getIntent().getStringExtra("suggestionId")
+        );
 
+        emailSubject = safeString(
+                getIntent().getStringExtra("emailSubject")
+        );
 
-        String nextBillingDate =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "nextBillingDate"
-                                )
-                );
+        emailSender = safeString(
+                getIntent().getStringExtra("emailSender")
+        );
 
+        emailBody = safeString(
+                getIntent().getStringExtra("emailBody")
+        );
 
-        sourceType =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "sourceType"
-                                )
-                );
-
-
-        gmailMessageId =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "messageId"
-                                )
-                );
-
-
-        suggestionId =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "suggestionId"
-                                )
-                );
-
-
-        emailSubject =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "emailSubject"
-                                )
-                );
-
-
-        emailSender =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "emailSender"
-                                )
-                );
-
-
-        emailBody =
-                safeString(
-                        getIntent()
-                                .getStringExtra(
-                                        "emailBody"
-                                )
-                );
-
-
-        subscriptionProbability =
-                getIntent()
-                        .getDoubleExtra(
-                                "subscriptionProbability",
-                                0.0
-                        );
-
+        subscriptionProbability = getIntent().getDoubleExtra(
+                "subscriptionProbability",
+                0.0
+        );
 
         populateFields(
                 serviceName,
@@ -682,13 +390,12 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
                 nextBillingDate
         );
 
-
+        populateEmailInformation();
         updateDetectionStatus();
     }
 
-
     // =========================================================
-    // POPULATE FIELDS
+    // POPULATE SUBSCRIPTION FIELDS
     // =========================================================
 
     private void populateFields(
@@ -698,594 +405,330 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
             String billingCycle,
             String nextBillingDate
     ) {
-
-        etServiceName.setText(
-                safeString(
-                        serviceName
-                )
-        );
-
+        etServiceName.setText(safeString(serviceName));
 
         if (amount > 0) {
-
             etAmount.setText(
-                    String.format(
-                            Locale.US,
-                            "%.2f",
-                            amount
-                    )
+                    String.format(Locale.US, "%.2f", amount)
             );
-
-
         } else {
-
-            etAmount.setText(
-                    ""
-            );
+            etAmount.setText("");
         }
 
-
-        // =====================================================
-        // AMBIGUOUS $ MUST NOT AUTO SELECT USD
-        // =====================================================
-
-        if (currency.equals("$")) {
-
-            actCurrency.setText(
-                    "",
-                    false
-            );
-
-
+        // Do not guess USD when the source currency is only "$".
+        if ("$".equals(currency)) {
+            actCurrency.setText("", false);
         } else {
-
-            actCurrency.setText(
-                    currency,
-                    false
-            );
+            actCurrency.setText(safeString(currency), false);
         }
-
 
         actBillingCycle.setText(
-                safeString(
-                        billingCycle
-                ),
+                safeString(billingCycle),
                 false
         );
 
-
         etNextBillingDate.setText(
-                safeString(
-                        nextBillingDate
-                )
+                safeString(nextBillingDate)
         );
+
+        populateEmailInformation();
     }
 
+    // =========================================================
+    // POPULATE EMAIL INFORMATION
+    // =========================================================
+
+    private void populateEmailInformation() {
+        String serviceName = getEditTextValue(etServiceName);
+
+        if (tvReviewServiceName != null) {
+            tvReviewServiceName.setText(
+                    serviceName.isEmpty()
+                            ? "Subscription"
+                            : serviceName
+            );
+        }
+
+        String subjectText = emailSubject.isEmpty()
+                ? "Email subject unavailable"
+                : emailSubject;
+
+        if (tvReviewEmailSubject != null) {
+            tvReviewEmailSubject.setText(subjectText);
+        }
+
+        if (tvEmailSubject != null) {
+            tvEmailSubject.setText(
+                    emailSubject.isEmpty()
+                            ? "Not available"
+                            : emailSubject
+            );
+        }
+
+        if (tvEmailFrom != null) {
+            tvEmailFrom.setText(
+                    emailSender.isEmpty()
+                            ? "Not available"
+                            : emailSender
+            );
+        }
+
+        if (tvEmailPreview != null) {
+            tvEmailPreview.setText(
+                    emailBody.isEmpty()
+                            ? "Email content unavailable"
+                            : emailBody
+            );
+        }
+
+        // There is no dedicated email-date field in the supplied
+        // database schema. Do not present CreatedAt as email date.
+        if (tvEmailDate != null) {
+            tvEmailDate.setText("Date unavailable");
+        }
+    }
 
     // =========================================================
     // DETECTION STATUS
     // =========================================================
 
     private void updateDetectionStatus() {
+        // Some versions of the XML do not include this TextView.
 
-        if (subscriptionProbability > 0) {
-
-            tvDetectionStatus.setText(
-                    String.format(
-                            Locale.US,
-                            "Subscription detected • %.1f%% confidence",
-                            subscriptionProbability * 100.0
-                    )
-            );
-
-
-        } else {
-
-            tvDetectionStatus.setText(
-                    "Subscription detected"
-            );
-        }
     }
 
-
     // =========================================================
-    // CURRENCY
+    // CURRENCY DROPDOWN
     // =========================================================
 
     private void setupCurrencyDropdown() {
-
         String[] currencies = {
-
-                "LKR",
-                "USD",
-                "EUR",
-                "GBP",
-                "AUD",
-                "CAD",
-                "SGD",
-                "INR",
-                "JPY"
+                "LKR", "USD", "EUR", "GBP", "AUD",
+                "CAD", "SGD", "INR", "JPY"
         };
 
-
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(
-
-                        this,
-
-                        android.R.layout
-                                .simple_dropdown_item_1line,
-
-                        currencies
-                );
-
-
-        actCurrency.setAdapter(
-                adapter
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                currencies
         );
 
+        actCurrency.setAdapter(adapter);
 
         actCurrency.setOnItemClickListener(
-                (parent, view, position, id) ->
-                        updateLkrEstimate()
+                (parent, view, position, id) -> updateLkrEstimate()
         );
     }
 
-
     // =========================================================
-    // BILLING CYCLE
+    // BILLING CYCLE DROPDOWN
     // =========================================================
 
     private void setupBillingCycleDropdown() {
-
         String[] billingCycles = {
-
-                "Monthly",
-                "Weekly",
-                "Quarterly",
-                "Yearly"
+                "Monthly", "Weekly", "Quarterly", "Yearly"
         };
 
-
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(
-
-                        this,
-
-                        android.R.layout
-                                .simple_dropdown_item_1line,
-
-                        billingCycles
-                );
-
-
-        actBillingCycle.setAdapter(
-                adapter
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                billingCycles
         );
-    }
 
+        actBillingCycle.setAdapter(adapter);
+    }
 
     // =========================================================
     // DATE PICKER
     // =========================================================
 
     private void setupDatePicker() {
+        etNextBillingDate.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
 
-        etNextBillingDate.setOnClickListener(
-                v -> {
+            String currentDate = getEditTextValue(etNextBillingDate);
 
-                    Calendar calendar =
-                            Calendar.getInstance();
+            if (!currentDate.isEmpty()) {
+                try {
+                    String[] parts = currentDate.split("-");
 
-
-                    String currentDate =
-                            getEditTextValue(
-                                    etNextBillingDate
-                            );
-
-
-                    if (!currentDate.isEmpty()) {
-
-                        try {
-
-                            String[] parts =
-                                    currentDate.split(
-                                            "-"
-                                    );
-
-
-                            if (parts.length == 3) {
-
-                                calendar.set(
-
-                                        Integer.parseInt(
-                                                parts[0]
-                                        ),
-
-                                        Integer.parseInt(
-                                                parts[1]
-                                        ) - 1,
-
-                                        Integer.parseInt(
-                                                parts[2]
-                                        )
-                                );
-                            }
-
-
-                        } catch (Exception ignored) {
-
-                        }
+                    if (parts.length == 3) {
+                        calendar.set(
+                                Integer.parseInt(parts[0]),
+                                Integer.parseInt(parts[1]) - 1,
+                                Integer.parseInt(parts[2])
+                        );
                     }
-
-
-                    DatePickerDialog dialog =
-                            new DatePickerDialog(
-
-                                    ReviewSubscriptionActivity.this,
-
-                                    (view,
-                                     year,
-                                     month,
-                                     dayOfMonth) -> {
-
-                                        String selectedDate =
-                                                String.format(
-
-                                                        Locale.US,
-
-                                                        "%04d-%02d-%02d",
-
-                                                        year,
-
-                                                        month + 1,
-
-                                                        dayOfMonth
-                                                );
-
-
-                                        etNextBillingDate.setText(
-                                                selectedDate
-                                        );
-                                    },
-
-                                    calendar.get(
-                                            Calendar.YEAR
-                                    ),
-
-                                    calendar.get(
-                                            Calendar.MONTH
-                                    ),
-
-                                    calendar.get(
-                                            Calendar.DAY_OF_MONTH
-                                    )
-                            );
-
-
-                    dialog.show();
+                } catch (Exception ignored) {
+                    // Use today's date if the stored date is invalid.
                 }
-        );
+            }
+
+            DatePickerDialog dialog = new DatePickerDialog(
+                    ReviewSubscriptionActivity.this,
+                    (view, year, month, dayOfMonth) -> {
+                        String selectedDate = String.format(
+                                Locale.US,
+                                "%04d-%02d-%02d",
+                                year,
+                                month + 1,
+                                dayOfMonth
+                        );
+
+                        etNextBillingDate.setText(selectedDate);
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+
+            dialog.show();
+        });
     }
 
-
     // =========================================================
-    // LISTENERS
+    // BUTTON LISTENERS
     // =========================================================
 
     private void setupListeners() {
+        // If the XML contains a confirmation checkbox, require it.
+        // If it does not, do not crash or permanently disable saving.
+        if (checkConfirmed != null) {
+            btnConfirmSave.setEnabled(false);
 
-        btnConfirmSave.setEnabled(
-                false
-        );
-
-
-        checkConfirmed.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> {
-
-                    btnConfirmSave.setEnabled(
-                            isChecked
-                    );
-                }
-        );
-
+            checkConfirmed.setOnCheckedChangeListener(
+                    (buttonView, isChecked) ->
+                            btnConfirmSave.setEnabled(isChecked)
+            );
+        } else {
+            btnConfirmSave.setEnabled(true);
+        }
 
         btnConfirmSave.setOnClickListener(
                 v -> saveReviewedSubscription()
         );
 
-
         btnDoNotSave.setOnClickListener(
                 v -> ignorePendingSubscription()
         );
 
-
         etAmount.setOnFocusChangeListener(
                 (v, hasFocus) -> {
-
                     if (!hasFocus) {
-
                         updateLkrEstimate();
                     }
                 }
         );
     }
 
-
     // =========================================================
     // SAVE REVIEWED SUBSCRIPTION
     // =========================================================
 
     private void saveReviewedSubscription() {
+        String serviceName = getEditTextValue(etServiceName);
+        String amountText = getEditTextValue(etAmount);
 
-        // =====================================================
-        // VALIDATION
-        // =====================================================
+        String currency = normalizeCurrency(
+                actCurrency.getText().toString()
+        );
 
-        String serviceName =
-                getEditTextValue(
-                        etServiceName
-                );
+        String billingCycle = safeString(
+                actBillingCycle.getText().toString()
+        );
 
-
-        String amountText =
-                getEditTextValue(
-                        etAmount
-                );
-
-
-        String currency =
-                normalizeCurrency(
-                        safeString(
-                                actCurrency
-                                        .getText()
-                                        .toString()
-                        )
-                );
-
-
-        String billingCycle =
-                safeString(
-                        actBillingCycle
-                                .getText()
-                                .toString()
-                );
-
-
-        String nextBillingDate =
-                getEditTextValue(
-                        etNextBillingDate
-                );
-
+        String nextBillingDate = getEditTextValue(etNextBillingDate);
 
         if (serviceName.isEmpty()) {
-
-            etServiceName.setError(
-                    "Service name is required"
-            );
-
+            etServiceName.setError("Service name is required");
             etServiceName.requestFocus();
-
             return;
         }
-
 
         if (amountText.isEmpty()) {
-
-            etAmount.setError(
-                    "Amount is required"
-            );
-
+            etAmount.setError("Amount is required");
             etAmount.requestFocus();
-
             return;
         }
-
 
         double amount;
 
-
         try {
-
-            amount =
-                    Double.parseDouble(
-                            amountText
-                    );
-
-
+            amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-
-            etAmount.setError(
-                    "Enter a valid amount"
-            );
-
+            etAmount.setError("Enter a valid amount");
             etAmount.requestFocus();
-
             return;
         }
-
 
         if (amount <= 0) {
-
-            etAmount.setError(
-                    "Amount must be greater than 0"
-            );
-
+            etAmount.setError("Amount must be greater than 0");
+            etAmount.requestFocus();
             return;
         }
 
-
-        if (currency.isEmpty() ||
-                currency.equals("$")) {
-
-            actCurrency.setError(
-                    "Please select the exact currency"
-            );
-
+        if (currency.isEmpty() || "$".equals(currency)) {
+            actCurrency.setError("Please select the exact currency");
             return;
         }
-
 
         if (billingCycle.isEmpty()) {
-
-            actBillingCycle.setError(
-                    "Please select billing cycle"
-            );
-
+            actBillingCycle.setError("Please select billing cycle");
             return;
         }
-
 
         if (nextBillingDate.isEmpty()) {
-
-            etNextBillingDate.setError(
-                    "Next billing date is required"
-            );
-
+            etNextBillingDate.setError("Next billing date is required");
             return;
         }
 
-
-        if (!checkConfirmed.isChecked()) {
-
+        if (checkConfirmed != null && !checkConfirmed.isChecked()) {
             Toast.makeText(
                     this,
                     "Please confirm that you checked the details.",
                     Toast.LENGTH_SHORT
             ).show();
-
             return;
         }
 
-
-        // =====================================================
-        // DUPLICATE CHECK AGAIN
-        //
-        // Important because user may edit the service name.
-        // =====================================================
-
-        boolean exists =
-                databaseHelper
-                        .subscriptionExists(
-                                userId,
-                                serviceName
-                        );
-
+        // Prevent duplicate active subscriptions.
+        boolean exists = databaseHelper.subscriptionExists(
+                userId,
+                serviceName
+        );
 
         if (exists) {
-
             Toast.makeText(
                     this,
-                    serviceName
-                            + " already exists in active subscriptions.",
+                    serviceName + " already exists in active subscriptions.",
                     Toast.LENGTH_LONG
             ).show();
-
             return;
         }
 
-
-        // =====================================================
-        // INSERT INTO ACTIVE SUBSCRIPTION TABLE
-        // =====================================================
-
-        long insertedId =
-                databaseHelper
-                        .insertSubscription(
-
-                                userId,
-
-                                serviceName,
-
-                                amount,
-
-                                currency,
-
-                                billingCycle,
-
-                                nextBillingDate
-                        );
-
+        // Save the reviewed subscription.
+        long insertedId = databaseHelper.insertSubscription(
+                userId,
+                serviceName,
+                amount,
+                currency,
+                billingCycle,
+                nextBillingDate
+        );
 
         if (insertedId == -1) {
-
             Toast.makeText(
                     this,
                     "Failed to save subscription.",
                     Toast.LENGTH_LONG
             ).show();
-
             return;
         }
 
-
-        // =====================================================
-        // MARK PENDING RECORD AS SAVED
-        // =====================================================
-
+        // Mark the source pending record as saved.
         if (pendingId > 0) {
-
-            databaseHelper
-                    .markPendingSubscriptionSaved(
-                            pendingId
-                    );
+            databaseHelper.markPendingSubscriptionSaved(pendingId);
         }
-
-
-        System.out.println(
-                "========================================"
-        );
-
-        System.out.println(
-                "SUBSCRIPTION REVIEW CONFIRMED"
-        );
-
-        System.out.println(
-                "ACTIVE SUBSCRIPTION ID: "
-                        + insertedId
-        );
-
-        System.out.println(
-                "PENDING ID: "
-                        + pendingId
-        );
-
-        System.out.println(
-                "SERVICE: "
-                        + serviceName
-        );
-
-        System.out.println(
-                "AMOUNT: "
-                        + currency
-                        + " "
-                        + amount
-        );
-
-        System.out.println(
-                "BILLING CYCLE: "
-                        + billingCycle
-        );
-
-        System.out.println(
-                "NEXT BILLING DATE: "
-                        + nextBillingDate
-        );
-
-        System.out.println(
-                "GMAIL MESSAGE ID: "
-                        + gmailMessageId
-        );
-
-        System.out.println(
-                "SUGGESTION ID: "
-                        + suggestionId
-        );
-
-        System.out.println(
-                "========================================"
-        );
-
 
         Toast.makeText(
                 this,
@@ -1293,59 +736,33 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
                 Toast.LENGTH_SHORT
         ).show();
 
-
-        /*
-         * We just finish this screen.
-         *
-         * PendingSubscriptionsActivity.onResume()
-         * will reload its list automatically.
-         */
-
-        setResult(
-                RESULT_OK
-        );
-
-
+        setResult(RESULT_OK);
         finish();
     }
 
-
     // =========================================================
-    // DO NOT SAVE / IGNORE
+    // REJECT / DO NOT SAVE
     // =========================================================
 
     private void ignorePendingSubscription() {
-
         if (pendingId > 0) {
-
             int result =
-                    databaseHelper
-                            .markPendingSubscriptionIgnored(
-                                    pendingId
-                            );
-
+                    databaseHelper.markPendingSubscriptionIgnored(pendingId);
 
             if (result > 0) {
-
                 Toast.makeText(
                         this,
                         "Subscription message ignored.",
                         Toast.LENGTH_SHORT
                 ).show();
-
-
             } else {
-
                 Toast.makeText(
                         this,
                         "Could not update subscription message.",
                         Toast.LENGTH_LONG
                 ).show();
             }
-
-
         } else {
-
             Toast.makeText(
                     this,
                     "Subscription was not saved.",
@@ -1353,240 +770,128 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
             ).show();
         }
 
-
-        setResult(
-                RESULT_CANCELED
-        );
-
-
+        setResult(RESULT_CANCELED);
         finish();
     }
 
-
     // =========================================================
     // LKR ESTIMATE
-    //
-    // Proper /convert API integration will be added later.
-    // Do not invent exchange rates.
+    // No invented exchange rate is used.
     // =========================================================
 
     private void updateLkrEstimate() {
+        String amountText = getEditTextValue(etAmount);
 
-        String amountText =
-                getEditTextValue(
-                        etAmount
-                );
-
-
-        String currency =
-                normalizeCurrency(
-                        safeString(
-                                actCurrency
-                                        .getText()
-                                        .toString()
-                        )
-                );
-
+        String currency = normalizeCurrency(
+                actCurrency.getText().toString()
+        );
 
         if (amountText.isEmpty()) {
-
-            tvLkrEstimate.setText(
-                    "Rs. —"
-            );
-
-
-            tvRateInfo.setText(
-                    "Enter an amount first."
-            );
-
-
+            tvLkrEstimate.setText("Rs. —");
+            tvRateInfo.setText("Enter an amount first.");
             return;
         }
-
 
         double amount;
 
-
         try {
-
-            amount =
-                    Double.parseDouble(
-                            amountText
-                    );
-
-
+            amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-
-            tvLkrEstimate.setText(
-                    "Rs. —"
-            );
-
-
-            tvRateInfo.setText(
-                    "Enter a valid amount."
-            );
-
-
+            tvLkrEstimate.setText("Rs. —");
+            tvRateInfo.setText("Enter a valid amount.");
             return;
         }
 
-
-        if (currency.equals("LKR")) {
-
+        if ("LKR".equals(currency)) {
             tvLkrEstimate.setText(
-                    String.format(
-                            Locale.US,
-                            "Rs. %,.2f",
-                            amount
-                    )
+                    String.format(Locale.US, "Rs. %,.2f", amount)
             );
-
 
             tvRateInfo.setText(
                     "Original amount is already in LKR."
             );
-
-
             return;
         }
 
+        tvLkrEstimate.setText("Rs. —");
 
-        tvLkrEstimate.setText(
-                "Rs. —"
-        );
-
-
-        if (currency.isEmpty() ||
-                currency.equals("$")) {
-
+        if (currency.isEmpty() || "$".equals(currency)) {
             tvRateInfo.setText(
                     "Select the exact original currency."
             );
-
-
         } else {
-
             tvRateInfo.setText(
                     "LKR conversion will be added using the exchange-rate API."
             );
         }
     }
 
-
     // =========================================================
     // CURRENCY NORMALIZATION
     // =========================================================
 
-    private String normalizeCurrency(
-            String value
-    ) {
-
-        String currency =
-                safeString(
-                        value
-                );
-
+    private String normalizeCurrency(String value) {
+        String currency = safeString(value);
 
         if (currency.isEmpty()) {
-
             return "";
         }
 
-
-        String upper =
-                currency.toUpperCase(
-                        Locale.US
-                );
-
+        String upper = currency.toUpperCase(Locale.US);
 
         if (upper.equals("RS") ||
                 upper.equals("RS.") ||
                 upper.equals("LKR")) {
-
             return "LKR";
         }
 
-
-        if (currency.equals("€") ||
-                upper.equals("EUR")) {
-
+        if (currency.equals("€") || upper.equals("EUR")) {
             return "EUR";
         }
 
-
-        if (currency.equals("£") ||
-                upper.equals("GBP")) {
-
+        if (currency.equals("£") || upper.equals("GBP")) {
             return "GBP";
         }
 
-
-        if (currency.equals("₹") ||
-                upper.equals("INR")) {
-
+        if (currency.equals("₹") || upper.equals("INR")) {
             return "INR";
         }
 
-
         if (upper.equals("US$")) {
-
             return "USD";
         }
 
-
         if (upper.equals("A$")) {
-
             return "AUD";
         }
 
-
         if (upper.equals("C$")) {
-
             return "CAD";
         }
 
-
         if (upper.equals("S$")) {
-
             return "SGD";
         }
 
-
-        /*
-         * "$" alone is ambiguous.
-         */
-
+        // A bare dollar sign is ambiguous.
         if (currency.equals("$")) {
-
             return "$";
         }
-
 
         return upper;
     }
 
-
     // =========================================================
-    // GET EDIT TEXT VALUE
+    // EDIT TEXT HELPER
     // =========================================================
 
-    private String getEditTextValue(
-            TextInputEditText editText
-    ) {
-
-        if (editText == null ||
-                editText.getText() == null) {
-
+    private String getEditTextValue(TextInputEditText editText) {
+        if (editText == null || editText.getText() == null) {
             return "";
         }
 
-
-        return editText
-                .getText()
-                .toString()
-                .trim();
+        return editText.getText().toString().trim();
     }
-
 
     // =========================================================
     // NULLABLE CURSOR STRING
@@ -1596,46 +901,20 @@ public class ReviewSubscriptionActivity extends AppCompatActivity {
             Cursor cursor,
             String columnName
     ) {
+        int index = cursor.getColumnIndex(columnName);
 
-        int index =
-                cursor.getColumnIndex(
-                        columnName
-                );
-
-
-        if (index == -1 ||
-                cursor.isNull(index)) {
-
+        if (index == -1 || cursor.isNull(index)) {
             return "";
         }
 
-
-        String value =
-                cursor.getString(
-                        index
-                );
-
-
-        return safeString(
-                value
-        );
+        return safeString(cursor.getString(index));
     }
-
 
     // =========================================================
     // SAFE STRING
     // =========================================================
 
-    private String safeString(
-            String value
-    ) {
-
-        if (value == null) {
-
-            return "";
-        }
-
-
-        return value.trim();
+    private String safeString(String value) {
+        return value == null ? "" : value.trim();
     }
 }

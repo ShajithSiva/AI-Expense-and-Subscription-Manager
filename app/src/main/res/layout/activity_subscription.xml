@@ -230,7 +230,8 @@
                             android:layout_weight="1"
                             android:background="#E8F7EF"
                             android:orientation="vertical"
-                            android:padding="12dp">
+                            android:padding="12dp"
+                            app:cardCornerRadius="26dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -258,7 +259,8 @@
                             android:layout_weight="1"
                             android:background="#FFF4D9"
                             android:orientation="vertical"
-                            android:padding="12dp">
+                            android:padding="12dp"
+                            app:cardCornerRadius="26dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -286,7 +288,8 @@
                             android:layout_weight="1"
                             android:background="#FCE9E7"
                             android:orientation="vertical"
-                            android:padding="12dp">
+                            android:padding="12dp"
+                            app:cardCornerRadius="26dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -714,13 +717,20 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="80dp"
         android:layout_gravity="bottom"
-        android:background="#FFFFFF"
-        android:elevation="8dp"
-        app:itemIconTint="@color/bottom_nav_colors"
-        app:itemTextColor="@color/bottom_nav_colors"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:menu="@menu/bottom_menu"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_menu" />
+        app:itemHorizontalTranslationEnabled="false"
+        app:itemIconTint="@color/nav_item_colors"
+        app:itemTextColor="@color/nav_item_colors" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

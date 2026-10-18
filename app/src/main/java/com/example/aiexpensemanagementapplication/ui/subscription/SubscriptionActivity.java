@@ -2403,7 +2403,28 @@ public class SubscriptionActivity extends AppCompatActivity {
                         //
                         // NOT ACTIVE SUBSCRIPTION.
                         // =================================================
+                        String predictedLabel = safeString(
+                                prediction.getPredictedLabel()
+                        );
 
+                        if (!"Subscription".equalsIgnoreCase(predictedLabel)) {
+
+                            System.out.println(
+                                    "NON-SUBSCRIPTION SKIPPED: " + subject
+                            );
+
+                            // This email is not a subscription.
+                            // Do not insert it into the pending list.
+                            processNextEmail(
+                                    messages,
+                                    index + 1,
+                                    detectedCount,
+                                    newPendingCount,
+                                    skippedCount + 1
+                            );
+
+                            return;
+                        }
                         long pendingId =
                                 databaseHelper
                                         .insertPendingSubscription(

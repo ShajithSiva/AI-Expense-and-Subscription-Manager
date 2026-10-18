@@ -19,27 +19,20 @@
     app:strokeColor="#E5E7EB"
     app:strokeWidth="1dp">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
 
-
-        <!-- ================================================= -->
         <!-- TOP ROW -->
-        <!-- ================================================= -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-
             <!-- ICON -->
-
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
@@ -56,9 +49,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-
-            <!-- SERVICE -->
-
+            <!-- SERVICE DETAILS -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -90,9 +81,7 @@
 
             </LinearLayout>
 
-
             <!-- STATUS -->
-
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipStatus"
                 android:layout_width="wrap_content"
@@ -107,11 +96,7 @@
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
         <!-- DIVIDER -->
-        <!-- ================================================= -->
-
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -119,19 +104,13 @@
             android:layout_marginBottom="12dp"
             android:background="#EEF0F2" />
 
-
-        <!-- ================================================= -->
-        <!-- DETAILS -->
-        <!-- ================================================= -->
-
+        <!-- AMOUNT AND BILLING CYCLE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-
             <!-- AMOUNT -->
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -158,9 +137,7 @@
 
             </LinearLayout>
 
-
-            <!-- CYCLE -->
-
+            <!-- BILLING CYCLE -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -189,11 +166,7 @@
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- NEXT BILL -->
-        <!-- ================================================= -->
-
+        <!-- NEXT BILLING DATE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -219,22 +192,9 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvConfidence"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="AI confidence: 99.2%"
-                android:textColor="#159A68"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
         </LinearLayout>
 
-
-        <!-- ================================================= -->
         <!-- CLICK MESSAGE -->
-        <!-- ================================================= -->
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

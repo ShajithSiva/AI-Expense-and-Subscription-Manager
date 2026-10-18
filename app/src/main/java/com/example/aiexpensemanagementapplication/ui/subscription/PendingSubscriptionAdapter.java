@@ -20,50 +20,25 @@ public class PendingSubscriptionAdapter
         extends RecyclerView.Adapter<
         PendingSubscriptionAdapter.PendingViewHolder> {
 
-    // =========================================================
-    // LISTENER
-    // =========================================================
-
     public interface OnPendingSubscriptionClickListener {
-
         void onPendingSubscriptionClick(
                 PendingSubscription subscription
         );
     }
 
-
-    // =========================================================
-    // FIELDS
-    // =========================================================
-
     private final Context context;
-
     private final ArrayList<PendingSubscription> pendingList;
-
     private final OnPendingSubscriptionClickListener listener;
-
-
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
 
     public PendingSubscriptionAdapter(
             Context context,
             ArrayList<PendingSubscription> pendingList,
             OnPendingSubscriptionClickListener listener
     ) {
-
         this.context = context;
-
         this.pendingList = pendingList;
-
         this.listener = listener;
     }
-
-
-    // =========================================================
-    // CREATE VIEW HOLDER
-    // =========================================================
 
     @NonNull
     @Override
@@ -71,265 +46,131 @@ public class PendingSubscriptionAdapter
             @NonNull ViewGroup parent,
             int viewType
     ) {
-
-        View view =
-                LayoutInflater
-                        .from(context)
-                        .inflate(
-                                R.layout.item_pending_subscription,
-                                parent,
-                                false
-                        );
-
-
-        return new PendingViewHolder(
-                view
+        View view = LayoutInflater.from(context).inflate(
+                R.layout.item_pending_subscription,
+                parent,
+                false
         );
+
+        return new PendingViewHolder(view);
     }
-
-
-    // =========================================================
-    // BIND DATA
-    // =========================================================
 
     @Override
     public void onBindViewHolder(
             @NonNull PendingViewHolder holder,
             int position
     ) {
-
         PendingSubscription subscription =
-                pendingList.get(
-                        position
-                );
-
+                pendingList.get(position);
 
         if (subscription == null) {
-
             return;
         }
 
-
-        // =====================================================
-        // SERVICE NAME
-        // =====================================================
-
-        String serviceName =
-                safeString(
-                        subscription.getServiceName()
-                );
-
-
-        if (serviceName.isEmpty()) {
-
-            serviceName =
-                    "Unknown Service";
-        }
-
-
-        holder.tvServiceName.setText(
-                serviceName
+        // Service name
+        String serviceName = safeString(
+                subscription.getServiceName()
         );
 
+        holder.tvServiceName.setText(
+                serviceName.isEmpty()
+                        ? "Unknown Service"
+                        : serviceName
+        );
 
-        // =====================================================
-        // AMOUNT
-        // =====================================================
-
+        // Amount
         holder.tvAmount.setText(
                 subscription.getDisplayAmount()
         );
 
-
-        // =====================================================
-        // BILLING CYCLE
-        // =====================================================
-
+        // Billing cycle
         holder.tvBillingCycle.setText(
                 subscription.getDisplayBillingCycle()
         );
 
-
-        // =====================================================
-        // NEXT BILLING DATE
-        // =====================================================
-
+        // Next billing date
         holder.tvNextBillingDate.setText(
                 subscription.getDisplayNextBillingDate()
         );
 
-
-        // =====================================================
-        // CONFIDENCE
-        // =====================================================
-
-        holder.tvConfidence.setText(
-                "AI confidence: "
-                        + subscription.getDisplayConfidence()
+        // Email subject
+        String emailSubject = safeString(
+                subscription.getEmailSubject()
         );
 
-
-        // =====================================================
-        // EMAIL SUBJECT
-        // =====================================================
-
-        String emailSubject =
-                safeString(
-                        subscription.getEmailSubject()
-                );
-
-
-        if (emailSubject.isEmpty()) {
-
-            holder.tvEmailSubject.setText(
-                    "Detected from Gmail"
-            );
-
-
-        } else {
-
-            holder.tvEmailSubject.setText(
-                    emailSubject
-            );
-        }
-
-
-        // =====================================================
-        // STATUS
-        // =====================================================
-
-        holder.chipStatus.setText(
-                "Review"
+        holder.tvEmailSubject.setText(
+                emailSubject.isEmpty()
+                        ? "Detected from Gmail"
+                        : emailSubject
         );
 
+        // Review status
+        holder.chipStatus.setText("Review");
 
-        // =====================================================
-        // CLICK
-        // =====================================================
-
-        holder.cardPendingSubscription
-                .setOnClickListener(
-                        v -> {
-
-                            if (listener != null) {
-
-                                listener
-                                        .onPendingSubscriptionClick(
-                                                subscription
-                                        );
-                            }
-                        }
-                );
+        // Open review screen
+        holder.cardPendingSubscription.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onPendingSubscriptionClick(subscription);
+            }
+        });
     }
-
-
-    // =========================================================
-    // ITEM COUNT
-    // =========================================================
 
     @Override
     public int getItemCount() {
-
-        if (pendingList == null) {
-
-            return 0;
-        }
-
-
-        return pendingList.size();
+        return pendingList == null
+                ? 0
+                : pendingList.size();
     }
 
-
-    // =========================================================
-    // SAFE STRING
-    // =========================================================
-
-    private String safeString(
-            String value
-    ) {
-
-        if (value == null) {
-
-            return "";
-        }
-
-
-        return value.trim();
+    private String safeString(String value) {
+        return value == null ? "" : value.trim();
     }
-
-
-    // =========================================================
-    // VIEW HOLDER
-    // =========================================================
 
     public static class PendingViewHolder
             extends RecyclerView.ViewHolder {
 
         MaterialCardView cardPendingSubscription;
-
         TextView tvServiceName;
-
         TextView tvAmount;
-
         TextView tvBillingCycle;
-
         TextView tvNextBillingDate;
-
-        TextView tvConfidence;
-
         TextView tvEmailSubject;
-
         Chip chipStatus;
-
 
         public PendingViewHolder(
                 @NonNull View itemView
         ) {
-
             super(itemView);
-
 
             cardPendingSubscription =
                     itemView.findViewById(
                             R.id.cardPendingSubscription
                     );
 
-
             tvServiceName =
                     itemView.findViewById(
                             R.id.tvServiceName
                     );
-
 
             tvAmount =
                     itemView.findViewById(
                             R.id.tvAmount
                     );
 
-
             tvBillingCycle =
                     itemView.findViewById(
                             R.id.tvBillingCycle
                     );
-
 
             tvNextBillingDate =
                     itemView.findViewById(
                             R.id.tvNextBillingDate
                     );
 
-
-            tvConfidence =
-                    itemView.findViewById(
-                            R.id.tvConfidence
-                    );
-
-
             tvEmailSubject =
                     itemView.findViewById(
                             R.id.tvEmailSubject
                     );
-
 
             chipStatus =
                     itemView.findViewById(

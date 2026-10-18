@@ -5,13 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6FA"
+    android:background="#F5F7FB"
     tools:context=".ui.dashboard.DashboardActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- APP HEADER -->
         <LinearLayout
             android:id="@+id/layoutAppBar"
             android:layout_width="0dp"
@@ -21,9 +22,9 @@
             android:orientation="horizontal"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintEnd_toEndOf="parent">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -36,7 +37,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Good Morning,"
-                    android:textColor="#667085"
+                    android:textColor="#707070"
                     android:textSize="14sp" />
 
                 <TextView
@@ -44,28 +45,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
+                    android:ellipsize="end"
                     android:text="User"
-                    android:textColor="#172033"
+                    android:textColor="#14213D"
                     android:textSize="23sp"
                     android:textStyle="bold"
-                    tools:text="Shajith" />
+                    tools:text="User Name" />
+
             </LinearLayout>
 
+            <!-- NOTIFICATION -->
             <FrameLayout
                 android:id="@+id/layoutNotification"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginEnd="12dp"
-                android:background="#F4F6FA">
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="14dp">
 
                 <ImageView
                     android:id="@+id/imgNotification"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:clickable="true"
-                    android:contentDescription="Notifications"
                     android:focusable="true"
+                    android:contentDescription="Notifications"
                     android:src="@drawable/notification" />
 
                 <TextView
@@ -76,13 +79,14 @@
                     android:background="@drawable/badge_red"
                     android:gravity="center"
                     android:text="0"
-                    android:textColor="@android:color/black"
+                    android:textColor="#FFFFFF"
                     android:textSize="10sp"
                     android:textStyle="bold"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
+                    android:visibility="gone" />
+
             </FrameLayout>
 
+            <!-- PROFILE -->
             <FrameLayout
                 android:id="@+id/layoutProfile"
                 android:layout_width="48dp"
@@ -93,8 +97,8 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:clickable="true"
-                    android:contentDescription="Profile"
                     android:focusable="true"
+                    android:contentDescription="Profile"
                     android:scaleType="centerCrop"
                     android:src="@drawable/profile"
                     app:shapeAppearanceOverlay="@drawable/bg_icon_circle" />
@@ -104,18 +108,22 @@
                     android:layout_height="10dp"
                     android:layout_gravity="bottom|end"
                     android:background="@drawable/status" />
+
             </FrameLayout>
+
         </LinearLayout>
 
+        <!-- HEADER DIVIDER -->
         <View
             android:id="@+id/headerDivider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:background="#E4E9EF"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:background="#E5E7EB"
+            app:layout_constraintTop_toBottomOf="@id/layoutAppBar"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layoutAppBar" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- PERSONAL / FAMILY SWITCH -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardDashboardMode"
             android:layout_width="0dp"
@@ -123,13 +131,13 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="14dp"
             android:layout_marginEnd="20dp"
-            app:cardBackgroundColor="#E9EDF2"
-            app:cardCornerRadius="17dp"
+            app:cardBackgroundColor="#E9EEF5"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/headerDivider"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerDivider">
+            app:layout_constraintEnd_toEndOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -145,10 +153,10 @@
                     android:text="Personal"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:backgroundTint="#159A68"
-                    app:cornerRadius="13dp"
+                    app:cornerRadius="12dp"
                     app:elevation="0dp"
                     app:strokeWidth="0dp" />
 
@@ -160,55 +168,67 @@
                     android:layout_weight="1"
                     android:text="Family"
                     android:textAllCaps="false"
-                    android:textColor="#667085"
-                    android:textSize="15sp"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    app:backgroundTint="#E9EDF2"
-                    app:cornerRadius="13dp"
+                    app:backgroundTint="#E9EEF5"
+                    app:cornerRadius="12dp"
                     app:elevation="0dp"
                     app:strokeWidth="0dp" />
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- DASHBOARD FRAGMENT CONTAINER -->
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/dashboardContainer"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
-            android:background="#F4F6FA"
-            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:background="#F5F7FB"
             app:layout_constraintTop_toBottomOf="@id/cardDashboardMode"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             tools:layout="@layout/fragment_personal_dashboard" />
 
+        <!-- BOTTOM NAVIGATION -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigation"
             android:layout_width="0dp"
-            android:layout_height="70dp"
-            android:background="#FFFFFF"
-            android:elevation="8dp"
-            app:itemIconTint="@color/bottom_nav_colors"
-            app:itemTextColor="@color/bottom_nav_colors"
+            android:layout_height="80dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bg_bottom_nav"
+            android:elevation="12dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            app:menu="@menu/bottom_menu"
             app:labelVisibilityMode="labeled"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:itemHorizontalTranslationEnabled="false"
+            app:itemIconTint="@color/nav_item_colors"
+            app:itemTextColor="@color/nav_item_colors"
             app:layout_constraintStart_toStartOf="parent"
-            app:menu="@menu/bottom_menu" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- ADD EXPENSE FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddExpense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="90dp"
+        android:layout_marginBottom="96dp"
         android:contentDescription="Add Expense"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/ic_add"
         app:backgroundTint="#159A68"
-        app:borderWidth="0dp"
-        app:elevation="8dp"
-        app:tint="#FFFFFF" />
+        app:tint="#FFFFFF"
+        app:elevation="10dp"
+        app:borderWidth="0dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
