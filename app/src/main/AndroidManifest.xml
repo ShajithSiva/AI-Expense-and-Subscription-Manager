@@ -21,7 +21,7 @@
     </queries>
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/logo"
@@ -57,6 +57,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.onboarding.OnboardingActivity"
+            android:exported="false" />
+
+
         <activity
             android:name=".ui.auth.WelcomeActivity"
             android:exported="false" />

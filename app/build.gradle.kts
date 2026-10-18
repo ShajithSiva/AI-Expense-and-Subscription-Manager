@@ -48,6 +48,8 @@ android {
 
 dependencies {
 
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+
     // TensorFlow Lite
     implementation("org.tensorflow:tensorflow-lite:2.17.0")
 
