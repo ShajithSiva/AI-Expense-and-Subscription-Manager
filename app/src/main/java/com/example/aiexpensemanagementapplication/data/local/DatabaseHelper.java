@@ -3994,6 +3994,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
+
+    // Monthly transaction amount (yyyy-MM)
+    public double getMonthlyTransactionTotal(int userId, String type, String month) {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT IFNULL(SUM(" + AMOUNT + "), 0) FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=?" +
+                        " AND " + TRANSACTION_TYPE + "=?" +
+                        " AND substr(" + TRANSACTION_DATE + ", 1, 7)=?",
+                new String[]{String.valueOf(userId), type, month}
+        );
+
+        double total = 0;
+        if (cursor.moveToFirst()) {
+            total = cursor.getDouble(0);
+        }
+        cursor.close();
+        return total;
+    }
+
+    // Monthly number of transactions (yyyy-MM)
+    public int getMonthlyTransactionCount(int userId, String type, String month) {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=?" +
+                        " AND " + TRANSACTION_TYPE + "=?" +
+                        " AND substr(" + TRANSACTION_DATE + ", 1, 7)=?",
+                new String[]{String.valueOf(userId), type, month}
+        );
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
+
     public double getMonthlyIncome(int userId, String month) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -4551,6 +4593,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return entries;
     }
+
+
+    public List<Entry> getWeeklyExpenseEntriesForMonth(
+            int userId, String month) {
+
+        ArrayList<Entry> entries = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String sql =
+                "SELECT strftime('%w'," + TRANSACTION_DATE + "), " +
+                        "SUM(" + AMOUNT + ") " +
+                        "FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=?" +
+                        " AND " + TRANSACTION_TYPE + "='Expense'" +
+                        " AND substr(" + TRANSACTION_DATE + ",1,7)=?" +
+                        " GROUP BY strftime('%w'," + TRANSACTION_DATE + ")" +
+                        " ORDER BY 1";
+
+        Cursor cursor = db.rawQuery(
+                sql,
+                new String[]{String.valueOf(userId), month}
+        );
+
+        while (cursor.moveToNext()) {
+            if (!cursor.isNull(0)) {
+                entries.add(new Entry(
+                        cursor.getFloat(0),
+                        cursor.getFloat(1)
+                ));
+            }
+        }
+
+        cursor.close();
+
+        return entries;
+    }
+
+
     public int getActiveSubscriptionCount(int userId){
 
         SQLiteDatabase db = getReadableDatabase();
@@ -4866,6 +4947,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return entries;
     }
+
+
+    public ArrayList<PieEntry> getCategoryPieEntriesForMonth(
+            int userId, String month) {
+
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String sql =
+                "SELECT c." + CATEGORY_NAME +
+                        ", IFNULL(SUM(t." + AMOUNT + "), 0) " +
+                        "FROM " + TABLE_TRANSACTION + " t " +
+                        "INNER JOIN " + TABLE_CATEGORY + " c " +
+                        "ON t." + CATEGORY_ID + " = c." + CATEGORY_ID +
+                        " WHERE t." + USER_ID + "=? " +
+                        "AND t." + TRANSACTION_TYPE + "='Expense' " +
+                        "AND substr(t." + TRANSACTION_DATE + ", 1, 7)=? " +
+                        "GROUP BY c." + CATEGORY_NAME;
+
+        Cursor cursor = db.rawQuery(
+                sql,
+                new String[]{String.valueOf(userId), month}
+        );
+
+        while (cursor.moveToNext()) {
+            entries.add(
+                    new PieEntry(
+                            cursor.getFloat(1),
+                            cursor.getString(0)
+                    )
+            );
+        }
+
+        cursor.close();
+        return entries;
+    }
+
     public int getCategoryIdByName(String categoryName) {
 
         SQLiteDatabase db = getReadableDatabase();

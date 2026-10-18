@@ -31,6 +31,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.example.aiexpensemanagementapplication.ui.common.MonthNavigator;
+import com.example.aiexpensemanagementapplication.ui.common.MonthSwipeHelper;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -79,6 +81,8 @@ public class IncomeListActivity extends AppCompatActivity {
         setupRecyclerView();
 
         setListeners();
+
+        setupMonthNavigation();
 
         setupBottomNavigation();
     }
@@ -236,6 +240,72 @@ public class IncomeListActivity extends AppCompatActivity {
         );
     }
 
+
+    private void setupMonthNavigation() {
+
+        TextView tvMonthLabel =
+                findViewById(R.id.tvMonthLabel);
+
+        TextView btnPreviousMonth =
+                findViewById(R.id.btnPreviousMonth);
+
+        TextView btnNextMonth =
+                findViewById(R.id.btnNextMonth);
+
+        TextView tvPeriod =
+                findViewById(R.id.tvPeriod);
+
+        // Display selected month
+        tvMonthLabel.setText(
+                MonthNavigator.getMonthTitle()
+        );
+
+        tvPeriod.setText(
+                MonthNavigator.getMonthTitle()
+        );
+
+        // Previous month
+        btnPreviousMonth.setOnClickListener(v -> {
+
+            MonthNavigator.changeMonth(-1);
+
+            tvMonthLabel.setText(
+                    MonthNavigator.getMonthTitle()
+            );
+
+            tvPeriod.setText(
+                    MonthNavigator.getMonthTitle()
+            );
+
+            loadIncome();
+        });
+
+        // Next month
+        btnNextMonth.setOnClickListener(v -> {
+
+            MonthNavigator.changeMonth(1);
+
+            tvMonthLabel.setText(
+                    MonthNavigator.getMonthTitle()
+            );
+
+            tvPeriod.setText(
+                    MonthNavigator.getMonthTitle()
+            );
+
+            loadIncome();
+        });
+
+        View card = findViewById(R.id.cardSummary);
+
+        MonthSwipeHelper.attach(
+                card,
+                () -> btnPreviousMonth.performClick(),
+                () -> btnNextMonth.performClick()
+        );
+    }
+
+
     private int getCurrentUserId() {
 
         if (currentUser == null) {
@@ -266,6 +336,7 @@ public class IncomeListActivity extends AppCompatActivity {
         return userId;
     }
 
+
     private void loadIncome() {
 
         int userId = getCurrentUserId();
@@ -274,13 +345,43 @@ public class IncomeListActivity extends AppCompatActivity {
             return;
         }
 
-        incomeList =
+        // Retrieve saved income records
+        ArrayList<IncomeModel> allIncome =
                 databaseHelper.getAllIncome(userId);
+
+        // Show only the selected month's records
+        incomeList = filterIncomeByMonth(allIncome);
 
         adapter.updateList(incomeList);
 
         updateSummary();
     }
+
+
+
+    private ArrayList<IncomeModel> filterIncomeByMonth(
+            ArrayList<IncomeModel> sourceList) {
+
+        ArrayList<IncomeModel> monthlyList =
+                new ArrayList<>();
+
+        String selectedMonth =
+                MonthNavigator.getSelectedMonth();
+
+        for (IncomeModel income : sourceList) {
+
+            String date = income.getTransactionDate();
+
+            if (date != null &&
+                    date.startsWith(selectedMonth)) {
+
+                monthlyList.add(income);
+            }
+        }
+
+        return monthlyList;
+    }
+
 
     private void filterCategory(String category) {
 
@@ -291,9 +392,10 @@ public class IncomeListActivity extends AppCompatActivity {
         }
 
         ArrayList<IncomeModel> filteredList =
-                databaseHelper.getIncomeByCategory(
-                        userId,
-                        category
+                filterIncomeByMonth(
+                        databaseHelper.getIncomeByCategory(
+                                userId, category
+                        )
                 );
 
         adapter.updateList(filteredList);
@@ -310,15 +412,17 @@ public class IncomeListActivity extends AppCompatActivity {
         }
 
         ArrayList<IncomeModel> searchResults =
-                databaseHelper.searchIncome(
-                        userId,
-                        keyword.trim()
+                filterIncomeByMonth(
+                        databaseHelper.searchIncome(
+                                userId, keyword.trim()
+                        )
                 );
 
         adapter.updateList(searchResults);
 
         updateVisibleListState(searchResults.size());
     }
+
 
     private void updateSummary() {
 
@@ -328,11 +432,22 @@ public class IncomeListActivity extends AppCompatActivity {
             return;
         }
 
+        String selectedMonth =
+                MonthNavigator.getSelectedMonth();
+
         double totalIncome =
-                databaseHelper.getTotalIncome(userId);
+                databaseHelper.getMonthlyTransactionTotal(
+                        userId,
+                        "Income",
+                        selectedMonth
+                );
 
         int incomeCount =
-                databaseHelper.getIncomeCount(userId);
+                databaseHelper.getMonthlyTransactionCount(
+                        userId,
+                        "Income",
+                        selectedMonth
+                );
 
         tvTotalIncome.setText(
                 String.format(
@@ -346,8 +461,9 @@ public class IncomeListActivity extends AppCompatActivity {
                 incomeCount + " Transactions"
         );
 
-        updateVisibleListState(incomeCount);
+        updateVisibleListState(incomeList.size());
     }
+
 
     private void updateVisibleListState(int count) {
 
@@ -626,14 +742,18 @@ public class IncomeListActivity extends AppCompatActivity {
             return;
         }
 
+
         ArrayList<IncomeModel> filteredList =
-                databaseHelper.filterIncome(
-                        userId,
-                        category,
-                        incomeSource,
-                        incomeMode,
-                        sort
+                filterIncomeByMonth(
+                        databaseHelper.filterIncome(
+                                userId,
+                                category,
+                                incomeSource,
+                                incomeMode,
+                                sort
+                        )
                 );
+
 
         adapter.updateList(filteredList);
 

@@ -31,6 +31,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.example.aiexpensemanagementapplication.ui.common.MonthNavigator;
+import com.example.aiexpensemanagementapplication.ui.common.MonthSwipeHelper;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -101,6 +103,8 @@ public class ExpenseListActivity extends AppCompatActivity {
         setupBottomNavigation();
 
         listeners();
+
+        setupExpenseMonthNavigation();
     }
 
 
@@ -217,6 +221,56 @@ public class ExpenseListActivity extends AppCompatActivity {
 
         expenseList =
                 new ArrayList<>();
+    }
+
+    private void setupExpenseMonthNavigation() {
+
+        TextView previous =
+                findViewById(R.id.btnPreviousMonth);
+
+        TextView next =
+                findViewById(R.id.btnNextMonth);
+
+        previous.setOnClickListener(v -> {
+            changeExpenseMonth(-1);
+        });
+
+        next.setOnClickListener(v -> {
+            changeExpenseMonth(1);
+        });
+
+        MonthSwipeHelper.attach(
+                findViewById(R.id.cardSummary),
+                () -> previous.performClick(),
+                () -> next.performClick()
+        );
+
+        updateExpenseMonthLabel();
+    }
+
+    private void changeExpenseMonth(int offset) {
+
+        MonthNavigator.changeMonth(offset);
+
+        updateExpenseMonthLabel();
+
+        loadExpenses();
+    }
+
+    private void updateExpenseMonthLabel() {
+
+        String monthTitle =
+                MonthNavigator.getMonthTitle();
+
+        TextView monthLabel =
+                findViewById(R.id.tvMonthLabel);
+
+        TextView periodLabel =
+                findViewById(R.id.tvPeriod);
+
+        monthLabel.setText(monthTitle);
+
+        periodLabel.setText(monthTitle);
     }
 
 
@@ -352,11 +406,15 @@ public class ExpenseListActivity extends AppCompatActivity {
         }
 
 
+
         ArrayList<ExpenseModel> filteredList =
-                databaseHelper.getExpensesByCategory(
-                        userId,
-                        category
+                filterExpensesByMonth(
+                        databaseHelper.getExpensesByCategory(
+                                userId,
+                                category
+                        )
                 );
+
 
 
         adapter.updateList(
@@ -712,19 +770,18 @@ public class ExpenseListActivity extends AppCompatActivity {
          */
 
 
+
         ArrayList<ExpenseModel> filteredList =
-                databaseHelper.filterExpensesBySharing(
-
-                        userId,
-
-                        category,
-
-                        payment,
-
-                        sharing,
-
-                        sort
+                filterExpensesByMonth(
+                        databaseHelper.filterExpensesBySharing(
+                                userId,
+                                category,
+                                payment,
+                                sharing,
+                                sort
+                        )
                 );
+
 
 
         adapter.updateList(
@@ -737,6 +794,29 @@ public class ExpenseListActivity extends AppCompatActivity {
         );
     }
 
+
+    private ArrayList<ExpenseModel> filterExpensesByMonth(
+            ArrayList<ExpenseModel> sourceList) {
+
+        ArrayList<ExpenseModel> monthlyList =
+                new ArrayList<>();
+
+        String selectedMonth =
+                MonthNavigator.getSelectedMonth();
+
+        for (ExpenseModel expense : sourceList) {
+
+            String date = expense.getTransactionDate();
+
+            if (date != null &&
+                    date.startsWith(selectedMonth)) {
+
+                monthlyList.add(expense);
+            }
+        }
+
+        return monthlyList;
+    }
 
     // =========================================================
     // LOAD ALL USER EXPENSES
@@ -775,10 +855,12 @@ public class ExpenseListActivity extends AppCompatActivity {
          * A shared expense is still owned by this user.
          */
 
+
         expenseList =
-                databaseHelper.getAllExpenses(
-                        userId
+                filterExpensesByMonth(
+                        databaseHelper.getAllExpenses(userId)
                 );
+
 
 
         // -----------------------------------------------------
@@ -975,16 +1057,24 @@ public class ExpenseListActivity extends AppCompatActivity {
         }
 
 
-        double total =
-                databaseHelper.getTotalExpense(
-                        userId
-                );
 
+        String selectedMonth =
+                MonthNavigator.getSelectedMonth();
+
+        double total =
+                databaseHelper.getMonthlyTransactionTotal(
+                        userId,
+                        "Expense",
+                        selectedMonth
+                );
 
         int count =
-                databaseHelper.getExpenseCount(
-                        userId
+                databaseHelper.getMonthlyTransactionCount(
+                        userId,
+                        "Expense",
+                        selectedMonth
                 );
+
 
 
         tvTotalExpense.setText(
@@ -1124,11 +1214,15 @@ public class ExpenseListActivity extends AppCompatActivity {
         }
 
 
+
         ArrayList<ExpenseModel> searchList =
-                databaseHelper.searchExpenses(
-                        userId,
-                        keyword
+                filterExpensesByMonth(
+                        databaseHelper.searchExpenses(
+                                userId,
+                                keyword
+                        )
                 );
+
 
 
         adapter.updateList(

@@ -36,6 +36,8 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.example.aiexpensemanagementapplication.ui.common.MonthNavigator;
+import com.example.aiexpensemanagementapplication.ui.common.MonthSwipeHelper;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -176,6 +178,8 @@ public class PersonalDashboardFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initialize(view);
+
+        setupDashboardMonthNavigation(view);
 
         setupClickListeners();
 
@@ -319,6 +323,57 @@ public class PersonalDashboardFragment extends Fragment {
     }
 
 
+    private void setupDashboardMonthNavigation(View root) {
+
+        TextView previous =
+                root.findViewById(R.id.btnPreviousMonth);
+
+        TextView next =
+                root.findViewById(R.id.btnNextMonth);
+
+        previous.setOnClickListener(v ->
+                changeDashboardMonth(-1));
+
+        next.setOnClickListener(v ->
+                changeDashboardMonth(1));
+
+        MonthSwipeHelper.attach(
+                root.findViewById(R.id.cardBalance),
+                () -> changeDashboardMonth(-1),
+                () -> changeDashboardMonth(1)
+        );
+
+        updateDashboardMonthLabel(root);
+    }
+
+    private void changeDashboardMonth(int offset) {
+
+        MonthNavigator.changeMonth(offset);
+
+        View root = getView();
+
+        if (root == null) {
+            return;
+        }
+
+        updateDashboardMonthLabel(root);
+
+        loadBalance();
+        loadPieChart();
+        loadWeeklyChart();
+    }
+
+    private void updateDashboardMonthLabel(View root) {
+
+        TextView monthLabel =
+                root.findViewById(R.id.tvMonthLabel);
+
+        monthLabel.setText(
+                MonthNavigator.getMonthTitle()
+        );
+    }
+
+
     // =========================================================
     // CLICK LISTENERS
     // =========================================================
@@ -409,6 +464,12 @@ public class PersonalDashboardFragment extends Fragment {
             return;
         }
 
+        View root = getView();
+
+        if (root != null) {
+            updateDashboardMonthLabel(root);
+        }
+
         loadBalance();
 
         loadPieChart();
@@ -427,86 +488,64 @@ public class PersonalDashboardFragment extends Fragment {
     // BALANCE
     // =========================================================
 
+
     private void loadBalance() {
 
         if (currentUser == null) {
             return;
         }
 
-
         int userId =
-                databaseHelper.getUserIdByEmail(
-                        currentUser.getEmail()
+                databaseHelper.getUserIdByFirebaseUid(
+                        currentUser.getUid()
                 );
-
 
         if (userId == -1) {
             return;
         }
 
+        String month =
+                MonthNavigator.getSelectedMonth();
 
         double income =
-                databaseHelper.getTotalIncome(userId);
+                databaseHelper.getMonthlyTransactionTotal(
+                        userId, "Income", month
+                );
 
+        double expense =
+                databaseHelper.getMonthlyTransactionTotal(
+                        userId, "Expense", month
+                );
 
-        double balance =
-                databaseHelper.getTotalBalance(userId);
-
-
-        double budgetRemaining =
-                databaseHelper.getDashboardRemainingBudget(userId);
-
-
-        double budgetUsed =
-                databaseHelper.getDashboardBudgetUsed(userId);
-
-
-        // -----------------------------------------------------
-        // Display values
-        // -----------------------------------------------------
+        double balance = income - expense;
 
         tvIncome.setText(
-                String.format(
-                        "Rs %.2f",
-                        income
-                )
+                String.format(Locale.getDefault(),
+                        "Rs %.2f", income)
         );
-
-
-        tvTotalBalance.setText(
-                String.format(
-                        "Rs %.2f",
-                        balance
-                )
-        );
-
 
         tvRemainingBudget.setText(
-                String.format(
-                        "Rs %.2f",
-                        budgetRemaining
-                )
+                String.format(Locale.getDefault(),
+                        "Rs %.2f", expense)
         );
 
-
-        // Prevent percentage > 100
-        if (budgetUsed > 100) {
-            budgetUsed = 100;
-        }
-
-
-        if (budgetUsed < 0) {
-            budgetUsed = 0;
-        }
-
-
-        tvBudgetPercentage.setText(
-                String.format(
-                        "%.0f%%",
-                        budgetUsed
-                )
+        tvTotalBalance.setText(
+                String.format(Locale.getDefault(),
+                        "Rs %.2f", balance)
         );
+
+        if (income > 0) {
+            double percentage = (expense / income) * 100;
+
+            tvBudgetPercentage.setText(
+                    String.format(Locale.getDefault(),
+                            "%.0f%%", percentage)
+            );
+        } else {
+            tvBudgetPercentage.setText("—");
+        }
     }
+
 
 
     // =========================================================
@@ -532,8 +571,9 @@ public class PersonalDashboardFragment extends Fragment {
 
 
         ArrayList<PieEntry> entries =
-                databaseHelper.getCategoryPieEntries(
-                        userId
+                databaseHelper.getCategoryPieEntriesForMonth(
+                        userId,
+                        MonthNavigator.getSelectedMonth()
                 );
 
 
@@ -638,8 +678,9 @@ public class PersonalDashboardFragment extends Fragment {
 
 
         List<Entry> entries =
-                databaseHelper.getWeeklyExpenseEntries(
-                        userId
+                databaseHelper.getWeeklyExpenseEntriesForMonth(
+                        userId,
+                        MonthNavigator.getSelectedMonth()
                 );
 
 
