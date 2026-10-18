@@ -45,14 +45,14 @@ public class ProactiveInsightEngine {
         // 3. Savings
         analyzeSavings(analysis, insights);
 
-        // 4. Expense trend
-        analyzeExpenseTrend(analysis, insights);
+        // 4. Previous-month comparison disabled.
+        // Insights use current-month financial data only.
 
         // 5. Highest spending category
         analyzeHighestCategory(analysis, insights);
 
-        // 6. General positive trend
-        analyzePositiveTrend(analysis, insights);
+        // Previous-month trend analysis disabled.
+        // Current-month insights only.
 
         // ==============================
         // SORT BY SEVERITY

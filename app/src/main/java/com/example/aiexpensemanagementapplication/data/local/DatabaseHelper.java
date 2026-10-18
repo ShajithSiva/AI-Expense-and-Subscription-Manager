@@ -4330,56 +4330,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // category.
     // =====================================================
 
-    public Cursor getExpenseByCategory(int userId) {
 
-        SQLiteDatabase db =
-                this.getReadableDatabase();
+    public Cursor getExpenseByCategory(int userId, String month) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
 
         String query =
-
                 "SELECT " +
-
-                        "c." + CATEGORY_ID +
-                        " AS CategoryID, " +
-
-                        "c." + CATEGORY_NAME +
-                        " AS CategoryName, " +
-
-                        "IFNULL(SUM(t." +
-                        AMOUNT +
-                        "),0) AS Total " +
-
-                        "FROM " +
-                        TABLE_TRANSACTION + " t " +
-
-                        "INNER JOIN " +
-                        TABLE_CATEGORY + " c " +
-
-                        " ON t." +
-                        CATEGORY_ID +
-
-                        " = c." +
-                        CATEGORY_ID +
-
-                        " WHERE t." +
-                        USER_ID +
-                        "=?" +
-
-                        " AND t." +
-                        TRANSACTION_TYPE +
-                        "='Expense' " +
-
-                        " GROUP BY " +
-
-                        "c." + CATEGORY_ID +
-                        ", c." + CATEGORY_NAME +
-
-                        " ORDER BY Total DESC";
+                        "c." + CATEGORY_ID + " AS CategoryID, " +
+                        "c." + CATEGORY_NAME + " AS CategoryName, " +
+                        "IFNULL(SUM(t." + AMOUNT + "), 0) AS Total " +
+                        "FROM " + TABLE_TRANSACTION + " t " +
+                        "INNER JOIN " + TABLE_CATEGORY + " c " +
+                        "ON t." + CATEGORY_ID + " = c." + CATEGORY_ID +
+                        " WHERE t." + USER_ID + "=? " +
+                        "AND t." + TRANSACTION_TYPE + "='Expense' " +
+                        "AND strftime('%Y-%m', t." + TRANSACTION_DATE + ")=? " +
+                        "GROUP BY c." + CATEGORY_ID + ", c." + CATEGORY_NAME + " " +
+                        "ORDER BY Total DESC";
 
         return db.rawQuery(
                 query,
                 new String[]{
-                        String.valueOf(userId)
+                        String.valueOf(userId),
+                        month
                 }
         );
     }

@@ -340,10 +340,19 @@ public class FinancialAdvisorEngine {
             // GET CATEGORY TOTALS FROM DATABASE
             // -------------------------------------------------
 
-            cursor =
-                    databaseHelper.getExpenseByCategory(
-                            userId
-                    );
+            Calendar calendar = Calendar.getInstance();
+
+            String currentMonth = String.format(
+                    Locale.getDefault(),
+                    "%04d-%02d",
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH) + 1
+            );
+
+            cursor = databaseHelper.getExpenseByCategory(
+                    userId,
+                    currentMonth
+            );
 
 
             if (cursor == null) {
