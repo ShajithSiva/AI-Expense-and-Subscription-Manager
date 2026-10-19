@@ -80,50 +80,50 @@
                 app:strokeColor="#E4E9EF"
                 app:strokeWidth="1dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="24dp">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="center"-->
+<!--                    android:orientation="vertical"-->
+<!--                    android:padding="24dp">-->
 
-                    <FrameLayout
-                        android:layout_width="120dp"
-                        android:layout_height="120dp">
+<!--                    <FrameLayout-->
+<!--                        android:layout_width="120dp"-->
+<!--                        android:layout_height="120dp">-->
 
-                        <ImageView
-                            android:id="@+id/imgProfile"
-                            android:layout_width="76dp"
-                            android:layout_height="76dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/circle_dashed_gray"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/profile"/>
+<!--                        <ImageView-->
+<!--                            android:id="@+id/imgProfile"-->
+<!--                            android:layout_width="76dp"-->
+<!--                            android:layout_height="76dp"-->
+<!--                            android:layout_gravity="center"-->
+<!--                            android:background="@drawable/circle_dashed_gray"-->
+<!--                            android:scaleType="centerCrop"-->
+<!--                            android:src="@drawable/profile"/>-->
 
-                        <ImageButton
-                            android:id="@+id/btnChangePhoto"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:layout_gravity="bottom|end"
-                            android:layout_marginEnd="6dp"
-                            android:layout_marginBottom="6dp"
-                            android:padding="6dp"
-                            android:src="@drawable/camera"
-                            android:scaleType="centerInside"
-                            android:elevation="8dp"/>
+<!--                        <ImageButton-->
+<!--                            android:id="@+id/btnChangePhoto"-->
+<!--                            android:layout_width="36dp"-->
+<!--                            android:layout_height="36dp"-->
+<!--                            android:layout_gravity="bottom|end"-->
+<!--                            android:layout_marginEnd="6dp"-->
+<!--                            android:layout_marginBottom="6dp"-->
+<!--                            android:padding="6dp"-->
+<!--                            android:src="@drawable/camera"-->
+<!--                            android:scaleType="centerInside"-->
+<!--                            android:elevation="8dp"/>-->
 
-                    </FrameLayout>
+<!--                    </FrameLayout>-->
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Change Profile Picture"
-                        android:textColor="#159A68"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="16dp"-->
+<!--                        android:text="Change Profile Picture"-->
+<!--                        android:textColor="#159A68"-->
+<!--                        android:textSize="16sp"-->
+<!--                        android:textStyle="bold"/>-->
 
-                </LinearLayout>
+<!--                </LinearLayout>-->
 
             </com.google.android.material.card.MaterialCardView>
             <TextView

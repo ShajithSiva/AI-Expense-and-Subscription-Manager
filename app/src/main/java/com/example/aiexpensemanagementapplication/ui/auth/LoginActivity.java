@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvForgotPassword, tvRegister;
 
     private FirebaseAuth mAuth;
+    private TextView tvPasswordError;
     private DatabaseHelper databaseHelper;
     private FirebaseFirestore firestore;
 
@@ -53,6 +56,27 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         tvForgotPassword.setOnClickListener(v -> resetPassword());
+        tvPasswordError = findViewById(R.id.tvPasswordError);
+
+        etPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(
+                    CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(
+                    CharSequence s, int start, int before, int count) {
+
+                if (tvPasswordError != null) {
+                    tvPasswordError.setVisibility(android.view.View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
     private void loginUser() {
@@ -73,10 +97,13 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (password.isEmpty()) {
-            etPassword.setError("Enter your password");
+            tvPasswordError.setText("Enter your password");
+            tvPasswordError.setVisibility(android.view.View.VISIBLE);
             etPassword.requestFocus();
             return;
         }
+
+        tvPasswordError.setVisibility(android.view.View.GONE);
 
         btnLogin.setEnabled(false);
         btnLogin.setText("Signing In...");

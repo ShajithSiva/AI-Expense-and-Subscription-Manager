@@ -76,7 +76,7 @@
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:layout_gravity="top|end"
-                    android:background="@drawable/badge_red"
+                    android:background="@drawable/bg_badge_red"
                     android:gravity="center"
                     android:text="0"
                     android:textColor="#FFFFFF"
