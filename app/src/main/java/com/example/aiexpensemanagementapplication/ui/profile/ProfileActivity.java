@@ -30,6 +30,9 @@ import android.net.Uri;
 import android.content.SharedPreferences;
 import android.app.Activity;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 
 public class ProfileActivity extends AppCompatActivity{
     private TextView tvName;
@@ -278,88 +281,68 @@ public class ProfileActivity extends AppCompatActivity{
         }
     }
 
+
     private void loadStatistics() {
 
         if (currentUser == null) {
             return;
         }
 
-        int userId =
-                databaseHelper.getUserIdByFirebaseUid(
-                        currentUser.getUid()
-                );
+        int userId = databaseHelper.getUserIdByFirebaseUid(
+                currentUser.getUid()
+        );
 
         if (userId == -1) {
             return;
         }
 
-        // =========================
-        // TOTAL EXPENSES
-        // =========================
+        // Get current month: yyyy-MM
+        Calendar calendar = Calendar.getInstance();
 
+        String currentMonth = String.format(
+                Locale.getDefault(),
+                "%04d-%02d",
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1
+        );
+
+        // Current month's expenses
         double totalExpense =
-                databaseHelper.getTotalExpense(userId);
+                databaseHelper.getMonthlyExpense(userId, currentMonth);
 
+        // Current month's income minus expenses
+        double monthlyIncome =
+                databaseHelper.getMonthlyIncome(userId, currentMonth);
 
-        // =========================
-        // TOTAL BALANCE
-        // =========================
+        double totalBalance = monthlyIncome - totalExpense;
 
-        double totalBalance =
-                databaseHelper.getTotalBalance(userId);
-
-
-        // =========================
-        // MONTHLY BUDGET
-        // =========================
-
-        Budget budget =
-                databaseHelper.getBudgetSettings(userId);
+        // Monthly budget
+        Budget budget = databaseHelper.getBudgetSettings(userId);
 
         double monthlyBudget = 0.0;
 
         if (budget != null) {
-
-            monthlyBudget =
-                    budget.getMonthlyBudget();
+            monthlyBudget = budget.getMonthlyBudget();
         }
 
-
-        // =========================
-        // REMAINING BUDGET
-        // =========================
-
-        double remainingBudget =
-                monthlyBudget - totalExpense;
+        // Current month's remaining budget
+        double remainingBudget = monthlyBudget - totalExpense;
 
         if (remainingBudget < 0) {
             remainingBudget = 0;
         }
 
-
-        // =========================
-        // DISPLAY
-        // =========================
-
+        // Display statistics
         tvExpense.setText(
-                String.format(
-                        "Rs. %.2f",
-                        totalExpense
-                )
+                String.format(Locale.getDefault(), "Rs. %.2f", totalExpense)
         );
 
         tvBalance.setText(
-                String.format(
-                        "Rs. %.2f",
-                        totalBalance
-                )
+                String.format(Locale.getDefault(), "Rs. %.2f", totalBalance)
         );
 
         tvBudget.setText(
-                String.format(
-                        "Rs. %.2f",
-                        remainingBudget
-                )
+                String.format(Locale.getDefault(), "Rs. %.2f", remainingBudget)
         );
     }
 

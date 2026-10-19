@@ -259,8 +259,26 @@
                 <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/pieChart"
                     android:layout_width="match_parent"
-                    android:layout_height="240dp"
+                    android:layout_height="300dp"
                     android:layout_marginTop="12dp" />
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Spending by Category"
+                    android:textColor="#14213D"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/categoryBreakdownContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -318,6 +336,18 @@
                         android:textSize="11sp"
                         android:textStyle="bold" />
                 </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/tvWeeklyTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="This Week: Rs. 0.00"
+                    android:textColor="#14213D"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/lineChart"

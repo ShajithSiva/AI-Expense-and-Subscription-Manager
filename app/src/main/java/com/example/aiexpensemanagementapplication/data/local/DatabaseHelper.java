@@ -4688,6 +4688,92 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public List<Entry> getCurrentWeekExpenseEntries(int userId) {
+
+        ArrayList<Entry> entries = new ArrayList<>();
+
+        Calendar calendar = Calendar.getInstance();
+
+        // Find Monday of the current week
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int daysFromMonday = (dayOfWeek + 5) % 7;
+
+        calendar.add(Calendar.DAY_OF_MONTH, -daysFromMonday);
+
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+        String monday = dateFormat.format(calendar.getTime());
+
+        // Find Sunday
+        calendar.add(Calendar.DAY_OF_MONTH, 6);
+
+        String sunday = dateFormat.format(calendar.getTime());
+
+        // Return spending for each day, including days with zero expenses
+        float[] dailyExpenses = new float[7];
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String sql =
+                "SELECT date(" + TRANSACTION_DATE + "), " +
+                        "IFNULL(SUM(" + AMOUNT + "), 0) " +
+                        "FROM " + TABLE_TRANSACTION +
+                        " WHERE " + USER_ID + "=? " +
+                        "AND " + TRANSACTION_TYPE + "='Expense' " +
+                        "AND date(" + TRANSACTION_DATE + ") " +
+                        "BETWEEN date(?) AND date(?) " +
+                        "GROUP BY date(" + TRANSACTION_DATE + ")";
+
+        Cursor cursor = db.rawQuery(
+                sql,
+                new String[]{
+                        String.valueOf(userId),
+                        monday,
+                        sunday
+                }
+        );
+
+        Calendar dayCalendar = Calendar.getInstance();
+
+        try {
+            while (cursor.moveToNext()) {
+
+                String transactionDate = cursor.getString(0);
+                float amount = cursor.getFloat(1);
+
+                Date parsedDate = dateFormat.parse(transactionDate);
+
+                if (parsedDate != null) {
+
+                    dayCalendar.setTime(parsedDate);
+
+                    int weekday = dayCalendar.get(Calendar.DAY_OF_WEEK);
+
+                    // Monday = 0, Tuesday = 1, ..., Sunday = 6
+                    int index = (weekday + 5) % 7;
+
+                    dailyExpenses[index] += amount;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            cursor.close();
+        }
+
+        // Always return all seven days
+        for (int i = 0; i < 7; i++) {
+            entries.add(new Entry(i, dailyExpenses[i]));
+        }
+
+        return entries;
+    }
+
+
+
     public int getActiveSubscriptionCount(int userId){
 
         SQLiteDatabase db = getReadableDatabase();
@@ -4734,18 +4820,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return total;
     }
     // =====================================================
-// AI FINANCIAL INSIGHT
-// =====================================================
+        // AI FINANCIAL INSIGHT
+        // =====================================================
 
     public String generateAIInsight(int userId) {
 
         try {
 
-            double income =
-                    getTotalIncome(userId);
 
-            double expense =
-                    getTotalExpense(userId);
+            Calendar calendar = Calendar.getInstance();
+
+            String currentMonth = String.format(
+                    Locale.getDefault(),
+                    "%04d-%02d",
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH) + 1
+            );
+
+            double income = getMonthlyIncome(userId, currentMonth);
+
+            double expense = getMonthlyExpense(userId, currentMonth);
+
 
             double savings =
                     income - expense;
@@ -9924,6 +10019,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         return 0;
+    }
+
+    public double getPreviousWeekExpenseTotal(int userId) {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int daysFromMonday = (dayOfWeek + 5) % 7;
+
+        // Previous week's Monday
+        calendar.add(Calendar.DAY_OF_MONTH, -daysFromMonday - 7);
+
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+        String monday = dateFormat.format(calendar.getTime());
+
+        // Previous week's Sunday
+        calendar.add(Calendar.DAY_OF_MONTH, 6);
+        String sunday = dateFormat.format(calendar.getTime());
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String sql = "SELECT IFNULL(SUM(" + AMOUNT + "), 0) " +
+                "FROM " + TABLE_TRANSACTION +
+                " WHERE " + USER_ID + "=? " +
+                "AND " + TRANSACTION_TYPE + "='Expense' " +
+                "AND date(" + TRANSACTION_DATE + ") " +
+                "BETWEEN date(?) AND date(?)";
+
+        Cursor cursor = db.rawQuery(
+                sql,
+                new String[]{
+                        String.valueOf(userId),
+                        monday,
+                        sunday
+                }
+        );
+
+        double total = 0;
+
+        try {
+            if (cursor.moveToFirst()) {
+                total = cursor.getDouble(0);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return total;
     }
 
 
