@@ -4569,6 +4569,88 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    // Returns one entry for each calendar week intersecting the selected month.
+    // Weeks run Monday through Sunday, matching the device calendar.
+    public List<Entry> getWeeklyIncomeEntriesForMonth(int userId, String month) {
+        return getWeeklyTransactionEntriesForMonth(userId, month, "Income");
+    }
+
+    public List<Entry> getWeeklyExpenseEntriesByWeekForMonth(int userId, String month) {
+        return getWeeklyTransactionEntriesForMonth(userId, month, "Expense");
+    }
+
+    private List<Entry> getWeeklyTransactionEntriesForMonth(
+            int userId, String month, String transactionType) {
+        ArrayList<Entry> entries = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        // Parse the selected month (yyyy-MM), then calculate its calendar weeks.
+        Calendar firstDay = Calendar.getInstance();
+        firstDay.set(Calendar.HOUR_OF_DAY, 0);
+        firstDay.set(Calendar.MINUTE, 0);
+        firstDay.set(Calendar.SECOND, 0);
+        firstDay.set(Calendar.MILLISECOND, 0);
+        try {
+            Date parsedMonth = new SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                    .parse(month + "-01");
+            if (parsedMonth != null) firstDay.setTime(parsedMonth);
+        } catch (java.text.ParseException e) {
+            // Return a stable empty weekly series for an invalid month value.
+            return entries;
+        }
+
+        // Monday is the first day of the week. Clip the first/last week to this month.
+        // Calendar.DAY_OF_WEEK: Sunday=1 ... Saturday=7; convert to Monday-based offset.
+        int leadingDays = (firstDay.get(Calendar.DAY_OF_WEEK) + 5) % 7;
+        int daysInMonth = firstDay.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int weekCount = (leadingDays + daysInMonth + 6) / 7;
+        double[] totalsByWeek = new double[weekCount];
+
+        // Normalize common stored date formats to yyyy-MM-dd before using SQLite date functions.
+        // Supports yyyy-MM-dd (and ISO date-time), dd.MM.yyyy, dd/MM/yyyy, dd-MM-yyyy.
+        String date = TRANSACTION_DATE;
+        String normalizedDateExpr = "CASE " +
+                "WHEN substr(" + date + ",5,1)='-' THEN substr(" + date + ",1,10) " +
+                "WHEN substr(" + date + ",3,1)='.' THEN " +
+                "substr(" + date + ",7,4)||'-'||substr(" + date + ",4,2)||'-'||substr(" + date + ",1,2) " +
+                "WHEN substr(" + date + ",3,1)='/' THEN " +
+                "substr(" + date + ",7,4)||'-'||substr(" + date + ",4,2)||'-'||substr(" + date + ",1,2) " +
+                "WHEN substr(" + date + ",3,1)='-' THEN " +
+                "substr(" + date + ",7,4)||'-'||substr(" + date + ",4,2)||'-'||substr(" + date + ",1,2) " +
+                "ELSE NULL END";
+
+        String weekIndexExpr = "CAST((CAST(strftime('%d'," + normalizedDateExpr +
+                ") AS INTEGER) + " + leadingDays + " - 1) / 7 AS INTEGER)";
+        String monthExpr = "strftime('%Y-%m'," + normalizedDateExpr + ")";
+        String sql = "SELECT " + weekIndexExpr + ", IFNULL(SUM(" + AMOUNT + "),0) " +
+                "FROM " + TABLE_TRANSACTION +
+                " WHERE " + USER_ID + "=? AND " + TRANSACTION_TYPE + "=?" +
+                " AND " + monthExpr + "=?" +
+                " GROUP BY " + weekIndexExpr;
+
+        Cursor cursor = db.rawQuery(sql, new String[]{
+                String.valueOf(userId), transactionType, month
+        });
+        try {
+            while (cursor.moveToNext()) {
+                if (!cursor.isNull(0)) {
+                    int weekIndex = cursor.getInt(0);
+                    if (weekIndex >= 0 && weekIndex < totalsByWeek.length) {
+                        totalsByWeek[weekIndex] = cursor.getDouble(1);
+                    }
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+
+        // Always return one entry per week, including weeks with zero transactions.
+        for (int weekIndex = 0; weekIndex < totalsByWeek.length; weekIndex++) {
+            entries.add(new Entry(weekIndex, (float) totalsByWeek[weekIndex]));
+        }
+        return entries;
+    }
+
     public List<Entry> getWeeklyExpenseEntriesForMonth(
             int userId, String month) {
 
@@ -6438,58 +6520,114 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public int getFinancialHealthScore(int userId){
 
-        double income =
-                getTotalIncome(userId);
+    /**
+     * Financial Health Score for the current month.
+     * Keeps compatibility with existing calls:
+     * getFinancialHealthScore(userId)
+     */
+    public int getFinancialHealthScore(int userId) {
 
-        double expense =
-                getTotalExpense(userId);
+        String currentMonth = new java.text.SimpleDateFormat(
+                "yyyy-MM",
+                java.util.Locale.getDefault()
+        ).format(new java.util.Date());
 
-        if(income<=0){
-
-            return 0;
-
-        }
-
-        double ratio =
-                expense/income;
-
-        int score;
-
-        if(ratio<=0.50){
-
-            score=100;
-
-        }else if(ratio<=0.60){
-
-            score=90;
-
-        }else if(ratio<=0.70){
-
-            score=80;
-
-        }else if(ratio<=0.80){
-
-            score=70;
-
-        }else if(ratio<=0.90){
-
-            score=60;
-
-        }else if(ratio<=1.00){
-
-            score=50;
-
-        }else{
-
-            score=20;
-
-        }
-
-        return score;
-
+        return getFinancialHealthScore(userId, currentMonth);
     }
+
+
+    /**
+     * Monthly Financial Health Score.
+     *
+     * Savings health  = 60%
+     * Budget health   = 40%
+     *
+     * If no monthly budget is configured, the score
+     * is based on savings health alone.
+     *
+     * month format: yyyy-MM (example: 2026-10)
+     */
+    public int getFinancialHealthScore(int userId, String month) {
+
+        if (month == null || !month.matches("\\d{4}-\\d{2}")) {
+            return 0;
+        }
+
+        double income = getMonthlyIncome(userId, month);
+        double expense = getMonthlyExpense(userId, month);
+
+        // No income data means a reliable score cannot be calculated.
+        if (income <= 0) {
+            return 0;
+        }
+
+        // -----------------------------------------
+        // 1. SAVINGS HEALTH SCORE (0-100)
+        // -----------------------------------------
+        double savings = income - expense;
+        double savingsRate = (savings / income) * 100.0;
+
+        int savingsScore;
+
+        if (savingsRate < 0) {
+            savingsScore = 0;       // Spending exceeds income
+        } else if (savingsRate < 5) {
+            savingsScore = 20;
+        } else if (savingsRate < 10) {
+            savingsScore = 40;
+        } else if (savingsRate < 20) {
+            savingsScore = 60;
+        } else if (savingsRate < 30) {
+            savingsScore = 80;
+        } else {
+            savingsScore = 100;
+        }
+
+        // -----------------------------------------
+        // 2. BUDGET HEALTH SCORE (0-100)
+        // -----------------------------------------
+        Budget budget = getBudgetSettings(userId);
+
+        // Without a configured budget, use savings health only.
+        if (budget == null || budget.getMonthlyBudget() <= 0) {
+            return Math.max(0, Math.min(100, savingsScore));
+        }
+
+        double monthlyBudget = budget.getMonthlyBudget();
+        double budgetUsedPercentage = (expense / monthlyBudget) * 100.0;
+
+        int budgetScore;
+
+        if (budgetUsedPercentage <= 50) {
+            budgetScore = 100;
+        } else if (budgetUsedPercentage <= 70) {
+            budgetScore = 85;
+        } else if (budgetUsedPercentage <= 80) {
+            budgetScore = 70;
+        } else if (budgetUsedPercentage <= 90) {
+            budgetScore = 50;
+        } else if (budgetUsedPercentage < 100) {
+            budgetScore = 25;
+        } else {
+            budgetScore = 0;        // Budget reached or exceeded
+        }
+
+        // -----------------------------------------
+        // 3. COMBINE SCORES
+        // Savings health: 60%
+        // Budget health:  40%
+        // -----------------------------------------
+        double finalScore =
+                (savingsScore * 0.60) +
+                        (budgetScore * 0.40);
+
+        return Math.max(
+                0,
+                Math.min(100, (int) Math.round(finalScore))
+        );
+    }
+
 
     public String getSpendingTrend(int userId){
 

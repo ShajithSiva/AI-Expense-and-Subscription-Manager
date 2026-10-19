@@ -1,132 +1,1012 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="#F3F6F5" tools:context=".ui.reports.FinancialReportsActivity">
-    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" android:background="#FFFFFF" app:title="Financial Reports" app:titleTextColor="#0D1B35" app:navigationIcon="@drawable/ic_back_arrow" app:elevation="2dp"/>
-    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:scrollbars="vertical">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingTop="16dp" android:paddingBottom="24dp">
-            <!--  Overview banner  -->
-            <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:cardBackgroundColor="#DDF5EB" app:cardCornerRadius="20dp" app:cardElevation="0dp" app:strokeWidth="0dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="YOUR FINANCIAL OVERVIEW" android:textColor="#176B50" android:textSize="11sp" android:letterSpacing="0.08" android:textStyle="bold"/>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Track Your Progress" android:textColor="#0D1B35" android:textSize="24sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="See how you spend, save and grow." android:textColor="#45665A" android:textSize="14sp"/>
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F4F8F7"
+    tools:context=".ui.reports.ReportsActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#F4F8F7"
+        app:title="Financial Reports"
+        app:titleTextColor="#10213D"
+        app:navigationIcon="@drawable/ic_back_arrow"
+        app:elevation="0dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
+
+            <!-- Month label: UI only; connect to a month picker in the Activity if needed. -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E5ECE9"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="MONTHLY FINANCIAL REPORT"
+                        android:textColor="#60736D"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.06" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="October 2026  ▾"
+                        android:textColor="#10213D"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!--  Financial Summary  -->
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:layout_marginBottom="12dp" android:text="Financial Summary" android:textColor="#0D1B35" android:textSize="20sp" android:textStyle="bold"/>
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:weightSum="2">
-                <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="126dp" android:layout_weight="1" android:layout_marginEnd="6dp" app:cardBackgroundColor="#E4F8EF" app:cardCornerRadius="18dp" app:cardElevation="0dp" app:strokeColor="#FFFFFF" app:strokeWidth="1dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical" android:padding="14dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="↑ TOTAL INCOME" android:textColor="#168653" android:textSize="11sp" android:textStyle="bold"/>
-                        <TextView android:id="@+id/tvTotalIncome" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Rs 0.00" android:textColor="#0D1B35" android:textSize="20sp" android:textStyle="bold" android:maxLines="1" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="14sp" android:autoSizeMaxTextSize="20sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Income received" android:textColor="#4C7562" android:textSize="11sp"/>
+
+            <!-- Overview banner -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="#D9F5E9"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="YOUR FINANCIAL OVERVIEW"
+                        android:textColor="#176B50"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Track Your Progress"
+                        android:textColor="#10213D"
+                        android:textSize="25sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="See how you spend, save and grow this month."
+                        android:textColor="#45665A"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Financial summary -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="12dp"
+                android:text="Financial Summary"
+                android:textColor="#10213D"
+                android:textSize="21sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="132dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardBackgroundColor="#E5F8EF"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#FFFFFF"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="↑  TOTAL INCOME"
+                            android:textColor="#148454"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvTotalIncome"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:autoSizeMaxTextSize="21sp"
+                            android:autoSizeMinTextSize="13sp"
+                            android:autoSizeTextType="uniform"
+                            android:maxLines="1"
+                            android:text="LKR 0.00"
+                            android:textColor="#10213D"
+                            android:textSize="21sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Income received"
+                            android:textColor="#4C7562"
+                            android:textSize="11sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="126dp" android:layout_weight="1" android:layout_marginStart="6dp" app:cardBackgroundColor="#FFF0F0" app:cardCornerRadius="18dp" app:cardElevation="0dp" app:strokeColor="#FFFFFF" app:strokeWidth="1dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical" android:padding="14dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="↓ TOTAL EXPENSE" android:textColor="#C43D43" android:textSize="11sp" android:textStyle="bold"/>
-                        <TextView android:id="@+id/tvTotalExpense" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Rs 0.00" android:textColor="#0D1B35" android:textSize="20sp" android:textStyle="bold" android:maxLines="1" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="14sp" android:autoSizeMaxTextSize="20sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Total spent" android:textColor="#916367" android:textSize="11sp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="132dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardBackgroundColor="#FFF0F1"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#FFFFFF"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="↓  TOTAL EXPENSE"
+                            android:textColor="#C43D43"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvTotalExpense"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:autoSizeMaxTextSize="21sp"
+                            android:autoSizeMinTextSize="13sp"
+                            android:autoSizeTextType="uniform"
+                            android:maxLines="1"
+                            android:text="LKR 0.00"
+                            android:textColor="#10213D"
+                            android:textSize="21sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Total spent"
+                            android:textColor="#916367"
+                            android:textSize="11sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal" android:weightSum="2">
-                <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="126dp" android:layout_weight="1" android:layout_marginEnd="6dp" app:cardBackgroundColor="#EAF4FF" app:cardCornerRadius="18dp" app:cardElevation="0dp" app:strokeColor="#FFFFFF" app:strokeWidth="1dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical" android:padding="14dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SAVINGS" android:textColor="#2877B9" android:textSize="11sp" android:textStyle="bold"/>
-                        <TextView android:id="@+id/tvSavings" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Rs 0.00" android:textColor="#0D1B35" android:textSize="20sp" android:textStyle="bold" android:maxLines="1" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="14sp" android:autoSizeMaxTextSize="20sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Income minus expenses" android:textColor="#54738C" android:textSize="10sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="132dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardBackgroundColor="#E8F4FF"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#FFFFFF"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="SAVINGS"
+                            android:textColor="#2877B9"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvSavings"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:autoSizeMaxTextSize="21sp"
+                            android:autoSizeMinTextSize="13sp"
+                            android:autoSizeTextType="uniform"
+                            android:maxLines="1"
+                            android:text="LKR 0.00"
+                            android:textColor="#10213D"
+                            android:textSize="21sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Income minus expenses"
+                            android:textColor="#54738C"
+                            android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="126dp" android:layout_weight="1" android:layout_marginStart="6dp" app:cardBackgroundColor="#FFF6DF" app:cardCornerRadius="18dp" app:cardElevation="0dp" app:strokeColor="#FFFFFF" app:strokeWidth="1dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical" android:padding="14dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BUDGET USED" android:textColor="#A96B08" android:textSize="11sp" android:textStyle="bold"/>
-                        <TextView android:id="@+id/tvBudgetUsed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="0%" android:textColor="#0D1B35" android:textSize="24sp" android:textStyle="bold"/>
-                        <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/progressBudgetUsed" android:layout_width="match_parent" android:layout_height="8dp" android:layout_marginTop="8dp" android:max="100" android:progress="0" app:indicatorColor="#F3A712" app:trackColor="#E8E1D1" app:trackCornerRadius="8dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="132dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardBackgroundColor="#FFF6DF"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#FFFFFF"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BUDGET USED"
+                            android:textColor="#A96B08"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvBudgetUsed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="0%"
+                            android:textColor="#10213D"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progressBudgetUsed"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="8dp"
+                            android:max="100"
+                            android:progress="0"
+                            app:indicatorColor="#F3A712"
+                            app:trackColor="#E8E1D1"
+                            app:trackCornerRadius="8dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-            <!--  Financial Analytics  -->
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:layout_marginBottom="12dp" android:text="Financial Analytics" android:textColor="#0D1B35" android:textSize="20sp" android:textStyle="bold"/>
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:weightSum="2">
-                <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="112dp" android:layout_weight="1" android:layout_marginEnd="6dp" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="16dp" app:cardElevation="1dp" app:strokeColor="#E9EFEB" app:strokeWidth="1dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical" android:padding="14dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Highest Category" android:textColor="#737B76" android:textSize="12sp"/>
-                        <TextView android:id="@+id/tvHighestCategory" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="--" android:textColor="#168653" android:textSize="18sp" android:textStyle="bold" android:maxLines="2"/>
+
+            <!-- Expense category breakdown -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E8EFEC"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Expense Breakdown"
+                        android:textColor="#10213D"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/pieChart"
+                            android:layout_width="0dp"
+                            android:layout_height="220dp"
+                            android:layout_weight="0.92"
+                            tools:ignore="MissingClass" />
+
+                        <LinearLayout
+                            android:id="@+id/expenseLegendContainer"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.28"
+                            android:orientation="vertical"
+                            android:paddingStart="8dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- One grouped chart: weekly income and expenses -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E8EFEC"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Income vs Expenses"
+                        android:textColor="#10213D"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Weekly comparison for this month"
+                        android:textColor="#7B8782"
+                        android:textSize="12sp" />
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/barChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_marginTop="8dp"
+                        tools:ignore="MissingClass" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Key insights: IDs consumed by ReportsActivity -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="12dp"
+                android:text="Key Insights"
+                android:textColor="#10213D"
+                android:textSize="21sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="112dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardBackgroundColor="#E5F8EF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Highest Category"
+                            android:textColor="#567168"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvHighestCategory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:maxLines="2"
+                            android:text="--"
+                            android:textColor="#148454"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="112dp" android:layout_weight="1" android:layout_marginStart="6dp" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="16dp" app:cardElevation="1dp" app:strokeColor="#E9EFEB" app:strokeWidth="1dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical" android:padding="14dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Largest Expense" android:textColor="#737B76" android:textSize="12sp"/>
-                        <TextView android:id="@+id/tvLargestExpense" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Rs 0.00" android:textColor="#C43D43" android:textSize="18sp" android:textStyle="bold" android:maxLines="1" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="13sp" android:autoSizeMaxTextSize="18sp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="112dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardBackgroundColor="#FFF0F1"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Largest Expense"
+                            android:textColor="#916367"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvLargestExpense"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:autoSizeMaxTextSize="17sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:autoSizeTextType="uniform"
+                            android:maxLines="1"
+                            android:text="LKR 0.00"
+                            android:textColor="#C43D43"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal" android:weightSum="2">
-                <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="112dp" android:layout_weight="1" android:layout_marginEnd="6dp" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="16dp" app:cardElevation="1dp" app:strokeColor="#E9EFEB" app:strokeWidth="1dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical" android:padding="14dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Avg Daily Expense" android:textColor="#737B76" android:textSize="12sp"/>
-                        <TextView android:id="@+id/tvAverageExpense" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Rs 0.00" android:textColor="#A96B08" android:textSize="18sp" android:textStyle="bold" android:maxLines="1" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="13sp" android:autoSizeMaxTextSize="18sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="112dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardBackgroundColor="#E8F4FF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Average Daily Expense"
+                            android:textColor="#54738C"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvAverageExpense"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:autoSizeMaxTextSize="17sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:autoSizeTextType="uniform"
+                            android:maxLines="1"
+                            android:text="LKR 0.00"
+                            android:textColor="#2877B9"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="112dp" android:layout_weight="1" android:layout_marginStart="6dp" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="16dp" app:cardElevation="1dp" app:strokeColor="#E9EFEB" app:strokeWidth="1dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical" android:padding="14dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Savings Rate" android:textColor="#737B76" android:textSize="12sp"/>
-                        <TextView android:id="@+id/tvSavingsRate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="0%" android:textColor="#168653" android:textSize="22sp" android:textStyle="bold"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="112dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardBackgroundColor="#FFF6DF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Savings Rate"
+                            android:textColor="#8A6A2C"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvSavingsRate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:text="0%"
+                            android:textColor="#148454"
+                            android:textSize="23sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-            <!--  Advanced Insights: preserve all original IDs  -->
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:layout_marginBottom="12dp" android:text="Advanced Insights" android:textColor="#0D1B35" android:textSize="20sp" android:textStyle="bold"/>
-            <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="18dp" app:cardElevation="1dp" app:strokeColor="#E9EFEB" app:strokeWidth="1dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Financial Health Score" android:textColor="#737B76" android:textSize="13sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/tvHealthScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="0 / 100" android:textColor="#0D1B35" android:textSize="26sp" android:textStyle="bold"/>
-                    <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/progressHealthScore" android:layout_width="match_parent" android:layout_height="7dp" android:layout_marginTop="8dp" android:max="100" android:progress="0" app:indicatorColor="#27B467" app:trackColor="#E6EEE9" app:trackCornerRadius="8dp"/>
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="16dp" android:layout_marginBottom="14dp" android:background="#E8EEEA"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Budget Remaining" android:textColor="#737B76" android:textSize="12sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/tvBudgetRemaining" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Rs 0.00" android:textColor="#0D1B35" android:textSize="16sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Budget Status" android:textColor="#737B76" android:textSize="12sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/tvBudgetStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Good" android:textColor="#168653" android:textSize="15sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Monthly Subscription Cost" android:textColor="#737B76" android:textSize="12sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/tvSubscriptionCost" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Rs 0.00" android:textColor="#0D1B35" android:textSize="16sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Spending Trend" android:textColor="#737B76" android:textSize="12sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/tvSpendingTrend" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Stable" android:textColor="#0D1B35" android:textSize="15sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Top Spending Categories" android:textColor="#737B76" android:textSize="12sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/tvTopCategories" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="No data" android:textColor="#0D1B35" android:textSize="14sp" android:lineSpacingExtra="3dp"/>
+
+
+            <!-- ADVANCED FINANCIAL INSIGHTS -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAdvancedInsights"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#E8EEF0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <!-- Section title -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Advanced Financial Insights"
+                        android:textColor="#172B4D"
+                        android:textSize="19sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Financial Health Score -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="#EFFAF4"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="FINANCIAL HEALTH SCORE"
+                                android:textColor="#547064"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.04" />
+
+                            <TextView
+                                android:id="@+id/tvHealthScore"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="100/100"
+                                android:textColor="#087F5B"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <com.google.android.material.progressindicator.LinearProgressIndicator
+                                android:id="@+id/progressHealthScore"
+                                android:layout_width="match_parent"
+                                android:layout_height="8dp"
+                                android:layout_marginTop="12dp"
+                                android:max="100"
+                                android:progress="100"
+                                app:indicatorColor="#12A875"
+                                app:trackColor="#D4EDE0"
+                                app:trackCornerRadius="8dp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Your overall financial health"
+                                android:textColor="#547064"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Budget Remaining + Budget Status -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="12dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="112dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            app:cardBackgroundColor="#EEF5FF"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center_vertical"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Budget Remaining"
+                                    android:textColor="#59718D"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvBudgetRemaining"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="LKR 0.00"
+                                    android:textColor="#1769AA"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:maxLines="2"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="12sp"
+                                    android:autoSizeMaxTextSize="18sp" />
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="112dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            app:cardBackgroundColor="#FFF7E8"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center_vertical"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Budget Status"
+                                    android:textColor="#8C7040"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvBudgetStatus"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="Good"
+                                    android:textColor="#168653"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:maxLines="2"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="12sp"
+                                    android:autoSizeMaxTextSize="20sp" />
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- Subscription Cost + Spending Trend -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="12dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="112dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            app:cardBackgroundColor="#F3EEFF"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center_vertical"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Monthly Subscription"
+                                    android:textColor="#75639C"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvSubscriptionCost"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="LKR 0.00"
+                                    android:textColor="#7651C8"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:maxLines="2"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="12sp"
+                                    android:autoSizeMaxTextSize="18sp" />
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="112dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            app:cardBackgroundColor="#FFF0F0"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center_vertical"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Spending Trend"
+                                    android:textColor="#9B6262"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvSpendingTrend"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="Stable"
+                                    android:textColor="#C04444"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:maxLines="2"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="12sp"
+                                    android:autoSizeMaxTextSize="18sp" />
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- Top Spending Categories -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        app:cardBackgroundColor="#F6F8FA"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Top Spending Categories"
+                                android:textColor="#24344A"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvTopCategories"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="No spending data available"
+                                android:textColor="#526477"
+                                android:textSize="14sp"
+                                android:lineSpacingExtra="5dp" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!--  Expense Category Breakdown  -->
-            <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="18dp" app:cardElevation="1dp" app:strokeColor="#E9EFEB" app:strokeWidth="1dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Expense Category Breakdown" android:textColor="#0D1B35" android:textSize="18sp" android:textStyle="bold"/>
-                    <com.github.mikephil.charting.charts.PieChart android:id="@+id/pieChart" android:layout_width="match_parent" android:layout_height="270dp" android:layout_marginTop="10dp" tools:ignore="MissingClass"/>
+
+
+            <!-- AI financial insight -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                app:cardBackgroundColor="#EFECFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="✦  AI Financial Insights"
+                        android:textColor="#4932B5"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvAIInsights"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:lineSpacingExtra="4dp"
+                        android:text="Loading insights..."
+                        android:textColor="#34385B"
+                        android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!--  Monthly Expenses  -->
-            <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="18dp" app:cardElevation="1dp" app:strokeColor="#E9EFEB" app:strokeWidth="1dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Monthly Expenses" android:textColor="#0D1B35" android:textSize="18sp" android:textStyle="bold"/>
-                    <com.github.mikephil.charting.charts.BarChart android:id="@+id/barChart" android:layout_width="match_parent" android:layout_height="280dp" android:layout_marginTop="10dp" tools:ignore="MissingClass"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-            <!--  Income vs Expense  -->
-            <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="18dp" app:cardElevation="1dp" app:strokeColor="#E9EFEB" app:strokeWidth="1dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Income vs Expense" android:textColor="#0D1B35" android:textSize="18sp" android:textStyle="bold"/>
-                    <com.github.mikephil.charting.charts.LineChart android:id="@+id/lineChart" android:layout_width="match_parent" android:layout_height="280dp" android:layout_marginTop="10dp" tools:ignore="MissingClass"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-            <!--  AI Financial Insights  -->
-            <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" app:cardBackgroundColor="#E6F7EF" app:cardCornerRadius="18dp" app:cardElevation="0dp" app:strokeColor="#FFFFFF" app:strokeWidth="1dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="✦ AI Financial Insights" android:textColor="#0D1B35" android:textSize="18sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/tvAIInsights" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Loading insights..." android:textColor="#28483B" android:textSize="14sp" android:lineSpacingExtra="4dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-            <!--  Export Reports  -->
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:layout_marginBottom="12dp" android:text="Export Reports" android:textColor="#0D1B35" android:textSize="20sp" android:textStyle="bold"/>
-            <com.google.android.material.button.MaterialButton android:id="@+id/btnExportPDF" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginBottom="10dp" android:text="Export as PDF" android:textAllCaps="false" android:textSize="15sp" android:textStyle="bold" app:icon="@drawable/ic_picture_as_pdf" app:iconGravity="textStart" app:iconPadding="10dp" app:cornerRadius="14dp" app:backgroundTint="#0D1B35" app:strokeWidth="0dp"/>
-            <com.google.android.material.button.MaterialButton android:id="@+id/btnExportExcel" android:layout_width="match_parent" android:layout_height="54dp" android:text="Export as CSV" android:textAllCaps="false" android:textSize="15sp" android:textStyle="bold" app:icon="@drawable/ic_table_chart" app:iconGravity="textStart" app:iconPadding="10dp" app:cornerRadius="14dp" app:backgroundTint="#27B467" app:strokeWidth="0dp"/>
-            <Space android:layout_width="match_parent" android:layout_height="18dp"/>
+
+            <!-- Export controls: original IDs preserved -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="12dp"
+                android:text="Export Monthly Report"
+                android:textColor="#10213D"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExportPDF"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginBottom="10dp"
+                android:text="Export PDF"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="#102B4E"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_picture_as_pdf"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:strokeWidth="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExportExcel"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:text="Export CSV"
+                android:textAllCaps="false"
+                android:textColor="#087A55"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="#FFFFFF"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_table_chart"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:strokeColor="#19A875"
+                app:strokeWidth="1dp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="18dp" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

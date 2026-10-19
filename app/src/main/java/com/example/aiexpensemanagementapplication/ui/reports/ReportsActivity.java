@@ -2,12 +2,17 @@ package com.example.aiexpensemanagementapplication.ui.reports;
 
 import android.os.Bundle;
 import android.widget.TextView;
+import android.view.Gravity;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -26,8 +31,6 @@ import com.github.mikephil.charting.data.BarEntry;
 
 import com.github.mikephil.charting.data.Entry;
 
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -48,7 +51,6 @@ import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.data.local.DatabaseHelper;
 import com.example.aiexpensemanagementapplication.model.Budget;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -82,10 +84,10 @@ public class ReportsActivity extends AppCompatActivity {
     private TextView tvSubscriptionCost;
     private TextView tvSpendingTrend;
     private TextView tvTopCategories;
+    private com.google.android.material.progressindicator.LinearProgressIndicator progressHealthScore;
 
     private PieChart pieChart;
     private BarChart barChart;
-    private LineChart lineChart;
 
     private MaterialButton btnExportPDF;
     private MaterialButton btnExportExcel;
@@ -121,7 +123,6 @@ public class ReportsActivity extends AppCompatActivity {
 
         setupBarChart();
 
-        setupLineChart();
 
         setupListeners();
 
@@ -244,7 +245,6 @@ public class ReportsActivity extends AppCompatActivity {
 
         pieChart = findViewById(R.id.pieChart);
         barChart = findViewById(R.id.barChart);
-        lineChart = findViewById(R.id.lineChart);
 
         tvHighestCategory = findViewById(R.id.tvHighestCategory);
         tvLargestExpense = findViewById(R.id.tvLargestExpense);
@@ -257,6 +257,7 @@ public class ReportsActivity extends AppCompatActivity {
         tvSubscriptionCost = findViewById(R.id.tvSubscriptionCost);
         tvSpendingTrend = findViewById(R.id.tvSpendingTrend);
         tvTopCategories = findViewById(R.id.tvTopCategories);
+        progressHealthScore = findViewById(R.id.progressHealthScore);
 
         btnExportPDF = findViewById(R.id.btnExportPDF);
         btnExportExcel = findViewById(R.id.btnExportExcel);
@@ -292,47 +293,32 @@ public class ReportsActivity extends AppCompatActivity {
 
     }
 
+    private String getSelectedMonth() {
+        Calendar calendar = Calendar.getInstance();
+        return new SimpleDateFormat("yyyy-MM", Locale.US)
+                .format(calendar.getTime());
+    }
+
     private void loadSummaryCards(){
+        String month = getSelectedMonth();
+        double totalIncome = databaseHelper.getMonthlyIncome(userId, month);
+        double totalExpense = databaseHelper.getMonthlyExpense(userId, month);
+        double savings = totalIncome - totalExpense;
 
-        double totalIncome =
-                databaseHelper.getTotalIncome(userId);
-
-        double totalExpense =
-                databaseHelper.getTotalExpense(userId);
-
-        double savings =
-                totalIncome-totalExpense;
-
-        tvTotalIncome.setText(
-                String.format("Rs %.2f",totalIncome));
-
-        tvTotalExpense.setText(
-                String.format("Rs %.2f",totalExpense));
-
-        tvSavings.setText(
-                String.format("Rs %.2f",savings));
+        tvTotalIncome.setText(String.format(Locale.getDefault(), "LKR %.2f", totalIncome));
+        tvTotalExpense.setText(String.format(Locale.getDefault(), "LKR %.2f", totalExpense));
+        tvSavings.setText(String.format(Locale.getDefault(), "LKR %.2f", savings));
 
         Budget budgetSettings = databaseHelper.getBudgetSettings(userId);
+        double budget = budgetSettings != null ? budgetSettings.getMonthlyBudget() : 0;
+        double percentage = budget > 0 ? (totalExpense / budget) * 100 : 0;
+        tvBudgetUsed.setText(String.format(Locale.getDefault(), "%.0f%%", percentage));
 
-        double budget = 0;
-
-        if (budgetSettings != null) {
-            budget = budgetSettings.getMonthlyBudget();
+        View progressView = findViewById(R.id.progressBudgetUsed);
+        if (progressView instanceof com.google.android.material.progressindicator.LinearProgressIndicator) {
+            ((com.google.android.material.progressindicator.LinearProgressIndicator) progressView)
+                    .setProgressCompat((int) Math.max(0, Math.min(100, percentage)), false);
         }
-
-        if(budget>0){
-
-            double percentage =
-                    (totalExpense/budget)*100;
-
-            tvBudgetUsed.setText(
-                    String.format("%.0f%%",percentage));
-
-        }else{
-
-            tvBudgetUsed.setText("0%");
-        }
-
     }
 
     private void loadAIInsights(){
@@ -637,7 +623,7 @@ public class ReportsActivity extends AppCompatActivity {
                 subHeadingPaint);
 
         canvas.drawText(
-                databaseHelper.getFinancialHealthScore(userId) + "/100",
+                databaseHelper.getFinancialHealthScore(userId, getSelectedMonth()) + "/100",
                 350,
                 y,
                 normalPaint);
@@ -892,7 +878,7 @@ public class ReportsActivity extends AppCompatActivity {
         int y3 = 45;
 
         canvas3.drawText(
-                "Income vs Expense",
+                "Weekly Income vs Expenses",
                 40,
                 y3,
                 titlePaint);
@@ -909,7 +895,7 @@ public class ReportsActivity extends AppCompatActivity {
         y3 += 25;
 
         Bitmap lineBitmap =
-                getChartBitmap(lineChart);
+                getChartBitmap(barChart);
 
         Bitmap scaledLine =
                 Bitmap.createScaledBitmap(
@@ -1072,185 +1058,211 @@ public class ReportsActivity extends AppCompatActivity {
         }
     }
 
-    private void setupPieChart(){
+    private void setupPieChart() {
+        String month = getSelectedMonth();
+        ArrayList<PieEntry> sourceEntries =
+                databaseHelper.getCategoryPieEntriesForMonth(userId, month);
 
-        ArrayList<PieEntry> entries =
-                databaseHelper.getCategoryPieEntries(userId);
+        // Match the donut and legend: top four categories plus Others.
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        float total = 0f;
+        for (PieEntry entry : sourceEntries) {
+            if (entry.getY() > 0) total += entry.getY();
+        }
 
-        PieDataSet dataSet =
-                new PieDataSet(entries,"Expenses");
+        if (sourceEntries.size() > 5) {
+            ArrayList<PieEntry> sorted = new ArrayList<>(sourceEntries);
+            java.util.Collections.sort(sorted,
+                    (a, b) -> Float.compare(b.getY(), a.getY()));
+            float others = 0f;
+            for (int i = 0; i < sorted.size(); i++) {
+                PieEntry item = sorted.get(i);
+                if (item.getY() <= 0) continue;
+                if (i < 4) entries.add(new PieEntry(item.getY(), item.getLabel()));
+                else others += item.getY();
+            }
+            if (others > 0) entries.add(new PieEntry(others, "Others"));
+        } else {
+            for (PieEntry item : sourceEntries) {
+                if (item.getY() > 0) entries.add(new PieEntry(item.getY(), item.getLabel()));
+            }
+        }
 
-        dataSet.setColors(
+        int[] colors = new int[]{
+                Color.parseColor("#16AD72"), Color.parseColor("#168CF0"),
+                Color.parseColor("#F59A16"), Color.parseColor("#8750D8"),
+                Color.parseColor("#AAB5BE"), Color.parseColor("#0D9488"),
+                Color.parseColor("#E45C68")
+        };
 
-                Color.parseColor("#F44336"),
-                Color.parseColor("#FF9800"),
-                Color.parseColor("#4CAF50"),
-                Color.parseColor("#2196F3"),
-                Color.parseColor("#9C27B0"),
-                Color.parseColor("#009688"),
-                Color.parseColor("#795548"),
-                Color.parseColor("#607D8B")
-
-        );
-
-        dataSet.setValueTextSize(12f);
-
-        PieData data = new PieData(dataSet);
-
-        pieChart.setData(data);
-
-        Description description = new Description();
-
-        description.setText("");
-
-        pieChart.setDescription(description);
-
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        dataSet.setColors(colors);
+        dataSet.setDrawValues(false);
+        dataSet.setSliceSpace(2f);
+        dataSet.setSelectionShift(3f);
+        pieChart.setData(new PieData(dataSet));
         pieChart.setUsePercentValues(false);
-
-        pieChart.animateY(1200);
-
+        pieChart.setDrawEntryLabels(false);
+        pieChart.setDrawHoleEnabled(true);
+        pieChart.setHoleRadius(64f);
+        pieChart.setTransparentCircleRadius(68f);
+        pieChart.setTransparentCircleColor(Color.WHITE);
+        pieChart.setTransparentCircleAlpha(150);
+        pieChart.setDrawCenterText(true);
+        double monthExpense = databaseHelper.getMonthlyExpense(userId, month);
+        pieChart.setCenterText(String.format(Locale.getDefault(),
+                "LKR %,.0f\nTotal Spent", monthExpense));
+        pieChart.setCenterTextSize(13f);
+        pieChart.setCenterTextColor(Color.parseColor("#10213D"));
+        pieChart.getLegend().setEnabled(false);
+        pieChart.getDescription().setEnabled(false);
+        pieChart.setExtraOffsets(2f, 2f, 2f, 2f);
+        pieChart.setMinAngleForSlices(3f);
+        pieChart.animateY(850);
         pieChart.invalidate();
+        buildExpenseLegend(entries, colors, total);
+    }
 
+    private void buildExpenseLegend(ArrayList<PieEntry> entries, int[] colors, float total) {
+        LinearLayout legend = findViewById(R.id.expenseLegendContainer);
+        if (legend == null) return;
+        legend.removeAllViews();
+
+        if (entries == null || entries.isEmpty() || total <= 0f) {
+            TextView empty = new TextView(this);
+            empty.setText("No expenses recorded this month");
+            empty.setTextColor(Color.parseColor("#74827D"));
+            empty.setTextSize(12f);
+            legend.addView(empty);
+            return;
+        }
+
+        for (int i = 0; i < entries.size(); i++) {
+            PieEntry entry = entries.get(i);
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            row.setPadding(0, dp(8), 0, dp(8));
+
+            TextView dot = new TextView(this);
+            dot.setText("●");
+            dot.setTextColor(colors[i % colors.length]);
+            dot.setTextSize(12f);
+            row.addView(dot, new LinearLayout.LayoutParams(dp(15), -2));
+
+            TextView name = new TextView(this);
+            name.setText(entry.getLabel() == null ? "Other" : entry.getLabel());
+            name.setTextColor(Color.parseColor("#24344A"));
+            name.setTextSize(11f);
+            name.setMaxLines(2);
+            LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(0, -2, 1f);
+            nameParams.setMargins(dp(3), 0, dp(2), 0);
+            row.addView(name, nameParams);
+
+            TextView percent = new TextView(this);
+            percent.setText(String.format(Locale.getDefault(), "%.0f%%", entry.getY() * 100f / total));
+            percent.setTextColor(Color.parseColor("#10213D"));
+            percent.setTextSize(10f);
+            percent.setGravity(android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
+            row.addView(percent, new LinearLayout.LayoutParams(dp(31), -2));
+
+            TextView amount = new TextView(this);
+            amount.setText(String.format(Locale.getDefault(), "%,.0f", entry.getY()));
+            amount.setTextColor(Color.parseColor("#24344A"));
+            amount.setTextSize(10f);
+            amount.setGravity(android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
+            amount.setMaxLines(1);
+            amount.setAutoSizeTextTypeWithDefaults(TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM);
+            amount.setAutoSizeTextTypeUniformWithConfiguration(7, 10, 1,
+                    android.util.TypedValue.COMPLEX_UNIT_SP);
+            row.addView(amount, new LinearLayout.LayoutParams(dp(52), -2));
+            legend.addView(row, new LinearLayout.LayoutParams(-1, -2));
+
+            if (i < entries.size() - 1) {
+                View divider = new View(this);
+                divider.setBackgroundColor(Color.parseColor("#EEF1F0"));
+                legend.addView(divider, new LinearLayout.LayoutParams(-1, dp(1)));
+            }
+        }
+    }
+
+    private int dp(float value) {
+        return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    private int getCalendarWeekCount(String month) {
+        Calendar firstDay = Calendar.getInstance();
+        try {
+            Date parsedMonth = new SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                    .parse(month + "-01");
+            if (parsedMonth != null) firstDay.setTime(parsedMonth);
+        } catch (java.text.ParseException ignored) { }
+        int leadingDays = (firstDay.get(Calendar.DAY_OF_WEEK) + 5) % 7;
+        return (leadingDays + firstDay.getActualMaximum(Calendar.DAY_OF_MONTH) + 6) / 7;
     }
 
     private void setupBarChart(){
+        String month = getSelectedMonth();
+        ArrayList<BarEntry> incomeEntries = new ArrayList<>();
+        ArrayList<BarEntry> expenseEntries = new ArrayList<>();
 
-        ArrayList<BarEntry> barEntries = new ArrayList<>();
-
-        for(Entry entry :
-                databaseHelper.getWeeklyExpenseEntries(userId)){
-
-            barEntries.add(
-                    new BarEntry(
-                            entry.getX(),
-                            entry.getY()
-                    )
-            );
-
+        for (Entry entry : databaseHelper.getWeeklyIncomeEntriesForMonth(userId, month)) {
+            incomeEntries.add(new BarEntry(entry.getX(), entry.getY()));
+        }
+        for (Entry entry : databaseHelper.getWeeklyExpenseEntriesByWeekForMonth(userId, month)) {
+            expenseEntries.add(new BarEntry(entry.getX(), entry.getY()));
         }
 
-        BarDataSet dataSet =
-                new BarDataSet(barEntries,"Weekly Expense");
+        BarDataSet incomeDataSet = new BarDataSet(incomeEntries, "Income");
+        incomeDataSet.setColor(Color.parseColor("#20B878"));
+        incomeDataSet.setDrawValues(false);
 
-        dataSet.setColor(Color.parseColor("#2196F3"));
+        BarDataSet expenseDataSet = new BarDataSet(expenseEntries, "Expenses");
+        expenseDataSet.setColor(Color.parseColor("#173653"));
+        expenseDataSet.setDrawValues(false);
 
-        BarData data =
-                new BarData(dataSet);
-
-        data.setBarWidth(0.6f);
-
+        BarData data = new BarData(incomeDataSet, expenseDataSet);
+        data.setBarWidth(0.36f);
         barChart.setData(data);
+        barChart.getDescription().setEnabled(false);
+        barChart.setDrawGridBackground(false);
+        barChart.setDrawBarShadow(false);
+        barChart.setFitBars(false);
+        barChart.setExtraBottomOffset(8f);
 
-        Description description =
-                new Description();
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setDrawGridLines(false);
+        xAxis.setTextColor(Color.parseColor("#536575"));
+        xAxis.setTextSize(10f);
+        int weekCount = getCalendarWeekCount(month);
+        xAxis.setAxisMinimum(0f);
+        xAxis.setAxisMaximum((float) weekCount);
+        xAxis.setCenterAxisLabels(true);
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int week = (int) value + 1;
+                return week >= 1 && week <= weekCount ? "Week " + week : "";
+            }
+        });
 
-        description.setText("");
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setTextColor(Color.parseColor("#536575"));
+        leftAxis.setDrawGridLines(true);
+        barChart.getAxisRight().setEnabled(false);
 
-        barChart.setDescription(description);
-
-        barChart.animateY(1200);
-
+        // DatabaseHelper returns every calendar week (including zero-value weeks),
+        // so bars remain aligned even when a week has no income or expenses.
+        data.groupBars(0f, 0.08f, 0.02f);
+        barChart.getLegend().setTextColor(Color.parseColor("#25384D"));
+        barChart.getLegend().setTextSize(11f);
+        barChart.animateY(900);
         barChart.invalidate();
-
     }
 
-    private void setupLineChart(){
-
-        ArrayList<Entry> incomeEntries =
-                new ArrayList<>();
-
-        ArrayList<Entry> expenseEntries =
-                new ArrayList<>();
-
-        Calendar calendar =
-                Calendar.getInstance();
-
-        calendar.add(Calendar.MONTH,-5);
-
-        SimpleDateFormat format =
-                new SimpleDateFormat("yyyy-MM",
-                        Locale.getDefault());
-
-        for(int i=0;i<6;i++){
-
-            String month =
-                    format.format(calendar.getTime());
-
-            incomeEntries.add(
-
-                    new Entry(
-
-                            i,
-
-                            (float) databaseHelper
-                                    .getMonthlyIncome(
-                                            userId,
-                                            month)
-
-                    )
-
-            );
-
-            expenseEntries.add(
-
-                    new Entry(
-
-                            i,
-
-                            (float) databaseHelper
-                                    .getMonthlyExpense(
-                                            userId,
-                                            month)
-
-                    )
-
-            );
-
-            calendar.add(Calendar.MONTH,1);
-
-        }
-
-        LineDataSet incomeDataSet =
-                new LineDataSet(
-                        incomeEntries,
-                        "Income");
-
-        incomeDataSet.setColor(
-                Color.parseColor("#4CAF50"));
-
-        incomeDataSet.setCircleColor(
-                Color.parseColor("#4CAF50"));
-
-        LineDataSet expenseDataSet =
-                new LineDataSet(
-                        expenseEntries,
-                        "Expense");
-
-        expenseDataSet.setColor(
-                Color.parseColor("#F44336"));
-
-        expenseDataSet.setCircleColor(
-                Color.parseColor("#F44336"));
-
-        LineData lineData =
-                new LineData(
-                        incomeDataSet,
-                        expenseDataSet);
-
-        lineChart.setData(lineData);
-
-        Description description =
-                new Description();
-
-        description.setText("");
-
-        lineChart.setDescription(description);
-
-        lineChart.animateX(1200);
-
-        lineChart.invalidate();
-
-    }
     private void loadAnalytics() {
 
         tvHighestCategory.setText(
@@ -1319,10 +1331,16 @@ public class ReportsActivity extends AppCompatActivity {
                         Color.GRAY);
         }
 
-        tvHealthScore.setText(
-                databaseHelper.getFinancialHealthScore(userId)
-                        + "/100"
+        int healthScore = databaseHelper.getFinancialHealthScore(
+                userId, getSelectedMonth()
         );
+
+        tvHealthScore.setText(healthScore + "/100");
+
+        if (progressHealthScore != null) {
+            progressHealthScore.setMax(100);
+            progressHealthScore.setProgressCompat(healthScore, false);
+        }
 
         tvSubscriptionCost.setText(
                 String.format(
