@@ -1,4 +1,5 @@
 package com.example.aiexpensemanagementapplication.ui;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
+import com.example.aiexpensemanagementapplication.R;
 import com.example.aiexpensemanagementapplication.ui.auth.LoginActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.RegisterActivity;
 import com.example.aiexpensemanagementapplication.ui.auth.VerifyEmailActivity;
@@ -23,45 +25,56 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SplashActivity extends BaseActivity {
 
-    private static final int SPLASH_DELAY = 2000;
-
     private static final String PREFS_NAME = "ExpenseVaultPrefs";
     private static final String KEY_ONBOARDING_COMPLETED =
             "onboarding_completed";
 
+    private static final long SPLASH_DELAY = 2000L;
+
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
 
-    private final Handler handler =
-            new Handler(Looper.getMainLooper());
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    private boolean splashTimeCompleted = false;
+    private boolean navigationDecisionReady = false;
+    private boolean navigationStarted = false;
+
+    private Intent pendingIntent;
+
+    private final Runnable splashRunnable = () -> {
+        splashTimeCompleted = true;
+        navigateIfReady();
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Display your custom splash layout.
+        setContentView(R.layout.activity_splash);
+
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
-        handler.postDelayed(() -> {
+        // Keep the custom splash visible for at least 2 seconds.
+        handler.postDelayed(splashRunnable, SPLASH_DELAY);
 
-            if (isFinishing() || isDestroyed()) {
-                return;
-            }
+        SharedPreferences preferences = getSharedPreferences(
+                PREFS_NAME,
+                MODE_PRIVATE
+        );
 
-            SharedPreferences preferences =
-                    getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean onboardingCompleted = preferences.getBoolean(
+                KEY_ONBOARDING_COMPLETED,
+                false
+        );
 
-            boolean onboardingCompleted = preferences.getBoolean(
-                    KEY_ONBOARDING_COMPLETED, false
-            );
-
-            if (!onboardingCompleted) {
-                navigateTo(OnboardingActivity.class);
-            } else {
-                checkUserSession();
-            }
-
-        }, SPLASH_DELAY);
+        if (!onboardingCompleted) {
+            prepareNavigation(OnboardingActivity.class);
+        } else {
+            checkUserSession();
+        }
     }
 
     private void checkUserSession() {
@@ -69,7 +82,7 @@ public class SplashActivity extends BaseActivity {
         FirebaseUser user = mAuth.getCurrentUser();
 
         if (user == null) {
-            navigateTo(WelcomeActivity.class);
+            prepareNavigation(WelcomeActivity.class);
             return;
         }
 
@@ -80,14 +93,14 @@ public class SplashActivity extends BaseActivity {
             }
 
             if (!task.isSuccessful()) {
-                navigateTo(WelcomeActivity.class);
+                prepareNavigation(WelcomeActivity.class);
                 return;
             }
 
             FirebaseUser currentUser = mAuth.getCurrentUser();
 
             if (currentUser == null) {
-                navigateTo(WelcomeActivity.class);
+                prepareNavigation(WelcomeActivity.class);
                 return;
             }
 
@@ -99,7 +112,8 @@ public class SplashActivity extends BaseActivity {
                 );
 
                 intent.putExtra("email", currentUser.getEmail());
-                navigate(intent);
+
+                prepareNavigation(intent);
                 return;
             }
 
@@ -115,7 +129,7 @@ public class SplashActivity extends BaseActivity {
                     .addOnFailureListener(e -> {
 
                         if (!isFinishing() && !isDestroyed()) {
-                            navigateTo(LoginActivity.class);
+                            prepareNavigation(LoginActivity.class);
                         }
                     });
         });
@@ -125,7 +139,7 @@ public class SplashActivity extends BaseActivity {
             @NonNull DocumentSnapshot document) {
 
         if (!document.exists()) {
-            navigateTo(RegisterActivity.class);
+            prepareNavigation(RegisterActivity.class);
             return;
         }
 
@@ -136,32 +150,55 @@ public class SplashActivity extends BaseActivity {
                 document.getBoolean("accountCompleted");
 
         if (phoneVerified == null || !phoneVerified) {
-            navigateTo(VerifyMobileActivity.class);
+            prepareNavigation(VerifyMobileActivity.class);
             return;
         }
 
         if (accountCompleted == null || !accountCompleted) {
-            navigateTo(CreatePasswordActivity.class);
+            prepareNavigation(CreatePasswordActivity.class);
             return;
         }
 
-        navigateTo(DashboardActivity.class);
+        prepareNavigation(DashboardActivity.class);
     }
 
-    private void navigateTo(Class<?> activityClass) {
+    private void prepareNavigation(Class<?> activityClass) {
         Intent intent = new Intent(this, activityClass);
-        navigate(intent);
+        prepareNavigation(intent);
     }
 
-    private void navigate(Intent intent) {
-        handler.removeCallbacksAndMessages(null);
-        startActivity(intent);
+    private void prepareNavigation(Intent intent) {
+
+        if (navigationStarted || isFinishing() || isDestroyed()) {
+            return;
+        }
+
+        pendingIntent = intent;
+        navigationDecisionReady = true;
+
+        navigateIfReady();
+    }
+
+    private void navigateIfReady() {
+
+        if (!splashTimeCompleted
+                || !navigationDecisionReady
+                || navigationStarted
+                || pendingIntent == null
+                || isFinishing()
+                || isDestroyed()) {
+            return;
+        }
+
+        navigationStarted = true;
+
+        startActivity(pendingIntent);
         finish();
     }
 
     @Override
     protected void onDestroy() {
-        handler.removeCallbacksAndMessages(null);
+        handler.removeCallbacks(splashRunnable);
         super.onDestroy();
     }
 }
