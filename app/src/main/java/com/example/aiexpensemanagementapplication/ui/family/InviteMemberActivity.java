@@ -170,8 +170,7 @@ public class InviteMemberActivity extends AppCompatActivity {
         radioMember =
                 findViewById(R.id.radioMember);
 
-        radioViewer =
-                findViewById(R.id.radioViewer);
+
 
         btnSendInvitation =
                 findViewById(R.id.btnSendInvitation);
